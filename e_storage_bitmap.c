@@ -10,8 +10,6 @@
 #include "e_types.h"
 #include "e_storage_node.h"
 
-typedef float TBChanel;
-
 typedef struct{
 	uint			global_version;
 	VNodeID			node_id;

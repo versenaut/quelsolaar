@@ -10,8 +10,6 @@
 #include "e_types.h"
 #include "e_storage_node.h"
 
-typedef float TBChanel;
-
 typedef struct{
 	real64 pre_value[4];
 	uint32 pre_pos[4];
