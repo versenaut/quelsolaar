@@ -27,7 +27,7 @@ extern void enough_init(void);
 extern uint		e_vc_connect(char	*server_address, char *name, char *pass, uint8 *host_id);
 extern boolean	e_vc_check_connected(void);
 extern boolean	e_vc_check_connected_slot(uint	connection);
-extern boolean	e_vc_check_acsepted_slot(uint connection);
+extern boolean	e_vc_check_accepted_slot(uint connection);
 extern void		e_vc_disconnect(uint	connection);
 extern void		e_vc_disconnect_all(void);
 extern void		e_vc_set_current_active_connection(uint connection);
