@@ -1,4 +1,4 @@
-#include <stdio.h>
+1#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
@@ -11,9 +11,7 @@
 
 extern boolean co_handle_head(BInputState *input, ENode *node, float *length);
 
-
-
-uint change_g_node_id = 0;
+static uint change_g_node_id = 0;
 
 void rename_g_layer_func(void *user, char *text)
 {
@@ -191,7 +189,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 			static double t[7];
 			char *ref, *text[] = {"X", "Y", "Z", "X", "Y", "Z", "W"};
 			uint i;
-			uint32 *parent;
+			uint32 parent;
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Bone Weight:", color_light, color_light, color_light);  
 			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nsg_get_bone_weight(node, bone), 16, rename_g_layer_func, e_nsg_get_bone_weight(node, bone), color, color_light);
 
@@ -205,7 +203,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 			e_nsg_get_bone_pos64(node, bone, t);
 			e_nsg_get_bone_rot64(node, bone, &t[3]);
 			parent = e_nsg_get_bone_parent(node, bone);
-			sui_draw_text(-0.25, y, SUI_T_SIZE, SUI_T_SPACE, "RARENT", color_light, color_light, color_light);
+			sui_draw_text(-0.25, y, SUI_T_SIZE, SUI_T_SPACE, "PARENT", color_light, color_light, color_light);
 			if(sui_type_number_uint(input,0.15, y, 0.15, SUI_T_SIZE, &parent, e_nsg_get_bone_weight(node, bone), color, color, color))
 				verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], t[3], t[4], t[5], t[6]);
 			y -= 0.05;
