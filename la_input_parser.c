@@ -369,7 +369,7 @@ void la_edit_func(BInputState *input, void *user)
 			glPushMatrix();
 			glTranslatef(0, 0, -1);
 			sui_draw_text(-0.5 * sui_compute_text_length(SUI_T_SIZE * 2, 3, "NO GEOMETRY"), 0, SUI_T_SIZE * 2, 3, "NO GEOMETRY", 1, 1, 1);
-			sui_draw_text(-0.5 * sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, "Click to create a geometry node"), -0.1, SUI_T_SIZE, SUI_T_SPACE, "Click to create a geomtry node", 1, 1, 1);
+			sui_draw_text(-0.5 * sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, "Click to create a geometry node"), -0.1, SUI_T_SIZE, SUI_T_SPACE, "Click to create a geometry node", 1, 1, 1);
 		}else
 		{
 			if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
