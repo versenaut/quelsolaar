@@ -598,8 +598,10 @@ void es_bitmap_init(void)
 	verse_callback_set(verse_send_b_tile_set,			callback_send_b_tile_set,			NULL);
 }
 
-void delete_bitmap_layer_func(uint id, ESBitmapLayer *layer, void *user_data)
+static void delete_bitmap_layer_func(uint id, void *pointer, void *user_data)
 {
+	ESBitmapLayer	*layer = pointer;
+
 	if(layer->data != NULL)
 		free(layer->data);
 	free(layer);
