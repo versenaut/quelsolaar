@@ -100,7 +100,7 @@ COVerseNode *create_verse_node(ENode *node)
 	co_node->pos_y = co_get_pos_y(0);
 	co_node->hidden = TRUE /*e_ns_get_node_owner(node) == VN_OWNER_MINE*/;
 	e_ns_set_custom_data(node, CONNECTOR_ENOUGH_SLOTT, co_node);
-	printf("creating node");
+/*	printf("creating node");*/
 	return co_node;
 }
 
