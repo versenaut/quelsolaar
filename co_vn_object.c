@@ -146,7 +146,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 			sprintf(nr, "group_%u", i);
 			verse_send_o_method_group_create(e_ns_get_node_id(node), ~0, nr);
 		}
-		if(NULL == e_nso_get_method_group(node, 0))
+		if(e_nso_get_next_method_group(node, 0) == (uint16) ~0)
 		{
 			sui_draw_text(-0.3, y - 0.1, SUI_T_SIZE, SUI_T_SPACE, "NO METHOD GROUPS", color_light, color_light, color_light);
 			y -= 0.05;
