@@ -58,19 +58,19 @@ extern void			e_ns_update_node_version_data(ENode *node);
 
 extern void			e_ns_set_custom_data(ENode *node, uint slot, void *data);
 extern void			e_ns_set_custom_func(uint slot, VNodeType type, void (*func)(ENode *node, ECustomDataCommand command));
-extern void			*e_ns_get_custom_data(ENode *node, uint slot);
+extern void *			e_ns_get_custom_data(ENode *node, uint slot);
 
 extern ENode *		e_ns_get_node_selected(uint connection, VNodeType type);
 extern void			e_ns_set_node_selected(uint connection, uint id, VNodeType type);
 extern uint			e_ns_get_node_selected_id(uint connection, VNodeType type);
 extern void			e_ns_set_node_create_func(void (* func)(uint connection, uint id, VNodeType type, void *user), void *user);
 
-extern char			*e_ns_get_tag_group(ENode *node, uint16 group_id);
+extern char *			e_ns_get_tag_group(ENode *node, uint16 group_id);
 extern uint			e_ns_get_next_tag_group(ENode *node, uint16 group_id);
 extern uint			e_ns_get_next_tag(ENode *node, uint16 group_id, uint16 tag_id);
-extern char			*e_ns_get_tag_name(ENode *node, uint16 group_id, uint16 tag_id);
+extern char *			e_ns_get_tag_name(ENode *node, uint16 group_id, uint16 tag_id);
 extern VNTagType	e_ns_get_tag_type(ENode *node, uint16 group_id, uint16 tag_id);
-extern VNTag		*e_ns_get_tag(ENode *node, uint16 group_id, uint16 tag_id);
+extern VNTag *		e_ns_get_tag(ENode *node, uint16 group_id, uint16 tag_id);
 
 /* object node storage ----------------------------------------------------------------------------------------------------------------*/
 
@@ -86,20 +86,20 @@ extern void			e_nso_get_matrix(ENode *node, double *matrix, uint32 time_s, uint3
 
 extern void			e_nso_get_light(ENode *node, double *light);
 
-extern EObjLink		*e_nso_get_link(ENode *node, uint16  id);
-extern EObjLink		*e_nso_get_next_link(ENode *node, uint16  id);
+extern EObjLink *	e_nso_get_link(ENode *node, uint16  id);
+extern EObjLink *	e_nso_get_next_link(ENode *node, uint16  id);
 extern uint16		e_nso_get_link_id(EObjLink *link);
 extern VNodeID		e_nso_get_link_node(EObjLink *link);
-extern char			*e_nso_get_link_name(EObjLink *link);
+extern char *			e_nso_get_link_name(EObjLink *link);
 extern uint32		e_nso_get_link_target_id(EObjLink *link);
 
-extern char			*e_nso_get_method_group(ENode *node, uint16 group_id);
+extern char *			e_nso_get_method_group(ENode *node, uint16 group_id);
 extern uint16		e_nso_get_next_method_group(ENode *node, uint16 group_id);
-extern char			*e_nso_get_method(ENode *node, uint16 group_id, uint16 method_id);
+extern char *			e_nso_get_method(ENode *node, uint16 group_id, uint16 method_id);
 extern uint16		e_nso_get_next_method(ENode *node, uint16 group_id, uint16 method_id);
 extern uint			e_nso_get_method_param_count(ENode *node, uint16 group_id, uint16 method_id);
-extern char			**e_nso_get_method_param_names(ENode *node, uint16 group_id, uint16 method_id);
-extern VNOParamType	*e_nso_get_method_param_types(ENode *node, uint16 group_id, uint16 method_id);
+extern char **			e_nso_get_method_param_names(ENode *node, uint16 group_id, uint16 method_id);
+extern VNOParamType *	e_nso_get_method_param_types(ENode *node, uint16 group_id, uint16 method_id);
 
 /* geometry node storage ----------------------------------------------------------------------------------------------------------------*/
 
@@ -119,13 +119,13 @@ extern EGeoLayer *	e_nsg_get_layer_crease_edge_layer(ENode *g_node);
 extern char *		e_nsg_get_layer_crease_edge_name(ENode *g_node);
 extern uint32		e_nsg_get_layer_crease_edge_value(ENode *g_node);
 
-extern void		*	e_nsg_get_layer_data(ENode *g_node, EGeoLayer *layer);
+extern void *			e_nsg_get_layer_data(ENode *g_node, EGeoLayer *layer);
 extern VNGLayerType e_nsg_get_layer_type(EGeoLayer *layer);
 extern uint			e_nsg_get_layer_id(EGeoLayer *layer);
 extern uint			e_nsg_get_layer_version(EGeoLayer *layer);
 extern uint			e_nsg_get_vertex_length(ENode *g_node);
 extern uint			e_nsg_get_polygon_length(ENode *g_node);
-extern char	*		e_nsg_get_layer_name(EGeoLayer *layer);
+extern char *			e_nsg_get_layer_name(EGeoLayer *layer);
 
 extern void			e_nsg_get_center(ENode *node, egreal *center);
 extern void			e_nsg_get_bounding_box(ENode *node, egreal *high_x, egreal *low_x, egreal *high_y, egreal *low_y, egreal *high_z, egreal *low_z);
@@ -138,8 +138,8 @@ extern uint			e_nsg_find_empty_polygon_slot(ENode *node, uint start);
 extern uint16		e_nsg_get_bone_by_weight(ENode *g_node, char *name);
 extern uint16		e_nsg_get_bone_next(ENode *g_node, uint16 bone_id);
 
-extern char	*		e_nsg_get_bone_weight(ENode *g_node, uint16 bone_id);
-extern char	*		e_nsg_get_bone_reference(ENode *g_node, uint16 bone_id);
+extern char *			e_nsg_get_bone_weight(ENode *g_node, uint16 bone_id);
+extern char *			e_nsg_get_bone_reference(ENode *g_node, uint16 bone_id);
 extern uint16		e_nsg_get_bone_parent(ENode *g_node, uint16 bone_id);
 extern void			e_nsg_get_bone_pos32(ENode *g_node, uint16 bone_id, float *pos);
 extern void			e_nsg_get_bone_pos64(ENode *g_node, uint16 bone_id, double *pos);
@@ -154,7 +154,7 @@ extern void			e_nsg_get_bone_matrix64(ENode *o_node, ENode *g_node, uint16 bone_
 /* material node storage ----------------------------------------------------------------------------------------------------------------*/
 
 extern VNMFragmentID	e_nsm_get_fragment_next(ENode *node, VNMFragmentID id);
-extern VMatFrag			*e_nsm_get_fragment(ENode *node, VNMFragmentID id);
+extern VMatFrag *	e_nsm_get_fragment(ENode *node, VNMFragmentID id);
 extern VNMFragmentType	e_nsm_get_fragment_type(ENode *node, VNMFragmentID id);
 
 
@@ -169,7 +169,7 @@ extern uint e_nsm_get_fragment_version(ENode *node, VNMFragmentID id);
 
 extern void			e_nsm_set_custom_data(ENode *node, VNMFragmentID frag, uint slot, void *data);
 extern void			e_nsm_set_custom_func(uint slot, void (*func)(ENode *node, VNMFragmentID frag, ECustomDataCommand command));
-extern void			*e_nsm_get_custom_data(ENode *node, VNMFragmentID frag, uint slot);
+extern void *			e_nsm_get_custom_data(ENode *node, VNMFragmentID frag, uint slot);
 
 /* bitmap node storage ----------------------------------------------------------------------------------------------------------------*/
 
