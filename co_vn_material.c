@@ -484,7 +484,7 @@ void co_draw_material(ENode *node)
 	COVNMaterial *mat;
 	VNMFragmentID id;
 	id = e_nsm_get_fragment_color_front(node);
-	if(id == -1)
+	if(id == (VNMFragmentID) ~0)
 		id = e_nsm_get_fragment_color_back(node);
 	if(e_nsm_get_fragment(node, id) != NULL)
 	{
