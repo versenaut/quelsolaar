@@ -406,7 +406,10 @@ void update_bitmap_image_handle_time(EBMHandle *handle, ESBitmapNode *node, uint
 {
 	uint x, y;
 	ESBitmapLayer	*layer;
-	for(layer =	get_next_dlut(&node->layertables, 0); layer != NULL && strcmp(handle->layers[channel], layer->name); layer = get_next_dlut(&node->layertables, layer->layer_id + 1));
+	VNBTile		tile;
+
+	for(layer = get_next_dlut(&node->layertables, 0); layer != NULL && strcmp(handle->layers[channel], layer->name); layer = get_next_dlut(&node->layertables, layer->layer_id + 1))
+		;
 	if(layer == NULL)
 		return;
 	ofset_x = ofset_z * node->size_x * node->size_y;
@@ -415,43 +418,31 @@ void update_bitmap_image_handle_time(EBMHandle *handle, ESBitmapNode *node, uint
 	}
 	else if(layer->type == VN_B_LAYER_UINT8)
 	{
-		uint8 *temp;
-		temp = malloc((sizeof *temp) * VN_B_TILE_SIZE * VN_B_TILE_SIZE);
 		for(y = 0; y < VN_B_TILE_SIZE; y++)
 			for(x = 0; x < VN_B_TILE_SIZE; x++)
-				temp[y * VN_B_TILE_SIZE + x] = (uint8)(data[((y + ofset_y) * node->size_x + x + ofset_x) * 3 + channel] * 255.0);
-		verse_send_b_tile_set(node->head.node_id, layer->layer_id, ofset_x / VN_B_TILE_SIZE, ofset_y / VN_B_TILE_SIZE, ofset_z, VN_B_LAYER_UINT8, temp);
-		free(temp);
+				tile.vuint8[y * VN_B_TILE_SIZE + x] = (uint8)(data[((y + ofset_y) * node->size_x + x + ofset_x) * 3 + channel] * 255.0);
+		verse_send_b_tile_set(node->head.node_id, layer->layer_id, ofset_x / VN_B_TILE_SIZE, ofset_y / VN_B_TILE_SIZE, ofset_z, VN_B_LAYER_UINT8, &tile);
 	}
 	else if(layer->type == VN_B_LAYER_UINT16)
 	{
-		uint16 *temp;
-		temp = malloc((sizeof *temp) * VN_B_TILE_SIZE * VN_B_TILE_SIZE);
 		for(y = 0; y < VN_B_TILE_SIZE; y++)
 			for(x = 0; x < VN_B_TILE_SIZE; x++)
-				temp[y * VN_B_TILE_SIZE + x] = (uint16)(data[((y + ofset_y) * node->size_x + x + ofset_x) * 3 + channel] * ((256.0 * 256.0) - 1));
-		verse_send_b_tile_set(node->head.node_id, layer->layer_id, ofset_x / VN_B_TILE_SIZE, ofset_y / VN_B_TILE_SIZE, ofset_z, VN_B_LAYER_UINT16, temp);
-		free(temp);
+				tile.vuint16[y * VN_B_TILE_SIZE + x] = (uint16)(data[((y + ofset_y) * node->size_x + x + ofset_x) * 3 + channel] * ((256.0 * 256.0) - 1));
+		verse_send_b_tile_set(node->head.node_id, layer->layer_id, ofset_x / VN_B_TILE_SIZE, ofset_y / VN_B_TILE_SIZE, ofset_z, VN_B_LAYER_UINT16, &tile);
 	}
 	else if(layer->type == VN_B_LAYER_REAL32)
 	{
-		double *temp;
-		temp = malloc((sizeof *temp) * VN_B_TILE_SIZE * VN_B_TILE_SIZE);
 		for(y = 0; y < VN_B_TILE_SIZE; y++)
 			for(x = 0; x < VN_B_TILE_SIZE; x++)
-				temp[y * VN_B_TILE_SIZE + x] = data[((y + ofset_y) * node->size_x + x + ofset_x) * 3 + channel];
-		verse_send_b_tile_set(node->head.node_id, layer->layer_id, ofset_x / VN_B_TILE_SIZE, ofset_y / VN_B_TILE_SIZE, ofset_z, VN_B_LAYER_REAL32, temp);
-		free(temp);
+				tile.vreal32[y * VN_B_TILE_SIZE + x] = data[((y + ofset_y) * node->size_x + x + ofset_x) * 3 + channel];
+		verse_send_b_tile_set(node->head.node_id, layer->layer_id, ofset_x / VN_B_TILE_SIZE, ofset_y / VN_B_TILE_SIZE, ofset_z, VN_B_LAYER_REAL32, &tile);
 	}
 	else if(layer->type == VN_B_LAYER_REAL64)
 	{
-		double *temp;
-		temp = malloc((sizeof *temp) * VN_B_TILE_SIZE * VN_B_TILE_SIZE);
 		for(y = 0; y < VN_B_TILE_SIZE; y++)
 			for(x = 0; x < VN_B_TILE_SIZE; x++)
-				temp[y * VN_B_TILE_SIZE + x] = data[((y + ofset_y) * node->size_x + x + ofset_x) * 3 + channel];
-		verse_send_b_tile_set(node->head.node_id, layer->layer_id, ofset_x / VN_B_TILE_SIZE, ofset_y / VN_B_TILE_SIZE, ofset_z, VN_B_LAYER_REAL64, temp);
-		free(temp);
+				tile.vreal64[y * VN_B_TILE_SIZE + x] = data[((y + ofset_y) * node->size_x + x + ofset_x) * 3 + channel];
+		verse_send_b_tile_set(node->head.node_id, layer->layer_id, ofset_x / VN_B_TILE_SIZE, ofset_y / VN_B_TILE_SIZE, ofset_z, VN_B_LAYER_REAL64, &tile);
 	}
 }
 
