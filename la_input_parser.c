@@ -18,11 +18,11 @@ typedef enum {
 	PIM_SPLIT,
 	PIM_DRAG_MANIPULATOR,
 	PIM_DRAG_ONE_VERTEX,
-	PIM_SHOW_EMPTY_MENY,
-	PIM_SHOW_VERTEX_MENY,
-	PIM_SHOW_EDGE_MENY,
-	PIM_SHOW_MANIPULATOR_MENY,
-	PIM_SHOW_POLY_MENY,
+	PIM_SHOW_EMPTY_MENU,
+	PIM_SHOW_VERTEX_MENU,
+	PIM_SHOW_EDGE_MENU,
+	PIM_SHOW_MANIPULATOR_MENU,
+	PIM_SHOW_POLY_MENU,
 	PIM_CHANGE_VIEW
 }ParseInputMode;
 
@@ -50,7 +50,7 @@ void la_parse_input(BInputState *input)
 		distance = 1E100;
 		selected_distance = 1E100;
 		p_find_closest_vertex(&closest, &select_closest, &distance, &selected_distance, input->pointer_x, input->pointer_y);
-		if(selected_distance > VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) && ParseInputData.mode != PIM_SHOW_EDGE_MENY)
+		if(selected_distance > VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) && ParseInputData.mode != PIM_SHOW_EDGE_MENU)
 			p_find_closest_edge(edge, input->pointer_x, input->pointer_y);
 	}else
 		la_pfx_select_vertex();
@@ -102,18 +102,18 @@ void la_parse_input(BInputState *input)
 				{
 					ParseInputData.start_vertex = select_closest;
 					if(la_t_tm_test_center(input))
-						ParseInputData.mode = PIM_SHOW_MANIPULATOR_MENY;
+						ParseInputData.mode = PIM_SHOW_MANIPULATOR_MENU;
 					else if(selected_distance < VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE))
 					{
-						ParseInputData.mode = PIM_SHOW_VERTEX_MENY;
+						ParseInputData.mode = PIM_SHOW_VERTEX_MENU;
 						la_pu_vertex(input, ParseInputData.start_vertex);
 					}
 					else if(edge[0] != -1 && edge[1] != -1)
-						ParseInputData.mode = PIM_SHOW_EDGE_MENY;
+						ParseInputData.mode = PIM_SHOW_EDGE_MENU;
 					else if((polygon = la_t_poly_test(input)) != -1)
-						ParseInputData.mode = PIM_SHOW_POLY_MENY;
+						ParseInputData.mode = PIM_SHOW_POLY_MENU;
 					else
-						ParseInputData.mode = PIM_SHOW_EMPTY_MENY;
+						ParseInputData.mode = PIM_SHOW_EMPTY_MENU;
 				}
 				if(input->mouse_button[1] == TRUE && input->last_mouse_button[1] == FALSE)
 				{
@@ -297,7 +297,7 @@ void la_parse_input(BInputState *input)
 					la_t_draw_line_add(input->pointer_x, input->pointer_y, FALSE);
 			}
 		break;
-		case PIM_SHOW_EMPTY_MENY :
+		case PIM_SHOW_EMPTY_MENU :
 			if(la_pu_empty(input))
 			{
 				ParseInputData.depth[0] = 0;
@@ -307,16 +307,16 @@ void la_parse_input(BInputState *input)
 			if((input->mouse_button[2] == FALSE && input->last_mouse_button[2] == TRUE) || (input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE))
 				ParseInputData.mode = PIM_IDLE;
 		break;
-		case PIM_SHOW_VERTEX_MENY :
+		case PIM_SHOW_VERTEX_MENU :
 			la_pu_vertex(input, ParseInputData.start_vertex);
 		break;
-		case PIM_SHOW_EDGE_MENY :
+		case PIM_SHOW_EDGE_MENU :
 			la_pu_edge(input, edge);
 		break;
-		case PIM_SHOW_MANIPULATOR_MENY :
+		case PIM_SHOW_MANIPULATOR_MENU :
 			la_pu_manipulator(input);
 		break;
-		case PIM_SHOW_POLY_MENY :
+		case PIM_SHOW_POLY_MENU :
 			la_pu_polygon(input, polygon);
 		break;
 		case PIM_CHANGE_VIEW :
