@@ -67,8 +67,8 @@ extern uint			e_ns_get_node_selected_id(uint connection, VNodeType type);
 extern void			e_ns_set_node_create_func(void (* func)(uint connection, uint id, VNodeType type, void *user), void *user);
 
 extern char *			e_ns_get_tag_group(const ENode *node, uint16 group_id);
-extern uint			e_ns_get_next_tag_group(const ENode *node, uint16 group_id);
-extern uint			e_ns_get_next_tag(const ENode *node, uint16 group_id, uint16 tag_id);
+extern uint16			e_ns_get_next_tag_group(const ENode *node, uint16 group_id);
+extern uint16			e_ns_get_next_tag(const ENode *node, uint16 group_id, uint16 tag_id);
 extern char *			e_ns_get_tag_name(const ENode *node, uint16 group_id, uint16 tag_id);
 extern VNTagType	e_ns_get_tag_type(const ENode *node, uint16 group_id, uint16 tag_id);
 extern VNTag *		e_ns_get_tag(const ENode *node, uint16 group_id, uint16 tag_id);

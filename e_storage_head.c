@@ -171,7 +171,7 @@ char *e_ns_get_tag_group(const ENodeHead *node, uint16 group_id)
 	return NULL;
 }
 
-uint e_ns_get_next_tag_group(const ENodeHead *node, uint16 group_id)
+uint16 e_ns_get_next_tag_group(const ENodeHead *node, uint16 group_id)
 {
 	for(;node->group_count > group_id && ((ETagGroup *)node->tag_groups)[group_id].group_name[0] == 0; group_id++);
 	if(node->group_count == group_id)
@@ -179,7 +179,7 @@ uint e_ns_get_next_tag_group(const ENodeHead *node, uint16 group_id)
 	return group_id;
 }
 
-uint e_ns_get_next_tag(const ENodeHead *node, uint16 group_id, uint16 tag_id)
+uint16 e_ns_get_next_tag(const ENodeHead *node, uint16 group_id, uint16 tag_id)
 {	
 	if(node->group_count <= group_id || ((ETagGroup *)node->tag_groups)[group_id].group_name[0] == 0)
 		return -1;
