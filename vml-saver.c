@@ -9,7 +9,7 @@
 #include "verse.h"
 #include "enough.h"
 
-void save_object(FILE *f, ENode *o_node)
+static void save_object(FILE *f, ENode *o_node)
 {
 	char *method_types[] = {"VN_O_METHOD_PTYPE_INT8", "VN_O_METHOD_PTYPE_INT16", "VN_O_METHOD_PTYPE_INT32", "VN_O_METHOD_PTYPE_UINT8", "VN_O_METHOD_PTYPE_UINT16", "VN_O_METHOD_PTYPE_UINT32", "VN_O_METHOD_PTYPE_REAL32", "VN_O_METHOD_PTYPE_REAL64", "VN_O_METHOD_PTYPE_REAL32_VEC2", "VN_O_METHOD_PTYPE_REAL32_VEC3", "VN_O_METHOD_PTYPE_REAL32_VEC4", "VN_O_METHOD_PTYPE_REAL64_VEC2", "VN_O_METHOD_PTYPE_REAL64_VEC3", "VN_O_METHOD_PTYPE_REAL64_VEC4", "VN_O_METHOD_PTYPE_REAL32_MAT4", "VN_O_METHOD_PTYPE_REAL32_MAT9", "VN_O_METHOD_PTYPE_REAL32_MAT16", "VN_O_METHOD_PTYPE_REAL64_MAT4", "VN_O_METHOD_PTYPE_REAL64_MAT9", "VN_O_METHOD_PTYPE_REAL64_MAT16", "VN_O_METHOD_PTYPE_NODE", "VN_O_METHOD_PTYPE_LAYER"};
 	double tmp[4];
@@ -64,7 +64,7 @@ void save_object(FILE *f, ENode *o_node)
 	}
 }
 
-void save_geometry(FILE *f, ENode *g_node)
+static void save_geometry(FILE *f, ENode *g_node)
 {
 	char *layer_type[] = {"VN_G_LAYER_VERTEX_XYZ", "VN_G_LAYER_VERTEX_UINT32", "VN_G_LAYER_VERTEX_REAL", "VN_G_LAYER_POLYGON_CORNER_UINT32", "VN_G_LAYER_POLYGON_CORNER_REAL", "VN_G_LAYER_POLYGON_FACE_UINT8", "VN_G_LAYER_POLYGON_FACE_UINT32", "VN_G_LAYER_POLYGON_FACE_REAL"};
 	EGeoLayer *layer;
@@ -171,10 +171,7 @@ void save_geometry(FILE *f, ENode *g_node)
 	fprintf(f, "\t</bones>\n");
 }
 
-
-
-
-void save_material(FILE *f, ENode *m_node)
+static void save_material(FILE *f, ENode *m_node)
 {
 	char *light_type[] = {"VN_M_LIGHT_DIRECT", "VN_M_LIGHT_AMBIENT", "VN_M_LIGHT_DIRECT_AND_AMBIENT", "VN_M_LIGHT_BACK_DIRECT", "VN_M_LIGHT_BACK_AMBIENT", "VN_M_LIGHT_BACK_DIRECT_AND_AMBIENT"};
 	char *noise_type[] = {"VN_M_NOISE_PERLIN_ZERO_TO_ONE", "VN_M_NOISE_PERLIN_MINUS_ONE_TO_ONE"};
@@ -290,7 +287,7 @@ void save_material(FILE *f, ENode *m_node)
 	fprintf(f, "\t</fragments>\n");
 }
 
-void save_bitmap(FILE *f, ENode *b_node)
+static void save_bitmap(FILE *f, ENode *b_node)
 {
 	char *layer_type[] = {"VN_B_LAYER_UINT1", "VN_B_LAYER_UINT8", "VN_B_LAYER_UINT16", "VN_B_LAYER_REAL32", "VN_B_LAYER_REAL64"};
 	EBitLayer *layer;
@@ -394,7 +391,7 @@ void save_bitmap(FILE *f, ENode *b_node)
 	fprintf(f, "\t</layers>\n");
 }
 
-void save_text(FILE *f, ENode *t_node)
+static void save_text(FILE *f, ENode *t_node)
 {
 	ETextBuffer *buffer;
 
@@ -410,7 +407,7 @@ void save_text(FILE *f, ENode *t_node)
 	fprintf(f, "\t</buffers>\n");
 }
 
-void save_curve(FILE *f, ENode *c_node)
+static void save_curve(FILE *f, ENode *c_node)
 {
 	ECurve *curve;
 	real64 pre_value[4];
@@ -450,7 +447,7 @@ void save_curve(FILE *f, ENode *c_node)
 	fprintf(f, "\t</curves>\n");
 }
 
-void save_node(FILE *f, ENode *node)
+static void save_node(FILE *f, ENode *node)
 {
 	char *node_type[] = {"V_NT_OBJECT", "V_NT_GEOMETRY", "V_NT_MATERIAL", "V_NT_BITMAP", "V_NT_TEXT", "V_NT_CURVE", "V_NT_AUDIO"};
 	char *tag_type[] = {"VN_TAG_BOOLEAN", "VN_TAG_UINT32", "VN_TAG_REAL64", "VN_TAG_STRING", "VN_TAG_REAL64_VEC3", "VN_TAG_LINK", "VN_TAG_ANIMATION", "VN_TAG_BLOB", "VN_TAG_TYPE_COUNT"};
@@ -534,8 +531,7 @@ void save_node(FILE *f, ENode *node)
 
 }
 
-
-void save_data(FILE *f)
+static void save_data(FILE *f)
 {
 	ENode *node;
 	uint i;
@@ -547,7 +543,7 @@ void save_data(FILE *f)
 	fclose(f);
 }
 
-void download_data()
+static void download_data(void)
 {
 	void *layer;
 	ENode *node;
@@ -559,8 +555,7 @@ void download_data()
 			e_nsb_get_layer_data(node, layer);
 }
 
-
-char *find_param(int argc, char **argv, char *gear, char *default_text)
+static char * find_param(int argc, char **argv, char *gear, char *default_text)
 {
 	uint i;
 	for(i = 1; i < argc - 1; i++)
