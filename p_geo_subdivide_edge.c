@@ -304,7 +304,7 @@ void polygon_edgetest(uint32 vertex1, uint32 vertex2, SubMesh *geometry, SubMesh
 	rop_next_vertex(geometry);
 }
 
-/*gose threw alledges and cheks for edges whitout vertexes*/
+/* Go through all edges and check for edges without vertices. */
 void rop_edgeref(SubMesh *geometry, SubMesh *last_geometry, uint level)
 {
 	uint32	i, max_uint, polygon;

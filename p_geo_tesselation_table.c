@@ -221,7 +221,7 @@ uint middle_split(weight_polygon *polygon, weight_square *square, uint h_tess, u
 	h = (square->horizontal1 - square->horizontal0) / (egreal)h_tess;
 	v = (square->vertical3 - square->vertical0) / (egreal)v_tess;
 
-	for(i = 0; i < h_tess; i++) /* filling the midle of the quad whit polygons*/
+	for(i = 0; i < h_tess; i++) /* filling the middle of the quad with polygons*/
 	{
 		for(j = 0; j < v_tess; j++)
 		{
