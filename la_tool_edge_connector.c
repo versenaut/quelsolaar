@@ -41,10 +41,10 @@ void la_t_init_edge_connector(void)
 void print_neighbor(void)
 {
 	uint i;
-	printf("list 0 has %i entrys\n", GlobalSurfaceCreate.list_length[0]);
+	printf("list 0 has %u entries\n", GlobalSurfaceCreate.list_length[0]);
 //	for(i = 0; i < GlobalSurfaceCreate.list_length[0]; i++)
 //		printf("list 0 entry %i is = %i balance = %i\n", i, GlobalSurfaceCreate.list[0][i].vertex, GlobalSurfaceCreate.list[0][i].turn);
-	printf("list 1 has %i entrys\n", GlobalSurfaceCreate.list_length[1]);
+	printf("list 1 has %u entries\n", GlobalSurfaceCreate.list_length[1]);
 //	for(i = 0; i < GlobalSurfaceCreate.list_length[1]; i++)
 //		printf("list 1 entry %i is = %i balance = %i\n", i, GlobalSurfaceCreate.list[1][i].vertex, GlobalSurfaceCreate.list[1][i].turn);
 }
