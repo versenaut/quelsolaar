@@ -1,0 +1,242 @@
+/*
+**
+*/
+#if !defined(ENOUGH_H)
+#define	ENOUGH_H
+#include "verse.h"
+#include "e_types.h"
+#include "st_types.h"
+/*
+	This is the header for the Enough libary, The api is a storage api written on top verse
+*/
+
+#define E_CDC_COUNT 16
+
+typedef enum{
+	E_CDC_CREATE,
+	E_CDC_STRUCT,
+	E_CDC_DATA,
+	E_CDC_DESTROY
+}ECustomDataCommand;
+
+/* verse connection ----------------------------------------------------------------------------------------------------------------*/
+
+
+extern void enough_init(void);
+
+extern uint		e_vc_connect(char	*server_address, char *name, char *pass, uint8 *host_id);
+extern boolean	e_vc_check_connected(void);
+extern boolean	e_vc_check_connected_slot(uint	connection);
+extern boolean	e_vc_check_acsepted_slot(uint connection);
+extern void		e_vc_disconnect(uint	connection);
+extern void		e_vc_disconnect_all(void);
+extern void		e_vc_set_current_active_connection(uint connection);
+extern void		e_vc_connection_update(uint connection, uint time);
+extern void		e_vc_set_auto_subscribe(VNodeType type, boolean set);
+
+/* verse node storage ----------------------------------------------------------------------------------------------------------------*/
+
+typedef void ENode;
+
+extern ENode *		e_ns_get_node(uint connection, uint node_id);
+extern ENode *		e_ns_get_node_next(uint id, uint connection, VNodeType type);
+extern ENode *		e_ns_get_node_avatar(uint connection);
+extern ENode *		e_ns_get_node_link(ENode *parent, uint node_id);
+
+extern uint			e_ns_get_node_count(uint connection, VNodeType type);
+
+extern uint			e_ns_get_node_id(ENode *node);
+extern VNodeType	e_ns_get_node_type(ENode *node);
+extern VNodeOwner	e_ns_get_node_owner(ENode *node);
+extern char *		e_ns_get_node_name(ENode *node);
+extern uint			e_ns_get_node_connection(ENode *node);
+
+extern uint			e_ns_get_node_version_struct(ENode *node);
+extern uint			e_ns_get_node_version_data(ENode *node);
+extern void			e_ns_update_node_version_struct(ENode *node);
+extern void			e_ns_update_node_version_data(ENode *node);
+
+extern void			e_ns_set_custom_data(ENode *node, uint slot, void *data);
+extern void			e_ns_set_custom_func(uint slot, VNodeType type, void (*func)(ENode *node, ECustomDataCommand command));
+extern void			*e_ns_get_custom_data(ENode *node, uint slot);
+
+extern ENode *		e_ns_get_node_selected(uint connection, VNodeType type);
+extern void			e_ns_set_node_selected(uint connection, uint id, VNodeType type);
+extern uint			e_ns_get_node_selected_id(uint connection, VNodeType type);
+extern void			e_ns_set_node_create_func(void (* func)(uint connection, uint id, VNodeType type, void *user), void *user);
+
+extern char			*e_ns_get_tag_group(ENode *node, uint16 group_id);
+extern uint			e_ns_get_next_tag_group(ENode *node, uint16 group_id);
+extern uint			e_ns_get_next_tag(ENode *node, uint16 group_id, uint16 tag_id);
+extern char			*e_ns_get_tag_name(ENode *node, uint16 group_id, uint16 tag_id);
+extern VNTagType	e_ns_get_tag_type(ENode *node, uint16 group_id, uint16 tag_id);
+extern VNTag		*e_ns_get_tag(ENode *node, uint16 group_id, uint16 tag_id);
+
+/* object node storage ----------------------------------------------------------------------------------------------------------------*/
+
+typedef void EObjLink;
+
+extern void			e_nso_get_pos(ENode *node, double *pos, double *speed, double *accelerate, double *drag_normal, double *drag, uint32 *time);
+extern void			e_nso_get_rot(ENode *node, double *rot, double *speed, double *accelerate, double *drag_normal, double *drag, uint32 *time);
+extern void			e_nso_get_pos_time(ENode *node, double *pos, uint32 time_s, uint32 time_f);
+extern void			e_nso_get_rot_time(ENode *node, double *rot, uint32 time_s, uint32 time_f);
+extern void			e_nso_get_scale(ENode *node, double *scale);
+extern void			e_nso_get_rot_matrix(ENode *node, double *matrix, uint32 time_s, uint32 time_f);
+extern void			e_nso_get_matrix(ENode *node, double *matrix, uint32 time_s, uint32 time_f);
+
+extern void			e_nso_get_light(ENode *node, double *light);
+
+extern EObjLink		*e_nso_get_link(ENode *node, uint16  id);
+extern EObjLink		*e_nso_get_next_link(ENode *node, uint16  id);
+extern uint16		e_nso_get_link_id(EObjLink *link);
+extern VNodeID		e_nso_get_link_node(EObjLink *link);
+extern char			*e_nso_get_link_name(EObjLink *link);
+extern uint32		e_nso_get_link_target_id(EObjLink *link);
+
+extern char			*e_nso_get_method_group(ENode *node, uint16 group_id);
+extern uint16		e_nso_get_next_method_group(ENode *node, uint16 group_id);
+extern char			*e_nso_get_method(ENode *node, uint16 group_id, uint16 method_id);
+extern uint16		e_nso_get_next_method(ENode *node, uint16 group_id, uint16 method_id);
+extern uint			e_nso_get_method_param_count(ENode *node, uint16 group_id, uint16 method_id);
+extern char			**e_nso_get_method_param_names(ENode *node, uint16 group_id, uint16 method_id);
+extern VNOParamType	*e_nso_get_method_param_types(ENode *node, uint16 group_id, uint16 method_id);
+
+/* geometry node storage ----------------------------------------------------------------------------------------------------------------*/
+
+typedef void EGeoLayer;
+
+extern EGeoLayer *	e_nsg_get_layer_by_name(ENode *g_node, char *name);
+extern EGeoLayer *	e_nsg_get_layer_by_id(ENode *g_node,  uint layer_id);
+extern EGeoLayer *	e_nsg_get_layer_by_type(ENode *g_node, VNGLayerType type, char *name);
+extern EGeoLayer *	e_nsg_get_layer_by_fragment(ENode *g_node, char *name);
+extern EGeoLayer *	e_nsg_get_layer_next(ENode *g_node, uint layer_id);
+
+extern EGeoLayer *	e_nsg_get_layer_crease_vertex_layer(ENode *g_node);
+extern char *		e_nsg_get_layer_crease_vertex_name(ENode *g_node);
+extern uint32		e_nsg_get_layer_crease_vertex_value(ENode *g_node);
+
+extern EGeoLayer *	e_nsg_get_layer_crease_edge_layer(ENode *g_node);
+extern char *		e_nsg_get_layer_crease_edge_name(ENode *g_node);
+extern uint32		e_nsg_get_layer_crease_edge_value(ENode *g_node);
+
+extern void		*	e_nsg_get_layer_data(ENode *g_node, EGeoLayer *layer);
+extern VNGLayerType e_nsg_get_layer_type(EGeoLayer *layer);
+extern uint			e_nsg_get_layer_id(EGeoLayer *layer);
+extern uint			e_nsg_get_layer_version(EGeoLayer *layer);
+extern uint			e_nsg_get_vertex_legnth(ENode *g_node);
+extern uint			e_nsg_get_polygon_legnth(ENode *g_node);
+extern char	*		e_nsg_get_layer_name(EGeoLayer *layer);
+
+extern void			e_nsg_get_center(ENode *node, egreal *center);
+extern void			e_nsg_get_bounding_box(ENode *node, egreal *high_x, egreal *low_x, egreal *high_y, egreal *low_y, egreal *high_z, egreal *low_z);
+extern egreal		e_nsg_get_size(ENode *node);
+
+
+extern uint			e_nsg_find_empty_vertex_slot(ENode *node, uint start);
+extern uint			e_nsg_find_empty_polygon_slot(ENode *node, uint start);
+
+extern uint16		e_nsg_get_bone_by_weight(ENode *g_node, char *name);
+extern uint16		e_nsg_get_bone_next(ENode *g_node, uint16 bone_id);
+
+extern char	*		e_nsg_get_bone_weight(ENode *g_node, uint16 bone_id);
+extern char	*		e_nsg_get_bone_reference(ENode *g_node, uint16 bone_id);
+extern uint16		e_nsg_get_bone_parent(ENode *g_node, uint16 bone_id);
+extern void			e_nsg_get_bone_pos32(ENode *g_node, uint16 bone_id, float *pos);
+extern void			e_nsg_get_bone_pos64(ENode *g_node, uint16 bone_id, double *pos);
+extern void			e_nsg_get_bone_rot32(ENode *g_node, uint16 bone_id, float *rot);
+extern void			e_nsg_get_bone_rot64(ENode *g_node, uint16 bone_id, double *rot);
+/*
+extern void			e_nsg_get_bone_matrix32(ENode *o_node, ENode *g_node, uint16 bone_id, float *matrix);
+extern void			e_nsg_get_bone_matrix64(ENode *o_node, ENode *g_node, uint16 bone_id, double *matrix);
+*/
+
+
+/* material node storage ----------------------------------------------------------------------------------------------------------------*/
+
+extern VNMFragmentID	e_nsm_get_fragment_next(ENode *node, VNMFragmentID id);
+extern VMatFrag			*e_nsm_get_fragment(ENode *node, VNMFragmentID id);
+extern VNMFragmentType	e_nsm_get_fragment_type(ENode *node, VNMFragmentID id);
+
+
+extern VNMFragmentID	e_nsm_get_fragment_color_front(ENode *node);
+extern VNMFragmentID	e_nsm_get_fragment_color_back(ENode *node);
+extern VNMFragmentID	e_nsm_get_fragment_color_particles(ENode *node);
+extern VNMFragmentID	e_nsm_get_fragment_color_displacement(ENode *node);
+extern VNMFragmentID	e_nsm_find_empty_slot(ENode *node, VNMFragmentID id);
+
+extern uint			e_nsm_get_fragment_count(ENode *node);
+extern uint e_nsm_get_fragment_version(ENode *node, VNMFragmentID id);
+
+extern void			e_nsm_set_custom_data(ENode *node, VNMFragmentID frag, uint slot, void *data);
+extern void			e_nsm_set_custom_func(uint slot, void (*func)(ENode *node, VNMFragmentID frag, ECustomDataCommand command));
+extern void			*e_nsm_get_custom_data(ENode *node, VNMFragmentID frag, uint slot);
+
+/* bitmap node storage ----------------------------------------------------------------------------------------------------------------*/
+
+typedef void EBitLayer;
+
+extern EBitLayer *	e_nsb_get_layer_by_name(ENode *node, char *name);
+extern EBitLayer *	e_nsb_get_layer_by_id(ENode *node, uint layer_id);
+extern EBitLayer *	e_nsb_get_layer_by_type(ENode *node, VNBLayerType type, char *name);
+extern EBitLayer *	e_nsb_get_layer_next(ENode *node, uint layer_id);
+
+extern void *		e_nsb_get_layer_data(ENode *node, EBitLayer *layer);
+extern uint			e_nsb_get_layer_id(EBitLayer *layer);
+extern char *		e_nsb_get_layer_name(EBitLayer *layer);
+extern VNBLayerType e_nsb_get_layer_type(EBitLayer *layer);
+extern uint			e_nsb_get_layer_version(EBitLayer *layer);
+
+
+typedef void EBMHandle;
+
+extern ebreal		e_nsb_get_aspect(ENode *node);
+extern void			e_nsb_get_size(ENode *node, uint *x, uint *y, uint *z);
+extern EBMHandle	*e_nsb_get_image_handle(VNodeID node_id, char *layer_r, char *layer_g, char *layer_b);
+extern EBMHandle	*e_nsb_get_empty_handle(void);
+extern void			e_nsb_evaluate_image_handle_tile(EBMHandle *handle, ebreal *output, ebreal u, ebreal v, ebreal w);
+extern void			e_nsb_evaluate_image_handle_clamp(EBMHandle *handle, ebreal *output, ebreal u, ebreal v, ebreal w);
+extern void			e_nsb_destroy_image_handle(EBMHandle *handle);
+
+/* code node storage ----------------------------------------------------------------------------------------------------------------*/
+
+
+typedef void ETextBuffer;
+
+extern char *			e_nst_get_language(ENode *t_node);
+extern char *			e_nst_get_info(ENode *t_node);
+
+extern ETextBuffer *	e_nst_get_buffer_by_name(ENode *t_node, char *name);
+extern ETextBuffer *	e_nst_get_buffer_by_id(ENode *t_node, uint buffer_id);
+extern ETextBuffer *	e_nst_get_buffer_next(ENode *t_node, uint buffer_id);
+
+extern char *			e_nst_get_buffer_name(ETextBuffer *buffer);
+extern uint				e_nst_get_buffer_id(ETextBuffer *buffer);
+extern uint				e_nst_get_buffer_length(ETextBuffer *buffer);
+extern char *			e_nst_get_buffer_text(ETextBuffer *buffer);
+
+
+/* curve node storage ----------------------------------------------------------------------------------------------------------------*/
+
+
+typedef void ECurve;
+
+extern ECurve *			e_nsc_get_curve_by_name(ENode *c_node, char *name);
+extern ECurve *			e_nsc_get_curve_by_id(ENode *c_node, uint curve_id);
+extern ECurve *			e_nsc_get_curve_next(ENode *c_node, uint curve_id);
+
+extern char *			e_nsc_get_curve_name(ECurve *curve);
+extern uint				e_nsc_get_curve_id(ECurve *curve);
+extern uint				e_nsc_get_curve_length(ECurve *curve);
+extern uint				e_nsc_get_curve_dimentions(ECurve *curve);
+extern uint				e_nsc_get_curve_point_count(ECurve *curve);
+
+extern uint				e_nsc_get_point_next(ECurve *curve, uint point_id);
+extern uint				e_nsc_get_point_order(ECurve *curve, uint point_nr);
+extern uint				e_nsc_get_point_pos(ECurve *curve, uint point_id);
+
+extern void				e_nsc_get_point(ECurve *curve, uint point_id, real64 *pre_value, uint32 *pre_pos, real64 *value, real64 *pos, real64 *post_value, uint32 *post_pos);
+extern void				e_nsc_get_point_double(ECurve *curve, uint point_id, real64 *pre_value, real64 *pre_pos, real64 *value, real64 *pos, real64 *post_value, real64 *post_pos);
+extern void				e_nsc_get_segment(ECurve *curve, uint segment_nr, uint axis, real64 *point_0, real64 *point_1, real64 *point_2, real64 *point_3);
+
+extern void				e_nsc_send_c_key_set(ENode *node, ECurve *curve, uint32 key_id, real64 *pre_value, real64 *pre_pos, real64 *value, real64 *pos, real64 *post_value, real64 *post_pos);
+#endif

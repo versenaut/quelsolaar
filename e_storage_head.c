@@ -1,0 +1,237 @@
+#include "e_includes.h"
+
+#include "verse.h"
+#include "st_types.h"
+#include "e_storage_node.h"
+
+typedef struct{
+	VNTag		tag;
+	VNTagType	type;
+	char		tag_name[16];
+}ETag;
+
+typedef struct{
+	ETag		*tags;
+	uint		tag_count;
+	char		group_name[16];
+}ETagGroup;
+
+
+void e_destroy_node_head(ENodeHead *node)
+{
+	uint i;
+	if(node->tag_groups != NULL)
+	{
+		for(i = 0; i < node->group_count; i++)
+			free(((ETagGroup *)node->tag_groups)[i].tags);
+		free(node->tag_groups);
+	}
+}
+
+extern ENodeHead *e_ns_get_node_networking(uint node_id);
+
+
+void callback_send_tag_group_create(void *user, VNodeID node_id, uint16 group_id, char *name)
+{
+	ENodeHead *node;
+	uint i;
+	if((node = (ENodeHead *)e_ns_get_node_networking(node_id)) == NULL)
+		return;
+	if(group_id >= node->group_count)
+	{
+		node->tag_groups = realloc(node->tag_groups, sizeof(ETagGroup) * (group_id + 16));
+		for(i = node->group_count; i < group_id + 16; i++)
+		{
+			((ETagGroup *)node->tag_groups)[i].group_name[0] = 0;
+ 			((ETagGroup *)node->tag_groups)[i].tags = NULL;
+			((ETagGroup *)node->tag_groups)[i].tag_count = 0;
+		}
+		node->group_count = group_id + 16;
+	}
+	for(i = 0; name[i] != 0 && i < 15; i++)
+		((ETagGroup *)node->tag_groups)[group_id].group_name[i] = name[i];
+	((ETagGroup *)node->tag_groups)[group_id].group_name[i] = 0;
+	verse_send_tag_group_subscribe(node_id, group_id);
+}
+
+void callback_send_tag_group_destroy(void *user, VNodeID node_id, uint16 group_id)
+{
+	ENodeHead *node;
+	if((node = e_ns_get_node_networking(node_id)) == NULL)
+		return;
+	if(node->group_count < group_id || ((ETagGroup *)node->tag_groups)[group_id].group_name[0] == 0)
+		return;
+	if(((ETagGroup *)node->tag_groups)[group_id].tag_count != 0)
+		free(((ETagGroup *)node->tag_groups)[group_id].tags);
+	((ETagGroup *)node->tag_groups)[group_id].group_name[0] = 0;
+	((ETagGroup *)node->tag_groups)[group_id].tags = NULL;
+	((ETagGroup *)node->tag_groups)[group_id].tag_count = 0;
+}
+
+
+void callback_send_tag_create(void *user, VNodeID node_id, uint16 group_id, uint16 tag_id, char *name, VNTagType type, VNTag *tag)
+{
+	ENodeHead *node;
+	ETag *t = NULL;
+	uint i;
+	if((node = (ENodeHead *)e_ns_get_node_networking(node_id)) == NULL)
+		return;
+	if(group_id >= node->group_count || ((ETagGroup *)node->tag_groups)[group_id].group_name[0] == 0)
+		return;
+
+	if(((ETagGroup *)node->tag_groups)[group_id].tag_count <= tag_id)
+	{
+		((ETagGroup *)node->tag_groups)[group_id].tags = realloc(((ETagGroup *)node->tag_groups)[group_id].tags, (sizeof *((ETagGroup *)node->tag_groups)[group_id].tags) * (tag_id + 8));
+		i = 0;
+		for(((ETagGroup *)node->tag_groups)[group_id].tag_count = 0; i < tag_id + 8; i++)
+			((ETagGroup *)node->tag_groups)[group_id].tags[i].tag_name[0] = 0;
+		((ETagGroup *)node->tag_groups)[group_id].tag_count = tag_id + 8;
+	}	
+
+	t = &((ETagGroup *)node->tag_groups)[group_id].tags[tag_id];
+	t->type = type;
+	
+	for(i = 0; name[i] != 0 && i < 15; i++)
+		t->tag_name[i] = name[i];
+	t->tag_name[i] = 0;
+	switch(type)
+	{
+		case VN_TAG_BOOLEAN :
+			t->tag.vboolean = tag->vboolean;
+		break;
+		case VN_TAG_UINT32 :
+			t->tag.vuint32 = tag->vuint32;
+		break;
+		case VN_TAG_REAL64 :
+			t->tag.vreal64 = tag->vreal64;
+		break;
+		case VN_TAG_STRING :
+			for(i = 0; tag->vstring[i] != 0; i++);
+			t->tag.vstring = malloc((sizeof *tag->vstring) * i);
+			for(i = 0; tag->vstring[i] != 0; i++)
+				t->tag.vstring[i] = tag->vstring[i];
+			t->tag.vstring[i] = 0;
+		break;
+		case VN_TAG_REAL64_VEC3 :
+			t->tag.vreal64_vec3[0] = tag->vreal64_vec3[0];
+			t->tag.vreal64_vec3[1] = tag->vreal64_vec3[1];
+			t->tag.vreal64_vec3[2] = tag->vreal64_vec3[2];
+		break;
+		case VN_TAG_LINK :
+			t->tag.vlink = tag->vlink;
+		break;
+		case VN_TAG_ANIMATION :
+			t->tag.vanimation.curve = tag->vanimation.curve;
+			t->tag.vanimation.start = tag->vanimation.start;
+			t->tag.vanimation.end = tag->vanimation.end;
+		break;
+		case VN_TAG_BLOB :
+			t->tag.vblob.blob = malloc(tag->vblob.size);
+			t->tag.vblob.size = tag->vblob.size;
+			for(i = 0; i < t->tag.vblob.size; i++)
+				((char *)t->tag.vblob.blob)[i] = ((char *)tag->vblob.blob)[i];
+		break;
+	}
+}
+
+/*
+typedef union {
+	boolean vboolean;
+	uint32	vuint32;
+	real64	vreal64;
+	char	*vstring;
+	real64	vreal64_vec3[3];
+	VNodeID	vlink;
+	struct {
+		VNodeID curve;
+		uint32 start;
+		uint32 end;
+	} vanimation;
+	struct {
+		uint16	size;
+		void	*blob;
+	} vblob;
+} VNTag;
+*/
+
+void callback_send_tag_destroy(void *user, VNodeID node_id, uint16 group_id, uint16 tag_id)
+{
+	ENodeHead *node;
+	if((node = e_ns_get_node_networking(node_id)) == NULL)
+		return;
+	if(node->group_count >= group_id && ((ETagGroup *)node->tag_groups)[group_id].group_name[0] != 0 && ((ETagGroup *)node->tag_groups)[group_id].tag_count > tag_id)
+		((ETagGroup *)node->tag_groups)[group_id].tags[tag_id].tag_name[0] = 0;
+}
+
+char *e_ns_get_tag_group(ENodeHead *node, uint16 group_id)
+{
+	if(node->group_count > group_id)
+		if(((ETagGroup *)node->tag_groups)[group_id].group_name[0] != 0)
+			return ((ETagGroup *)node->tag_groups)[group_id].group_name;
+	return NULL;
+}
+
+uint e_ns_get_next_tag_group(ENodeHead *node, uint16 group_id)
+{
+	for(;node->group_count > group_id && ((ETagGroup *)node->tag_groups)[group_id].group_name[0] == 0; group_id++);
+	if(node->group_count == group_id)
+		return -1;
+	return group_id;
+}
+
+uint e_ns_get_next_tag(ENodeHead *node, uint16 group_id, uint16 tag_id)
+{	
+	if(node->group_count <= group_id || ((ETagGroup *)node->tag_groups)[group_id].group_name[0] == 0)
+		return -1;
+	for(;((ETagGroup *)node->tag_groups)[group_id].tag_count > tag_id && ((ETagGroup *)node->tag_groups)[group_id].tags[tag_id].tag_name[0] == 0; tag_id++);
+	if(((ETagGroup *)node->tag_groups)[group_id].tag_count == tag_id)
+		return -1;
+	return tag_id;
+}
+
+char *e_ns_get_tag_name(ENodeHead *node, uint16 group_id, uint16 tag_id)
+{
+	if(node->group_count >= group_id && ((ETagGroup *)node->tag_groups)[group_id].group_name[0] != 0 && ((ETagGroup *)node->tag_groups)[group_id].tag_count > tag_id)
+		return ((ETagGroup *)node->tag_groups)[group_id].tags[tag_id].tag_name;
+	return NULL;
+}
+
+VNTagType e_ns_get_tag_type(ENodeHead *node, uint16 group_id, uint16 tag_id)
+{
+	if(node->group_count >= group_id && ((ETagGroup *)node->tag_groups)[group_id].group_name[0] != 0 && ((ETagGroup *)node->tag_groups)[group_id].tag_count > tag_id)
+		return ((ETagGroup *)node->tag_groups)[group_id].tags[tag_id].type;
+	return 0;
+}
+
+VNTag *e_ns_get_tag(ENodeHead *node, uint16 group_id, uint16 tag_id)
+{
+	if(node->group_count >= group_id && ((ETagGroup *)node->tag_groups)[group_id].group_name[0] != 0 && ((ETagGroup *)node->tag_groups)[group_id].tag_count > tag_id)
+		return &((ETagGroup *)node->tag_groups)[group_id].tags[tag_id].tag;
+	return NULL;
+}
+
+void callback_send_node_name_set(void *user, VNodeID node_id, char *name)
+{
+	ENodeHead *node;
+	uint i;
+	if((node = (ENodeHead *)e_ns_get_node_networking(node_id)) == NULL)
+		return;
+	if(node == 0)
+		return;
+	for(i = 0; name[i] != 0 && i < 48; i++)
+		node->node_name[i] = name[i];
+	node->node_name[i] = name[i];
+}
+
+void es_head_init(void)
+{
+	verse_callback_set(verse_send_tag_group_create, callback_send_tag_group_create, NULL);
+	verse_callback_set(verse_send_tag_group_destroy, callback_send_tag_group_destroy, NULL);
+	verse_callback_set(verse_send_tag_create, callback_send_tag_create, NULL);
+	verse_callback_set(verse_send_tag_destroy, callback_send_tag_destroy, NULL);
+	verse_callback_set(verse_send_node_name_set, callback_send_node_name_set, NULL);
+}
+
+
+
+

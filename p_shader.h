@@ -1,0 +1,14 @@
+
+extern void p_extention_init(void *(*gl_GetProcAddress)(const char* proc));
+extern boolean p_extention_test(char *string);
+
+extern void p_shader_init();
+extern void p_shader_param_load(ENode *parent, uint32 node_id, egreal **geom_param, uint environment, uint diffuse_environment);
+
+extern uint p_shader_get_param_count(ENode *node);
+extern VMatFrag *p_shader_get_param(ENode *node, uint nr);
+
+extern char	p_shader_get_source_vertex(ENode *node);
+extern char	p_shader_get_source_frag(ENode *node);
+extern void p_shader_bind(uint32 node_id);
+extern void p_shader_unbind(uint32 node_id);
