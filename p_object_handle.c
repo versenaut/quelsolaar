@@ -11,8 +11,8 @@
 	#include <GL/gl.h>
 #endif
 
-#include "st_types.h"
 #include "enough.h"
+#include "st_types.h"
 #include "p_task.h"
 #include "persuade.h"
 #include "p_object.h"
