@@ -122,7 +122,6 @@ void uv_pu_polygon(BInputState *input, uint poly)
 			uv_tool_poly_project(poly);
 		break;
 		case 5 :
-	//		uv_strip(poly, 0);
 			 uv_strip_plane(poly);
 		break;
 	}
@@ -168,23 +167,23 @@ void uv_pu_corner(BInputState *input, uint poly, uint corner)
 	switch(ring)
 	{
 		case 0 :
-//			uv_tool_corner_streight_uv(poly,  corner);
+/*			uv_tool_corner_streight_uv(poly,  corner);*/
 			uv_tool_corner_colaps(poly,  corner);
-//			uv_tool_edge_streight(poly,  corner);
+/*			uv_tool_edge_streight(poly,  corner);*/
 		break;
 		case 1 :
 			uv_tool_corner_select(poly,  corner);
 		break;
 		case 2 :
-//			uv_tool_corner_streight_uv(poly,  corner);
-//			uv_tool_corner_colaps(poly,  corner);
-			uv_tool_edge_straight_uv(poly,  corner);
+/*			uv_tool_corner_streight_uv(poly,  corner);
+			uv_tool_corner_colaps(poly,  corner);
+*/			uv_tool_edge_straight_uv(poly,  corner);
 		break;
 		case 3 :
-//			uv_tool_corner_streight_uv(poly,  corner);
-//			uv_tool_corner_colaps(poly,  corner);
-//			uv_tool_edge_streight(poly,  corner);
-		break;
+/*			uv_tool_corner_streight_uv(poly,  corner);
+			uv_tool_corner_colaps(poly,  corner);
+			uv_tool_edge_streight(poly,  corner);
+*/		break;
 	}
 	if(input->mode == BAM_DRAW)
 		glPopMatrix();
