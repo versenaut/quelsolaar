@@ -2,16 +2,20 @@
 #include <stdlib.h>
 #include <math.h>
 
-/*#include "st_types.h"
+/*
+#include "st_types.h"
 #include "st_text.h"
-#include "verse.h"*/
+#include "verse.h"
+*/
 #include "enough.h"
 #include "seduce.h"
 
-#define LOGGO_RING_SPLIT 48
-#define LOGGO_SMALL_RING_SPLIT 48
-#define CO_INIT_DUST_COUNT 2000
-
+/* These can be reduced for low-performance machines. Restrictions
+ * apply, lowest "safe" settings are probably 12/12/1 respectively.
+*/
+#define LOGO_RING_SPLIT		48
+#define LOGO_SMALL_RING_SPLIT	48
+#define CO_INIT_DUST_COUNT	2000
 
 struct{
 	float	*ring;
@@ -45,15 +49,15 @@ void co_intro_init(void)
 	uint i, temp;
 	double x, y, z, size;
 
-	COIntroData.ring = malloc((sizeof * COIntroData.ring) * LOGGO_RING_SPLIT * 4 * 2);
-	COIntroData.small_rings = malloc((sizeof * COIntroData.small_rings) * LOGGO_SMALL_RING_SPLIT * 4 * 2);
-	COIntroData.larger_ring = malloc((sizeof * COIntroData.larger_ring) * LOGGO_SMALL_RING_SPLIT * 4 * 2);
-	COIntroData.lens_vertex = malloc((sizeof * COIntroData.lens_vertex) * LOGGO_SMALL_RING_SPLIT * 3 * 2);
-	COIntroData.lens_color = malloc((sizeof * COIntroData.lens_color) * LOGGO_SMALL_RING_SPLIT * 3 * 4);
+	COIntroData.ring = malloc((sizeof * COIntroData.ring) * LOGO_RING_SPLIT * 4 * 2);
+	COIntroData.small_rings = malloc((sizeof * COIntroData.small_rings) * LOGO_SMALL_RING_SPLIT * 4 * 2);
+	COIntroData.larger_ring = malloc((sizeof * COIntroData.larger_ring) * LOGO_SMALL_RING_SPLIT * 4 * 2);
+	COIntroData.lens_vertex = malloc((sizeof * COIntroData.lens_vertex) * LOGO_SMALL_RING_SPLIT * 3 * 2);
+	COIntroData.lens_color = malloc((sizeof * COIntroData.lens_color) * LOGO_SMALL_RING_SPLIT * 3 * 4);
 	COIntroData.dust = malloc((sizeof * COIntroData.dust) * CO_INIT_DUST_COUNT * 3);
 	create_ring_section(0, 4, -69, 15);
-	create_ring_section(4, (LOGGO_RING_SPLIT - 4) / 2, -5.7, 120);
-	create_ring_section((LOGGO_RING_SPLIT - 4) / 2 + 4, (LOGGO_RING_SPLIT - 4) / 2, 156.5, 93);
+	create_ring_section(4, (LOGO_RING_SPLIT - 4) / 2, -5.7, 120);
+	create_ring_section((LOGO_RING_SPLIT - 4) / 2 + 4, (LOGO_RING_SPLIT - 4) / 2, 156.5, 93);
 
 	for(i = 0; i < CO_INIT_DUST_COUNT * 3;)
 	{
@@ -70,11 +74,11 @@ void co_intro_init(void)
 		COIntroData.dust[i++] = 0.7 * cos(y) * z;
 
 	}
-	for(i = 0; i < LOGGO_SMALL_RING_SPLIT; i++)
+	for(i = 0; i < LOGO_SMALL_RING_SPLIT; i++)
 	{
-		x = sin((double)i * 2.0 * 3.14 / LOGGO_SMALL_RING_SPLIT);
-		y = cos((double)i * 2.0 * 3.14 / LOGGO_SMALL_RING_SPLIT);
-		temp = ((i + LOGGO_SMALL_RING_SPLIT - 1) % LOGGO_SMALL_RING_SPLIT);
+		x = sin((double)i * 2.0 * 3.14 / LOGO_SMALL_RING_SPLIT);
+		y = cos((double)i * 2.0 * 3.14 / LOGO_SMALL_RING_SPLIT);
+		temp = ((i + LOGO_SMALL_RING_SPLIT - 1) % LOGO_SMALL_RING_SPLIT);
 		sui_draw_set_vec2(COIntroData.small_rings, 4 * i + 2, -0.19 + y * 0.04, x * 0.04);
 		sui_draw_set_vec2(COIntroData.small_rings, 4 * i +  3, -0.19 + y * 0.06, x * 0.06);
 		sui_draw_set_vec2(COIntroData.small_rings, 4 * temp + 0, -0.19 + y * 0.06, x * 0.06);
@@ -101,24 +105,24 @@ void co_intro_symbol(float color)
 {
 	glPushMatrix();
 
-sui_draw_gl(GL_QUADS, COIntroData.ring, LOGGO_RING_SPLIT * 4, 2, color, color, color);
+sui_draw_gl(GL_QUADS, COIntroData.ring, LOGO_RING_SPLIT * 4, 2, color, color, color);
 
 
-sui_set_color_array_gl(COIntroData.lens_color, LOGGO_SMALL_RING_SPLIT * 3, 4);
-sui_draw_gl(GL_TRIANGLES, COIntroData.lens_vertex, LOGGO_SMALL_RING_SPLIT * 3, 2, color, color, color);
-sui_draw_gl(GL_QUADS, COIntroData.small_rings, LOGGO_SMALL_RING_SPLIT * 4, 2, color, color, color);
+sui_set_color_array_gl(COIntroData.lens_color, LOGO_SMALL_RING_SPLIT * 3, 4);
+sui_draw_gl(GL_TRIANGLES, COIntroData.lens_vertex, LOGO_SMALL_RING_SPLIT * 3, 2, color, color, color);
+sui_draw_gl(GL_QUADS, COIntroData.small_rings, LOGO_SMALL_RING_SPLIT * 4, 2, color, color, color);
 
 	glRotated(135, 0, 0, 1);
 
-sui_set_color_array_gl(COIntroData.lens_color, LOGGO_SMALL_RING_SPLIT * 3, 4);
-sui_draw_gl(GL_TRIANGLES, COIntroData.lens_vertex, LOGGO_SMALL_RING_SPLIT * 3, 2, color, color, color);
-sui_draw_gl(GL_QUADS, COIntroData.small_rings, LOGGO_SMALL_RING_SPLIT * 4, 2, color, color, color);
+sui_set_color_array_gl(COIntroData.lens_color, LOGO_SMALL_RING_SPLIT * 3, 4);
+sui_draw_gl(GL_TRIANGLES, COIntroData.lens_vertex, LOGO_SMALL_RING_SPLIT * 3, 2, color, color, color);
+sui_draw_gl(GL_QUADS, COIntroData.small_rings, LOGO_SMALL_RING_SPLIT * 4, 2, color, color, color);
 
 	glRotated(-135 - 60, 0, 0, 1);
 
-sui_set_color_array_gl(COIntroData.lens_color, LOGGO_SMALL_RING_SPLIT * 3, 4);
-sui_draw_gl(GL_TRIANGLES, COIntroData.lens_vertex, LOGGO_SMALL_RING_SPLIT * 3, 2, color, color, color);
-sui_draw_gl(GL_QUADS, COIntroData.larger_ring, LOGGO_SMALL_RING_SPLIT * 4, 2, color, color, color);
+sui_set_color_array_gl(COIntroData.lens_color, LOGO_SMALL_RING_SPLIT * 3, 4);
+sui_draw_gl(GL_TRIANGLES, COIntroData.lens_vertex, LOGO_SMALL_RING_SPLIT * 3, 2, color, color, color);
+sui_draw_gl(GL_QUADS, COIntroData.larger_ring, LOGO_SMALL_RING_SPLIT * 4, 2, color, color, color);
 	glPopMatrix();
 
 
