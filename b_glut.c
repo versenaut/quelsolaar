@@ -186,9 +186,8 @@ boolean b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boo
 	return TRUE;
 }
 
-void betray_launch_main_loop()
+void betray_launch_main_loop(void)
 {
-
 	glutMainLoop();
 }
 

@@ -44,7 +44,7 @@ struct{
 	double	time;
 }COVNGraphicsData;
 
-void co_vng_init()
+void co_vng_init(void)
 {
 	uint i, temp;
 	double x, y, z, size;

@@ -59,7 +59,7 @@ uint uvg_get_node(void)
 	return UVGGlobal.node_id;
 }
 
-void uvg_init()
+void uvg_init(void)
 {
 	uint i;
 	UVGGlobal.node_id = 0;
@@ -85,7 +85,7 @@ void uvg_init()
 		UVGGlobal.events[i].type = ET_END;
 }
 
-boolean uvg_update()
+boolean uvg_update(void)
 {
 	ENode *node;
 	EGeoLayer *layer;
@@ -168,12 +168,12 @@ boolean uvg_update()
 	return TRUE;
 }
 
-boolean uvg_node_has_uv()
+boolean uvg_node_has_uv(void)
 {
 	return UVGGlobal.u != NULL && UVGGlobal.v != NULL;
 }
 
-void uvg_node_create_uv()
+void uvg_node_create_uv(void)
 {
 	if(UVGGlobal.u == NULL)
 		verse_send_g_layer_create(UVGGlobal.node_id, -1, "map_u", VN_G_LAYER_POLYGON_CORNER_REAL, 0, 0);
@@ -292,22 +292,22 @@ uint uvg_get_uv_version(uint id)
 	return 1;
 }
 
-uint *uvg_get_ref()
+uint *uvg_get_ref(void)
 {
 	return UVGGlobal.polygon;
 }
 
-egreal *uvg_get_vertex()
+egreal *uvg_get_vertex(void)
 {
 	return UVGGlobal.vertex;
 }
 
-uint uvg_get_vertex_length()
+uint uvg_get_vertex_length(void)
 {
 	return UVGGlobal.vertex_length;
 }
 
-uint uvg_get_polygon_length()
+uint uvg_get_polygon_length(void)
 {
 	return UVGGlobal.polygon_length;
 }
@@ -355,7 +355,7 @@ uint find_same_event(uint id, uint type)
 	return UVGGlobal.event_pos;
 }
 
-void uvg_redo()
+void uvg_redo(void)
 {
 	if(UVGGlobal.event_pos == UVGGlobal.event_end)
 		return;
@@ -372,7 +372,7 @@ void uvg_redo()
 	}
 }
 
-void uvg_undo()
+void uvg_undo(void)
 {
 	if(UVGGlobal.event_pos == UVGGlobal.event_start)
 		return;
@@ -513,7 +513,7 @@ void uvg_set_one_corner_uv(uint id, uint corner, egreal u, egreal v)
 	execute_event(event, 1);
 }
 
-void uvg_action_end()
+void uvg_action_end(void)
 {
 	if(UVGGlobal.events[UVGGlobal.event_pos].type == ET_END)
 		return;

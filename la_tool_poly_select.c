@@ -279,7 +279,7 @@ void detach_quad(ExtrudeParams *extrude, uint *ref, uint ref_id, uint *crease)
 }
 
 
-void la_t_detach_selected_polygons()
+void la_t_detach_selected_polygons(void)
 {
 	ExtrudeParams param;
 	double matrix[16];
@@ -359,7 +359,7 @@ void duplicate_polygon(ExtrudeParams *extrude, uint *ref, uint ref_id, uint *cre
 
 }
 
-void la_t_duplicate_selected_polygons()
+void la_t_duplicate_selected_polygons(void)
 {
 	ExtrudeParams param;
 	double matrix[16], select;
@@ -386,7 +386,7 @@ void la_t_duplicate_selected_polygons()
 	free(param.pairs);
 }
 
-void la_t_flip_selected_polygons()
+void la_t_flip_selected_polygons(void)
 {
 	double *select;
 	uint i, vertex_length, ref_length, *ref, *crease;

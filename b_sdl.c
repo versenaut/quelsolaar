@@ -230,9 +230,9 @@ void *betray_get_gl_proc_address()
 	return SDL_GL_GetProcAddress;
 }
 
-extern void betray_time_update();
+extern void betray_time_update(void);
 
-void betray_launch_main_loop()
+void betray_launch_main_loop(void)
 {
 	BInputState *input;
 	input = betray_get_input_state();
