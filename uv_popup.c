@@ -20,11 +20,11 @@ void uv_pu_empty(BInputState *input)
 	element[0].data.angle[0] = -45;
 	element[0].data.angle[1] = 45;
 	element[1].type = PU_T_ANGLE;
-	element[1].text = "UnDo";
+	element[1].text = "Undo";
 	element[1].data.angle[0] = 45;
 	element[1].data.angle[1] = 135;
 	element[2].type = PU_T_ANGLE;
-	element[2].text = "ReDo";
+	element[2].text = "Redo";
 	element[2].data.angle[0] = 225;
 	element[2].data.angle[1] = 315;
 	element[3].type = PU_T_ANGLE;
@@ -92,8 +92,6 @@ void uv_pu_polygon(BInputState *input, uint poly)
 	element[5].data.angle[0] = 270;
 	element[5].data.angle[1] = 330;
 
-
-
 	if(input->mode == BAM_DRAW)
 	{
 		glPushMatrix();
@@ -139,7 +137,7 @@ void uv_pu_corner(BInputState *input, uint poly, uint corner)
 	float *cam;
 	uint ring;
 	element[0].type = PU_T_ANGLE;
-	element[0].text = "Colapse";
+	element[0].text = "Collapse";
 	element[0].data.angle[0] = -45;
 	element[0].data.angle[1] = 45;
 	element[1].type = PU_T_ANGLE;
@@ -199,15 +197,15 @@ void uv_pu_edge(BInputState *input, uint poly, uint edge)
 	float *cam;
 	uint ring;
 	element[0].type = PU_T_ANGLE;
-	element[0].text = "Streight Edge";
+	element[0].text = "Straight Edge";
 	element[0].data.angle[0] = -45;
 	element[0].data.angle[1] = 45;
 	element[1].type = PU_T_ANGLE;
-	element[1].text = "Streight Select";
+	element[1].text = "Straight Select";
 	element[1].data.angle[0] = 45;
 	element[1].data.angle[1] = 135;
 	element[2].type = PU_T_ANGLE;
-	element[2].text = "Streight Poly";
+	element[2].text = "Straight Poly";
 	element[2].data.angle[0] = 225;
 	element[2].data.angle[1] = 315;
 	element[3].type = PU_T_ANGLE;
