@@ -105,7 +105,7 @@ void uv_draw_line_add(float x, float y, boolean add)
 	glPopMatrix();
 }
 /*
-boolean uv_draw_select_meny_test(void)
+boolean uv_draw_select_menu_test(void)
 {
 	if(GlobalDrawLine.select_length)
 	{

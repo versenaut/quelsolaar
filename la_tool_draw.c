@@ -146,7 +146,7 @@ boolean draw_line_delete_test(double *vertex, double *a, double *b, boolean *del
 	return FALSE;
 }
 
-boolean la_t_draw_select_meny_test(void)
+boolean la_t_draw_select_menu_test(void)
 {
 	if(GlobalDrawLine.select_length)
 	{

@@ -151,7 +151,7 @@ void la_parse_input(BInputState *input)
 			glEnable(GL_DEPTH_TEST);
 			p_get_projection_vertex_with_axis(output, ParseInputData.depth, input->pointer_x, input->pointer_y, input->mouse_button[1], snap);
 			if(ParseInputData.start_vertex == -1)
-				if(la_t_draw_select_meny_test())
+				if(la_t_draw_select_menu_test())
 					ParseInputData.mode = PIM_DRAW_SELECT;
 			if(input->mode == BAM_EVENT)
 			{			

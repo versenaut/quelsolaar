@@ -76,7 +76,7 @@ void la_pu_connect(BInputState *input, void *user)
 		if(e_vc_check_connected_slot(0))
 		{
 			if(input->mode == BAM_DRAW)
-				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECTING") * -0.5, -0.35, 0.02, 2, "CONNECTING", 0, 0, 0);    
+				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECTING") * -0.5, -0.35, 0.02, 2, "CONNECTING", 0, 0, 0);
 		}
 		else
 		{
@@ -103,8 +103,6 @@ void la_pu_connect(BInputState *input, void *user)
 		glEnable(GL_DEPTH_TEST);
 	}
 }
-
-
 
 extern void geometry_save(void);
 extern void geometry_load(char *file);
