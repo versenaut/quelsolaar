@@ -506,7 +506,7 @@ void se_save_symbols(char *file_name)
 void se_save_font(char *file_name)
 {
 	uint i, j, k, line_count, size[256];
-	float *buf, whith[256];
+	float *buf, width[256];
 	SEFuncType type;
 	FILE *file;
 	file = fopen(file_name, "w");
@@ -519,7 +519,7 @@ void se_save_font(char *file_name)
 	for(i = 0; i < SEditor.drawing_count && i < 256; i++)
 	{
 		size[i] = 0;
-		whith[i] = 0;
+		width[i] = 0;
 		if(SEditor.drawings[i].line_count > 0)
 		{
 			buf = se_create_array(&SEditor.drawings[i], &line_count);
@@ -531,14 +531,14 @@ void se_save_font(char *file_name)
 				if(j % 16 == 0)
 					fprintf(file, "\n\t\t\t");
 				fprintf(file, ", (float)%f, (float)%f", buf[j] * SE_OUTPUT_SCALE, buf[j + 1] * SE_OUTPUT_SCALE);
-				if(buf[j] > whith[i])
-					whith[i] = buf[j];
+				if(buf[j] > width[i])
+					width[i] = buf[j];
 			}
 			size[i] = line_count / 2;
 			fprintf(file, "};\n");
 		}
-		if(whith[i] < 0.000001)
-			whith[i] = 0.1 * SE_OUTPUT_SCALE;
+		if(width[i] < 0.000001)
+			width[i] = 0.1 * SE_OUTPUT_SCALE;
 	}
 	fprintf(file, "\tstatic uint font_size[] = {%u", size[0]);
 	for(i = 1; i < 256; i++)
@@ -558,15 +558,15 @@ void se_save_font(char *file_name)
 	fprintf(file, "\t}\n\tif(font_size[letter] != 0)\n");
 	fprintf(file, "\t\tsui_draw_gl(GL_LINES, font_array[letter], font_size[letter], 2, red, green, blue);\n}\n\n");
 	fprintf(file, "float sui_get_letter_size(char letter)\n{\n");
-		fprintf(file, "\tstatic float font_whith[] = {%f", whith[0]);
+		fprintf(file, "\tstatic float font_width[] = {%f", width[0]);
 	for(i = 1; i < 256; i++)
 	{
 		if(i % 16 == 0)
 			fprintf(file, "\n\t\t\t");
-		fprintf(file, ", (float)%f", whith[i]);
+		fprintf(file, ", (float)%f", width[i]);
 	}
 	fprintf(file, "};\n");
-	fprintf(file, "\treturn font_whith[letter];\n}\n");
+	fprintf(file, "\treturn font_width[letter];\n}\n");
 	fclose(file);
 }
 

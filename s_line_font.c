@@ -552,7 +552,7 @@ void sui_draw_letter(uint8 letter, float red, float green, float blue)
 
 float sui_get_letter_size(char letter)
 {
-	static float font_whith[] = {0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000
+	static float font_width[] = {0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000
 			, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000
 			, (float)0.100000, (float)0.080000, (float)0.100000, (float)0.220000, (float)0.240000, (float)0.240000, (float)0.240000, (float)0.040000, (float)0.060000, (float)0.060000, (float)0.100000, (float)0.240000, (float)0.060000, (float)0.240000, (float)0.060000, (float)0.240000
 			, (float)0.240000, (float)0.120000, (float)0.240000, (float)0.240000, (float)0.240000, (float)0.240000, (float)0.240000, (float)0.240000, (float)0.240000, (float)0.240000, (float)0.040000, (float)0.040000, (float)0.240000, (float)0.160000, (float)0.240000, (float)0.240000
@@ -568,5 +568,5 @@ float sui_get_letter_size(char letter)
 			, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000
 			, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000
 			, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000};
-	return font_whith[letter];
+	return font_width[letter];
 }
