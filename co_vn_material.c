@@ -705,7 +705,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 					break;
 					case VN_M_FT_VOLUME :
 					{
-						char *text[4] = {"Diffucion", "Red", "Green", "Blue"};
+						char *text[] = { "Diffusion", "Red", "Green", "Blue" };
 						expand = 0.2 + 0.2 * mat_pos->size;
 						place[0] = mat_pos->pos[0] + 0.015;
 						place[1] = mat_pos->pos[1] + 0.015 + y;
