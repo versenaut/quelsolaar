@@ -43,7 +43,7 @@ typedef struct{
 extern void	e_ns_update_node_version_struct(ESCurveNode *node);
 extern void	e_ns_update_node_version_data(ESCurveNode *node);
 
-ESCurve *e_nsc_get_layer_by_name(ESCurveNode *node, char *name)
+ESCurve *e_nsc_get_layer_by_name(ESCurveNode *node, const char *name)
 {
 	ESCurve *curve;
 	for(curve =	get_next_dlut(&node->curvetables, 0); curve != NULL; curve = get_next_dlut(&node->curvetables, curve->curve_id + 1))

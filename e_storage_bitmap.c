@@ -61,7 +61,7 @@ void e_nsb_get_size(ESBitmapNode *node, uint *x, uint *y, uint *z)
 	*z = node->size_z;
 }
 
-ESBitmapLayer *e_nsb_get_layer_by_name(ESBitmapNode *node, char *name)
+ESBitmapLayer *e_nsb_get_layer_by_name(ESBitmapNode *node, const char *name)
 {
 	ESBitmapLayer *layer;
 	for(layer =	get_next_dlut(&node->layertables, 0); layer != NULL; layer = get_next_dlut(&node->layertables, layer->layer_id + 1))
@@ -75,7 +75,7 @@ ESBitmapLayer *e_nsb_get_layer_by_id(ESBitmapNode *node, uint layer_id)
 	return find_dlut(&node->layertables, layer_id);
 }
 
-ESBitmapLayer *e_nsb_get_layer_by_type(ESBitmapNode *node, VNBLayerType type, char *name)
+ESBitmapLayer *e_nsb_get_layer_by_type(ESBitmapNode *node, VNBLayerType type, const char *name)
 {
 	ESBitmapLayer *layer;
 	for(layer =	get_next_dlut(&node->layertables, 0); layer != NULL; layer = get_next_dlut(&node->layertables, layer->layer_id + 1))
@@ -166,7 +166,7 @@ ESBitmapNode *e_create_b_node(VNodeID node_id, VNodeOwner owner)
 	return node;
 }
 
-void callback_send_b_layer_create(void *user_data, VNodeID node_id, VLayerID layer_id, char *name, VNBLayerType type)
+void callback_send_b_layer_create(void *user_data, VNodeID node_id, VLayerID layer_id, const char *name, VNBLayerType type)
 {
 	ESBitmapNode	*node;
 	ESBitmapLayer	*layer;
@@ -384,7 +384,7 @@ void uppdate_bitmap_image_handle(EBMHandle *handle)
 
 }
 
-EBMHandle *e_nsb_get_image_handle(VNodeID node_id, char *layer_r, char *layer_g, char *layer_b)
+EBMHandle *e_nsb_get_image_handle(VNodeID node_id, const char *layer_r, const char *layer_g, const char *layer_b)
 {
 	EBMHandle *handle;
 	handle = malloc(sizeof *handle);

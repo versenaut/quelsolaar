@@ -31,7 +31,7 @@ void e_destroy_node_head(ENodeHead *node)
 extern ENodeHead *e_ns_get_node_networking(uint node_id);
 
 
-void callback_send_tag_group_create(void *user, VNodeID node_id, uint16 group_id, char *name)
+void callback_send_tag_group_create(void *user, VNodeID node_id, uint16 group_id, const char *name)
 {
 	ENodeHead *node;
 	uint i;
@@ -69,7 +69,7 @@ void callback_send_tag_group_destroy(void *user, VNodeID node_id, uint16 group_i
 }
 
 
-void callback_send_tag_create(void *user, VNodeID node_id, uint16 group_id, uint16 tag_id, char *name, VNTagType type, VNTag *tag)
+void callback_send_tag_create(void *user, VNodeID node_id, uint16 group_id, uint16 tag_id, const char *name, VNTagType type, VNTag *tag)
 {
 	ENodeHead *node;
 	ETag *t = NULL;
@@ -210,7 +210,7 @@ VNTag *e_ns_get_tag(ENodeHead *node, uint16 group_id, uint16 tag_id)
 	return NULL;
 }
 
-void callback_send_node_name_set(void *user, VNodeID node_id, char *name)
+void callback_send_node_name_set(void *user, VNodeID node_id, const char *name)
 {
 	ENodeHead *node;
 	uint i;

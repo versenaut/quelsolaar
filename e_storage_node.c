@@ -117,7 +117,7 @@ ENodeHead *e_create_node(VNodeID node_id, VNodeType type, VNodeOwner owner)
 	return node;
 }
 
-void e_vc_disconnect(uint connection, char *bye)
+void e_vc_disconnect(uint connection, const char *bye)
 {
 	if(ENSGlobal.context[connection].connected == TRUE)
 	{

@@ -196,7 +196,7 @@ char *e_nst_get_info(ESTextNode *node)
 	return node->info;
 }
 
-ESTextBuffer *e_nst_get_buffer_by_name(ESTextNode *node, char *name)
+ESTextBuffer *e_nst_get_buffer_by_name(ESTextNode *node, const char *name)
 {
 	ESTextBuffer *buffer;
 	uint i;

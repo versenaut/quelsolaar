@@ -27,9 +27,9 @@ extern void enough_init(void);
 
 extern uint		e_vc_connect(const char *server_address, const char *name, const char *pass, const uint8 *host_id);
 extern boolean	e_vc_check_connected(void);
-extern boolean	e_vc_check_connected_slot(uint	connection);
+extern boolean	e_vc_check_connected_slot(uint connection);
 extern boolean	e_vc_check_accepted_slot(uint connection);
-extern void		e_vc_disconnect(uint	connection);
+extern void		e_vc_disconnect(uint connection);
 extern void		e_vc_disconnect_all(void);
 extern void		e_vc_set_current_active_connection(uint connection);
 extern void		e_vc_connection_update(uint connection, uint time);
@@ -106,10 +106,10 @@ extern VNOParamType *	e_nso_get_method_param_types(ENode *node, uint16 group_id,
 
 typedef void EGeoLayer;
 
-extern EGeoLayer *	e_nsg_get_layer_by_name(ENode *g_node, char *name);
+extern EGeoLayer *	e_nsg_get_layer_by_name(ENode *g_node, const char *name);
 extern EGeoLayer *	e_nsg_get_layer_by_id(ENode *g_node,  uint layer_id);
-extern EGeoLayer *	e_nsg_get_layer_by_type(ENode *g_node, VNGLayerType type, char *name);
-extern EGeoLayer *	e_nsg_get_layer_by_fragment(ENode *g_node, char *name);
+extern EGeoLayer *	e_nsg_get_layer_by_type(ENode *g_node, VNGLayerType type, const char *name);
+extern EGeoLayer *	e_nsg_get_layer_by_fragment(ENode *g_node, const char *name);
 extern EGeoLayer *	e_nsg_get_layer_next(ENode *g_node, uint layer_id);
 
 extern EGeoLayer *	e_nsg_get_layer_crease_vertex_layer(ENode *g_node);
@@ -136,7 +136,7 @@ extern egreal		e_nsg_get_size(ENode *node);
 extern uint			e_nsg_find_empty_vertex_slot(ENode *node, uint start);
 extern uint			e_nsg_find_empty_polygon_slot(ENode *node, uint start);
 
-extern uint16		e_nsg_get_bone_by_weight(ENode *g_node, char *name);
+extern uint16		e_nsg_get_bone_by_weight(ENode *g_node, const char *name);
 extern uint16		e_nsg_get_bone_next(ENode *g_node, uint16 bone_id);
 
 extern char *			e_nsg_get_bone_weight(ENode *g_node, uint16 bone_id);
@@ -176,9 +176,9 @@ extern void *			e_nsm_get_custom_data(ENode *node, VNMFragmentID frag, uint slot
 
 typedef void EBitLayer;
 
-extern EBitLayer *	e_nsb_get_layer_by_name(ENode *node, char *name);
+extern EBitLayer *	e_nsb_get_layer_by_name(ENode *node, const char *name);
 extern EBitLayer *	e_nsb_get_layer_by_id(ENode *node, uint layer_id);
-extern EBitLayer *	e_nsb_get_layer_by_type(ENode *node, VNBLayerType type, char *name);
+extern EBitLayer *	e_nsb_get_layer_by_type(ENode *node, VNBLayerType type, const char *name);
 extern EBitLayer *	e_nsb_get_layer_next(ENode *node, uint layer_id);
 
 extern void *		e_nsb_get_layer_data(ENode *node, EBitLayer *layer);
@@ -192,7 +192,7 @@ typedef void EBMHandle;
 
 extern ebreal		e_nsb_get_aspect(ENode *node);
 extern void			e_nsb_get_size(ENode *node, uint *x, uint *y, uint *z);
-extern EBMHandle	*e_nsb_get_image_handle(VNodeID node_id, char *layer_r, char *layer_g, char *layer_b);
+extern EBMHandle	*e_nsb_get_image_handle(VNodeID node_id, const char *layer_r, const char *layer_g, const char *layer_b);
 extern EBMHandle	*e_nsb_get_empty_handle(void);
 extern void			e_nsb_evaluate_image_handle_tile(EBMHandle *handle, ebreal *output, ebreal u, ebreal v, ebreal w);
 extern void			e_nsb_evaluate_image_handle_clamp(EBMHandle *handle, ebreal *output, ebreal u, ebreal v, ebreal w);
@@ -206,7 +206,7 @@ typedef void ETextBuffer;
 extern char *			e_nst_get_language(ENode *t_node);
 extern char *			e_nst_get_info(ENode *t_node);
 
-extern ETextBuffer *	e_nst_get_buffer_by_name(ENode *t_node, char *name);
+extern ETextBuffer *	e_nst_get_buffer_by_name(ENode *t_node, const char *name);
 extern ETextBuffer *	e_nst_get_buffer_by_id(ENode *t_node, uint buffer_id);
 extern ETextBuffer *	e_nst_get_buffer_next(ENode *t_node, uint buffer_id);
 
@@ -221,7 +221,7 @@ extern char *			e_nst_get_buffer_text(ETextBuffer *buffer);
 
 typedef void ECurve;
 
-extern ECurve *			e_nsc_get_curve_by_name(ENode *c_node, char *name);
+extern ECurve *			e_nsc_get_curve_by_name(ENode *c_node, const char *name);
 extern ECurve *			e_nsc_get_curve_by_id(ENode *c_node, uint curve_id);
 extern ECurve *			e_nsc_get_curve_next(ENode *c_node, uint curve_id);
 
@@ -240,4 +240,5 @@ extern void				e_nsc_get_point_double(ECurve *curve, uint point_id, real64 *pre_
 extern void				e_nsc_get_segment(ECurve *curve, uint segment_nr, uint axis, real64 *point_0, real64 *point_1, real64 *point_2, real64 *point_3);
 
 extern void				e_nsc_send_c_key_set(ENode *node, ECurve *curve, uint32 key_id, real64 *pre_value, real64 *pre_pos, real64 *value, real64 *pos, real64 *post_value, real64 *post_pos);
+
 #endif

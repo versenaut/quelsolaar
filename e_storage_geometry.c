@@ -228,7 +228,7 @@ char *e_nsg_get_layer_name(EGeoLayer *layer)
 	return layer->name;
 }
 
-EGeoLayer *e_nsg_get_layer_by_name(ESGeometryNode *node, char *name)
+EGeoLayer *e_nsg_get_layer_by_name(ESGeometryNode *node, const char *name)
 {
 	EGeoLayer *data, *end;
 	data = node->layers;
@@ -265,7 +265,7 @@ uint e_nsg_get_polygon_length(ESGeometryNode *node)
 	return node->polygon_length;
 }
 
-EGeoLayer* e_nsg_get_layer_by_type(ESGeometryNode *node, VNGLayerType type, char *name)
+EGeoLayer* e_nsg_get_layer_by_type(ESGeometryNode *node, VNGLayerType type, const char *name)
 {
 	EGeoLayer *data, *end;
 	data = node->layers;
@@ -499,7 +499,7 @@ ESGeometryNode	*e_create_g_node(VNodeID node_id, VNodeOwner owner)
 	return node;
 }
 
-void callback_send_g_layer_create(void *user_data, VNodeID node_id, VLayerID layer_id, char *name, VNGLayerType type, uint32 def_integer, real64 def_real)
+void callback_send_g_layer_create(void *user_data, VNodeID node_id, VLayerID layer_id, const char *name, VNGLayerType type, uint32 def_integer, real64 def_real)
 {
 	ESGeometryNode	*node;
 	EGeoLayer		*layer;
@@ -606,7 +606,7 @@ void delete_geometry(ESGeometryNode	*g_node)
 	free(g_node);
 }
 
-void callback_send_g_crease_set_vertex(void *user_data, VNodeID node_id, char *layer, uint32 def_crease)
+void callback_send_g_crease_set_vertex(void *user_data, VNodeID node_id, const char *layer, uint32 def_crease)
 {
 	ESGeometryNode	*node;
 	EGeoLayer	*crease_layer;
@@ -622,7 +622,7 @@ void callback_send_g_crease_set_vertex(void *user_data, VNodeID node_id, char *l
 	e_ns_update_node_version_struct(node);
 }
 
-void callback_send_g_crease_set_edge(void *user_data, VNodeID node_id, char *layer, uint32 def_crease)
+void callback_send_g_crease_set_edge(void *user_data, VNodeID node_id, const char *layer, uint32 def_crease)
 {
 	ESGeometryNode	*node;
 	EGeoLayer	*crease_layer;
@@ -769,7 +769,7 @@ void callback_send_g_bone_destroy(void *user, VNodeID node_id, uint16 bone_id)
 }
 
 
-uint16 e_nsg_get_bone_by_weight(ESGeometryNode *g_node, char *name)
+uint16 e_nsg_get_bone_by_weight(ESGeometryNode *g_node, const char *name)
 {
 	uint i, j;
 	for(i = 0; i < g_node->bones_allocated; i++)

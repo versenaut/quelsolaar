@@ -423,7 +423,7 @@ void callback_send_o_method_group_destroy(void *user_data, VNodeID node_id, uint
 	}
 }
 
-void callback_send_o_method_group_create(void *user_data, VNodeID node_id, uint16 group_id, char *name)
+void callback_send_o_method_group_create(void *user_data, VNodeID node_id, uint16 group_id, const char *name)
 {
 	ESObjectNode	*node;
 	uint i;
@@ -472,7 +472,7 @@ void callback_send_o_method_destroy(void *user_data, VNodeID node_id, uint16 gro
 	}
 }
 
-void callback_send_o_method_create(void *user_data, VNodeID node_id, uint16 group_id, uint16 method_id, char *name, uint8 param_count, VNOParamType *param_types, char * *param_names)
+void callback_send_o_method_create(void *user_data, VNodeID node_id, uint16 group_id, uint16 method_id, const char *name, uint8 param_count, VNOParamType *param_types, const char * *param_names)
 {
 	ESObjectNode	*node;
 	uint i, j;
