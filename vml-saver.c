@@ -420,7 +420,7 @@ static void save_curve(FILE *f, ENode *c_node)
 	fprintf(f, "\t<curves>\n");
 	for(curve = e_nsc_get_curve_next(c_node, 0); curve != NULL; curve = e_nsc_get_curve_next(c_node, e_nsc_get_curve_id(curve) + 1))
 	{
-		fprintf(f, "\t\t<curve name=\"%s\" dimentions=\"%u\">\n", e_nsc_get_curve_name(curve), e_nsc_get_curve_dimensions(curve));
+		fprintf(f, "\t\t<curve name=\"%s\" dimensions=\"%u\">\n", e_nsc_get_curve_name(curve), e_nsc_get_curve_dimensions(curve));
 		for(i = e_nsc_get_point_next(curve, 0); i != -1; i = e_nsc_get_point_next(curve, i + 1))
 		{
 			fprintf(f, "\t\t\t<point>\n\t\t\t\t");
