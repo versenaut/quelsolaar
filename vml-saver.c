@@ -395,8 +395,8 @@ static void save_text(FILE *f, ENode *t_node)
 {
 	ETextBuffer *buffer;
 
-	fprintf(f, "\t<language>\n%s\n\t</language>", e_nst_get_language(t_node));
-	fprintf(f, "\t<info>\n%s\n\t</info>", e_nst_get_info(t_node));
+	fprintf(f, "\t<language>%s</language>\n", e_nst_get_language(t_node));
+	fprintf(f, "\t<info>%s</info>\n", e_nst_get_info(t_node));
 	fprintf(f, "\t<buffers>\n");
 	for(buffer = e_nst_get_buffer_next(t_node, 0); buffer != NULL; buffer = e_nst_get_buffer_next(t_node, e_nst_get_buffer_id(buffer) + 1))
 	{
