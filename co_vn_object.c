@@ -385,7 +385,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 			ENode *l_node;
 			uint32 target;
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Link name:", color_light, color_light, color_light);  
-			co_w_type_in(input, 0.15, y_meth, 0.5, SUI_T_SIZE, e_nso_get_link_name(link), 16, rename_link_func, e_nso_get_link_name(link), color, color_light);
+			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nso_get_link_name(link), 16, rename_link_func, e_nso_get_link_name(link), color, color_light);
 			y -= 0.05;
 
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Node ID:", color_light, color_light, color_light);  
