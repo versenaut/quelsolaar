@@ -284,7 +284,7 @@ static void save_material(FILE *f, ENode *m_node)
 			break;
 			case VN_M_FT_MATRIX :
 				fprintf(f,
-					"\t\t\t<mapping>%u</mapping>\n", frag->noise.mapping);
+					"\t\t\t<data>%u</data>\n", frag->matrix.data);
 				fprintf(f, "\t\t\t<matrix>\n");
 				fprintf(f, "\t\t\t\t%f %f %f %f\n", frag->matrix.matrix[0], frag->matrix.matrix[1], frag->matrix.matrix[2], frag->matrix.matrix[3]);
 				fprintf(f, "\t\t\t\t%f %f %f %f\n", frag->matrix.matrix[4], frag->matrix.matrix[5], frag->matrix.matrix[6], frag->matrix.matrix[7]);
