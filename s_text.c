@@ -61,7 +61,7 @@ void sui_draw_code(float pos_x, float pos_y, float size, float spacing, char *te
 		glTranslatef(0.240000 + 0.05, 0, 0);
 	}
 	glPopMatrix();
-	printf("size of avrage text = %f\n", sui_get_letter_size(97));
+	printf("size of average text = %f\n", sui_get_letter_size(97));
 	glDisable(GL_LINE_SMOOTH);
 }*/
 
