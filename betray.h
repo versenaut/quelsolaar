@@ -2,12 +2,13 @@
 #if !defined(BETRAY_H)
 #define	BETRAY_H
 
-
 #include "st_types.h"
 
 /* Basic functionality */
 
+/* Define this to use SDL, otherwise GLUT is used as the back end layer. */
 /*#define BETRAY_SDL_SYSTEM_WRAPPER*/
+
 #if !defined(BETRAY_SDL_SYSTEM_WRAPPER)
 #define BETRAY_GLUT_SYSTEM_WRAPPER
 #include <GL/glut.h>
