@@ -7,7 +7,7 @@
 #include "la_draw_overlay.h"
 #include "la_particle_fx.h"
  
-#define VERTEX_SNAPP_DISTANCE 0.0003
+#define VERTEX_SNAP_DISTANCE 0.0003
 #define MAX_POPUP_TIME 100
 
 typedef enum { 
@@ -50,7 +50,7 @@ void la_parse_input(BInputState *input)
 		distance = 1E100;
 		selected_distance = 1E100;
 		p_find_closest_vertex(&closest, &select_closest, &distance, &selected_distance, input->pointer_x, input->pointer_y);
-		if(selected_distance > VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) && ParseInputData.mode != PIM_SHOW_EDGE_MENU)
+		if(selected_distance > VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE) && ParseInputData.mode != PIM_SHOW_EDGE_MENU)
 			p_find_closest_edge(edge, input->pointer_x, input->pointer_y);
 	}else
 		la_pfx_select_vertex();
@@ -67,7 +67,7 @@ void la_parse_input(BInputState *input)
 						ParseInputData.mode = PIM_DRAG_MANIPULATOR;
 						return;
 					}
-					if(selected_distance < VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE))
+					if(selected_distance < VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE))
 					{
 						udg_get_vertex_pos(ParseInputData.depth, select_closest);
 						ParseInputData.start_vertex = select_closest;
@@ -103,7 +103,7 @@ void la_parse_input(BInputState *input)
 					ParseInputData.start_vertex = select_closest;
 					if(la_t_tm_test_center(input))
 						ParseInputData.mode = PIM_SHOW_MANIPULATOR_MENU;
-					else if(selected_distance < VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE))
+					else if(selected_distance < VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE))
 					{
 						ParseInputData.mode = PIM_SHOW_VERTEX_MENU;
 						la_pu_vertex(input, ParseInputData.start_vertex);
@@ -129,7 +129,7 @@ void la_parse_input(BInputState *input)
 			{
 				if(la_t_tm_test_center(input) == FALSE)
 				{
-					if((ParseInputData.mode == PIM_IDLE && selected_distance < VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE)) || (ParseInputData.mode == PIM_DRAW || ParseInputData.mode == PIM_DRAG_MANIPULATOR || ParseInputData.mode == PIM_DRAG_ONE_VERTEX) && input->mouse_button[1] == TRUE)
+					if((ParseInputData.mode == PIM_IDLE && selected_distance < VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE)) || (ParseInputData.mode == PIM_DRAW || ParseInputData.mode == PIM_DRAG_MANIPULATOR || ParseInputData.mode == PIM_DRAG_ONE_VERTEX) && input->mouse_button[1] == TRUE)
 					{
 						double closest[3];
 						udg_get_vertex_pos(closest, select_closest);
@@ -146,7 +146,7 @@ void la_parse_input(BInputState *input)
 		case PIM_DRAW :
 			udg_get_vertex_pos(snap, select_closest);
 			glDisable(GL_DEPTH_TEST);
-			if(selected_distance > VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) && ParseInputData.start_vertex == -1 && input->mode == BAM_DRAW)
+			if(selected_distance > VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE) && ParseInputData.start_vertex == -1 && input->mode == BAM_DRAW)
 				la_t_draw_line_draw_delete_overlay();
 			glEnable(GL_DEPTH_TEST);
 			p_get_projection_vertex_with_axis(output, ParseInputData.depth, input->pointer_x, input->pointer_y, input->mouse_button[1], snap);
@@ -159,7 +159,7 @@ void la_parse_input(BInputState *input)
 				{
 					double pos[3];
 					uint vertex[2];
-					if(selected_distance < VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) && input->mouse_button[1] != TRUE)
+					if(selected_distance < VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE) && input->mouse_button[1] != TRUE)
 					{
 						vertex[1] = select_closest;
 						if(ParseInputData.start_vertex == select_closest)
@@ -217,7 +217,7 @@ void la_parse_input(BInputState *input)
 				la_do_draw(ParseInputData.depth, output, input->mouse_button[1], snap);
 				if(ParseInputData.start_vertex == -1)
 					la_t_draw_line_add(input->pointer_x, input->pointer_y, TRUE);
-				if(selected_distance < VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) || input->mouse_button[1])
+				if(selected_distance < VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE) || input->mouse_button[1])
 				{
 					double closest[3];
 					udg_get_vertex_pos(closest, select_closest);
@@ -280,7 +280,7 @@ void la_parse_input(BInputState *input)
 				}else
 				{
 					la_do_xyz_lines(ParseInputData.depth, input->mouse_button[1]);
-					if(select_closest != ParseInputData.start_vertex && selected_distance < VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) && input->mouse_button[1] == TRUE)
+					if(select_closest != ParseInputData.start_vertex && selected_distance < VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE) && input->mouse_button[1] == TRUE)
 						la_do_active_vertex(snap, FALSE);
 				}
 			}
