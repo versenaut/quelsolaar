@@ -142,7 +142,7 @@ void draw_star(float time, float *color)
 		glRotatef(50 * (1 - time), 1, 0, 0);
 //		nglDrawArray(NGL_TRIANGLES_FILLED, GlobalIntro.star_id, &color, 1, GlobalIntro.star_m_id, GlobalIntro.star_ref);
 		sui_set_color_array_gl(color, 35, 4);
-		sui_draw_ellements_gl(GL_TRIANGLES, GlobalIntro.star_id, GlobalIntro.star_ref, 34 * 3, 2, 0, 0, 0);
+		sui_draw_elements_gl(GL_TRIANGLES, GlobalIntro.star_id, GlobalIntro.star_ref, 34 * 3, 2, 0, 0, 0);
 		glPopMatrix();
 	}
 }
@@ -151,7 +151,7 @@ void draw_star(float time, float *color)
 extern void sui_draw_gl(uint draw_type, float *array, uint length, uint dimentions, float red, float green, float blue);
 extern void sui_draw_2d_line_gl(float start_x, float start_y, float end_x, float end_y, float red, float green, float blue);
 extern void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end_x, float end_y, float end_z, float red, float green, float blue);
-extern void sui_draw_ellements_gl(uint draw_type, float *array, uint *reference, uint length, uint dimentions, float red, float green, float blue);
+extern void sui_draw_elements_gl(uint draw_type, float *array, uint *reference, uint length, uint dimentions, float red, float green, float blue);
 
 extern void sui_set_blend_gl(uint source, uint destination);
 
@@ -174,7 +174,7 @@ void draw_pointer(float time, float *color)
 		glRotatef(60 * i, 0, 0, 1);
 	//	nglDrawArray(NGL_TRIANGLES_FILLED, GlobalIntro.star_id, &GlobalIntro.star_color, 1, GlobalIntro.star_add_id, GlobalIntro.star_ref);
 		sui_set_color_array_gl(color, 35, 4);
-		sui_draw_ellements_gl(GL_TRIANGLES, GlobalIntro.star_id, GlobalIntro.star_ref, 34 * 3, 2, 0, 0, 0);
+		sui_draw_elements_gl(GL_TRIANGLES, GlobalIntro.star_id, GlobalIntro.star_ref, 34 * 3, 2, 0, 0, 0);
 		glPopMatrix();
 	}
 	glPopMatrix();

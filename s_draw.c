@@ -43,7 +43,7 @@ void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end
 	sui_draw_gl(GL_LINES, array, 2, 3, red, green, blue);
 }
 
-void sui_draw_ellements_gl(uint draw_type, float *array, uint *reference, uint length, uint dimentions, float red, float green, float blue)
+void sui_draw_elements_gl(uint draw_type, float *array, uint *reference, uint length, uint dimentions, float red, float green, float blue)
 {
 	glColor3f(red, green, blue);
 	glEnableClientState(GL_VERTEX_ARRAY);

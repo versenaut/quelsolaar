@@ -474,7 +474,7 @@ void co_draw_material_texture(COVNMaterial *mat, float x, float y)
 	glTranslatef(x, y, 0);
 	sui_set_texture2D_array_gl(uv, 65, 2, mat->texture_id);
 //	sui_draw_gl(GL_TRIANGLES, vertex, 65, 2, 0, 0, 0);
-	sui_draw_ellements_gl(GL_TRIANGLES, vertex, ref, 64 * 3, 2, 1, 1, 1);
+	sui_draw_elements_gl(GL_TRIANGLES, vertex, ref, 64 * 3, 2, 1, 1, 1);
 	glPopMatrix();
 }
 
