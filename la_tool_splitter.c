@@ -147,7 +147,7 @@ void polygon_split_end(uint *ref, uint *crease, uint *poly_id, /*uint vertex_cou
 	}
 }
 
-void find_edge_spliter(uint edge0, uint edge1, float x, float y)
+void find_edge_splitter(uint edge0, uint edge1, float x, float y)
 {
 	uint i, j, ref_count, *ref, vertex_count, *crease;
 	double vertex[3];
@@ -189,7 +189,7 @@ void find_edge_spliter(uint edge0, uint edge1, float x, float y)
 	}
 }
 
-void la_t_edge_spliter_start(BInputState *input, uint *edge)
+void la_t_edge_splitter_start(BInputState *input, uint *edge)
 {
 	GlobalSplitData.division = 1;
 	GlobalSplitData.division_old = 0;
@@ -203,9 +203,9 @@ void la_t_edge_spliter_start(BInputState *input, uint *edge)
 	splitt_edge_possition(edge[0], edge[1], input->pointer_x, input->pointer_y);
 	create_vertex_edge(edge[0], edge[1], input->pointer_x, input->pointer_y, FALSE, FALSE);
 //	GlobalSplitData.vertex_id[0] = GlobalSplitData.vertex_create = udg_find_empty_slot_id(VN_G_FRAGMENT_VERTEX, GlobalSplitData.vertex_create + 1);
-	find_edge_spliter(edge[0], edge[1], input->pointer_x, input->pointer_y);
+	find_edge_splitter(edge[0], edge[1], input->pointer_x, input->pointer_y);
 	/*if( DO THE TURN TEST) */
-	find_edge_spliter(edge[1], edge[0], input->pointer_x, input->pointer_y);
+	find_edge_splitter(edge[1], edge[0], input->pointer_x, input->pointer_y);
 
 	if(GlobalSplitData.poly_create == 0)
 	{
@@ -296,7 +296,7 @@ void final_middle_split(uint poly)
 	}
 }
 
-void la_t_edge_spliter(BInputState *input)
+void la_t_edge_splitter(BInputState *input)
 {
 	uint i, j, k, j2, new_vertex, poly; 
 	double vertex[4][3], start[2], mouse[2], a, b;
@@ -402,7 +402,7 @@ void la_t_edge_spliter(BInputState *input)
 					}
 					GlobalSplitData.division_old = GlobalSplitData.division;
 					
-					find_edge_spliter(GlobalSplitData.ref[i][j2], GlobalSplitData.ref[i][j], input->pointer_x, input->pointer_y);
+					find_edge_splitter(GlobalSplitData.ref[i][j2], GlobalSplitData.ref[i][j], input->pointer_x, input->pointer_y);
 					
 					final_edge_split(1, j - 1);
 					final_middle_split(1);

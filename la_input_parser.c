@@ -83,7 +83,7 @@ void la_parse_input(BInputState *input)
 							}else
 							{
 								ParseInputData.mode = PIM_SPLIT;
-								la_t_edge_spliter_start(input, edge);
+								la_t_edge_splitter_start(input, edge);
 							}
 							return;
 						}
@@ -233,7 +233,7 @@ void la_parse_input(BInputState *input)
 		break;
 		case PIM_SPLIT :
 			if(input->mode == BAM_EVENT)
-				la_t_edge_spliter(input);
+				la_t_edge_splitter(input);
 		break;
 		case PIM_DRAG_MANIPULATOR :
 			udg_get_vertex_pos(snap, select_closest);

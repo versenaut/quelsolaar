@@ -76,8 +76,8 @@ extern void		la_t_smooth_select(void);
 
 /* la_tool_split.c */
 
-extern void 	la_t_edge_spliter_start(BInputState *input, uint *edge);
-extern void 	la_t_edge_spliter(BInputState *input);
+extern void 	la_t_edge_splitter_start(BInputState *input, uint *edge);
+extern void 	la_t_edge_splitter(BInputState *input);
 
 /* la_tool_deply.c */
 
