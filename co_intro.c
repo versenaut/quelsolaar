@@ -40,7 +40,7 @@ void create_ring_section(uint start, uint sections, float start_angle, float ang
 	}
 }
 
-void co_intro_init()
+void co_intro_init(void)
 {
 	uint i, temp;
 	double x, y, z, size;
@@ -94,7 +94,7 @@ void co_intro_init()
 	}
 }
 void co_vng_ring(void);
-void co_vng_sun();
+void co_vng_sun(void);
 void co_pfx_sun_stars(void);
 
 void co_intro_symbol(float color)
@@ -124,7 +124,7 @@ sui_draw_gl(GL_QUADS, COIntroData.larger_ring, LOGGO_SMALL_RING_SPLIT * 4, 2, co
 
 }
 
-void co_intro_draw()
+void co_intro_draw(void)
 {
 	static float timer = 2;
 	float color, cam = 1, x, y, z, aspect, border[16] = {-1, 1, 1, 1, 1, 0.45, -1, 0.45, -1, -1, 1, -1, 1, -0.45, -1, -0.45};

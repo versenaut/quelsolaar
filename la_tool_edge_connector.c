@@ -38,7 +38,7 @@ void la_t_init_edge_connector(void)
 
 }
 
-void print_neighbor()
+void print_neighbor(void)
 {
 	uint i;
 	printf("list 0 has %i entrys\n", GlobalSurfaceCreate.list_length[0]);

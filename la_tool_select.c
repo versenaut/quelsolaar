@@ -62,7 +62,7 @@ void la_t_poly_select(uint polygon)
 		udg_set_select(ref[3], value);
 }
 
-void la_t_smooth_select()
+void la_t_smooth_select(void)
 {
 	uint i, *count, ref_count, *ref, vertex_count;
 	double *vertex, *value, temp;

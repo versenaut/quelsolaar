@@ -2,7 +2,7 @@
 #define CO_ENOUGH_NODE_SLOT 2
 #define CO_ENOUGH_DATA_SLOT 1
 
-extern void co_init_handle_verse_node();
+extern void co_init_handle_verse_node(void);
 
 extern uint co_vn_mouse_over(BInputState *input);
 extern void co_vn_unhide_node(uint node_id, float pos_x, float pos_y);

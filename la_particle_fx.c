@@ -317,7 +317,8 @@ uint create_particle_material(uint size, float *data)
 	glDisable(GL_TEXTURE_2D);
 	return texture_id;
 }
-uint create_def_material()
+
+uint create_def_material(void)
 {
 	uint texture_id, size = 256, i;
 	float *data, color[3] = {1, 1, 1};
@@ -939,7 +940,7 @@ void la_pfx_draw_intro(void)
 	glEnable(GL_DEPTH_TEST);
 }
 
-void la_pfx_video_flare()
+void la_pfx_video_flare(void)
 {
 	float pos[8] ={0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5}, uv[8] = {0, 0, 1, 0, 1, 1, 0, 1};
 	glDepthMask(0);

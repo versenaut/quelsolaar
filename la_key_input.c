@@ -28,7 +28,7 @@ void stop_macro(void)
 	LAInputHandlerGlobal.play = FALSE;
 }
 
-void init_key_input()
+void init_key_input(void)
 {
 	LAInputHandlerGlobal.file = NULL;
 	LAInputHandlerGlobal.rec = FALSE;

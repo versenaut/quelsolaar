@@ -82,8 +82,7 @@ void la_t_colapse_two_vertexes(uint vertex_a, uint vertex_b)
 	udg_vertex_delete(vertex_a);	
 }
 
-
-void la_t_colapse_selected_vertexes()
+void la_t_colapse_selected_vertexes(void)
 {
 	uint32 new_ref[4], vertex_count, polygon_count, *ref, i, j, colapse;
 	boolean recreate, del = TRUE;
@@ -149,7 +148,8 @@ double la_t_compute_weld_distance(uint a, uint b)
 			return (vertex_a[0] - vertex_b[0]) * (vertex_a[0] - vertex_b[0]) + (vertex_a[1] - vertex_b[1]) * (vertex_a[1] - vertex_b[1]) + (vertex_a[2] - vertex_b[2]) * (vertex_a[2] - vertex_b[2]);
 	return 10000000;
 }
-void la_t_weld_selected_vertexes()
+
+void la_t_weld_selected_vertexes(void)
 {
 	uint32 new_ref[4], vertex_count, polygon_count, *ref, poly, i, j, k;
 	double f, best = 10000000;

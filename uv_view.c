@@ -93,7 +93,7 @@ void uv_center(float x, float y)
 	view_cam_speed = 0.9;
 }
 
-float *get_cam_pos()
+float * get_cam_pos(void)
 {
 	return view_cam_pos;
 }

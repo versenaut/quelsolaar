@@ -158,7 +158,7 @@ void udg_set_modeling_layer(char *layer)
 	UNDOGlobal.layer_name[i] = 0;
 }
 
-double *udg_get_base_layer()
+double *udg_get_base_layer(void)
 {
 	ENode *g_node;
 	EGeoLayer *layer;
@@ -288,7 +288,7 @@ void execute_event(UNDOEvent *event, uint direction)
 	}
 }
 
-void udg_undo_geometry()
+void udg_undo_geometry(void)
 {
 	if(UNDOGlobal.undos > 0)
 	{
@@ -306,7 +306,7 @@ void udg_undo_geometry()
 	UNDOGlobal.redos++;
 }
 
-void udg_redo_geometry()
+void udg_redo_geometry(void)
 {
 	if(UNDOGlobal.redos > 0)
 	{
@@ -325,7 +325,7 @@ void udg_redo_geometry()
 }
 
 
-UNDOEvent * get_next_undo_event()
+UNDOEvent * get_next_undo_event(void)
 {
 	if(++UNDOGlobal.pos == UNDOGlobal.length)
 		UNDOGlobal.pos = 0;
@@ -671,14 +671,14 @@ void udg_clear_select(double value)
 		udg_set_select(i, value);
 }
 
-uint32 udg_find_empty_slot_vertex()
+uint32 udg_find_empty_slot_vertex(void)
 {
 	UNDOGlobal.slot[0] = e_nsg_find_empty_vertex_slot(e_ns_get_node(0, UNDOGlobal.g_node), UNDOGlobal.slot[0] + 1);
 	fprintf(stderr, "UNDOGlobal.slot[0] %u\n", UNDOGlobal.slot[0]);
 	return UNDOGlobal.slot[0];	
 }
 
-uint32 udg_find_empty_slot_polygon()
+uint32 udg_find_empty_slot_polygon(void)
 {
 	UNDOGlobal.slot[1] = e_nsg_find_empty_polygon_slot(e_ns_get_node(0, UNDOGlobal.g_node), UNDOGlobal.slot[1] + 1);
 	fprintf(stderr, "UNDOGlobal.slot[1] %u\n", UNDOGlobal.slot[1]);
@@ -756,7 +756,7 @@ double udg_get_distance(void)
 	return UNDOGlobal.distance;
 }
 
-void undo_event_done()
+void undo_event_done(void)
 {
 	if(UNDOGlobal.event[UNDOGlobal.pos].type == UNDOET_STOPP)
 		return;

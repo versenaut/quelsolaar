@@ -97,12 +97,12 @@ void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, 
 	BGlobal.screen_mode.fullscreen = window_fullscreen;
 }
 
-BInputState *betray_get_input_state()
+BInputState *betray_get_input_state(void)
 {
 	return &BGlobal.input;
 }
 
-float betray_get_time()
+float betray_get_time(void)
 {
 	return BGlobal.input.time;
 }
@@ -253,7 +253,7 @@ char *betray_debug(void)
 	return betray_debug_text;
 }
 
-boolean betray_is_type_in()
+boolean betray_is_type_in(void)
 {
 	return type_in_string != NULL;
 }

@@ -1,6 +1,6 @@
 
 extern void		init_undo(void);
-extern void		undo_event_done();
+extern void		undo_event_done(void);
 extern void		udg_connect(char *address);
 extern void		udg_connect_local(void);
 

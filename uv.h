@@ -1,4 +1,4 @@
-extern void uvo_draw_square();
+extern void uvo_draw_square(void);
 
 extern void get_tri_edge(egreal *output, uint edge, egreal *uv);
 extern void get_quad_edge(egreal *output, uint edge, egreal *uv);
@@ -21,7 +21,7 @@ extern float uv_get_view_x(float x);
 extern float uv_get_view_y(float y);
 
 extern void uv_center(float x, float y);
-extern float *get_cam_pos();
+extern float *get_cam_pos(void);
 
 extern boolean uv_test_tri(egreal *uv, float x, float y);
 extern boolean uv_test_quad(egreal *uv, float x, float y);
@@ -47,18 +47,18 @@ void uv_draw_line_test_select(void);
 /* transform */
 
 
-extern void uv_trans_init();
+extern void uv_trans_init(void);
 
 extern void uv_trans_move_corner(BInputState *input, uint poly_id, uint corner);
 extern void uv_trans_move_edge(BInputState *input, uint poly_id, uint corner);
-extern void uv_trans_draw();
+extern void uv_trans_draw(void);
 
 extern boolean uv_trans_begin(BInputState *input);
 extern void uv_trans_continiue(BInputState *input);
-extern void uv_trans_end();
+extern void uv_trans_end(void);
 
-extern void uv_trans_unhide();
-extern void uv_trans_hide();
+extern void uv_trans_unhide(void);
+extern void uv_trans_hide(void);
 
 extern void uv_trans_get_pos(egreal *pos);
 
@@ -99,8 +99,8 @@ extern void uv_tool_poly_project(uint poly);
 extern void uv_tool_poly_plane_select(uint poly);
 /* select tools */
 
-extern void uv_tool_flip_x();
-extern void uv_tool_flip_y();
+extern void uv_tool_flip_x(void);
+extern void uv_tool_flip_y(void);
 extern void uv_fit_selection(boolean preserve_aspect);
 
 /* unfold */
@@ -109,9 +109,9 @@ extern uint uv_polygon_unfold(uint id, float x, float y);
 extern void uv_start_polygon_unfold(uint id, float x, float y);
 
 
-extern void uve_init();
-extern void uve_update();
-extern void uve_draw();
+extern void uve_init(void);
+extern void uve_update(void);
+extern void uve_draw(void);
 extern boolean uve_test(float x, float y);
 
 /* strips */

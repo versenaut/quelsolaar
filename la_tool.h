@@ -7,7 +7,7 @@ extern void		la_t_weld_selected_vertexes(void);
 /* la_tool_draw.c */
 
 
-extern void		la_t_init_draw_line();
+extern void		la_t_init_draw_line(void);
 extern void		la_t_new_draw_line(void);
 extern void		la_t_draw_line_add(float x, float y, boolean add);
 extern boolean  la_t_draw_select_meny_test(void);
@@ -26,7 +26,7 @@ extern boolean la_t_draw_line_test_select(SelectionMode mode);
 
 /* la_tool_edge_connector.c */
 
-extern void		la_t_init_edge_connector();
+extern void		la_t_init_edge_connector(void);
 extern boolean la_t_edge_connector(uint *edge);
 
 /* la_tool_manipulator.c */
@@ -48,12 +48,12 @@ extern void 	grab_one_vertex(BInputState *input, uint id, double *pos);
 extern void		la_t_face_vector(double *origo, double *vector, uint v0, uint v1, uint v2);
 
 extern void		la_t_extrude(uint vertex_count, void (*func)(double *output, uint vertex_id, void *data), void *data);
-extern void		la_t_detach_selected_polygons();
-extern void		la_t_duplicate_selected_polygons();
-extern void		la_t_flip_selected_polygons();
+extern void		la_t_detach_selected_polygons(void);
+extern void		la_t_duplicate_selected_polygons(void);
+extern void		la_t_flip_selected_polygons(void);
 extern void		la_t_mirror(double *pos, double *vector);
 extern void		la_t_flatten(double *origo, double *vector);
-extern void		la_t_delete_selection();
+extern void		la_t_delete_selection(void);
 
 /* la_tool_reshape.c */
 
@@ -72,7 +72,7 @@ extern void 	la_t_crease_selected(uint32 crease_value);
 /* la_tool_select.c */
 extern uint		la_t_poly_test(BInputState *input);
 extern void		la_t_poly_select(uint polygon);
-extern void		la_t_smooth_select();
+extern void		la_t_smooth_select(void);
 
 /* la_tool_split.c */
 

@@ -144,9 +144,7 @@ void uv_trans_init()
 }
 
 
-
-
-void uv_trans_lock()
+void uv_trans_lock(void)
 {
 	uint id;
 	UVTGlobal.locked_uv = malloc((sizeof *UVTGlobal.locked_uv) * uvg_get_polygon_length() * 8);
@@ -155,7 +153,7 @@ void uv_trans_lock()
 	UVTGlobal.locked_length = uvg_get_polygon_length();
 }
 
-void uv_trans_unlock()
+void uv_trans_unlock(void)
 {
 	free(UVTGlobal.locked_uv);
 	UVTGlobal.locked_length = 0;

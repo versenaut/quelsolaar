@@ -395,7 +395,7 @@ typedef enum{
 #define SE_OUTPUT_SCALE 1
 //#define SE_OUTPUT_SCALE 0.25
 
-void se_convert_flat_arcs()
+void se_convert_flat_arcs(void)
 {
 	uint i, j;
 	for(i = 0; i < SEditor.drawing_count; i++)

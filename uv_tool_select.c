@@ -10,7 +10,7 @@
 
 extern void uv_trans_get_pos(egreal *pos);
 
-void uv_tool_flip_x()
+void uv_tool_flip_x(void)
 {
 	uint id, i;
 	egreal uv[8], center[2], *s;
@@ -29,7 +29,7 @@ void uv_tool_flip_x()
 	}
 }
 
-void uv_tool_flip_y()
+void uv_tool_flip_y(void)
 {
 	uint id, i;
 	egreal uv[8], center[2], *s;

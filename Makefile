@@ -4,7 +4,7 @@
 
 VERSE=../verse
 
-CFLAGS=-I$(VERSE) -g
+CFLAGS=-I$(VERSE) -g -Wstrict-prototypes
 LDFLAGS=-L$(VERSE) -L/usr/X11R6/lib
 LDLIBS=-lverse -lGL -lm -lglut -lGLU -lSDL
 

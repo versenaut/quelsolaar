@@ -41,13 +41,14 @@ extern void	delete_material(ENodeHead *node);
 extern void	delete_bitmap(ENodeHead *node);
 extern void	delete_code(ENodeHead *node);
 
-extern void es_head_init();
-extern void	es_object_init();
-extern void	es_geometry_init();
-extern void	es_material_init();
-extern void	es_bitmap_init();
-extern void es_code_init();
-extern void	es_curve_init();
+extern void es_head_init(void);
+extern void	es_object_init(void);
+extern void	es_geometry_init(void);
+extern void	es_material_init(void);
+extern void	es_bitmap_init(void);
+extern void es_code_init(void);
+extern void	es_curve_init(void);
+
 /* ------------------------------------------------------------------------------------------------------------------------- */
 
 static void e_ns_del_node(uint key, void *value, void *user_data)
@@ -294,7 +295,7 @@ ENodeHead *e_ns_get_node_avatar(uint connection)
 	return find_dlut(&ENSGlobal.context[connection].look_up_table, ENSGlobal.context[connection].avatar);
 }
 
-void enough_init()
+void enough_init(void)
 {
 	uint i, j;
 	for(i = 0; i < MAX_CONNECTIONS; i++)
