@@ -57,7 +57,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 	{
 		EGeoLayer *layer;
 		y -= 0.05;
-		if(sw_text_button(input, -0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new layer", color, color, color))
+		if(sw_text_button(input, -0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new Layer", color, color, color))
 		{
 			EGeoLayer *l;
 			uint i;
@@ -180,17 +180,16 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 				i++;
 			sprintf(nr, "weight_%u", i);
 			verse_send_g_bone_create(change_g_node_id, -1, nr, "reference", 0, 0, 0, 0, 0, 0, 0, 1);
-
 		}
 		y -= 0.05;
 		for(bone = e_nsg_get_bone_next(node, 0); bone != (uint16)-1; bone = e_nsg_get_bone_next(node, bone + 1))
 		{
-
 			static double t[7];
 			char *ref, *text[] = {"X", "Y", "Z", "X", "Y", "Z", "W"};
 			uint i;
 			uint32 parent;
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Bone Weight:", color_light, color_light, color_light);  
+
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Bone Weight:", color_light, color_light, color_light);
 			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nsg_get_bone_weight(node, bone), 16, rename_g_layer_func, e_nsg_get_bone_weight(node, bone), color, color_light);
 
 			if(co_w_close_button(input, 0.645, y, color, color, color))
@@ -209,8 +208,6 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 			y -= 0.05;
 			sui_draw_text(-0.25, y, SUI_T_SIZE, SUI_T_SPACE, "POSITION", color_light, color_light, color_light);
 			sui_draw_text(-0.25, y - 0.15, SUI_T_SIZE, SUI_T_SPACE, "ROTATION", color_light, color_light, color_light);
-
-
 
 			for(i = 0; i < 7; i++)
 			{	
