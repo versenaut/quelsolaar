@@ -271,7 +271,7 @@ float co_handle_node_head(BInputState *input, ENode *node)
 	}
 
 	y -= 0.15;
-	co_vng_divider(input, 0.2, y, &tag_rot, &color, &color_light, &show_tags, "TAGS");
+	co_vng_divider(input, 0.2, y, &tag_rot, &color, &color_light, &show_tags, "Tags");
 	y -= 0.05;
 	
 	if(tag_rot > 0.01)
@@ -289,7 +289,7 @@ float co_handle_node_head(BInputState *input, ENode *node)
 		y -= 0.05;
 		if(-1 == e_ns_get_next_tag_group(node, 0))
 		{
-			sui_draw_text(-0.3, y, SUI_T_SIZE, SUI_T_SPACE, "NO TAGS GROUPS", color_light, color_light, color_light);  
+			sui_draw_text(-0.3, y, SUI_T_SIZE, SUI_T_SPACE, "No Tag Groups", color_light, color_light, color_light);  
 			y -= 0.05;
 		}
 		for(i = e_ns_get_next_tag_group(node, 0); i != -1 ; i = e_ns_get_next_tag_group(node, i + 1))

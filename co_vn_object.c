@@ -107,7 +107,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 	y = co_handle_node_head(input, node);
 	rename_o_node_id = e_ns_get_node_id(node);
 
-	co_vng_divider(input, 0.2, y, &rot_light, &color, &color_light, &show_light, "LIGHT");
+	co_vng_divider(input, 0.2, y, &rot_light, &color, &color_light, &show_light, "Light");
 
 	if(rot_light > 0.001)
 	{
@@ -133,7 +133,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 	}
 	glPopMatrix();
 	y -= 0.05 + 0.15 * rot_light;
-	co_vng_divider(input, 0.2, y, &rot_meth, &color, &color_light, &show_meth, "METHODS");
+	co_vng_divider(input, 0.2, y, &rot_meth, &color, &color_light, &show_meth, "Methods");
 	pre_expander = y;
 
 	if(rot_meth > 0.001)
@@ -287,7 +287,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 	glPopMatrix();
 
 	y -= 0.05 + (y - pre_expander) * (1 - rot_meth);
-	co_vng_divider(input, 0.2, y, &rot_trans, &color, &color_light, &show_trans, "TRANSFORM");
+	co_vng_divider(input, 0.2, y, &rot_trans, &color, &color_light, &show_trans, "Transform");
 
 	if(rot_trans > 0.001)
 	{
@@ -370,7 +370,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 	}
 	glPopMatrix();
 	y -= 0.05 + 0.6 * rot_trans;
-	co_vng_divider(input, 0.2, y, &rot_link, &color, &color_light, &show_link, "LINKS");
+	co_vng_divider(input, 0.2, y, &rot_link, &color, &color_light, &show_link, "Links");
 	y -= 0.05;	
 	if(rot_link > 0.001)
 	{
