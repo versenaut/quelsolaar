@@ -40,7 +40,7 @@ struct{
 	egreal	*u;
 	egreal	*v;
 	egreal	*corner_select;
-	uint	colapse_id;
+	uint	collapse_id;
 	boolean create;
 	UVEvent events[UNDO_BUFFER_SIZE];
 	uint	event_start;
@@ -76,7 +76,7 @@ void uvg_init()
 	UVGGlobal.select_version = 0;
 	UVGGlobal.corner_select = NULL;
 	UVGGlobal.vertex_select = NULL;
-	UVGGlobal.colapse_id = 0;
+	UVGGlobal.collapse_id = 0;
 	UVGGlobal.create = FALSE;
 	UVGGlobal.event_pos = 0;
 	UVGGlobal.event_start = 0;
@@ -159,11 +159,11 @@ boolean uvg_update()
 
 	if(UVGGlobal.u != NULL && UVGGlobal.v != NULL && UVGGlobal.create)
 	{
-		UVGGlobal.colapse_id = uvg_get_next_polygon(UVGGlobal.colapse_id + 1);
-		if(UVGGlobal.colapse_id == -1)
-			UVGGlobal.colapse_id = uvg_get_next_polygon(0);
-		if(UVGGlobal.colapse_id != -1)
-			uvg_get_un_colapse(UVGGlobal.colapse_id);
+		UVGGlobal.collapse_id = uvg_get_next_polygon(UVGGlobal.collapse_id + 1);
+		if(UVGGlobal.collapse_id == -1)
+			UVGGlobal.collapse_id = uvg_get_next_polygon(0);
+		if(UVGGlobal.collapse_id != -1)
+			uvg_get_un_collapse(UVGGlobal.collapse_id);
 	}
 	return TRUE;
 }
@@ -182,7 +182,7 @@ void uvg_node_create_uv()
 	UVGGlobal.create = TRUE;
 }
 
-void uvg_get_un_colapse(uint id)
+void uvg_get_un_collapse(uint id)
 {
 	if(UVGGlobal.u[id * 4] < UVGGlobal.u[id * 4 + 1] + 0.00001 && UVGGlobal.u[id * 4] > UVGGlobal.u[id * 4 + 1] - 0.00001 &&
 		UVGGlobal.u[id * 4 + 1] < UVGGlobal.u[id * 4 + 2] + 0.00001 && UVGGlobal.u[id * 4 + 1] > UVGGlobal.u[id * 4 + 2] - 0.00001 &&

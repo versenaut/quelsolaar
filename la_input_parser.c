@@ -245,7 +245,7 @@ void la_parse_input(BInputState *input)
 		case PIM_DRAG_ONE_VERTEX :
 			{
 				double vertex[3];
-				static uint colapse = 0;
+				static uint collapse = 0;
 				udg_get_vertex_pos(snap, select_closest);
 
 				if(input->mode == BAM_EVENT)
@@ -257,13 +257,13 @@ void la_parse_input(BInputState *input)
 						ParceInputData.mode = PIM_IDLE;
                     
 /*					if(input->last_mouse_button[0] != TRUE)
-						colapse = ParceInputData.start_vertex;
+						collapse = ParceInputData.start_vertex;
 					if(input->mouse_button[2] != TRUE)
 						p_get_projection_vertex_with_axis(vertex, ParceInputData.depth, input->pointer_x, input->pointer_y, input->mouse_button[1], snap);
 					else
 					{
 						if(closest != ParceInputData.start_vertex)
-							colapse = select_closest;
+							collapse = select_closest;
 						vertex[0] = snap[0];
 						vertex[1] = snap[1];
 						vertex[2] = snap[2];
@@ -273,7 +273,7 @@ void la_parse_input(BInputState *input)
 						if(input->mouse_button[2] != TRUE)
 							udg_vertex_set(ParceInputData.start_vertex, ParceInputData.depth, vertex[0], vertex[1], vertex[2]);
 						else
-							la_t_colapse_two_vertexes(ParceInputData.start_vertex, select_closest);
+							la_t_collapse_two_vertexes(ParceInputData.start_vertex, select_closest);
 						ParceInputData.mode = PIM_IDLE;
 					}else
 						udg_vertex_move(ParceInputData.start_vertex, vertex[0], vertex[1], vertex[2]);*/

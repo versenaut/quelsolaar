@@ -1,7 +1,7 @@
 /* la_tool_cloapse.c */
 
-extern void		la_t_colapse_two_vertexes(uint vertex_a, uint vertex_b);
-extern void		la_t_colapse_selected_vertexes(void);
+extern void		la_t_collapse_two_vertexes(uint vertex_a, uint vertex_b);
+extern void		la_t_collapse_selected_vertexes(void);
 extern void		la_t_weld_selected_vertexes(void);
 
 /* la_tool_draw.c */

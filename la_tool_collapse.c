@@ -3,11 +3,11 @@
 #include "st_matrix_operations.h"
 #include "la_geometry_undo.h"
 
-void colapse_polygon(uint id, uint *ref, uint colapse, uint vertex_count, boolean *del)
+void collapse_polygon(uint id, uint *ref, uint collapse, uint vertex_count, boolean *del)
 {
 	uint i, count = 0, shift, create_ref[4];
 	for(i = 0; i < 4; i++)
-		if(ref[i] == colapse)
+		if(ref[i] == collapse)
 			count++;
 	if(count == 1)
 	{
@@ -15,11 +15,11 @@ void colapse_polygon(uint id, uint *ref, uint colapse, uint vertex_count, boolea
 		*del = FALSE;
 	}else if(count > 2 || (count == 2 && ref[3] > vertex_count))
 		udg_polygon_delete(id);
-	else if((ref[1] == colapse && ref[3] == colapse) || (ref[0] == colapse && ref[2] == colapse))
+	else if((ref[1] == collapse && ref[3] == collapse) || (ref[0] == collapse && ref[2] == collapse))
 		udg_polygon_delete(id);
 	else
 	{
-		for(i = 0; i < 4 && (ref[i] != colapse || ref[(i + 1) % 4] != colapse); i++);
+		for(i = 0; i < 4 && (ref[i] != collapse || ref[(i + 1) % 4] != collapse); i++);
 		shift = (3 - i);
 		for(i = 0; i < 4; i++)
 			create_ref[(i + shift) % 4] = ref[i];
@@ -28,7 +28,7 @@ void colapse_polygon(uint id, uint *ref, uint colapse, uint vertex_count, boolea
 	}
 }
 
-void la_t_colapse_two_vertexes(uint vertex_a, uint vertex_b)
+void la_t_collapse_two_vertexes(uint vertex_a, uint vertex_b)
 {
 	uint32 new_ref[4], vertex_count, polygon_count, *ref, i, j;
 	double a[3], b[3];
@@ -48,7 +48,7 @@ void la_t_colapse_two_vertexes(uint vertex_a, uint vertex_b)
 					new_ref[2] = ref[i * 4 + 2];
 					new_ref[3] = ref[i * 4 + 3];
 					new_ref[j] = vertex_b;
-					colapse_polygon(i, new_ref, vertex_b, vertex_count, &del);
+					collapse_polygon(i, new_ref, vertex_b, vertex_count, &del);
 				}
 			}
 		}
@@ -82,9 +82,9 @@ void la_t_colapse_two_vertexes(uint vertex_a, uint vertex_b)
 	udg_vertex_delete(vertex_a);	
 }
 
-void la_t_colapse_selected_vertexes(void)
+void la_t_collapse_selected_vertexes(void)
 {
-	uint32 new_ref[4], vertex_count, polygon_count, *ref, i, j, colapse;
+	uint32 new_ref[4], vertex_count, polygon_count, *ref, i, j, collapse;
 	boolean recreate, del = TRUE;
 	double vertex[3], middle[3] = {0, 0, 0}, sum = 0, select;
 	
@@ -93,7 +93,7 @@ void la_t_colapse_selected_vertexes(void)
 	for(i = 0; i < vertex_count && 0.01 > udg_get_select(i); i++);
 	if(i == vertex_count)
 		return;
-	colapse = i;
+	collapse = i;
 	for(; i < vertex_count; i++)
 	{
 		select = udg_get_select(i);
@@ -117,25 +117,24 @@ void la_t_colapse_selected_vertexes(void)
 			for(j = 0; j < 4; j++)
 			{
 				new_ref[j] = ref[i * 4 + j];
-				if(new_ref[j] <= vertex_count && 0.01 < udg_get_select(new_ref[j]) && new_ref[j] != colapse)
+				if(new_ref[j] <= vertex_count && 0.01 < udg_get_select(new_ref[j]) && new_ref[j] != collapse)
 				{
-					new_ref[j] = colapse;
+					new_ref[j] = collapse;
 					recreate = TRUE;
 				}					
 			}
 			if(recreate == TRUE)
-				colapse_polygon(i, new_ref, colapse, vertex_count, &del);
+				collapse_polygon(i, new_ref, collapse, vertex_count, &del);
 		}
 	}
 	if(del)
-		udg_vertex_delete(colapse);
-	for(i = colapse + 1; i < vertex_count; i++);
+		udg_vertex_delete(collapse);
+	for(i = collapse + 1; i < vertex_count; i++);
 		if(0.01 < udg_get_select(i))
 			udg_vertex_delete(i);
-	udg_get_vertex_pos(vertex, colapse);
-	udg_vertex_set(colapse, vertex, middle[0] / sum, middle[1] / sum, middle[2] / sum);
+	udg_get_vertex_pos(vertex, collapse);
+	udg_vertex_set(collapse, vertex, middle[0] / sum, middle[1] / sum, middle[2] / sum);
 }
-
 
 
 double la_t_compute_weld_distance(uint a, uint b)

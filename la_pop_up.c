@@ -343,7 +343,7 @@ void la_pu_manipulator(BInputState *input)
 			la_t_detach_selected_polygons();
 		break;
 		case 3 :
-			la_t_colapse_selected_vertexes();
+			la_t_collapse_selected_vertexes();
 		break;
 		case 4 :
 			la_t_crease_selected(-1);
@@ -487,7 +487,7 @@ void la_pu_edge(BInputState *input, uint *edge)
 			la_t_select_hull(edge);
 		break;
 		case 4 :
-			la_t_colapse_two_vertexes(edge[0], edge[1]);
+			la_t_collapse_two_vertexes(edge[0], edge[1]);
 		break;
 		case 5 :
 		{
