@@ -511,7 +511,10 @@ void callback_send_g_layer_create(void *user_data, VNodeID node_id, VLayerID lay
 	{
 		node->layers = realloc(node->layers, (sizeof *node->layers) * (layer_id + 8));
 		for(;node->layer_allocated < layer_id + 8; node->layer_allocated++)
+		{
 			node->layers[node->layer_allocated].name[0] = 0;
+			node->layers[node->layer_allocated].data = NULL;
+		}
 	}
 	layer = &node->layers[layer_id];
 	layer->layer_id = layer_id;
