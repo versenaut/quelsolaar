@@ -1,12 +1,15 @@
+/*
+ * The "Persuade" library requires OpenGL 2.0 or higher. Since many people don't have this yet,
+ * it can be disabled by not defining he PERSUADE_H symbol in "persuade.h". This file can be
+ * renamed into "persuade.h" on systems where OpenGL 2.0 is available.
+*/
+
 #if !defined PERSUADE_H
 #define	PERSUADE_H
 
 #include "enough.h"
 
-
-
 typedef void PMesh;
-
 
 extern void persuade_init(uint max_tesselation_level, void *(*gl_GetProcAddress)(const char* proc)); /* initialize persuade and set the maximum SDS level*/
 extern void p_task_compute(uint count); /* this function makes Persuade update everything that needs to be computedcompute */
