@@ -1,4 +1,3 @@
-#define	NGL_H
 #include "la_includes.h"
 
 #include "st_matrix_operations.h"
