@@ -25,21 +25,21 @@ typedef enum{
 }TManipMode;
 
 struct{
-	float		*manupulator_array;
-	float		*manupulator_normal;
-	float		*manupulator_color;
-	float		*manupulator_circle;
-	float		*manupulator_grid;
-	float		*manupulator_normal_array;
-	uint		manupulator_normal_array_length;
-	float		*manupulator_rings;
-	float		*manupulator_rings_normals;
-	float		*manupulator_rings_color;
-	float		*manupulator_rings_shadow;
-	double		manupulator_pos[3];
-	double		manupulator_size;
-	double		manupulator_scale[3];
-	double		manupulator_rotate_scale;
+	float		*manipulator_array;
+	float		*manipulator_normal;
+	float		*manipulator_color;
+	float		*manipulator_circle;
+	float		*manipulator_grid;
+	float		*manipulator_normal_array;
+	uint		manipulator_normal_array_length;
+	float		*manipulator_rings;
+	float		*manipulator_rings_normals;
+	float		*manipulator_rings_color;
+	float		*manipulator_rings_shadow;
+	double		manipulator_pos[3];
+	double		manipulator_size;
+	double		manipulator_scale[3];
+	double		manipulator_rotate_scale;
 	TManipMode	mode;
 	double		grabb_pos;
 	double		grabb_manip_pos;
@@ -56,103 +56,103 @@ void la_t_tm_init(void)
 {
 	uint i, j, k;
 	float square[8];
-	GlobalTransformManupulator.manupulator_normal_array = 0;
-	GlobalTransformManupulator.manupulator_circle = malloc((sizeof *GlobalTransformManupulator.manupulator_circle) * (ROTATE_GRID_DEGEES * 6 + 24) * 3);
-	GlobalTransformManupulator.manupulator_grid = malloc((sizeof *GlobalTransformManupulator.manupulator_grid) * (ROTATE_GRID_DEGEES * 4 + ROTATE_GRID_SPLITS * 4) * 3);
+	GlobalTransformManupulator.manipulator_normal_array = 0;
+	GlobalTransformManupulator.manipulator_circle = malloc((sizeof *GlobalTransformManupulator.manipulator_circle) * (ROTATE_GRID_DEGEES * 6 + 24) * 3);
+	GlobalTransformManupulator.manipulator_grid = malloc((sizeof *GlobalTransformManupulator.manipulator_grid) * (ROTATE_GRID_DEGEES * 4 + ROTATE_GRID_SPLITS * 4) * 3);
 	k = 0;
 	for(i = 0; i < ROTATE_GRID_DEGEES; i++)
 	{
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_grid, k++, 0.96 * sin(2 * PI * (float)i / ROTATE_GRID_DEGEES + 0.01), 0.96 * cos(2 * PI * (float)i / ROTATE_GRID_DEGEES + 0.01), -0.002);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_grid, k++, 0.99 * sin(2 * PI * (float)i / ROTATE_GRID_DEGEES + 0.006), 0.99 * cos(2 * PI * (float)i / ROTATE_GRID_DEGEES + 0.006), -0.018);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_grid, k++, 0.99 * sin(2 * PI * (float)i / ROTATE_GRID_DEGEES - 0.006), 0.99 * cos(2 * PI * (float)i / ROTATE_GRID_DEGEES - 0.006), -0.018);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_grid, k++, 0.96 * sin(2 * PI * (float)i / ROTATE_GRID_DEGEES - 0.01), 0.96 * cos(2 * PI * (float)i / ROTATE_GRID_DEGEES - 0.01), -0.002);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_grid, k++, 0.96 * sin(2 * PI * (float)i / ROTATE_GRID_DEGEES + 0.01), 0.96 * cos(2 * PI * (float)i / ROTATE_GRID_DEGEES + 0.01), -0.002);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_grid, k++, 0.99 * sin(2 * PI * (float)i / ROTATE_GRID_DEGEES + 0.006), 0.99 * cos(2 * PI * (float)i / ROTATE_GRID_DEGEES + 0.006), -0.018);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_grid, k++, 0.99 * sin(2 * PI * (float)i / ROTATE_GRID_DEGEES - 0.006), 0.99 * cos(2 * PI * (float)i / ROTATE_GRID_DEGEES - 0.006), -0.018);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_grid, k++, 0.96 * sin(2 * PI * (float)i / ROTATE_GRID_DEGEES - 0.01), 0.96 * cos(2 * PI * (float)i / ROTATE_GRID_DEGEES - 0.01), -0.002);
 
 
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_circle, i * 6 + 0, 1 * sin(2 * PI * (float)i / ROTATE_GRID_DEGEES), 1 * cos(2 * PI * (float)i / ROTATE_GRID_DEGEES), -0.01);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_circle, i * 6 + 1, 1 * sin(2 * PI * (float)(i + 1) / ROTATE_GRID_DEGEES), 1 * cos(2 * PI * (float)(i + 1) / ROTATE_GRID_DEGEES), -0.01);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_circle, i * 6 + 2, 0.95 * sin(2 * PI * (float)i / ROTATE_GRID_DEGEES), 0.95 * cos(2 * PI * (float)i / ROTATE_GRID_DEGEES), -0.0);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_circle, i * 6 + 3, 0.95 * sin(2 * PI * (float)(i + 1) / ROTATE_GRID_DEGEES), 0.95 * cos(2 * PI * (float)(i + 1) / ROTATE_GRID_DEGEES), -0.0);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_circle, i * 6 + 4, 0.9 * sin(2 * PI * (float)i / ROTATE_GRID_DEGEES), 0.9 * cos(2 * PI * (float)i / ROTATE_GRID_DEGEES), -0.015);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_circle, i * 6 + 5, 0.9 * sin(2 * PI * (float)(i + 1) / ROTATE_GRID_DEGEES), 0.9 * cos(2 * PI * (float)(i + 1) / ROTATE_GRID_DEGEES), -0.015);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_circle, i * 6 + 0, 1 * sin(2 * PI * (float)i / ROTATE_GRID_DEGEES), 1 * cos(2 * PI * (float)i / ROTATE_GRID_DEGEES), -0.01);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_circle, i * 6 + 1, 1 * sin(2 * PI * (float)(i + 1) / ROTATE_GRID_DEGEES), 1 * cos(2 * PI * (float)(i + 1) / ROTATE_GRID_DEGEES), -0.01);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_circle, i * 6 + 2, 0.95 * sin(2 * PI * (float)i / ROTATE_GRID_DEGEES), 0.95 * cos(2 * PI * (float)i / ROTATE_GRID_DEGEES), -0.0);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_circle, i * 6 + 3, 0.95 * sin(2 * PI * (float)(i + 1) / ROTATE_GRID_DEGEES), 0.95 * cos(2 * PI * (float)(i + 1) / ROTATE_GRID_DEGEES), -0.0);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_circle, i * 6 + 4, 0.9 * sin(2 * PI * (float)i / ROTATE_GRID_DEGEES), 0.9 * cos(2 * PI * (float)i / ROTATE_GRID_DEGEES), -0.015);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_circle, i * 6 + 5, 0.9 * sin(2 * PI * (float)(i + 1) / ROTATE_GRID_DEGEES), 0.9 * cos(2 * PI * (float)(i + 1) / ROTATE_GRID_DEGEES), -0.015);
 	}
 
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_circle, i * 6 + 0, 0, 0, 1);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_circle, i * 6 + 1, 0, 0, 0.01);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_circle, i * 6 + 2, 0, 0, -0.01);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_circle, i * 6 + 3, 0, 0, -1);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_circle, i * 6 + 0, 0, 0, 1);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_circle, i * 6 + 1, 0, 0, 0.01);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_circle, i * 6 + 2, 0, 0, -0.01);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_circle, i * 6 + 3, 0, 0, -1);
 
 	for(i = 0; i < ROTATE_GRID_SPLITS; i++)
 	{
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_grid, k++, 0.94 * sin(2 * PI * (float)i / ROTATE_GRID_SPLITS + 0.02), 0.94 * cos(2 * PI * (float)i / ROTATE_GRID_SPLITS + 0.02), -0.002);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_grid, k++, 0.94 * sin(2 * PI * (float)i / ROTATE_GRID_SPLITS - 0.02), 0.94 * cos(2 * PI * (float)i / ROTATE_GRID_SPLITS - 0.02), -0.002);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_grid, k++, 0.91 * sin(2 * PI * (float)i / ROTATE_GRID_SPLITS - 0.01), 0.91 * cos(2 * PI * (float)i / ROTATE_GRID_SPLITS - 0.01), -0.028);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_grid, k++, 0.91 * sin(2 * PI * (float)i / ROTATE_GRID_SPLITS + 0.01), 0.91 * cos(2 * PI * (float)i / ROTATE_GRID_SPLITS + 0.01), -0.028);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_grid, k++, 0.94 * sin(2 * PI * (float)i / ROTATE_GRID_SPLITS + 0.02), 0.94 * cos(2 * PI * (float)i / ROTATE_GRID_SPLITS + 0.02), -0.002);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_grid, k++, 0.94 * sin(2 * PI * (float)i / ROTATE_GRID_SPLITS - 0.02), 0.94 * cos(2 * PI * (float)i / ROTATE_GRID_SPLITS - 0.02), -0.002);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_grid, k++, 0.91 * sin(2 * PI * (float)i / ROTATE_GRID_SPLITS - 0.01), 0.91 * cos(2 * PI * (float)i / ROTATE_GRID_SPLITS - 0.01), -0.028);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_grid, k++, 0.91 * sin(2 * PI * (float)i / ROTATE_GRID_SPLITS + 0.01), 0.91 * cos(2 * PI * (float)i / ROTATE_GRID_SPLITS + 0.01), -0.028);
 	}
 	k = 0;
-	GlobalTransformManupulator.manupulator_array = malloc((sizeof *GlobalTransformManupulator.manupulator_array) * (12 + 24 * 6) * 3);
-	GlobalTransformManupulator.manupulator_normal = malloc((sizeof *GlobalTransformManupulator.manupulator_normal) * (12 + 24 * 6) * 3);
+	GlobalTransformManupulator.manipulator_array = malloc((sizeof *GlobalTransformManupulator.manipulator_array) * (12 + 24 * 6) * 3);
+	GlobalTransformManupulator.manipulator_normal = malloc((sizeof *GlobalTransformManupulator.manipulator_normal) * (12 + 24 * 6) * 3);
 
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 0, 1, 1);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.3, 0, 0.01);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 0, 1, 1);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.1, 0, 0.014);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 0, 1, 1);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.1, 0.014, 0);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 0, 1, 1);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.3, 0.01, 0);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 0, 1, 1);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.3, 0, 0.01);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 0, 1, 1);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.1, 0, 0.014);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 0, 1, 1);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.1, 0.014, 0);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 0, 1, 1);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.3, 0.01, 0);
 
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 1, 0, 1);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0, 0.1, 0.014);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 1, 0, 1);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0, 0.3, 0.01);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 1, 0, 1);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.01, 0.3, 0);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 1, 0, 1);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.014, 0.1, 0);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 1, 0, 1);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0, 0.1, 0.014);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 1, 0, 1);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0, 0.3, 0.01);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 1, 0, 1);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.01, 0.3, 0);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 1, 0, 1);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.014, 0.1, 0);
 
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 1, 12, 0);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.014, 0, 0.1);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 1, 1, 0);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.01, 0, 0.3);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 1, 1, 0);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0, 0.01, 0.3);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 1, 1, 0);
-	sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0, 0.014, 0.1);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 1, 12, 0);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.014, 0, 0.1);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 1, 1, 0);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.01, 0, 0.3);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 1, 1, 0);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0, 0.01, 0.3);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 1, 1, 0);
+	sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0, 0.014, 0.1);
 
 	for(i = 1; i < 13; i++)
 	{
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 1, 0, 0);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0, 0.3 * sin(0.5 * PI * (float)i / 14), 0.3 * cos(0.5 * PI * (float)i / 14));
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 1, 0, 0);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0, 0.3 * sin(0.5 * PI * (float)(i + 1) / 14), 0.3 * cos(0.5 * PI * (float)(i + 1) / 14));
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 1, 0, 0);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0, 0.29 * sin(0.5 * PI * (float)(i + 1) / 14), 0.29 * cos(0.5 * PI * (float)(i + 1) / 14));
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 1, 0, 0);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0, 0.29 * sin(0.5 * PI * (float)i / 14), 0.29 * cos(0.5 * PI * (float)i / 14));
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 1, 0, 0);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0, 0.3 * sin(0.5 * PI * (float)i / 14), 0.3 * cos(0.5 * PI * (float)i / 14));
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 1, 0, 0);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0, 0.3 * sin(0.5 * PI * (float)(i + 1) / 14), 0.3 * cos(0.5 * PI * (float)(i + 1) / 14));
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 1, 0, 0);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0, 0.29 * sin(0.5 * PI * (float)(i + 1) / 14), 0.29 * cos(0.5 * PI * (float)(i + 1) / 14));
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 1, 0, 0);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0, 0.29 * sin(0.5 * PI * (float)i / 14), 0.29 * cos(0.5 * PI * (float)i / 14));
 
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 0, 1, 0);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.3 * sin(0.5 * PI * (float)i / 14), 0, 0.3 * cos(0.5 * PI * (float)i / 14));
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 0, 1, 0);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.3 * sin(0.5 * PI * (float)(i + 1) / 14), 0, 0.3 * cos(0.5 * PI * (float)(i + 1) / 14));
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 0, 1, 0);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.29 * sin(0.5 * PI * (float)(i + 1) / 14), 0, 0.29 * cos(0.5 * PI * (float)(i + 1) / 14));
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 0, 1, 0);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.29 * sin(0.5 * PI * (float)i / 14), 0, 0.29 * cos(0.5 * PI * (float)i / 14));
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 0, 1, 0);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.3 * sin(0.5 * PI * (float)i / 14), 0, 0.3 * cos(0.5 * PI * (float)i / 14));
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 0, 1, 0);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.3 * sin(0.5 * PI * (float)(i + 1) / 14), 0, 0.3 * cos(0.5 * PI * (float)(i + 1) / 14));
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 0, 1, 0);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.29 * sin(0.5 * PI * (float)(i + 1) / 14), 0, 0.29 * cos(0.5 * PI * (float)(i + 1) / 14));
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 0, 1, 0);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.29 * sin(0.5 * PI * (float)i / 14), 0, 0.29 * cos(0.5 * PI * (float)i / 14));
 
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 0, 0, 1);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.3 * sin(0.5 * PI * (float)i / 14), 0.3 * cos(0.5 * PI * (float)i / 14), 0);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 0, 0, 1);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.3 * sin(0.5 * PI * (float)(i + 1) / 14), 0.3 * cos(0.5 * PI * (float)(i + 1) / 14), 0);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 0, 0, 1);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.29 * sin(0.5 * PI * (float)(i + 1) / 14), 0.29 * cos(0.5 * PI * (float)(i + 1) / 14), 0);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal, k, 0, 0, 1);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_array, k++, 0.29 * sin(0.5 * PI * (float)i / 14), 0.29 * cos(0.5 * PI * (float)i / 14), 0);	
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 0, 0, 1);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.3 * sin(0.5 * PI * (float)i / 14), 0.3 * cos(0.5 * PI * (float)i / 14), 0);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 0, 0, 1);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.3 * sin(0.5 * PI * (float)(i + 1) / 14), 0.3 * cos(0.5 * PI * (float)(i + 1) / 14), 0);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 0, 0, 1);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.29 * sin(0.5 * PI * (float)(i + 1) / 14), 0.29 * cos(0.5 * PI * (float)(i + 1) / 14), 0);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal, k, 0, 0, 1);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_array, k++, 0.29 * sin(0.5 * PI * (float)i / 14), 0.29 * cos(0.5 * PI * (float)i / 14), 0);	
 	}
 
-	GlobalTransformManupulator.manupulator_rings = malloc((sizeof *GlobalTransformManupulator.manupulator_array) * 4 * (ROTATE_GRID_DEGEES + 6) * 2);
-	GlobalTransformManupulator.manupulator_rings_normals =  malloc((sizeof *GlobalTransformManupulator.manupulator_array) * 4 * (ROTATE_GRID_DEGEES + 6) * 3);
-	GlobalTransformManupulator.manupulator_rings_shadow = malloc((sizeof *GlobalTransformManupulator.manupulator_array) *  16 * (ROTATE_GRID_DEGEES + 6) * 2);
-	GlobalTransformManupulator.manupulator_rings_color = malloc((sizeof *GlobalTransformManupulator.manupulator_array) * 16 * (ROTATE_GRID_DEGEES + 6) * 4);
+	GlobalTransformManupulator.manipulator_rings = malloc((sizeof *GlobalTransformManupulator.manipulator_array) * 4 * (ROTATE_GRID_DEGEES + 6) * 2);
+	GlobalTransformManupulator.manipulator_rings_normals =  malloc((sizeof *GlobalTransformManupulator.manipulator_array) * 4 * (ROTATE_GRID_DEGEES + 6) * 3);
+	GlobalTransformManupulator.manipulator_rings_shadow = malloc((sizeof *GlobalTransformManupulator.manipulator_array) *  16 * (ROTATE_GRID_DEGEES + 6) * 2);
+	GlobalTransformManupulator.manipulator_rings_color = malloc((sizeof *GlobalTransformManupulator.manipulator_array) * 16 * (ROTATE_GRID_DEGEES + 6) * 4);
 	for(i = 0; i < ROTATE_GRID_DEGEES; i++)
 	{
 		square[0] =  0.35 * sin(2 * PI * (float)i / ROTATE_GRID_DEGEES);
@@ -164,15 +164,15 @@ void la_t_tm_init(void)
 		square[6] = 0.35 * sin(2 * PI * ((float)i + 0.5) / ROTATE_GRID_DEGEES);
 		square[7] = 0.35 * cos(2 * PI * ((float)i + 0.5) / ROTATE_GRID_DEGEES);
 
-		sui_draw_set_vec2(GlobalTransformManupulator.manupulator_rings, i * 4 + 0, square[0], square[1]);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_rings_normals, i * 4 + 0, square[0], square[1], -5);
-		sui_draw_set_vec2(GlobalTransformManupulator.manupulator_rings, i * 4 + 1, square[2], square[3]);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_rings_normals, i * 4 + 1, square[2], square[3], -5);
-		sui_draw_set_vec2(GlobalTransformManupulator.manupulator_rings, i * 4 + 2, square[4], square[5]);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_rings_normals, i * 4 + 2, square[4], square[5], -5);
-		sui_draw_set_vec2(GlobalTransformManupulator.manupulator_rings, i * 4 + 3, square[6], square[7]);
-		sui_draw_set_vec3(GlobalTransformManupulator.manupulator_rings_normals, i * 4 + 3, square[6], square[7], -5);
-		sui_create_shadow_edge(-0.02, 4, &GlobalTransformManupulator.manupulator_rings_shadow[16 * i * 2], &GlobalTransformManupulator.manupulator_rings_color[16 * i * 4], square);
+		sui_draw_set_vec2(GlobalTransformManupulator.manipulator_rings, i * 4 + 0, square[0], square[1]);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_rings_normals, i * 4 + 0, square[0], square[1], -5);
+		sui_draw_set_vec2(GlobalTransformManupulator.manipulator_rings, i * 4 + 1, square[2], square[3]);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_rings_normals, i * 4 + 1, square[2], square[3], -5);
+		sui_draw_set_vec2(GlobalTransformManupulator.manipulator_rings, i * 4 + 2, square[4], square[5]);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_rings_normals, i * 4 + 2, square[4], square[5], -5);
+		sui_draw_set_vec2(GlobalTransformManupulator.manipulator_rings, i * 4 + 3, square[6], square[7]);
+		sui_draw_set_vec3(GlobalTransformManupulator.manipulator_rings_normals, i * 4 + 3, square[6], square[7], -5);
+		sui_create_shadow_edge(-0.02, 4, &GlobalTransformManupulator.manipulator_rings_shadow[16 * i * 2], &GlobalTransformManupulator.manipulator_rings_color[16 * i * 4], square);
 	}
 
 	for(; i < ROTATE_GRID_DEGEES + 6; i++)
@@ -188,24 +188,24 @@ void la_t_tm_init(void)
 			square[6] = -0.4 * cos(2 * PI * ((float)i - 2.2 + (float)j * 0.4) / 18);
 			square[7] = 0.4 * sin(2 * PI * ((float)i - 2.2 + (float)j * 0.4) / 18);
 			i += j; 
-			sui_draw_set_vec2(GlobalTransformManupulator.manupulator_rings, i * 4 + 0, square[0], square[1]);
-			sui_draw_set_vec3(GlobalTransformManupulator.manupulator_rings_normals, i * 4 + 0, square[0], square[1], -5);
-			sui_draw_set_vec2(GlobalTransformManupulator.manupulator_rings, i * 4 + 1, square[2], square[3]);
-			sui_draw_set_vec3(GlobalTransformManupulator.manupulator_rings_normals, i * 4 + 1, square[2], square[3], -5);
-			sui_draw_set_vec2(GlobalTransformManupulator.manupulator_rings, i * 4 + 2, square[4], square[5]);
-			sui_draw_set_vec3(GlobalTransformManupulator.manupulator_rings_normals, i * 4 + 2, square[4], square[5], -5);
-			sui_draw_set_vec2(GlobalTransformManupulator.manupulator_rings, i * 4 + 3, square[6], square[7]);
-			sui_draw_set_vec3(GlobalTransformManupulator.manupulator_rings_normals, i * 4 + 3, square[6], square[7], -5);
-			sui_create_shadow_edge(0.02 - (float)j * 0.04, 4, &GlobalTransformManupulator.manupulator_rings_shadow[16 * i * 2], &GlobalTransformManupulator.manupulator_rings_color[16 * i * 4], square);
+			sui_draw_set_vec2(GlobalTransformManupulator.manipulator_rings, i * 4 + 0, square[0], square[1]);
+			sui_draw_set_vec3(GlobalTransformManupulator.manipulator_rings_normals, i * 4 + 0, square[0], square[1], -5);
+			sui_draw_set_vec2(GlobalTransformManupulator.manipulator_rings, i * 4 + 1, square[2], square[3]);
+			sui_draw_set_vec3(GlobalTransformManupulator.manipulator_rings_normals, i * 4 + 1, square[2], square[3], -5);
+			sui_draw_set_vec2(GlobalTransformManupulator.manipulator_rings, i * 4 + 2, square[4], square[5]);
+			sui_draw_set_vec3(GlobalTransformManupulator.manipulator_rings_normals, i * 4 + 2, square[4], square[5], -5);
+			sui_draw_set_vec2(GlobalTransformManupulator.manipulator_rings, i * 4 + 3, square[6], square[7]);
+			sui_draw_set_vec3(GlobalTransformManupulator.manipulator_rings_normals, i * 4 + 3, square[6], square[7], -5);
+			sui_create_shadow_edge(0.02 - (float)j * 0.04, 4, &GlobalTransformManupulator.manipulator_rings_shadow[16 * i * 2], &GlobalTransformManupulator.manipulator_rings_color[16 * i * 4], square);
 		}
 	}
 
 
-	GlobalTransformManupulator.manupulator_pos[0] = 0;
-	GlobalTransformManupulator.manupulator_pos[1] = 0;
-	GlobalTransformManupulator.manupulator_pos[2] = 0;
-	GlobalTransformManupulator.manupulator_size = 1;
-	GlobalTransformManupulator.manupulator_rotate_scale = 1;
+	GlobalTransformManupulator.manipulator_pos[0] = 0;
+	GlobalTransformManupulator.manipulator_pos[1] = 0;
+	GlobalTransformManupulator.manipulator_pos[2] = 0;
+	GlobalTransformManupulator.manipulator_size = 1;
+	GlobalTransformManupulator.manipulator_rotate_scale = 1;
 	GlobalTransformManupulator.mode = TMM_IDLE;
 	GlobalTransformManupulator.data = NULL;
 	GlobalTransformManupulator.hide = TRUE;
@@ -213,22 +213,22 @@ void la_t_tm_init(void)
 
 void la_t_tm_place(double x, double y, double z)
 {
-	GlobalTransformManupulator.manupulator_pos[0] = x;
-	GlobalTransformManupulator.manupulator_pos[1] = y;
-	GlobalTransformManupulator.manupulator_pos[2] = z;
+	GlobalTransformManupulator.manipulator_pos[0] = x;
+	GlobalTransformManupulator.manipulator_pos[1] = y;
+	GlobalTransformManupulator.manipulator_pos[2] = z;
 }
 void la_t_tm_get_pos(double *pos)
 {
-	pos[0] = GlobalTransformManupulator.manupulator_pos[0];
-	pos[1] = GlobalTransformManupulator.manupulator_pos[1];
-	pos[2] = GlobalTransformManupulator.manupulator_pos[2];
+	pos[0] = GlobalTransformManupulator.manipulator_pos[0];
+	pos[1] = GlobalTransformManupulator.manipulator_pos[1];
+	pos[2] = GlobalTransformManupulator.manipulator_pos[2];
 }
 void la_t_tm_get_vector(double *vector)
 {
 	double r;
 	uint i;
 	p_get_view_camera(vector);
-	dv3_sub(vector, GlobalTransformManupulator.manupulator_pos);
+	dv3_sub(vector, GlobalTransformManupulator.manipulator_pos);
 	r = sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]);
 	vector[0] = (double)((uint)(vector[0] * 1.6 / r));
 	vector[1] = (double)((uint)(vector[1] * 1.6 / r));
@@ -249,31 +249,31 @@ void la_t_tm_draw(BInputState *input, boolean active)
 	if(active != TRUE)
 	{
 		double camera[3];
-		p_get_projection_screen(camera, GlobalTransformManupulator.manupulator_pos[0], GlobalTransformManupulator.manupulator_pos[1], GlobalTransformManupulator.manupulator_pos[2]);
-		GlobalTransformManupulator.manupulator_size = 0.5 * camera[2]; /*sqrt(camera[0] * camera[0] + camera[1] * camera[1] + camera[2] * camera[2]);*/
+		p_get_projection_screen(camera, GlobalTransformManupulator.manipulator_pos[0], GlobalTransformManupulator.manipulator_pos[1], GlobalTransformManupulator.manipulator_pos[2]);
+		GlobalTransformManupulator.manipulator_size = 0.5 * camera[2]; /*sqrt(camera[0] * camera[0] + camera[1] * camera[1] + camera[2] * camera[2]);*/
 		p_get_view_camera(camera);
-		camera[0] =	camera[0] - GlobalTransformManupulator.manupulator_pos[0];
-		camera[1] = camera[1] - GlobalTransformManupulator.manupulator_pos[1];
-		camera[2] = camera[2] - GlobalTransformManupulator.manupulator_pos[2];
+		camera[0] =	camera[0] - GlobalTransformManupulator.manipulator_pos[0];
+		camera[1] = camera[1] - GlobalTransformManupulator.manipulator_pos[1];
+		camera[2] = camera[2] - GlobalTransformManupulator.manipulator_pos[2];
 		for(i = 0; i < 3; i++)
 		{
 			if(0 > camera[i])
-				GlobalTransformManupulator.manupulator_scale[i] = GlobalTransformManupulator.manupulator_size;
+				GlobalTransformManupulator.manipulator_scale[i] = GlobalTransformManupulator.manipulator_size;
 			else
-				GlobalTransformManupulator.manupulator_scale[i] = -GlobalTransformManupulator.manupulator_size;
+				GlobalTransformManupulator.manipulator_scale[i] = -GlobalTransformManupulator.manipulator_size;
 		}
 		for(i = 0; i < 3; i++)
 		{
 			double dist[3];
-			p_get_projection_plane(dist, i, input->pointer_x, input->pointer_y, GlobalTransformManupulator.manupulator_pos[i]);
+			p_get_projection_plane(dist, i, input->pointer_x, input->pointer_y, GlobalTransformManupulator.manipulator_pos[i]);
 		}
 	}
 	glDisable(GL_DEPTH_TEST);
 	if(GlobalTransformManupulator.mode == TMM_SCALE)
-		la_do_xyz_lines(GlobalTransformManupulator.manupulator_pos, input->mouse_button[1]);
+		la_do_xyz_lines(GlobalTransformManupulator.manipulator_pos, input->mouse_button[1]);
 	glPushMatrix();	
-	glTranslated(GlobalTransformManupulator.manupulator_pos[0], GlobalTransformManupulator.manupulator_pos[1], GlobalTransformManupulator.manupulator_pos[2]);
-	glScaled(GlobalTransformManupulator.manupulator_scale[0], GlobalTransformManupulator.manupulator_scale[1], GlobalTransformManupulator.manupulator_scale[2]);
+	glTranslated(GlobalTransformManupulator.manipulator_pos[0], GlobalTransformManupulator.manipulator_pos[1], GlobalTransformManupulator.manipulator_pos[2]);
+	glScaled(GlobalTransformManupulator.manipulator_scale[0], GlobalTransformManupulator.manipulator_scale[1], GlobalTransformManupulator.manipulator_scale[2]);
 
 	if(GlobalTransformManupulator.mode == TMM_ROTATE)
 	{
@@ -281,18 +281,18 @@ void la_t_tm_draw(BInputState *input, boolean active)
 			glRotated(90, 0, 1, 0);
 		if(GlobalTransformManupulator.grabb_axis == 1)
 			glRotated(90, 1, 0, 0);
-		sui_draw_gl(GL_LINES, GlobalTransformManupulator.manupulator_circle, (ROTATE_GRID_DEGEES * 6 + 24), 3, 1, 1, 1);
-		glScaled(1, 1, GlobalTransformManupulator.manupulator_rotate_scale);
-		sui_draw_gl(GL_QUADS, GlobalTransformManupulator.manupulator_grid, (ROTATE_GRID_DEGEES * 4 + ROTATE_GRID_SPLITS * 4), 3, 1, 1, 1);
-		glScaled(-8 * GlobalTransformManupulator.manupulator_size / GlobalTransformManupulator.manupulator_scale[0], -8 * GlobalTransformManupulator.manupulator_size / GlobalTransformManupulator.manupulator_scale[1], -8 * GlobalTransformManupulator.manupulator_size / GlobalTransformManupulator.manupulator_scale[2]);
+		sui_draw_gl(GL_LINES, GlobalTransformManupulator.manipulator_circle, (ROTATE_GRID_DEGEES * 6 + 24), 3, 1, 1, 1);
+		glScaled(1, 1, GlobalTransformManupulator.manipulator_rotate_scale);
+		sui_draw_gl(GL_QUADS, GlobalTransformManupulator.manipulator_grid, (ROTATE_GRID_DEGEES * 4 + ROTATE_GRID_SPLITS * 4), 3, 1, 1, 1);
+		glScaled(-8 * GlobalTransformManupulator.manipulator_size / GlobalTransformManupulator.manipulator_scale[0], -8 * GlobalTransformManupulator.manipulator_size / GlobalTransformManupulator.manipulator_scale[1], -8 * GlobalTransformManupulator.manipulator_size / GlobalTransformManupulator.manipulator_scale[2]);
 	}
 
 	
 	if(GlobalTransformManupulator.mode == TMM_IDLE || GlobalTransformManupulator.mode == TMM_PLACE)	
 	{
 		double matrix[16];
-//		sui_set_normal_array_gl(GlobalTransformManupulator.manupulator_normal, 12 + 24 * 6);
-		sui_draw_gl(GL_QUADS, GlobalTransformManupulator.manupulator_array, 12 + 24 * 6, 3, 1, 1, 1);
+//		sui_set_normal_array_gl(GlobalTransformManupulator.manipulator_normal, 12 + 24 * 6);
+		sui_draw_gl(GL_QUADS, GlobalTransformManupulator.manipulator_array, 12 + 24 * 6, 3, 1, 1, 1);
 		p_get_model_matrix(matrix);
 		matrix[3] = 0;
 		matrix[7] = 0;
@@ -303,14 +303,14 @@ void la_t_tm_draw(BInputState *input, boolean active)
 		glPopMatrix();
 		glPushMatrix();
 		reverse_matrix(matrix);
-		glTranslated(GlobalTransformManupulator.manupulator_pos[0], GlobalTransformManupulator.manupulator_pos[1], GlobalTransformManupulator.manupulator_pos[2]);
+		glTranslated(GlobalTransformManupulator.manipulator_pos[0], GlobalTransformManupulator.manipulator_pos[1], GlobalTransformManupulator.manipulator_pos[2]);
 		glMultMatrixd(matrix);
-		glScaled(GlobalTransformManupulator.manupulator_size, GlobalTransformManupulator.manupulator_size, GlobalTransformManupulator.manupulator_size);
-//		sui_set_normal_array_gl(GlobalTransformManupulator.manupulator_normal, 12 + 24 * 6);
-		sui_draw_gl(GL_QUADS, GlobalTransformManupulator.manupulator_rings, 4 * (ROTATE_GRID_DEGEES + 6), 2, 1, 1, 1);
+		glScaled(GlobalTransformManupulator.manipulator_size, GlobalTransformManupulator.manipulator_size, GlobalTransformManupulator.manipulator_size);
+//		sui_set_normal_array_gl(GlobalTransformManupulator.manipulator_normal, 12 + 24 * 6);
+		sui_draw_gl(GL_QUADS, GlobalTransformManupulator.manipulator_rings, 4 * (ROTATE_GRID_DEGEES + 6), 2, 1, 1, 1);
 		sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		sui_set_color_array_gl(GlobalTransformManupulator.manupulator_rings_color, 16 * (ROTATE_GRID_DEGEES + 6), 4);
-		sui_draw_gl(GL_QUADS, GlobalTransformManupulator.manupulator_rings_shadow, 16 * (ROTATE_GRID_DEGEES + 6), 2, 1, 1, 1);
+		sui_set_color_array_gl(GlobalTransformManupulator.manipulator_rings_color, 16 * (ROTATE_GRID_DEGEES + 6), 4);
+		sui_draw_gl(GL_QUADS, GlobalTransformManupulator.manipulator_rings_shadow, 16 * (ROTATE_GRID_DEGEES + 6), 2, 1, 1, 1);
 		glPopMatrix();
 		glPushMatrix();
 	}
@@ -322,11 +322,11 @@ void la_t_tm_draw(BInputState *input, boolean active)
 		create_matrix_normalized(matrix, origo, vector, point);
 		glPopMatrix();
 		glPushMatrix();
-		glTranslated(GlobalTransformManupulator.manupulator_pos[0], GlobalTransformManupulator.manupulator_pos[1], GlobalTransformManupulator.manupulator_pos[2]);
+		glTranslated(GlobalTransformManupulator.manipulator_pos[0], GlobalTransformManupulator.manipulator_pos[1], GlobalTransformManupulator.manipulator_pos[2]);
 		glMultMatrixd(matrix);
-		glScaled(GlobalTransformManupulator.manupulator_size, GlobalTransformManupulator.manupulator_size, GlobalTransformManupulator.manupulator_size);
+		glScaled(GlobalTransformManupulator.manipulator_size, GlobalTransformManupulator.manipulator_size, GlobalTransformManupulator.manipulator_size);
 		la_pfx_video_flare();
-//		sui_draw_gl(GL_QUADS, GlobalTransformManupulator.manupulator_rings, (ROTATE_GRID_DEGEES * 4 + 8), 3, 1, 1, 1);
+//		sui_draw_gl(GL_QUADS, GlobalTransformManupulator.manipulator_rings, (ROTATE_GRID_DEGEES * 4 + 8), 3, 1, 1, 1);
 		glPopMatrix();
 		glPushMatrix();
 	}
@@ -334,7 +334,7 @@ void la_t_tm_draw(BInputState *input, boolean active)
 	if(GlobalTransformManupulator.mode == TMM_NORMAL || GlobalTransformManupulator.mode == TMM_TANGENT || GlobalTransformManupulator.mode == TMM_SMOOTH)	
 	{
 
-		sui_draw_gl(GL_LINES, GlobalTransformManupulator.manupulator_normal_array, GlobalTransformManupulator.manupulator_normal_array_length * 2, 3, 1, 1, 1);
+		sui_draw_gl(GL_LINES, GlobalTransformManupulator.manipulator_normal_array, GlobalTransformManupulator.manipulator_normal_array_length * 2, 3, 1, 1, 1);
 	}
 	glEnable(GL_DEPTH_TEST);
 }
@@ -373,8 +373,8 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 
 	for(i = 0; i < 3; i++)
 	{
-		GlobalTransformManupulator.min_scale[i] = GlobalTransformManupulator.manupulator_pos[i];
-		GlobalTransformManupulator.max_scale[i] = GlobalTransformManupulator.manupulator_pos[i];
+		GlobalTransformManupulator.min_scale[i] = GlobalTransformManupulator.manipulator_pos[i];
+		GlobalTransformManupulator.max_scale[i] = GlobalTransformManupulator.manipulator_pos[i];
 	}
 	for(i = 0; i < GlobalTransformManupulator.data_length; i++)
 	{
@@ -585,9 +585,9 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 			if(count[i] != 0)
 			{
 				udg_get_vertex_pos(vertex, i);
-				GlobalTransformManupulator.normal[i * 3] = (vertex[0] - (GlobalTransformManupulator.normal[i * 3] / count[i])) / (GlobalTransformManupulator.manupulator_size * 0.4);
-				GlobalTransformManupulator.normal[i * 3 + 1] = (vertex[1] - (GlobalTransformManupulator.normal[i * 3 + 1] / count[i])) / (GlobalTransformManupulator.manupulator_size * 0.4);
-				GlobalTransformManupulator.normal[i * 3 + 2] = (vertex[2] - (GlobalTransformManupulator.normal[i * 3 + 2] / count[i])) / (GlobalTransformManupulator.manupulator_size * 0.4);
+				GlobalTransformManupulator.normal[i * 3] = (vertex[0] - (GlobalTransformManupulator.normal[i * 3] / count[i])) / (GlobalTransformManupulator.manipulator_size * 0.4);
+				GlobalTransformManupulator.normal[i * 3 + 1] = (vertex[1] - (GlobalTransformManupulator.normal[i * 3 + 1] / count[i])) / (GlobalTransformManupulator.manipulator_size * 0.4);
+				GlobalTransformManupulator.normal[i * 3 + 2] = (vertex[2] - (GlobalTransformManupulator.normal[i * 3 + 2] / count[i])) / (GlobalTransformManupulator.manipulator_size * 0.4);
 			}
 		}
 		free(temp);
@@ -600,8 +600,8 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 			if(GlobalTransformManupulator.normal[i * 3] != 0 || GlobalTransformManupulator.normal[i * 3 + 1] != 0 || GlobalTransformManupulator.normal[i * 3 + 2] != 0)
 				if(udg_get_select(i) > 0.01)
 					j++;
-		GlobalTransformManupulator.manupulator_normal_array_length = j;
-		GlobalTransformManupulator.manupulator_normal_array = malloc((sizeof *GlobalTransformManupulator.manupulator_normal_array) * j * 2 * 3);
+		GlobalTransformManupulator.manipulator_normal_array_length = j;
+		GlobalTransformManupulator.manipulator_normal_array = malloc((sizeof *GlobalTransformManupulator.manipulator_normal_array) * j * 2 * 3);
 		j = 0;
 		for(i = 0; i < vertex_count; i++)
 		{
@@ -609,8 +609,8 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 			{
 				if(udg_get_select(i) > 0.01)
 				{
-					sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal_array, j * 2 + 0, vertex[i * 3] - GlobalTransformManupulator.normal[i * 3] * GlobalTransformManupulator.manupulator_size * 0.4, vertex[i * 3 + 1] - GlobalTransformManupulator.normal[i * 3 + 1] * GlobalTransformManupulator.manupulator_size * 0.4, vertex[i * 3 + 2] - GlobalTransformManupulator.normal[i * 3 + 2] * GlobalTransformManupulator.manupulator_size * 0.4);
-					sui_draw_set_vec3(GlobalTransformManupulator.manupulator_normal_array, j * 2 + 1, vertex[i * 3] + GlobalTransformManupulator.normal[i * 3] * GlobalTransformManupulator.manupulator_size * 0.4, vertex[i * 3 + 1] + GlobalTransformManupulator.normal[i * 3 + 1] * GlobalTransformManupulator.manupulator_size * 0.4, vertex[i * 3 + 2] + GlobalTransformManupulator.normal[i * 3 + 2] * GlobalTransformManupulator.manupulator_size * 0.4);
+					sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal_array, j * 2 + 0, vertex[i * 3] - GlobalTransformManupulator.normal[i * 3] * GlobalTransformManupulator.manipulator_size * 0.4, vertex[i * 3 + 1] - GlobalTransformManupulator.normal[i * 3 + 1] * GlobalTransformManupulator.manipulator_size * 0.4, vertex[i * 3 + 2] - GlobalTransformManupulator.normal[i * 3 + 2] * GlobalTransformManupulator.manipulator_size * 0.4);
+					sui_draw_set_vec3(GlobalTransformManupulator.manipulator_normal_array, j * 2 + 1, vertex[i * 3] + GlobalTransformManupulator.normal[i * 3] * GlobalTransformManupulator.manipulator_size * 0.4, vertex[i * 3 + 1] + GlobalTransformManupulator.normal[i * 3 + 1] * GlobalTransformManupulator.manipulator_size * 0.4, vertex[i * 3 + 2] + GlobalTransformManupulator.normal[i * 3 + 2] * GlobalTransformManupulator.manipulator_size * 0.4);
 					j++;
 				}
 			}
@@ -626,45 +626,45 @@ boolean la_t_tm_grabb(BInputState *input)
 		return FALSE;
 	for(i = 0; i < 3; i++)
 	{
-		pos = p_get_projection_line(&distance, i, input->pointer_x, input->pointer_y, GlobalTransformManupulator.manupulator_pos);
-		if(pos / GlobalTransformManupulator.manupulator_scale[i] > 0.1 && pos / GlobalTransformManupulator.manupulator_scale[i] < 0.3 && distance < 0.02 * 0.02)
+		pos = p_get_projection_line(&distance, i, input->pointer_x, input->pointer_y, GlobalTransformManupulator.manipulator_pos);
+		if(pos / GlobalTransformManupulator.manipulator_scale[i] > 0.1 && pos / GlobalTransformManupulator.manipulator_scale[i] < 0.3 && distance < 0.02 * 0.02)
 		{
 			GlobalTransformManupulator.grabb_axis = i;
 			GlobalTransformManupulator.grabb_pos = pos;
-			GlobalTransformManupulator.grabb_manip_pos = GlobalTransformManupulator.manupulator_pos[i];
+			GlobalTransformManupulator.grabb_manip_pos = GlobalTransformManupulator.manipulator_pos[i];
 			GlobalTransformManupulator.mode = TMM_TRANSFORM;
 			lock_transform_vertexes(input, FALSE, FALSE, FALSE);
-			la_pfx_create_bright(GlobalTransformManupulator.manupulator_pos);
+			la_pfx_create_bright(GlobalTransformManupulator.manipulator_pos);
 			return TRUE;
 		}	
 	}
 
-	distance = p_get_projection_screen_distance(GlobalTransformManupulator.manupulator_pos[0], GlobalTransformManupulator.manupulator_pos[1], GlobalTransformManupulator.manupulator_pos[2], input->pointer_x, input->pointer_y);
+	distance = p_get_projection_screen_distance(GlobalTransformManupulator.manipulator_pos[0], GlobalTransformManupulator.manipulator_pos[1], GlobalTransformManupulator.manipulator_pos[2], input->pointer_x, input->pointer_y);
 	if(distance < 0.05 * 0.05)
 	{
 		GlobalTransformManupulator.mode = TMM_PLACE;
-		la_pfx_create_bright(GlobalTransformManupulator.manupulator_pos);
+		la_pfx_create_bright(GlobalTransformManupulator.manipulator_pos);
 		return TRUE;
 	}
 
 	for(i = 0; i < 3; i++)
 	{
 		double a, b,radius;
-		p_get_projection_plane(dist, i, input->pointer_x, input->pointer_y, GlobalTransformManupulator.manupulator_pos[i]);
-		if((dist[(i + 1) % 3] - GlobalTransformManupulator.manupulator_pos[(i + 1) % 3]) * GlobalTransformManupulator.manupulator_scale[(i + 1) % 3] > 0 &&
-			(dist[(i + 2) % 3] - GlobalTransformManupulator.manupulator_pos[(i + 2) % 3]) * GlobalTransformManupulator.manupulator_scale[(i + 2) % 3] > 0)
+		p_get_projection_plane(dist, i, input->pointer_x, input->pointer_y, GlobalTransformManupulator.manipulator_pos[i]);
+		if((dist[(i + 1) % 3] - GlobalTransformManupulator.manipulator_pos[(i + 1) % 3]) * GlobalTransformManupulator.manipulator_scale[(i + 1) % 3] > 0 &&
+			(dist[(i + 2) % 3] - GlobalTransformManupulator.manipulator_pos[(i + 2) % 3]) * GlobalTransformManupulator.manipulator_scale[(i + 2) % 3] > 0)
 		{
-			a = (dist[(i + 1) % 3] - GlobalTransformManupulator.manupulator_pos[(i + 1) % 3]) / (GlobalTransformManupulator.manupulator_size * 0.3);
-			b = (dist[(i + 2) % 3] - GlobalTransformManupulator.manupulator_pos[(i + 2) % 3]) / (GlobalTransformManupulator.manupulator_size * 0.3);
+			a = (dist[(i + 1) % 3] - GlobalTransformManupulator.manipulator_pos[(i + 1) % 3]) / (GlobalTransformManupulator.manipulator_size * 0.3);
+			b = (dist[(i + 2) % 3] - GlobalTransformManupulator.manipulator_pos[(i + 2) % 3]) / (GlobalTransformManupulator.manipulator_size * 0.3);
 			radius = a * a + b * b;
 			if(radius < 1)
 			{
 				GlobalTransformManupulator.grabb_axis = i;
 				GlobalTransformManupulator.mode = TMM_ROTATE;
-				GlobalTransformManupulator.grabb_pos = atan2(dist[(GlobalTransformManupulator.grabb_axis + 1) % 3] - GlobalTransformManupulator.manupulator_pos[(GlobalTransformManupulator.grabb_axis + 1) % 3], dist[(GlobalTransformManupulator.grabb_axis + 2) % 3] - GlobalTransformManupulator.manupulator_pos[(GlobalTransformManupulator.grabb_axis + 2) % 3]);
+				GlobalTransformManupulator.grabb_pos = atan2(dist[(GlobalTransformManupulator.grabb_axis + 1) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 1) % 3], dist[(GlobalTransformManupulator.grabb_axis + 2) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 2) % 3]);
 				GlobalTransformManupulator.grabb_pos = 0.5 * PI * (double)((int)(GlobalTransformManupulator.grabb_pos / (0.5 * PI) + 4.5));
 				lock_transform_vertexes(input, FALSE, FALSE, FALSE);
-				la_pfx_create_bright(GlobalTransformManupulator.manupulator_pos);
+				la_pfx_create_bright(GlobalTransformManupulator.manipulator_pos);
 				return TRUE;
 			}
 		}	
@@ -673,11 +673,11 @@ boolean la_t_tm_grabb(BInputState *input)
 	{
 		GlobalTransformManupulator.mode = TMM_SCALE;
 		lock_transform_vertexes(input, FALSE, FALSE, FALSE);
-		la_pfx_create_bright(GlobalTransformManupulator.manupulator_pos);
+		la_pfx_create_bright(GlobalTransformManupulator.manipulator_pos);
 		return TRUE;
 	}
 
-	p_get_projection_screen(dist, GlobalTransformManupulator.manupulator_pos[0], GlobalTransformManupulator.manupulator_pos[1], GlobalTransformManupulator.manupulator_pos[2]);
+	p_get_projection_screen(dist, GlobalTransformManupulator.manipulator_pos[0], GlobalTransformManupulator.manipulator_pos[1], GlobalTransformManupulator.manipulator_pos[2]);
 	pos = (-input->pointer_x - dist[0]) - (-input->pointer_y - dist[1]);
 	if(pos > -0.35 && pos < 0)
 	{
@@ -685,7 +685,7 @@ boolean la_t_tm_grabb(BInputState *input)
 		if(pos > -0.07 && pos < 0.07)
 		{
 			GlobalTransformManupulator.mode = TMM_NORMAL;
-			GlobalTransformManupulator.grabb_manip_pos = ((input->pointer_x - dist[0]) - (input->pointer_y - dist[1])) * GlobalTransformManupulator.manupulator_size;
+			GlobalTransformManupulator.grabb_manip_pos = ((input->pointer_x - dist[0]) - (input->pointer_y - dist[1])) * GlobalTransformManupulator.manipulator_size;
 			lock_transform_vertexes(input, TRUE, FALSE, FALSE);
 			return TRUE;
 		}
@@ -697,7 +697,7 @@ boolean la_t_tm_grabb(BInputState *input)
 		if(pos > -0.07 && pos < 0.07)
 		{
 			GlobalTransformManupulator.mode = TMM_SMOOTH;
-			GlobalTransformManupulator.grabb_manip_pos = ((input->pointer_x - dist[0]) + (input->pointer_y - dist[1])) * GlobalTransformManupulator.manupulator_size;
+			GlobalTransformManupulator.grabb_manip_pos = ((input->pointer_x - dist[0]) + (input->pointer_y - dist[1])) * GlobalTransformManupulator.manipulator_size;
 			lock_transform_vertexes(input, FALSE, FALSE, TRUE);
 			return TRUE;
 		}
@@ -709,7 +709,7 @@ boolean la_t_tm_grabb(BInputState *input)
 		if(pos > -0.03 && pos < 0.03)
 		{
 			GlobalTransformManupulator.mode = TMM_TANGENT;
-			GlobalTransformManupulator.grabb_manip_pos = (input->pointer_x - dist[0]) * -GlobalTransformManupulator.manupulator_size;
+			GlobalTransformManupulator.grabb_manip_pos = (input->pointer_x - dist[0]) * -GlobalTransformManupulator.manipulator_size;
 			lock_transform_vertexes(input, FALSE, TRUE, FALSE);
 			return TRUE;
 		}
@@ -721,7 +721,7 @@ boolean la_t_tm_grabb(BInputState *input)
 
 void la_t_tm_view_center(void)
 {
-	p_set_view_center(GlobalTransformManupulator.manupulator_pos);
+	p_set_view_center(GlobalTransformManupulator.manipulator_pos);
 }
 
 boolean la_t_tm_test_center(BInputState *input)
@@ -729,7 +729,7 @@ boolean la_t_tm_test_center(BInputState *input)
 	double manip[3], pos;
 	if(GlobalTransformManupulator.hide == TRUE)
 		return FALSE;
-	p_get_projection_screen(manip, GlobalTransformManupulator.manupulator_pos[0], GlobalTransformManupulator.manupulator_pos[1], GlobalTransformManupulator.manupulator_pos[2]);
+	p_get_projection_screen(manip, GlobalTransformManupulator.manipulator_pos[0], GlobalTransformManupulator.manipulator_pos[1], GlobalTransformManupulator.manipulator_pos[2]);
 	if((manip[0] + input->pointer_x) * (manip[0] + input->pointer_x) + (manip[1] + input->pointer_y) * (manip[1] + input->pointer_y) < 0.165 * 0.165)
 		return TRUE;
 	pos = (-input->pointer_x - manip[0]) - (-input->pointer_y - manip[1]);
@@ -776,9 +776,9 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 		return;
 	if(GlobalTransformManupulator.mode == TMM_PLACE)
 	{
-		GlobalTransformManupulator.manupulator_pos[0] = snap[0];
-		GlobalTransformManupulator.manupulator_pos[1] = snap[1];
-		GlobalTransformManupulator.manupulator_pos[2] = snap[2];
+		GlobalTransformManupulator.manipulator_pos[0] = snap[0];
+		GlobalTransformManupulator.manipulator_pos[1] = snap[1];
+		GlobalTransformManupulator.manipulator_pos[2] = snap[2];
 		if(input->mouse_button[0] != TRUE)
 			GlobalTransformManupulator.mode = TMM_IDLE;
 		return;
@@ -786,26 +786,26 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 	if(GlobalTransformManupulator.mode == TMM_NORMAL)
 	{
 		double output[3];
-		p_get_projection_screen(output, GlobalTransformManupulator.manupulator_pos[0], GlobalTransformManupulator.manupulator_pos[1], GlobalTransformManupulator.manupulator_pos[2]);
-		normal_tangent = ((input->pointer_x - output[0]) - (input->pointer_y - output[1])) * GlobalTransformManupulator.manupulator_size - GlobalTransformManupulator.grabb_manip_pos;
+		p_get_projection_screen(output, GlobalTransformManupulator.manipulator_pos[0], GlobalTransformManupulator.manipulator_pos[1], GlobalTransformManupulator.manipulator_pos[2]);
+		normal_tangent = ((input->pointer_x - output[0]) - (input->pointer_y - output[1])) * GlobalTransformManupulator.manipulator_size - GlobalTransformManupulator.grabb_manip_pos;
 		func = normal_func;
 		data = &normal_tangent;
 	}
 	if(GlobalTransformManupulator.mode == TMM_SMOOTH)
 	{
 		double output[3];
-		p_get_projection_screen(output, GlobalTransformManupulator.manupulator_pos[0], GlobalTransformManupulator.manupulator_pos[1], GlobalTransformManupulator.manupulator_pos[2]);
-		normal_tangent = ((input->pointer_x - output[0]) + (input->pointer_y - output[1])) * GlobalTransformManupulator.manupulator_size - GlobalTransformManupulator.grabb_manip_pos;
-		if(normal_tangent > GlobalTransformManupulator.manupulator_size * -0.4)
-			normal_tangent = GlobalTransformManupulator.manupulator_size * -0.4;
+		p_get_projection_screen(output, GlobalTransformManupulator.manipulator_pos[0], GlobalTransformManupulator.manipulator_pos[1], GlobalTransformManupulator.manipulator_pos[2]);
+		normal_tangent = ((input->pointer_x - output[0]) + (input->pointer_y - output[1])) * GlobalTransformManupulator.manipulator_size - GlobalTransformManupulator.grabb_manip_pos;
+		if(normal_tangent > GlobalTransformManupulator.manipulator_size * -0.4)
+			normal_tangent = GlobalTransformManupulator.manipulator_size * -0.4;
 		func = normal_func;
 		data = &normal_tangent;
 	}
 	if(GlobalTransformManupulator.mode == TMM_TANGENT)
 	{
 		double output[3];
-		p_get_projection_screen(output, GlobalTransformManupulator.manupulator_pos[0], GlobalTransformManupulator.manupulator_pos[1], GlobalTransformManupulator.manupulator_pos[2]);
-		normal_tangent = (input->pointer_x - output[0]) * -GlobalTransformManupulator.manupulator_size - GlobalTransformManupulator.grabb_manip_pos;
+		p_get_projection_screen(output, GlobalTransformManupulator.manipulator_pos[0], GlobalTransformManupulator.manipulator_pos[1], GlobalTransformManupulator.manipulator_pos[2]);
+		normal_tangent = (input->pointer_x - output[0]) * -GlobalTransformManupulator.manipulator_size - GlobalTransformManupulator.grabb_manip_pos;
 		func = normal_func;
 		data = &normal_tangent;
 	}
@@ -814,11 +814,11 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 	if(GlobalTransformManupulator.mode == TMM_TRANSFORM)
 	{
 		if(input->mouse_button[1])
-			GlobalTransformManupulator.manupulator_pos[GlobalTransformManupulator.grabb_axis] = snap[GlobalTransformManupulator.grabb_axis];
+			GlobalTransformManupulator.manipulator_pos[GlobalTransformManupulator.grabb_axis] = snap[GlobalTransformManupulator.grabb_axis];
 		else
-			GlobalTransformManupulator.manupulator_pos[GlobalTransformManupulator.grabb_axis] += p_get_projection_line(NULL, GlobalTransformManupulator.grabb_axis, input->pointer_x, input->pointer_y, GlobalTransformManupulator.manupulator_pos) - GlobalTransformManupulator.grabb_pos;
+			GlobalTransformManupulator.manipulator_pos[GlobalTransformManupulator.grabb_axis] += p_get_projection_line(NULL, GlobalTransformManupulator.grabb_axis, input->pointer_x, input->pointer_y, GlobalTransformManupulator.manipulator_pos) - GlobalTransformManupulator.grabb_pos;
 		
-		delta = GlobalTransformManupulator.manupulator_pos[GlobalTransformManupulator.grabb_axis] - GlobalTransformManupulator.grabb_manip_pos;
+		delta = GlobalTransformManupulator.manipulator_pos[GlobalTransformManupulator.grabb_axis] - GlobalTransformManupulator.grabb_manip_pos;
 		matrix[12 + GlobalTransformManupulator.grabb_axis] += delta;
 		func = matrix_func;
 		data = matrix;
@@ -835,23 +835,23 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 		}
 		else
 		{
-			p_get_projection_plane(dist, GlobalTransformManupulator.grabb_axis, input->pointer_x, input->pointer_y, GlobalTransformManupulator.manupulator_pos[GlobalTransformManupulator.grabb_axis]);
+			p_get_projection_plane(dist, GlobalTransformManupulator.grabb_axis, input->pointer_x, input->pointer_y, GlobalTransformManupulator.manipulator_pos[GlobalTransformManupulator.grabb_axis]);
 		}
-		delta = atan2(dist[(GlobalTransformManupulator.grabb_axis + 1) % 3] - GlobalTransformManupulator.manupulator_pos[(GlobalTransformManupulator.grabb_axis + 1) % 3], dist[(GlobalTransformManupulator.grabb_axis + 2) % 3] - GlobalTransformManupulator.manupulator_pos[(GlobalTransformManupulator.grabb_axis + 2) % 3]) - GlobalTransformManupulator.grabb_pos;
-		r = (dist[(GlobalTransformManupulator.grabb_axis + 1) % 3] - GlobalTransformManupulator.manupulator_pos[(GlobalTransformManupulator.grabb_axis + 1) % 3]) * (dist[(GlobalTransformManupulator.grabb_axis + 1) % 3] - GlobalTransformManupulator.manupulator_pos[(GlobalTransformManupulator.grabb_axis + 1) % 3]) + (dist[(GlobalTransformManupulator.grabb_axis + 2) % 3] - GlobalTransformManupulator.manupulator_pos[(GlobalTransformManupulator.grabb_axis + 2) % 3]) * (dist[(GlobalTransformManupulator.grabb_axis + 2) % 3] - GlobalTransformManupulator.manupulator_pos[(GlobalTransformManupulator.grabb_axis + 2) % 3]);
-		if(r < GlobalTransformManupulator.manupulator_size * GlobalTransformManupulator.manupulator_size * 1 * 1 && r > GlobalTransformManupulator.manupulator_size * GlobalTransformManupulator.manupulator_size * 0.9 * 0.9)
+		delta = atan2(dist[(GlobalTransformManupulator.grabb_axis + 1) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 1) % 3], dist[(GlobalTransformManupulator.grabb_axis + 2) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 2) % 3]) - GlobalTransformManupulator.grabb_pos;
+		r = (dist[(GlobalTransformManupulator.grabb_axis + 1) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 1) % 3]) * (dist[(GlobalTransformManupulator.grabb_axis + 1) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 1) % 3]) + (dist[(GlobalTransformManupulator.grabb_axis + 2) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 2) % 3]) * (dist[(GlobalTransformManupulator.grabb_axis + 2) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 2) % 3]);
+		if(r < GlobalTransformManupulator.manipulator_size * GlobalTransformManupulator.manipulator_size * 1 * 1 && r > GlobalTransformManupulator.manipulator_size * GlobalTransformManupulator.manipulator_size * 0.9 * 0.9)
 		{
-			if(r < GlobalTransformManupulator.manupulator_size * GlobalTransformManupulator.manupulator_size * 0.96 * 0.96)
+			if(r < GlobalTransformManupulator.manipulator_size * GlobalTransformManupulator.manipulator_size * 0.96 * 0.96)
 				delta = (double)((uint)(ROTATE_GRID_SPLITS * delta / (2 * PI))) * 2 * PI / ROTATE_GRID_SPLITS; 
 			else 
 				delta = (double)((uint)(ROTATE_GRID_DEGEES * delta / (2 * PI))) * 2 * PI / ROTATE_GRID_DEGEES;
-			GlobalTransformManupulator.manupulator_rotate_scale *= 0.9;
+			GlobalTransformManupulator.manipulator_rotate_scale *= 0.9;
 		}else
-			GlobalTransformManupulator.manupulator_rotate_scale = GlobalTransformManupulator.manupulator_rotate_scale * 0.9 + 0.1;
+			GlobalTransformManupulator.manipulator_rotate_scale = GlobalTransformManupulator.manipulator_rotate_scale * 0.9 + 0.1;
 
 		clear_matrix(matrix2);
 		clear_matrix(matrix3);
-		transform_matrix(matrix2, GlobalTransformManupulator.manupulator_pos[0], GlobalTransformManupulator.manupulator_pos[1], GlobalTransformManupulator.manupulator_pos[2]);
+		transform_matrix(matrix2, GlobalTransformManupulator.manipulator_pos[0], GlobalTransformManupulator.manipulator_pos[1], GlobalTransformManupulator.manipulator_pos[2]);
 		if(GlobalTransformManupulator.grabb_axis == 0)
 			matrix_rotate_x(matrix, -delta);
 		else if(GlobalTransformManupulator.grabb_axis == 1)
@@ -860,7 +860,7 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 			matrix_rotate_z(matrix, -delta);
 		matrix_multiply(matrix2, matrix, matrix3);
 		clear_matrix(matrix2);
-		transform_matrix(matrix2, -GlobalTransformManupulator.manupulator_pos[0], -GlobalTransformManupulator.manupulator_pos[1], -GlobalTransformManupulator.manupulator_pos[2]);
+		transform_matrix(matrix2, -GlobalTransformManupulator.manipulator_pos[0], -GlobalTransformManupulator.manipulator_pos[1], -GlobalTransformManupulator.manipulator_pos[2]);
 		matrix_multiply(matrix3, matrix2, matrix);
 		func = matrix_func;
 		data = matrix;
@@ -870,7 +870,7 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 	if(GlobalTransformManupulator.mode == TMM_SCALE)
 	{
 		double scale[3], vertex[3], length;
-		p_get_projection_vertex_with_axis(vertex, GlobalTransformManupulator.manupulator_pos, input->pointer_x, input->pointer_y, input->mouse_button[1], snap);
+		p_get_projection_vertex_with_axis(vertex, GlobalTransformManupulator.manipulator_pos, input->pointer_x, input->pointer_y, input->mouse_button[1], snap);
 		
 		scale[0] = 0;
 		scale[1] = 0;
@@ -878,24 +878,24 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 
 		for(i = 0; i < 3; i++)
 		{
-			if(vertex[i] > GlobalTransformManupulator.manupulator_pos[i])
+			if(vertex[i] > GlobalTransformManupulator.manipulator_pos[i])
 			{
-				if(GlobalTransformManupulator.max_scale[i] > GlobalTransformManupulator.manupulator_pos[i] + 0.001)
-					scale[i] = (vertex[i] - GlobalTransformManupulator.manupulator_pos[i]) / (GlobalTransformManupulator.max_scale[i] - GlobalTransformManupulator.manupulator_pos[i]);
+				if(GlobalTransformManupulator.max_scale[i] > GlobalTransformManupulator.manipulator_pos[i] + 0.001)
+					scale[i] = (vertex[i] - GlobalTransformManupulator.manipulator_pos[i]) / (GlobalTransformManupulator.max_scale[i] - GlobalTransformManupulator.manipulator_pos[i]);
 			}
 			else
-				if(GlobalTransformManupulator.min_scale[i] + 0.001 < GlobalTransformManupulator.manupulator_pos[i])
-					scale[i] = (vertex[i] - GlobalTransformManupulator.manupulator_pos[i]) / (GlobalTransformManupulator.min_scale[i] - GlobalTransformManupulator.manupulator_pos[i]);
+				if(GlobalTransformManupulator.min_scale[i] + 0.001 < GlobalTransformManupulator.manipulator_pos[i])
+					scale[i] = (vertex[i] - GlobalTransformManupulator.manipulator_pos[i]) / (GlobalTransformManupulator.min_scale[i] - GlobalTransformManupulator.manipulator_pos[i]);
 		}
 		length = sqrt(scale[0] * scale[0] + scale[1] * scale[1] + scale[2] * scale[2]);
 		for(i = 0; i < 3; i++)
 		{
-			if(scale[i] == 1 || (vertex[i] - GlobalTransformManupulator.manupulator_pos[i] > -0.0001 && vertex[i] - GlobalTransformManupulator.manupulator_pos[i] < 0.0001))
+			if(scale[i] == 1 || (vertex[i] - GlobalTransformManupulator.manipulator_pos[i] > -0.0001 && vertex[i] - GlobalTransformManupulator.manipulator_pos[i] < 0.0001))
 				scale[i] = 1;
 			else
 				scale[i] = length;
 		}
-		transform_matrix(matrix, (scale[0] - 1) * -GlobalTransformManupulator.manupulator_pos[0], (scale[1] - 1) * -GlobalTransformManupulator.manupulator_pos[1], (scale[2] - 1) * -GlobalTransformManupulator.manupulator_pos[2]);
+		transform_matrix(matrix, (scale[0] - 1) * -GlobalTransformManupulator.manipulator_pos[0], (scale[1] - 1) * -GlobalTransformManupulator.manipulator_pos[1], (scale[2] - 1) * -GlobalTransformManupulator.manipulator_pos[2]);
 		scale_matrix(matrix, scale[0], scale[1], scale[2]);
 		func = matrix_func;
 		data = matrix;
@@ -939,7 +939,7 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 			free(GlobalTransformManupulator.data);
 		if(GlobalTransformManupulator.normal != NULL);
 		{
-			free(GlobalTransformManupulator.manupulator_normal_array);
+			free(GlobalTransformManupulator.manipulator_normal_array);
 			free(GlobalTransformManupulator.normal);
 		}
 		GlobalTransformManupulator.mode = TMM_IDLE;
