@@ -1,14 +1,15 @@
 /*
-**
+ * This is the header for the Enough library. Enough is a storage API written on top of Verse;
+ * it saves application authors from having to do the work of defining and managing data structures
+ * to hold a "mirror" of a Verse host's contents. Note that Enough does not contain any functions
+ * for sending data to the host, use the plain Verse API for that.
 */
+
 #if !defined(ENOUGH_H)
 #define	ENOUGH_H
 #include "verse.h"
 #include "e_types.h"
 #include "st_types.h"
-/*
-	This is the header for the Enough libary, The api is a storage api written on top verse
-*/
 
 #define E_CDC_COUNT 16
 
