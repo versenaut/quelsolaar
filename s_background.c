@@ -1,10 +1,9 @@
 
+#include <math.h>
 #include <stdlib.h>
 
-
-#define WIDGET_DEFENITION
 #include "seduce.h"
-#include <math.h>
+
 #define CIRCLE_SEGMENTS 32
 #define IRIS_SEGMENTS 64
 #define BACK_SEGMENTS 16

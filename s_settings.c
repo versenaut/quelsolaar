@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define WIDGET_DEFENITION
 #include "seduce.h"
 
 typedef struct{
