@@ -8,7 +8,8 @@ extern void parce_input(BInputState *input, void *user);
 void layer_name_func(void *user, char *text)
 {
 	ENode *node;
-	if((node = e_ns_get_node(0, udg_get_modeling_node())) != NULL && (node = e_ns_get_node(0, e_nso_get_link(node, V_NT_GEOMETRY))) != NULL) 
+	if((node = e_ns_get_node(0, udg_get_modeling_node())) != NULL &&
+	   (node = e_ns_get_node(0, e_nso_get_link_id(e_nso_get_link(node, V_NT_GEOMETRY)))) != NULL) 
 	{
 		EGeoLayer *layer;
 		if((layer = e_nsg_get_layer_by_name(node, text)) != NULL)
