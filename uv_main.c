@@ -21,7 +21,7 @@ void uv_intro_handler(BInputState *input, void *user)
 	static char connect_type_in[48];
 	connect_type_in[0] = 0;
 
-	if(e_vc_check_connected() && e_vc_check_acsepted_slot(0))
+	if(e_vc_check_connected() && e_vc_check_accepted_slot(0))
 	{
 		ENode *node;
 		node = e_ns_get_node_next(0, 0, V_NT_GEOMETRY);

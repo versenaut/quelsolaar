@@ -227,7 +227,7 @@ extern ECurve *			e_nsc_get_curve_next(ENode *c_node, uint curve_id);
 extern char *			e_nsc_get_curve_name(ECurve *curve);
 extern uint				e_nsc_get_curve_id(ECurve *curve);
 extern uint				e_nsc_get_curve_length(ECurve *curve);
-extern uint				e_nsc_get_curve_dimentions(ECurve *curve);
+extern uint				e_nsc_get_curve_dimensions(ECurve *curve);
 extern uint				e_nsc_get_curve_point_count(ECurve *curve);
 
 extern uint				e_nsc_get_point_next(ECurve *curve, uint point_id);

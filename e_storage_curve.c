@@ -28,7 +28,7 @@ typedef struct{
 	uint16			curve_id;
 	char			name[16];
 	uint			version;
-	uint			dimentions;
+	uint			dimensions;
 	ESCurvePoint	*points;
 	uint32			length;
 	uint32			allocated;
@@ -77,9 +77,9 @@ uint e_nsc_get_curve_version(ESCurve *curve)
 	return curve->version;
 }
 
-uint e_nsc_get_curve_dimentions(ESCurve *curve)
+uint e_nsc_get_curve_dimensions(ESCurve *curve)
 {
-	return curve->dimentions;
+	return curve->dimensions;
 }
 
 uint e_nsc_get_curve_point_count(ESCurve *curve)
@@ -109,7 +109,7 @@ ESCurveNode *e_create_c_node(VNodeID node_id, VNodeOwner owner)
 	return node;
 }
 
-static void callback_send_c_curve_create(void *user, VNodeID node_id, VLayerID curve_id, const char *name, uint8 dimentions)
+static void callback_send_c_curve_create(void *user, VNodeID node_id, VLayerID curve_id, const char *name, uint8 dimensions)
 {
 	ESCurveNode	*node;
 	ESCurve *curve;
@@ -117,7 +117,7 @@ static void callback_send_c_curve_create(void *user, VNodeID node_id, VLayerID c
 	node = e_create_c_node(node_id, 0);
 	if((curve = find_dlut(&node->curvetables, curve_id)) != NULL)
 	{
-		if(curve->dimentions != dimentions)
+		if(curve->dimensions != dimensions)
 		{
 			if(curve->points)
 				free(curve->points);
@@ -136,7 +136,7 @@ static void callback_send_c_curve_create(void *user, VNodeID node_id, VLayerID c
 	for(i = 0; i < 15 && name[i] != 0; i++)
 		curve->name[i] = name[i];
 	curve->name[i] = 0;
-	curve->dimentions = dimentions;
+	curve->dimensions = dimensions;
 	curve->curve_id = curve_id;
 	curve->version++;
 	verse_send_c_curve_subscribe(node_id, curve_id);
@@ -174,13 +174,13 @@ typedef struct{
 typedef struct{
 	uint16			curve_id;
 	uint			version;
-	uint			dimentions;
+	uint			dimensions;
 	ESCurvePoint	*points;
 	uint32			length;
 	uint32			allocated;
 }ESCurve;
 */
-void callback_send_c_key_set(void *user_data, VNodeID node_id, VLayerID curve_id, uint32 key_id, uint8 dimentions, real64 *pre_value, uint32 *pre_pos, real64 *value, real64 pos, real64 *post_value, uint32 *post_pos)
+void callback_send_c_key_set(void *user_data, VNodeID node_id, VLayerID curve_id, uint32 key_id, uint8 dimensions, real64 *pre_value, uint32 *pre_pos, real64 *value, real64 pos, real64 *post_value, uint32 *post_pos)
 {
 	ESCurveNode		*node;
 	ESCurve			*curve;
@@ -200,7 +200,7 @@ void callback_send_c_key_set(void *user_data, VNodeID node_id, VLayerID curve_id
 	}
 
 	point = &curve->points[key_id];
-	for(i = 0; i < dimentions; i++)
+	for(i = 0; i < dimensions; i++)
 	{
 		point->pre_value[i] = pre_value[i];
 		point->pre_pos[i] = pre_pos[i];
@@ -303,21 +303,21 @@ void e_nsc_get_point(ESCurve *curve, uint point_id, real64 *pre_value, uint32 *p
 	uint i;
 	point = &curve->points[point_id];
 	if(pre_value != NULL)
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			pre_value[i] = point->pre_value[i];
 	if(pre_pos != NULL)
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			pre_pos[i] = point->pre_pos[i];
 	if(value != NULL)
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			value[i] = point->value[i];
 	if(pos != NULL)
 		*pos = point->pos;
 	if(post_value != NULL)
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			post_value[i] = point->post_value[i];
 	if(post_pos != NULL)
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			post_pos[i] = point->post_pos[i];
 }
 
@@ -336,21 +336,21 @@ void e_nsc_get_point_double(ESCurve *curve, uint point_id, real64 *pre_value, re
 
 
 	if(pre_value != NULL)
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			pre_value[i] = point->value[i] + point->pre_value[i] * -dist[0];
 	if(pre_pos != NULL)
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			pre_pos[i] = point->pos + point->pre_pos[i] / (double)(0xffffffff) * dist[0];
 	if(value != NULL)
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			value[i] = point->value[i];
 	if(pos != NULL)
 		*pos = point->pos;
 	if(post_value != NULL)
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			post_value[i] = point->value[i] + point->post_value[i] * dist[1];
 	if(post_pos != NULL)
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			post_pos[i] = point->pos + point->post_pos[i] / (double)(0xffffffff) * dist[1];
 }
 
@@ -359,10 +359,10 @@ void e_nsc_send_c_key_set(ESCurveNode *node, ESCurve *curve, uint32 key_id, real
 	ESCurvePoint	*point;
 	double dist[2] = {-1, 1}, f, prev[4], postv[4];
 	uint32 prep[4], postp[4];
-	uint8 dimentions;
+	uint8 dimensions;
 	uint i;
 
-	dimentions = e_nsc_get_curve_dimentions(curve);
+	dimensions = e_nsc_get_curve_dimensions(curve);
 
 	point = &curve->points[key_id];
 
@@ -381,23 +381,23 @@ void e_nsc_send_c_key_set(ESCurveNode *node, ESCurve *curve, uint32 key_id, real
 
 	if(pre_value != NULL)
 	{
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			prev[i] = (pre_value[i] - value[i]) / -dist[0];
 	}else
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			prev[i] = point->pre_value[i];
 
 	if(post_value != NULL)
 	{
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			postv[i] = (post_value[i] - value[i]) / dist[1];
 	}else
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			postv[i] = point->post_value[i];
 
 	if(pre_pos != NULL)
 	{
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 		{
 			f = ((*pos - pre_pos[i]) / -dist[0]);
 			if(f < 0)
@@ -408,12 +408,12 @@ void e_nsc_send_c_key_set(ESCurveNode *node, ESCurve *curve, uint32 key_id, real
 				prep[i] = f * 0xffffffff;
 		}
 	}else
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			prep[i] = point->pre_pos[i];
 
 	if(post_pos != NULL)
 	{
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 		{
 			f = (*pos - post_pos[i]) / -dist[1];
 			if(f < 0)
@@ -424,10 +424,10 @@ void e_nsc_send_c_key_set(ESCurveNode *node, ESCurve *curve, uint32 key_id, real
 				postp[i] = f * 0xffffffff;
 		}
 	}else
-		for(i = 0; i < curve->dimentions; i++)
+		for(i = 0; i < curve->dimensions; i++)
 			postp[i] = point->post_pos[i];
 
-	verse_send_c_key_set(e_ns_get_node_id(node), e_nsc_get_curve_id(curve), key_id, dimentions, prev, prep, value, *pos, postv, postp);
+	verse_send_c_key_set(e_ns_get_node_id(node), e_nsc_get_curve_id(curve), key_id, dimensions, prev, prep, value, *pos, postv, postp);
 }
 
 void e_nsc_get_segment(ESCurve *curve, uint segment_nr, uint axis, real64 *point_0, real64 *point_1, real64 *point_2, real64 *point_3)

@@ -33,7 +33,7 @@ void co_c_draw_section(ECurve *curve, float scroll, float stretch, float y_pos, 
 	scale /= (aspect - 0.1 + y_pos);
 	pan -= (y_pos - aspect + 0.1 - y_pos) * scale;
 
-	for(i = 0; i < e_nsc_get_curve_dimentions(curve); i++)
+	for(i = 0; i < e_nsc_get_curve_dimensions(curve); i++)
 	{
 		for(j = 0; j < 3; j++)
 		{
@@ -67,7 +67,7 @@ void co_c_draw_section(ECurve *curve, float scroll, float stretch, float y_pos, 
 
 void co_c_space(ECurve *curve, float *scale, float *pan)
 {
-	uint i, j, k, dimentions = 1;
+	uint i, j, k, dimensions = 1;
 	double pos[8];
 	if(2 > e_nsc_get_curve_point_count(curve))
 	{
@@ -75,13 +75,13 @@ void co_c_space(ECurve *curve, float *scale, float *pan)
 		*pan = -1;
 		return;
 	}
-	dimentions = e_nsc_get_curve_dimentions(curve);
+	dimensions = e_nsc_get_curve_dimensions(curve);
 	e_nsc_get_segment(curve, 0, 0, pos, &pos[2], &pos[4], &pos[6]);
 	*scale = pos[1];
 	*pan = pos[1];
 	for(i = 1; i < e_nsc_get_curve_point_count(curve); i++)
 	{
-		for(j = 0; j < dimentions; j++)
+		for(j = 0; j < dimensions; j++)
 		{
 			e_nsc_get_segment(curve, i - 1, j, pos, &pos[2], &pos[4], &pos[6]);
 			for(k = 0; k < 4; k++)
@@ -130,13 +130,13 @@ void	sui_draw_symb_empty(float point_x, float point_y, float pos_x, float pos_y,
 
 void co_c_draw_point(BInputState *input, ENode *node, ECurve *curve, float *scroll, float *stretch, float y_pos, float scale, float pan, float color, float color_light)
 {
-	uint i, j, dimentions, point;
+	uint i, j, dimensions, point;
 	static uint grab_dim, grab_control, grab_point = -1;
 	double pre_x[4], pre_y[4], pos_x, pos_y[4], post_x[4], post_y[4], x, y, aspect;
 	aspect = betray_get_screen_mode(NULL, NULL, NULL);
 	if(aspect < 0.1)
 		aspect = 0.1;
-	dimentions = e_nsc_get_curve_dimentions(curve);
+	dimensions = e_nsc_get_curve_dimensions(curve);
 	x = input->pointer_x;
 	y = input->pointer_y;
 
@@ -156,10 +156,10 @@ void co_c_draw_point(BInputState *input, ENode *node, ECurve *curve, float *scro
 			real64 pos;
 			real64 post_value[4] = {0, 0, 0, 0};
 			uint32 post_pos[4] = {0x8fffffff, 0x8fffffff, 0x8fffffff, 0x8fffffff};
-			for(i = 0; i < dimentions; i++)
+			for(i = 0; i < dimensions; i++)
 				value[i] = y * scale + pan;
 			pos = x * *stretch + *scroll;
-			verse_send_c_key_set(e_ns_get_node_id(node), e_nsc_get_curve_id(curve), -1, dimentions, pre_value, pre_pos, value, pos, post_value, post_pos);
+			verse_send_c_key_set(e_ns_get_node_id(node), e_nsc_get_curve_id(curve), -1, dimensions, pre_value, pre_pos, value, pos, post_value, post_pos);
 		}
 	}
 	if(input->mode == BAM_EVENT && input->mouse_button[0] == TRUE && input->last_mouse_button[0] == TRUE && grab_point == -1 && y_pos > input->click_pointer_y)
@@ -170,7 +170,7 @@ void co_c_draw_point(BInputState *input, ENode *node, ECurve *curve, float *scro
 	for(point = e_nsc_get_point_next(curve, 0); point != -1; point = e_nsc_get_point_next(curve, point + 1))
 	{
 		e_nsc_get_point_double(curve, point, pre_y, pre_x, pos_y, &pos_x, post_y, post_x);
-		for(i = 0; i < dimentions; i++)
+		for(i = 0; i < dimensions; i++)
 		{
 			pre_x[i] = (pre_x[i] - *scroll) / *stretch;
 			post_x[i] = (post_x[i] - *scroll) / *stretch;
@@ -179,7 +179,7 @@ void co_c_draw_point(BInputState *input, ENode *node, ECurve *curve, float *scro
 			post_y[i] = (post_y[i] - pan) / scale;
 		}
 		pos_x = (pos_x - *scroll) / *stretch;
-		for(i = 0; i < dimentions; i++)
+		for(i = 0; i < dimensions; i++)
 		{
 			if(input->mode == BAM_DRAW)
 			{
@@ -274,7 +274,7 @@ void rename_c_layer_func(void *user, char *text)
 	{
 		for(curve = e_nsc_get_curve_next(node, 0); curve != NULL && curve != user; curve = e_nsc_get_curve_next(node, e_nsc_get_curve_id(curve) + 1));
 		if(curve == user)
-			verse_send_c_curve_create(change_c_node_id, e_nsc_get_curve_id(curve), text, e_nsc_get_curve_dimentions(curve));
+			verse_send_c_curve_create(change_c_node_id, e_nsc_get_curve_id(curve), text, e_nsc_get_curve_dimensions(curve));
 	}
 }
 
@@ -330,7 +330,7 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 			if(co_w_close_button(input, 0.645, y, color, color, color))
 				verse_send_c_curve_destroy(change_c_node_id, e_nsc_get_curve_id(curve));
 			y -= 0.05;
-			dim = e_nsc_get_curve_dimentions(curve);
+			dim = e_nsc_get_curve_dimensions(curve);
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Dimentions:", color_light, color_light, color_light); 
 			if(sui_type_number_uint(input, 0.15, y, 0.5, SUI_T_SIZE, &dim, curve, color, color, color))
 				if(dim > 0 && dim < 5)

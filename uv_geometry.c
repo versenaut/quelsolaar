@@ -99,14 +99,14 @@ boolean uvg_update()
 
 	if((layer = e_nsg_get_layer_by_id(node, 1)) == NULL)
 		return FALSE;
-	if(UVGGlobal.polygon_length != e_nsg_get_polygon_legnth(node))
+	if(UVGGlobal.polygon_length != e_nsg_get_polygon_length(node))
 	{
-		UVGGlobal.corner_select = realloc(UVGGlobal.corner_select, (sizeof *UVGGlobal.corner_select) * e_nsg_get_polygon_legnth(node) * 4);
-		for(i = UVGGlobal.polygon_length * 4; i < e_nsg_get_polygon_legnth(node) * 4; i++)
+		UVGGlobal.corner_select = realloc(UVGGlobal.corner_select, (sizeof *UVGGlobal.corner_select) * e_nsg_get_polygon_length(node) * 4);
+		for(i = UVGGlobal.polygon_length * 4; i < e_nsg_get_polygon_length(node) * 4; i++)
 			UVGGlobal.corner_select[i] = 0;
 	}
-	UVGGlobal.vertex_length = e_nsg_get_vertex_legnth(node);
-	UVGGlobal.polygon_length = e_nsg_get_polygon_legnth(node);
+	UVGGlobal.vertex_length = e_nsg_get_vertex_length(node);
+	UVGGlobal.polygon_length = e_nsg_get_polygon_length(node);
 	UVGGlobal.polygon = e_nsg_get_layer_data(node, layer);
 	if((layer = e_nsg_get_layer_by_type(node, VN_G_LAYER_VERTEX_REAL, "select")) == NULL)
 	{

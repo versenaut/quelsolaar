@@ -15,7 +15,7 @@
 */
 typedef struct {
 	boolean			connected;
-	boolean			acsepted;
+	boolean			accepted;
 	DynLookUpTable	look_up_table;
 	uint32			node_type_count[V_NT_NUM_TYPES];
 	uint32			selected_node[V_NT_NUM_TYPES];
@@ -191,7 +191,7 @@ void callback_send_connect_accept(void *user, uint32 avatar, void *address)
 		if(ENSGlobal.auto_subscribe[i] == TRUE || TRUE)
 			mask = mask | (1 << i);
 	ENSGlobal.context[ENSGlobal.curent_net_connection].avatar = avatar;
-	ENSGlobal.context[ENSGlobal.curent_net_connection].acsepted = TRUE;
+	ENSGlobal.context[ENSGlobal.curent_net_connection].accepted = TRUE;
 	verse_send_node_list(mask);
 }
 
@@ -202,7 +202,7 @@ uint e_vc_connect(char	*server_address, char *name, char *pass, uint8 *server_id
 	for(connection = 0; ENSGlobal.context[connection].connected == TRUE && connection < MAX_CONNECTIONS; connection++);
 	if(connection == MAX_CONNECTIONS)
 		return -1;
-	ENSGlobal.context[connection].acsepted = FALSE;
+	ENSGlobal.context[connection].accepted = FALSE;
 	session = verse_send_connect(name, pass, server_address, server_id);
 	if(session  != NULL)
 		e_vc_connect_internal(session, connection);
@@ -239,9 +239,9 @@ boolean e_vc_check_connected_slot(uint connection)
 	return ENSGlobal.context[connection].connected;
 }
 
-boolean e_vc_check_acsepted_slot(uint connection)
+boolean e_vc_check_accepted_slot(uint connection)
 {
-	return ENSGlobal.context[connection].acsepted;
+	return ENSGlobal.context[connection].accepted;
 }
 
 void e_ns_init_head(ENodeHead *head, VNodeType type, VNodeID node_id, VNodeOwner owner)

@@ -41,7 +41,7 @@ void la_pu_connect(BInputState *input, void *user)
 	static char connect_type_in[48];
 	connect_type_in[0] = 0;
 
-	if(e_vc_check_connected() && e_vc_check_acsepted_slot(0))
+	if(e_vc_check_connected() && e_vc_check_accepted_slot(0))
 	{
 		betray_set_action_func(la_edit_func, NULL);
 		return;

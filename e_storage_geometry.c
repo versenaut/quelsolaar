@@ -255,12 +255,12 @@ EGeoLayer* e_nsg_get_layer_next(ESGeometryNode *node, uint layer_id)
 	return NULL;
 }
 
-uint e_nsg_get_vertex_legnth(ESGeometryNode *node)
+uint e_nsg_get_vertex_length(ESGeometryNode *node)
 {
 	return node->vertex_length;
 }
 
-uint e_nsg_get_polygon_legnth(ESGeometryNode *node)
+uint e_nsg_get_polygon_length(ESGeometryNode *node)
 {
 	return node->polygon_length;
 }

@@ -199,8 +199,8 @@ void udg_clone_node(uint32 node_id)
 
 	ref = e_nsg_get_layer_data(original_node, e_nsg_get_layer_by_id(original_node, 1));
 	crease = e_nsg_get_layer_data(original_node, e_nsg_get_layer_by_type(original_node, VN_G_LAYER_POLYGON_CORNER_UINT32, "crease"));
-	length = e_nsg_get_polygon_legnth(original_node);
-	vertex_length = e_nsg_get_vertex_legnth(original_node);
+	length = e_nsg_get_polygon_length(original_node);
+	vertex_length = e_nsg_get_vertex_length(original_node);
 	id = e_nsg_get_layer_id(e_nsg_get_layer_by_type(copy_node, VN_G_LAYER_POLYGON_CORNER_UINT32, "crease"));
 	vertex = e_nsg_get_layer_data(original_node, e_nsg_get_layer_by_id(original_node, 0));	
 	for(i = 0; i < vertex_length; i++)
@@ -361,7 +361,7 @@ boolean udg_update_geometry(void)
 	{
 		g_node = e_ns_get_node(0, UNDOGlobal.g_node);
 		UNDOGlobal.structure_version = e_ns_get_node_version_struct(g_node);
-		UNDOGlobal.ref_length = e_nsg_get_polygon_legnth(g_node);
+		UNDOGlobal.ref_length = e_nsg_get_polygon_length(g_node);
 		UNDOGlobal.ref = e_nsg_get_layer_data(g_node, e_nsg_get_layer_by_id(g_node, 1));
 		layer = e_nsg_get_layer_crease_edge_layer(g_node);
 		if(layer != NULL)
@@ -386,18 +386,18 @@ boolean udg_update_geometry(void)
 		{
 			if(UNDOGlobal.select_local != TRUE)
 			{
-				if(e_nsg_get_vertex_legnth(g_node) != 0)
-					UNDOGlobal.select = malloc((sizeof *UNDOGlobal.select) * e_nsg_get_vertex_legnth(g_node));
+				if(e_nsg_get_vertex_length(g_node) != 0)
+					UNDOGlobal.select = malloc((sizeof *UNDOGlobal.select) * e_nsg_get_vertex_length(g_node));
 				else
 					UNDOGlobal.select = NULL;
 			}
-			if(UNDOGlobal.vertex_length != e_nsg_get_vertex_legnth(g_node))
+			if(UNDOGlobal.vertex_length != e_nsg_get_vertex_length(g_node))
 			{
-				if(e_nsg_get_vertex_legnth(g_node) != 0)
+				if(e_nsg_get_vertex_length(g_node) != 0)
 				{
 					uint i;
-					UNDOGlobal.select = realloc(UNDOGlobal.select, (sizeof *UNDOGlobal.select) * e_nsg_get_vertex_legnth(g_node));
-					for(i = UNDOGlobal.vertex_length; i < e_nsg_get_vertex_legnth(g_node); i++)
+					UNDOGlobal.select = realloc(UNDOGlobal.select, (sizeof *UNDOGlobal.select) * e_nsg_get_vertex_length(g_node));
+					for(i = UNDOGlobal.vertex_length; i < e_nsg_get_vertex_length(g_node); i++)
 						UNDOGlobal.select[i] = 0;
 				}else
 				{
@@ -407,7 +407,7 @@ boolean udg_update_geometry(void)
 			}
 			UNDOGlobal.select_local = TRUE;
 		}
-		UNDOGlobal.vertex_length = e_nsg_get_vertex_legnth(g_node);
+		UNDOGlobal.vertex_length = e_nsg_get_vertex_length(g_node);
 			layer = e_nsg_get_layer_by_type(g_node, VN_G_LAYER_VERTEX_XYZ, UNDOGlobal.layer_name);
 		if(layer == NULL)
 			layer = e_nsg_get_layer_by_id(g_node, 0);	
