@@ -62,7 +62,7 @@ void la_parse_input(BInputState *input)
 				if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
 				{
 					ParseInputData.click_time = 0;
-					if(la_t_tm_grabb(input))
+					if(la_t_tm_grab(input))
 					{
 						ParseInputData.mode = PIM_DRAG_MANIPULATOR;
 						return;

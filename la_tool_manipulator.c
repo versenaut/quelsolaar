@@ -41,9 +41,9 @@ struct{
 	double		manipulator_scale[3];
 	double		manipulator_rotate_scale;
 	TManipMode	mode;
-	double		grabb_pos;
-	double		grabb_manip_pos;
-	uint		grabb_axis;
+	double		grab_pos;
+	double		grab_manip_pos;
+	uint		grab_axis;
 	double		*data;
 	double		*normal;
 	uint		data_length;
@@ -277,9 +277,9 @@ void la_t_tm_draw(BInputState *input, boolean active)
 
 	if(GlobalTransformManupulator.mode == TMM_ROTATE)
 	{
-		if(GlobalTransformManupulator.grabb_axis == 0)
+		if(GlobalTransformManupulator.grab_axis == 0)
 			glRotated(90, 0, 1, 0);
-		if(GlobalTransformManupulator.grabb_axis == 1)
+		if(GlobalTransformManupulator.grab_axis == 1)
 			glRotated(90, 1, 0, 0);
 		sui_draw_gl(GL_LINES, GlobalTransformManupulator.manipulator_circle, (ROTATE_GRID_DEGEES * 6 + 24), 3, 1, 1, 1);
 		glScaled(1, 1, GlobalTransformManupulator.manipulator_rotate_scale);
@@ -618,7 +618,7 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 	}
 }
 
-boolean la_t_tm_grabb(BInputState *input)
+boolean la_t_tm_grab(BInputState *input)
 {
 	double dist[3], pos, distance;
 	uint i;
@@ -629,9 +629,9 @@ boolean la_t_tm_grabb(BInputState *input)
 		pos = p_get_projection_line(&distance, i, input->pointer_x, input->pointer_y, GlobalTransformManupulator.manipulator_pos);
 		if(pos / GlobalTransformManupulator.manipulator_scale[i] > 0.1 && pos / GlobalTransformManupulator.manipulator_scale[i] < 0.3 && distance < 0.02 * 0.02)
 		{
-			GlobalTransformManupulator.grabb_axis = i;
-			GlobalTransformManupulator.grabb_pos = pos;
-			GlobalTransformManupulator.grabb_manip_pos = GlobalTransformManupulator.manipulator_pos[i];
+			GlobalTransformManupulator.grab_axis = i;
+			GlobalTransformManupulator.grab_pos = pos;
+			GlobalTransformManupulator.grab_manip_pos = GlobalTransformManupulator.manipulator_pos[i];
 			GlobalTransformManupulator.mode = TMM_TRANSFORM;
 			lock_transform_vertexes(input, FALSE, FALSE, FALSE);
 			la_pfx_create_bright(GlobalTransformManupulator.manipulator_pos);
@@ -659,10 +659,10 @@ boolean la_t_tm_grabb(BInputState *input)
 			radius = a * a + b * b;
 			if(radius < 1)
 			{
-				GlobalTransformManupulator.grabb_axis = i;
+				GlobalTransformManupulator.grab_axis = i;
 				GlobalTransformManupulator.mode = TMM_ROTATE;
-				GlobalTransformManupulator.grabb_pos = atan2(dist[(GlobalTransformManupulator.grabb_axis + 1) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 1) % 3], dist[(GlobalTransformManupulator.grabb_axis + 2) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 2) % 3]);
-				GlobalTransformManupulator.grabb_pos = 0.5 * PI * (double)((int)(GlobalTransformManupulator.grabb_pos / (0.5 * PI) + 4.5));
+				GlobalTransformManupulator.grab_pos = atan2(dist[(GlobalTransformManupulator.grab_axis + 1) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grab_axis + 1) % 3], dist[(GlobalTransformManupulator.grab_axis + 2) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grab_axis + 2) % 3]);
+				GlobalTransformManupulator.grab_pos = 0.5 * PI * (double)((int)(GlobalTransformManupulator.grab_pos / (0.5 * PI) + 4.5));
 				lock_transform_vertexes(input, FALSE, FALSE, FALSE);
 				la_pfx_create_bright(GlobalTransformManupulator.manipulator_pos);
 				return TRUE;
@@ -685,7 +685,7 @@ boolean la_t_tm_grabb(BInputState *input)
 		if(pos > -0.07 && pos < 0.07)
 		{
 			GlobalTransformManupulator.mode = TMM_NORMAL;
-			GlobalTransformManupulator.grabb_manip_pos = ((input->pointer_x - dist[0]) - (input->pointer_y - dist[1])) * GlobalTransformManupulator.manipulator_size;
+			GlobalTransformManupulator.grab_manip_pos = ((input->pointer_x - dist[0]) - (input->pointer_y - dist[1])) * GlobalTransformManupulator.manipulator_size;
 			lock_transform_vertexes(input, TRUE, FALSE, FALSE);
 			return TRUE;
 		}
@@ -697,7 +697,7 @@ boolean la_t_tm_grabb(BInputState *input)
 		if(pos > -0.07 && pos < 0.07)
 		{
 			GlobalTransformManupulator.mode = TMM_SMOOTH;
-			GlobalTransformManupulator.grabb_manip_pos = ((input->pointer_x - dist[0]) + (input->pointer_y - dist[1])) * GlobalTransformManupulator.manipulator_size;
+			GlobalTransformManupulator.grab_manip_pos = ((input->pointer_x - dist[0]) + (input->pointer_y - dist[1])) * GlobalTransformManupulator.manipulator_size;
 			lock_transform_vertexes(input, FALSE, FALSE, TRUE);
 			return TRUE;
 		}
@@ -709,7 +709,7 @@ boolean la_t_tm_grabb(BInputState *input)
 		if(pos > -0.03 && pos < 0.03)
 		{
 			GlobalTransformManupulator.mode = TMM_TANGENT;
-			GlobalTransformManupulator.grabb_manip_pos = (input->pointer_x - dist[0]) * -GlobalTransformManupulator.manipulator_size;
+			GlobalTransformManupulator.grab_manip_pos = (input->pointer_x - dist[0]) * -GlobalTransformManupulator.manipulator_size;
 			lock_transform_vertexes(input, FALSE, TRUE, FALSE);
 			return TRUE;
 		}
@@ -787,7 +787,7 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 	{
 		double output[3];
 		p_get_projection_screen(output, GlobalTransformManupulator.manipulator_pos[0], GlobalTransformManupulator.manipulator_pos[1], GlobalTransformManupulator.manipulator_pos[2]);
-		normal_tangent = ((input->pointer_x - output[0]) - (input->pointer_y - output[1])) * GlobalTransformManupulator.manipulator_size - GlobalTransformManupulator.grabb_manip_pos;
+		normal_tangent = ((input->pointer_x - output[0]) - (input->pointer_y - output[1])) * GlobalTransformManupulator.manipulator_size - GlobalTransformManupulator.grab_manip_pos;
 		func = normal_func;
 		data = &normal_tangent;
 	}
@@ -795,7 +795,7 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 	{
 		double output[3];
 		p_get_projection_screen(output, GlobalTransformManupulator.manipulator_pos[0], GlobalTransformManupulator.manipulator_pos[1], GlobalTransformManupulator.manipulator_pos[2]);
-		normal_tangent = ((input->pointer_x - output[0]) + (input->pointer_y - output[1])) * GlobalTransformManupulator.manipulator_size - GlobalTransformManupulator.grabb_manip_pos;
+		normal_tangent = ((input->pointer_x - output[0]) + (input->pointer_y - output[1])) * GlobalTransformManupulator.manipulator_size - GlobalTransformManupulator.grab_manip_pos;
 		if(normal_tangent > GlobalTransformManupulator.manipulator_size * -0.4)
 			normal_tangent = GlobalTransformManupulator.manipulator_size * -0.4;
 		func = normal_func;
@@ -805,7 +805,7 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 	{
 		double output[3];
 		p_get_projection_screen(output, GlobalTransformManupulator.manipulator_pos[0], GlobalTransformManupulator.manipulator_pos[1], GlobalTransformManupulator.manipulator_pos[2]);
-		normal_tangent = (input->pointer_x - output[0]) * -GlobalTransformManupulator.manipulator_size - GlobalTransformManupulator.grabb_manip_pos;
+		normal_tangent = (input->pointer_x - output[0]) * -GlobalTransformManupulator.manipulator_size - GlobalTransformManupulator.grab_manip_pos;
 		func = normal_func;
 		data = &normal_tangent;
 	}
@@ -814,12 +814,12 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 	if(GlobalTransformManupulator.mode == TMM_TRANSFORM)
 	{
 		if(input->mouse_button[1])
-			GlobalTransformManupulator.manipulator_pos[GlobalTransformManupulator.grabb_axis] = snap[GlobalTransformManupulator.grabb_axis];
+			GlobalTransformManupulator.manipulator_pos[GlobalTransformManupulator.grab_axis] = snap[GlobalTransformManupulator.grab_axis];
 		else
-			GlobalTransformManupulator.manipulator_pos[GlobalTransformManupulator.grabb_axis] += p_get_projection_line(NULL, GlobalTransformManupulator.grabb_axis, input->pointer_x, input->pointer_y, GlobalTransformManupulator.manipulator_pos) - GlobalTransformManupulator.grabb_pos;
+			GlobalTransformManupulator.manipulator_pos[GlobalTransformManupulator.grab_axis] += p_get_projection_line(NULL, GlobalTransformManupulator.grab_axis, input->pointer_x, input->pointer_y, GlobalTransformManupulator.manipulator_pos) - GlobalTransformManupulator.grab_pos;
 		
-		delta = GlobalTransformManupulator.manipulator_pos[GlobalTransformManupulator.grabb_axis] - GlobalTransformManupulator.grabb_manip_pos;
-		matrix[12 + GlobalTransformManupulator.grabb_axis] += delta;
+		delta = GlobalTransformManupulator.manipulator_pos[GlobalTransformManupulator.grab_axis] - GlobalTransformManupulator.grab_manip_pos;
+		matrix[12 + GlobalTransformManupulator.grab_axis] += delta;
 		func = matrix_func;
 		data = matrix;
 	}
@@ -835,10 +835,10 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 		}
 		else
 		{
-			p_get_projection_plane(dist, GlobalTransformManupulator.grabb_axis, input->pointer_x, input->pointer_y, GlobalTransformManupulator.manipulator_pos[GlobalTransformManupulator.grabb_axis]);
+			p_get_projection_plane(dist, GlobalTransformManupulator.grab_axis, input->pointer_x, input->pointer_y, GlobalTransformManupulator.manipulator_pos[GlobalTransformManupulator.grab_axis]);
 		}
-		delta = atan2(dist[(GlobalTransformManupulator.grabb_axis + 1) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 1) % 3], dist[(GlobalTransformManupulator.grabb_axis + 2) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 2) % 3]) - GlobalTransformManupulator.grabb_pos;
-		r = (dist[(GlobalTransformManupulator.grabb_axis + 1) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 1) % 3]) * (dist[(GlobalTransformManupulator.grabb_axis + 1) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 1) % 3]) + (dist[(GlobalTransformManupulator.grabb_axis + 2) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 2) % 3]) * (dist[(GlobalTransformManupulator.grabb_axis + 2) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grabb_axis + 2) % 3]);
+		delta = atan2(dist[(GlobalTransformManupulator.grab_axis + 1) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grab_axis + 1) % 3], dist[(GlobalTransformManupulator.grab_axis + 2) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grab_axis + 2) % 3]) - GlobalTransformManupulator.grab_pos;
+		r = (dist[(GlobalTransformManupulator.grab_axis + 1) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grab_axis + 1) % 3]) * (dist[(GlobalTransformManupulator.grab_axis + 1) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grab_axis + 1) % 3]) + (dist[(GlobalTransformManupulator.grab_axis + 2) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grab_axis + 2) % 3]) * (dist[(GlobalTransformManupulator.grab_axis + 2) % 3] - GlobalTransformManupulator.manipulator_pos[(GlobalTransformManupulator.grab_axis + 2) % 3]);
 		if(r < GlobalTransformManupulator.manipulator_size * GlobalTransformManupulator.manipulator_size * 1 * 1 && r > GlobalTransformManupulator.manipulator_size * GlobalTransformManupulator.manipulator_size * 0.9 * 0.9)
 		{
 			if(r < GlobalTransformManupulator.manipulator_size * GlobalTransformManupulator.manipulator_size * 0.96 * 0.96)
@@ -852,11 +852,11 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 		clear_matrix(matrix2);
 		clear_matrix(matrix3);
 		transform_matrix(matrix2, GlobalTransformManupulator.manipulator_pos[0], GlobalTransformManupulator.manipulator_pos[1], GlobalTransformManupulator.manipulator_pos[2]);
-		if(GlobalTransformManupulator.grabb_axis == 0)
+		if(GlobalTransformManupulator.grab_axis == 0)
 			matrix_rotate_x(matrix, -delta);
-		else if(GlobalTransformManupulator.grabb_axis == 1)
+		else if(GlobalTransformManupulator.grab_axis == 1)
 			matrix_rotate_y(matrix, -delta);
-		else if(GlobalTransformManupulator.grabb_axis == 2)
+		else if(GlobalTransformManupulator.grab_axis == 2)
 			matrix_rotate_z(matrix, -delta);
 		matrix_multiply(matrix2, matrix, matrix3);
 		clear_matrix(matrix2);
