@@ -70,7 +70,7 @@ void co_vng_init(void)
 		sui_draw_set_vec3(COVNGraphicsData.color_color, i, 1, 1, 1);
 		sui_draw_set_ivec3(COVNGraphicsData.color_ref, i, i, (i + 1) % COLOR_RING_SPLITS, COLOR_RING_SPLITS);
 	}
-	sui_draw_set_vec2(COVNGraphicsData.color_vertex, i, 0, 0);
+/*	sui_draw_set_vec2(COVNGraphicsData.color_vertex, i, 0, 0);*/
 
 	/* Saturn rings */
 
