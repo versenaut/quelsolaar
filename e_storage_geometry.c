@@ -6,8 +6,8 @@
 #include "e_storage_node.h"
 
 typedef struct{ 
-	char *weight[16];
-	char *reference[16];
+	char weight[16];
+	char reference[16];
 	uint32 parent;
 	real64 pos_x;
 	real64 pos_y;
