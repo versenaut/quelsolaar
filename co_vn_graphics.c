@@ -30,7 +30,7 @@ struct{
 	float	*qubes;
 	float	*rays;
 	float	*color_vertex;
-	float	*color_ref;
+	uint	*color_ref;
 	float	*color_color;
 	float	*name;
 	float	*dust;
