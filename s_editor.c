@@ -393,7 +393,7 @@ typedef enum{
 */
 
 #define SE_OUTPUT_SCALE 1
-//#define SE_OUTPUT_SCALE 0.25
+/*#define SE_OUTPUT_SCALE 0.25*/
 
 void se_convert_flat_arcs(void)
 {
@@ -601,7 +601,7 @@ void se_load(char *file_name, SEEdtorMode ed_mode)
 				for(i = 0; line[i] != 0; i++);
 				line[i - 1] = 0;
 				se_new_drawing(line);
-//				sscanf(line, "char %u", &SEditor.drawings[SEditor.current_drawing].character);
+/*				sscanf(line, "char %u", &SEditor.drawings[SEditor.current_drawing].character);*/
 			}
 		}
 		fclose(drawing);
@@ -636,7 +636,7 @@ void se_draw_button(BInputState *input, SELineMode *mode, SEEdtorMode ed_mode)
 		sui_draw_symb_del(-0.9, -0.2, 0.3, 0.3, 0.3);
 	}else if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
 	{
-//		exit(0);
+/*		exit(0);*/
 		if(sui_box_click_test(-0.95, 0.15, 0.1, 0.1))
 			*mode = SE_LT_LINE;
 		if(sui_box_click_test(-0.95, 0.05, 0.1, 0.1))
@@ -722,11 +722,11 @@ void se_editor(BInputState *input, SEEdtorMode ed_mode)
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 		glClearColor(0.1, 0.1, 0.1, 0);
 		glTranslatef(0, 0, -1);	
-//		glTranslatef(4, 4, 0);
+/*		glTranslatef(4, 4, 0);*/
 		se_draw_grid(TRUE, ed_mode == SE_EM_SYMBOL);
-//		se_draw_grid(TRUE, TRUE);
-//		glTranslatef(-4, -4, 0);
-		if(ed_mode == SE_EM_FONT)
+/*		se_draw_grid(TRUE, TRUE);
+		glTranslatef(-4, -4, 0);
+*/		if(ed_mode == SE_EM_FONT)
 		{
 			sui_draw_symb_font(0, 0, 0.4, 0.4, 0.4);
 			sui_draw_text(-0.9, -0.5, SUI_T_SIZE, SUI_T_SPACE, d->name, 1, 1, 1);

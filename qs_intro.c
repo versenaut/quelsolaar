@@ -10,7 +10,7 @@ struct{
 	float		*star_color;
 	float		*star_fade;
 	uint		*star_ref;
-//	NGLArray	square;
+/*	NGLArray	square;*/
 	double		intro;
 	float		intro_t;
 }GlobalIntro;
@@ -140,7 +140,7 @@ void draw_star(float time, float *color)
 		glRotatef(60 * i, 0, 0, 1);
 		glRotatef(50 * (1 - time), 0, 1, 0);
 		glRotatef(50 * (1 - time), 1, 0, 0);
-//		nglDrawArray(NGL_TRIANGLES_FILLED, GlobalIntro.star_id, &color, 1, GlobalIntro.star_m_id, GlobalIntro.star_ref);
+/*		nglDrawArray(NGL_TRIANGLES_FILLED, GlobalIntro.star_id, &color, 1, GlobalIntro.star_m_id, GlobalIntro.star_ref);*/
 		sui_set_color_array_gl(color, 35, 4);
 		sui_draw_elements_gl(GL_TRIANGLES, GlobalIntro.star_id, GlobalIntro.star_ref, 34 * 3, 2, 0, 0, 0);
 		glPopMatrix();
@@ -172,7 +172,7 @@ void draw_pointer(float time, float *color)
 	{
 		glPushMatrix();
 		glRotatef(60 * i, 0, 0, 1);
-	//	nglDrawArray(NGL_TRIANGLES_FILLED, GlobalIntro.star_id, &GlobalIntro.star_color, 1, GlobalIntro.star_add_id, GlobalIntro.star_ref);
+	/*	nglDrawArray(NGL_TRIANGLES_FILLED, GlobalIntro.star_id, &GlobalIntro.star_color, 1, GlobalIntro.star_add_id, GlobalIntro.star_ref);*/
 		sui_set_color_array_gl(color, 35, 4);
 		sui_draw_elements_gl(GL_TRIANGLES, GlobalIntro.star_id, GlobalIntro.star_ref, 34 * 3, 2, 0, 0, 0);
 		glPopMatrix();
@@ -192,7 +192,7 @@ boolean qs_intro_draw(void)
 {
 	uint i;
 	float t = 0, border[16] = {-1, 1, 1, 1, 1, 0.45, -1, 0.45, -1, -1, 1, -1, 1, -0.45, -1, -0.45};
-//	Point position;
+/*	Point position;*/
 	if(GlobalIntro.intro != TRUE)
 		return FALSE;
 	glDisable(GL_CULL_FACE);
@@ -203,7 +203,7 @@ boolean qs_intro_draw(void)
 	glTranslatef(0,0,-1000);
 	glScalef(1 + GlobalIntro.intro_t * 2.8, 1, 1);
 
-//	nglDrawArray(NGL_QUADS_FILLED, GlobalIntro.square, NULL, 0, mui_get_material(3), 0);
+/*	nglDrawArray(NGL_QUADS_FILLED, GlobalIntro.square, NULL, 0, mui_get_material(3), 0);*/
 	glPopMatrix();
 
 	if(GlobalIntro.intro_t > 0.6)
@@ -249,20 +249,20 @@ boolean qs_intro_draw(void)
 	glPushMatrix();
 		glTranslatef(-1 + (1 - t) * (1 - t) * 4 , 0.3, -1);
 		glScalef(3, 3, 3);
-	//	mui_draw_text("QUEL", UITM_INTRO, NULL, NULL, 1 - (1 - t) * (1 - t) * (1 - t), position);
+	/*	mui_draw_text("QUEL", UITM_INTRO, NULL, NULL, 1 - (1 - t) * (1 - t) * (1 - t), position);*/
 		sui_draw_text(0, 0, 0.02, 2, "QUEL", 0, 0, 0);   
 	glPopMatrix();
 		glPushMatrix();
 		glTranslatef(0.8 - (1 - t) * (1 - t) * 8 , -0.25, -1);
 		glScalef(3, 3, 3);
-	//	mui_draw_text("SOLAAR", UITM_INTRO, NULL, NULL, 1 - (1 - t) * (1 - t) * (1 - t), position);	
+	/*	mui_draw_text("SOLAAR", UITM_INTRO, NULL, NULL, 1 - (1 - t) * (1 - t) * (1 - t), position);*/
 		sui_draw_text(0, 0, 0.02, 2, "SOLAAR", 0, 0, 0);  
 	glPopMatrix();	
 
 	if(GlobalIntro.intro_t < 1)
 		GlobalIntro.intro_t +=  0.025 * betray_get_delta_time();
 	glPushMatrix();
-//	glTranslatef(0, 0, -1);
+/*	glTranslatef(0, 0, -1);*/
 	sui_draw_gl(GL_QUADS, border, 8, 2, 0, 0, 0);
 	glPopMatrix();
 	return TRUE;

@@ -185,25 +185,25 @@ void p_shader_write_lights(ENode *node, PSExeCode *f_c)
 
 	if(direct || back_direct)
 		p_shader_extend_code(f_c, "\tfloat f, length;\n"
-//					"\tint i;\n"
-//					"\tfor(i = 0; i < 1; i++)\n"
-//					"\t{\n"
-					"\t\tv = gl_LightSource[0].position.xyz - pixel_pos;\n"
-//					"\t\tv = gl_LightSource[0].position.xyz;\n"
-//					"\t\tv = vec3(-2.0, -2.0, -4.0) - pixel_pos;\n"
-					"\t\tf = length(v);\n"
+/*					"\tint i;\n"
+					"\tfor(i = 0; i < 1; i++)\n"
+					"\t{\n"
+*/					"\t\tv = gl_LightSource[0].position.xyz - pixel_pos;\n"
+/*					"\t\tv = gl_LightSource[0].position.xyz;\n"
+					"\t\tv = vec3(-2.0, -2.0, -4.0) - pixel_pos;\n"
+*/					"\t\tf = length(v);\n"
 					"\t\tv = normalize(v);\n");
 	if(direct)
 		p_shader_extend_code(f_c, "\t\tf = max(0.0, dot(normal, v)) / f;\n"
 					"\t\tlight = gl_LightSource[0].diffuse.rgb * vec3(f, f, f);\n");
-//					"\t\tlight = gl_LightSource[0].position.rgb;\n");
-//					"\t\tlight = vec3(f, f, f);\n");
-	if(back_direct)
+/*					"\t\tlight = gl_LightSource[0].position.rgb;\n");
+					"\t\tlight = vec3(f, f, f);\n");
+*/	if(back_direct)
 		p_shader_extend_code(f_c, "\t\tf = max(0.0, dot(normal, vec3(0.0, 0.0, 0.0) - v)) / f;\n"
 					"\t\tlight = gl_LightSource[0].diffuse.xyz * f;\n");
-//	if(direct || back_direct)				
-//		p_shader_extend_code(f_c, "\t}\n");
-
+/*	if(direct || back_direct)				
+		p_shader_extend_code(f_c, "\t}\n");
+*/
 	if(ambient)
 		p_shader_extend_code(f_c, "\tambient = textureCube(diffuse_environment, normal).xyz;\n");
 	if(back_ambient)
@@ -291,15 +291,15 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 		switch(e_nsm_get_fragment_type(node, fragment))
 		{
 			case VN_M_FT_COLOR :
-			//	sprintf(code, "vec4(%f, %f, %f, 1)", (float)frag->color.red, (float)frag->color.green, (float)frag->color.blue);
+			/*	sprintf(code, "vec4(%f, %f, %f, 1)", (float)frag->color.red, (float)frag->color.green, (float)frag->color.blue);*/
 				sprintf(code, "color_%u", fragment);
 				splitabel = FALSE;
 				break;
 			case VN_M_FT_LIGHT :
-			//	sprintf(code, "light_%u", fragment);
-			//	sprintf(code, "vec4(dot(normalize(pixel_pos.xyz - vec3(0.2, 0.3, 1.0), vec3(0, 0, 1)))", fragment);
-		//		sprintf(code, "vec4(dot(normal, vec3(1.0, 1.0, 1.0)), 1.0)", fragment); 
-				switch(frag->light.type)
+			/*	sprintf(code, "light_%u", fragment);
+				sprintf(code, "vec4(dot(normalize(pixel_pos.xyz - vec3(0.2, 0.3, 1.0), vec3(0, 0, 1)))", fragment);
+				sprintf(code, "vec4(dot(normal, vec3(1.0, 1.0, 1.0)), 1.0)", fragment); 
+*/				switch(frag->light.type)
 				{
 					case VN_M_LIGHT_DIRECT :
 					sprintf(code, "vec4(light, 0)", fragment);
@@ -324,7 +324,7 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 			case VN_M_FT_REFLECTION :
 				{
 					char input[2560];
-			//		p_shader_write_math(node, fragment, input, c, passed, count);
+			/*		p_shader_write_math(node, fragment, input, c, passed, count);*/
 					sprintf(code, "textureCube(environment, normal).xyz");
 					break;
 				}
@@ -333,7 +333,7 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 				break;;
 			case VN_M_FT_GEOMETRY :
 				sprintf(code, "geometry_%u", fragment);
-//				sprintf(code, "pixel_pos");
+/*				sprintf(code, "pixel_pos");*/
 				splitabel = FALSE;
 				break;
 			case VN_M_FT_TEXTURE :
@@ -357,7 +357,7 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 				break;
 			case VN_M_FT_BLENDER :
 				{
-			//		sprintf(code, "temp");
+			/*		sprintf(code, "temp");*/
 					switch(frag->blender.type)
 					{
 						case VN_M_BLEND_FADE :

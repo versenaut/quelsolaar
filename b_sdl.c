@@ -112,12 +112,12 @@ uint system_wrapper_eventloop(BInputState *input)
 				if(event.active.gain) 
 				{
 					input_focus = TRUE;
-	//				SDL_ShowCursor(FALSE);
+	/*				SDL_ShowCursor(FALSE);*/
 				}
 				else
 				{
 					input_focus = FALSE;
-	//				SDL_ShowCursor(TRUE);
+	/*				SDL_ShowCursor(TRUE);*/
 				}
 			}
 			break;

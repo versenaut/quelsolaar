@@ -257,13 +257,14 @@ void uvo_draw_overlay(BInputState *input)
 
 		}
 	}
-//	sui_set_blend_gl(GL_ONE, GL_ONE);
+/*	sui_set_blend_gl(GL_ONE, GL_ONE);*/
 
 	sui_set_color_array_gl(color, pos, 3);
 	sui_draw_gl(GL_QUADS, array, pos, 2, 0, 0, 0);
 
-//	free(array);
-//	free(color);
+/*	free(array);
+	free(color);
+*/
 /*	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
 	{
 		uvg_get_uve(uv, id);

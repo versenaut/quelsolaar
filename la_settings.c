@@ -50,7 +50,7 @@ void draw_settings_menu(BInputState *input, void *user)
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST); 
 	    sw_draw_window(0, 0, 0.4, 0.6, 0.02);
-//		sui_draw_text("SETTINGS", SUITM_CENTER_SPACED, NULL, NULL, 0, 0, 0.5 , 0, sui_get_material(SUIM_BLACK_FONT));
+/*		sui_draw_text("SETTINGS", SUITM_CENTER_SPACED, NULL, NULL, 0, 0, 0.5 , 0, sui_get_material(SUIM_BLACK_FONT));*/
 		sui_draw_text(0 - 0.5 * sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, "SETTINGS"), 0, SUI_T_SIZE, SUI_T_SPACE, "SETTINGS", 0, 0, 0);
     }
 /*
@@ -68,13 +68,14 @@ void draw_settings_menu(BInputState *input, void *user)
 
 */
 
-//	boolean udg_update_geometry(void)
+/*	boolean udg_update_geometry(void)*/
 
-//	if(sw_text_button_center(input, SUIMC_BLACK, 0, -0.5, "OK"))
-//		betray_set_action_func(la_edit_func, NULL);
-
-//	if(udg_update_geometry())
-//		betray_set_action_func(parce_input, NULL);
+/*	if(sw_text_button_center(input, SUIMC_BLACK, 0, -0.5, "OK"))
+		betray_set_action_func(la_edit_func, NULL);
+*/
+/*	if(udg_update_geometry())
+		betray_set_action_func(parce_input, NULL);
+*/
 /*
 	sui_draw_text("Geometry complexity", SUITM_NORMAL, NULL, NULL, 0, pos[0] + 0.1, -0.1 , 0, sui_get_material(SUIM_BLACK_FONT));
 	sui_draw_text("Min Tesselation", SUITM_NORMAL, NULL, NULL, 0, pos[0] + 0.1, -0.2 , 0, sui_get_material(SUIM_BLACK_FONT));
@@ -96,7 +97,7 @@ void draw_settings_menu(BInputState *input, void *user)
 	if(max = sw_dir_slider_double_alt(input, max, 5, pos, &a))
 		sui_set_setting_int("MAX_TESS_LEVEL", (double)(a * 5.0 + 1.0));
 */
-//	void done_func(void *user)
+/*	void done_func(void *user)*/
 /*
 		static boolean layer_mode = FALSE;
 		EGeoLayer *layer;
@@ -116,10 +117,9 @@ void draw_settings_menu(BInputState *input, void *user)
 		layer_mode = sw_type_in_pulldown(input, -0.25, 0.1, 0.5, "Nisse", 15, names, count, layer_name_func, NULL, layer_mode);
 	}*/
 
-//	sui_type_in(input, -0.25, 0.2, 0.5, "load.obj", 32, geometry_load_obj, NULL);
-//	sui_type_in(input, -0.25, 0.3, 0.5, "save.obj", 32, geometry_save_obj, NULL);
-
-
+/*	sui_type_in(input, -0.25, 0.2, 0.5, "load.obj", 32, geometry_load_obj, NULL);
+	sui_type_in(input, -0.25, 0.3, 0.5, "save.obj", 32, geometry_save_obj, NULL);
+*/
 	if(input->mode == BAM_DRAW)
 	{
 		glEnable(GL_DEPTH_TEST); 
