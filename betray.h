@@ -64,7 +64,7 @@ extern void		betray_get_key_up_down(boolean *press, boolean *last_press, uint ke
 
 extern BInputState *betray_get_input_state(void);
 
-/*  to set and get the screan mode, please note that sui_get_screen_mode returns the aspect (whith * aspect == hight)*/
+/* To set and get the screen mode, please note that sui_get_screen_mode returns the aspect (width * aspect == height). */
 
 extern void		betray_reshape_view(uint x_size, uint y_size);
 
