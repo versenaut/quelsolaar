@@ -14,6 +14,8 @@ APPS=connector uvedit loqairou
 
 ALL:		$(APPS)
 
+# -----------------------------------------------
+
 connector:	co_main.o co_game.o co_intro.o co_vn_bitmap.o co_vn_curve.o co_vn_geometry.o co_vn_graphics.o \
 		co_vn_handle.o co_vn_head.o co_vn_mat_render.o co_vn_material.o co_vn_object.o co_vn_search.o \
 		co_vn_text.o co_widgets.o st_types.o \
@@ -34,6 +36,8 @@ loqairou:	la_draw_overlay.o la_flare_fx.o la_geometry_undo.o la_input_parser.o l
 		libseduce.a libbetray.a libenough.a
 		gcc -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
+# -----------------------------------------------
+
 libseduce.a:	s_background.o s_draw.o s_editor.o s_line_font.o s_main.o s_popup.o s_settings.o s_text.o
 		ar -cr $@ $^
 
@@ -43,6 +47,8 @@ libbetray.a:	b_glut.o b_main.o b_sdl.o
 libenough.a:	e_storage_bitmap.o e_storage_curve.o e_storage_code.o e_storage_geometry.o e_storage_head.o e_storage_material.o \
 		e_storage_node.o e_storage_object.o
 		ar -cr $@ $^
+
+# -----------------------------------------------
 
 clean:
 	rm -f $(APPS) *.o *.a
