@@ -296,8 +296,8 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		}
 		case VN_M_FT_ANIMATION :
 		{
-			for(i = 0; i < size * size * 3; i++)
-				buffer[i] = 0.5;
+			for(i = 0; i < size * 3; i++)
+				buffer[i] = 0.5f;
 			break;
 		}
 		case VN_M_FT_NOISE :
