@@ -5,6 +5,8 @@
 void sui_draw_text(float pos_x, float pos_y, float size, float spacing, const char *text, float red, float green, float blue)
 {
 	uint i;
+	if(text == NULL || *text == '\0')
+		return;
 //	glEnable(GL_LINE_SMOOTH);
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
