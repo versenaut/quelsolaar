@@ -102,19 +102,19 @@ static void save_geometry(FILE *f, ENode *g_node)
 				fprintf(f, "\t\t<layer name=\"%s\" type=\"VN_G_LAYER_VERTEX_XYZ\">\n", e_nsg_get_layer_name(layer));
 				for(i = 0; i < vertex_count; i++)
 					if(vertex[i * 3] != E_REAL_MAX)
-						fprintf(f, "\t\t\t%u %f %f %f\n", i, ((egreal *)data)[i * 3], ((egreal *)data)[i * 3 + 1], ((egreal *)data)[i * 3 + 2]);
+						fprintf(f, "\t\t\t<v>%u %f %f %f</v>\n", i, ((egreal *)data)[i * 3], ((egreal *)data)[i * 3 + 1], ((egreal *)data)[i * 3 + 2]);
 			break;
 			case VN_G_LAYER_VERTEX_UINT32 :
 				fprintf(f, "\t\t<layer name=\"%s\" type=\"VN_G_LAYER_VERTEX_UINT32\">\n", e_nsg_get_layer_name(layer));
 				for(i = 0; i < vertex_count; i++)
 					if(vertex[i * 3] != E_REAL_MAX)
-						fprintf(f, "\t\t\t%u %u \n", i, ((uint32 *)data)[i]);
+						fprintf(f, "\t\t\t<v>%u %u</v>\n", i, ((uint32 *)data)[i]);
 			break;
 			case VN_G_LAYER_VERTEX_REAL :
 				fprintf(f, "\t\t<layer name=\"%s\" type=\"VN_G_LAYER_VERTEX_REAL\">\n", e_nsg_get_layer_name(layer));
 				for(i = 0; i < vertex_count; i++)
 					if(vertex[i * 3] != E_REAL_MAX)
-						fprintf(f, "\t\t\t%u %f \n", i, ((egreal *)data)[i]);
+						fprintf(f, "\t\t\t<v>%u %f</v>\n", i, ((egreal *)data)[i]);
 			break;
 			case VN_G_LAYER_POLYGON_CORNER_UINT32 :
 				fprintf(f, "\t\t<layer name=\"%s\" type=\"VN_G_LAYER_POLYGON_CORNER_UINT32\">\n", e_nsg_get_layer_name(layer));
@@ -122,7 +122,7 @@ static void save_geometry(FILE *f, ENode *g_node)
 					if(ref[i * 4] < vertex_count && vertex[ref[i * 4] * 3] != E_REAL_MAX &&
 						ref[i * 4 + 1] < vertex_count && vertex[ref[i * 4 + 1] * 3] != E_REAL_MAX &&
 						ref[i * 4 + 2] < vertex_count && vertex[ref[i * 4 + 2] * 3] != E_REAL_MAX)
-						fprintf(f, "\t\t\t%u %u %u %u\n", ((uint32 *)data)[i * 4], ((uint32 *)data)[i * 4 + 1], ((uint32 *)data)[i * 4 + 2], ((uint32 *)data)[i * 4 + 3]);
+						fprintf(f, "\t\t\t<p>%u %u %u %u</p>\n", ((uint32 *)data)[i * 4], ((uint32 *)data)[i * 4 + 1], ((uint32 *)data)[i * 4 + 2], ((uint32 *)data)[i * 4 + 3]);
 			break;
 			case VN_G_LAYER_POLYGON_CORNER_REAL :
 				fprintf(f, "\t\t<layer name=\"%s\" type=\"VN_G_LAYER_POLYGON_CORNER_REAL\">\n", e_nsg_get_layer_name(layer));
@@ -130,7 +130,7 @@ static void save_geometry(FILE *f, ENode *g_node)
 					if(ref[i * 4] < vertex_count && vertex[ref[i * 4] * 3] != E_REAL_MAX &&
 						ref[i * 4 + 1] < vertex_count && vertex[ref[i * 4 + 1] * 3] != E_REAL_MAX &&
 						ref[i * 4 + 2] < vertex_count && vertex[ref[i * 4 + 2] * 3] != E_REAL_MAX)
-						fprintf(f, "\t\t\t%f %f %f %f\n", ((egreal *)data)[i * 4], ((egreal *)data)[i * 4 + 1], ((egreal *)data)[i * 4 + 2], ((egreal *)data)[i * 4 + 3]);
+						fprintf(f, "\t\t\t<p>%f %f %f %f</p>\n", ((egreal *)data)[i * 4], ((egreal *)data)[i * 4 + 1], ((egreal *)data)[i * 4 + 2], ((egreal *)data)[i * 4 + 3]);
 			break;
 			case VN_G_LAYER_POLYGON_FACE_UINT8 :
 				fprintf(f, "\t\t<layer name=\"%s\" type = \"VN_G_LAYER_POLYGON_FACE_UINT8\">\n", e_nsg_get_layer_name(layer));
@@ -138,7 +138,7 @@ static void save_geometry(FILE *f, ENode *g_node)
 					if(ref[i * 4] < vertex_count && vertex[ref[i * 4] * 3] != E_REAL_MAX &&
 						ref[i * 4 + 1] < vertex_count && vertex[ref[i * 4 + 1] * 3] != E_REAL_MAX &&
 						ref[i * 4 + 2] < vertex_count && vertex[ref[i * 4 + 2] * 3] != E_REAL_MAX)
-						fprintf(f, "\t\t\t%u\n", ((uint8 *)data)[i]);
+						fprintf(f, "\t\t\t<p>%u</p>\n", ((uint8 *)data)[i]);
 			break;
 			case VN_G_LAYER_POLYGON_FACE_UINT32 :
 				fprintf(f, "\t\t<layer name=\"%s\" type=\"VN_G_LAYER_POLYGON_FACE_UINT32\">\n", e_nsg_get_layer_name(layer));
@@ -146,7 +146,7 @@ static void save_geometry(FILE *f, ENode *g_node)
 					if(ref[i * 4] < vertex_count && vertex[ref[i * 4] * 3] != E_REAL_MAX &&
 						ref[i * 4 + 1] < vertex_count && vertex[ref[i * 4 + 1] * 3] != E_REAL_MAX &&
 						ref[i * 4 + 2] < vertex_count && vertex[ref[i * 4 + 2] * 3] != E_REAL_MAX)
-						fprintf(f, "\t\t\t%u\n", ((uint32 *)data)[i]);
+						fprintf(f, "\t\t\t<p>%u</p>\n", ((uint32 *)data)[i]);
 			break;
 			case VN_G_LAYER_POLYGON_FACE_REAL :
 				fprintf(f, "\t\t<layer name=\"%s\" type=\"VN_G_LAYER_POLYGON_FACE_REAL\">\n", e_nsg_get_layer_name(layer));
@@ -154,15 +154,15 @@ static void save_geometry(FILE *f, ENode *g_node)
 					if(ref[i * 4] < vertex_count && vertex[ref[i * 4] * 3] != E_REAL_MAX &&
 						ref[i * 4 + 1] < vertex_count && vertex[ref[i * 4 + 1] * 3] != E_REAL_MAX &&
 						ref[i * 4 + 2] < vertex_count && vertex[ref[i * 4 + 2] * 3] != E_REAL_MAX)
-						fprintf(f, "\t\t\t%u\n", ((egreal *)data)[i]);
+						fprintf(f, "\t\t\t<p>%u</p>\n", ((egreal *)data)[i]);
 			break;
 		}
 		fprintf(f, "\t\t</layer>\n");
 	}
 	fprintf(f, "\t</layers>\n");
 
-	fprintf(f, "\t<vertexcrease value=\"%u\" name=\"%s\"/>\n", e_nsg_get_layer_crease_vertex_value(g_node), e_nsg_get_layer_crease_vertex_name(g_node));
-	fprintf(f, "\t<edgecrease value=\"%u\" name=\"%s\"/>\n", e_nsg_get_layer_crease_edge_value(g_node), e_nsg_get_layer_crease_edge_name(g_node));
+	fprintf(f, "\t<vertexcrease layer=\"%s\" default=\"%u\" />\n", e_nsg_get_layer_crease_vertex_name(g_node), e_nsg_get_layer_crease_vertex_value(g_node));
+	fprintf(f, "\t<edgecrease layer=\"%s\" default=\"%u\" />\n", e_nsg_get_layer_crease_edge_name(g_node), e_nsg_get_layer_crease_edge_value(g_node));
 
 	fprintf(f, "\t<bones>\n");
 
