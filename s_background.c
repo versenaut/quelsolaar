@@ -233,16 +233,16 @@ void sui_create_shadow_edge(float size, uint count, float *shadow, float *color,
 
 void sw_draw_background_line(float length);
 
-void sw_draw_bakground_square(void)
+void sw_draw_background_square(void)
 {
 	glPushMatrix();
-    glScaled(1, 1.0 / 2.34, 1);
+	glScaled(1, 1.0 / 2.34, 1);
 	sui_set_color_array_gl(SBackgroundData.square_color, BACK_SEGMENTS * 6, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.square, BACK_SEGMENTS * 6, 3, 1, 1, 1);
 	glPopMatrix();
 }
 
-void sw_draw_bakground_ring(float pos_x, float pos_y)
+void sw_draw_background_ring(float pos_x, float pos_y)
 {
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
@@ -259,7 +259,7 @@ void sw_draw_background_point(float *pos)
 //	glScaled(0.8, 0.8, 1);
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
-    glScaled(-1, 1, 1);
+	glScaled(-1, 1, 1);
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
 	glPopMatrix();
@@ -273,7 +273,7 @@ void sw_draw_background_dot(float *pos)
 	glScaled(0.6, 0.6, 1);
 	sui_set_color_array_gl(SBackgroundData.point_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
-    glScaled(-1, 1, 1);
+	glScaled(-1, 1, 1);
 	sui_set_color_array_gl(SBackgroundData.point_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
 	glPopMatrix();
@@ -285,8 +285,8 @@ void sw_draw_background_line(float length)
 	glPushMatrix();
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
-    glTranslatef(length, 0, 0);
-    glScalef(-1, 1, 1);
+	glTranslatef(length, 0, 0);
+	glScalef(-1.0f, 1.0f, 1.0f);
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
 	glScalef(length, 1, 1);

@@ -199,7 +199,7 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 			if(element[i].type == PU_T_BOTTOM)
 				bottom++;
 		}*/
-		sw_draw_bakground_ring(pos_x, pos_y);
+		sw_draw_background_ring(pos_x, pos_y);
 		for(i = 0; i < element_count; i++)
 		{
 			switch(element[i].type)

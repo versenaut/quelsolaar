@@ -115,6 +115,6 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 
 /**/
 
-extern void sw_draw_bakground_ring(float pos_x, float pos_y);
+extern void sw_draw_background_ring(float pos_x, float pos_y);
 
 #endif

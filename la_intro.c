@@ -145,7 +145,7 @@ void la_intro_draw(void)
 	glPushMatrix();
 	t++;
 	spark++;
-//	sw_draw_bakground_square();
+//	sw_draw_background_square();
 	r = t - 400;
 	if(r > 0)
 	r = 0;

@@ -217,7 +217,7 @@ boolean la_pu_empty(BInputState *input)
 			if(ring == count++)
 				udg_set_modeling_node(e_ns_get_node_id(node));
 
-//	sw_drawbakground();
+//	sw_drawbackground();
 	if(input->mode == BAM_DRAW)
 	{
 		glPopMatrix();
@@ -604,7 +604,7 @@ void la_pu_polygon(BInputState *input, uint polygon)
 		break;
 
 	}
-//	sw_drawbakground();
+//	sw_drawbackground();
 	if(input->mode == BAM_DRAW)
 	{
 		glPopMatrix();
