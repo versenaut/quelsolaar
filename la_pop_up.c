@@ -168,11 +168,11 @@ boolean la_pu_empty(BInputState *input)
 	element[0].data.angle[0] = -45;
 	element[0].data.angle[1] = 45;
 	element[1].type = PU_T_ANGLE;
-	element[1].text = "UnDo";
+	element[1].text = "Undo";
 	element[1].data.angle[0] = 45;
 	element[1].data.angle[1] = 135;
 	element[2].type = PU_T_ANGLE;
-	element[2].text = "ReDo";
+	element[2].text = "Redo";
 	element[2].data.angle[0] = 225;
 	element[2].data.angle[1] = 315;
 	element[3].type = PU_T_BOTTOM;
@@ -280,7 +280,7 @@ void la_pu_manipulator(BInputState *input)
 	element[2].data.angle[0] = 105;
 	element[2].data.angle[1] = 135;
 	element[3].type = PU_T_ANGLE;
-	element[3].text = "Colapse";
+	element[3].text = "Collapse";
 	element[3].data.angle[0] = 45 + 180;
 	element[3].data.angle[1] = 75 + 180;
 	element[4].type = PU_T_ANGLE;
@@ -305,7 +305,7 @@ void la_pu_manipulator(BInputState *input)
 	element[11].type = PU_T_BOTTOM;
 	element[11].text = "Slice";
 	element[12].type = PU_T_BOTTOM;
-	element[12].text = "Slice off";
+	element[12].text = "Slice Off";
 	element[13].type = PU_T_BOTTOM;
 	element[13].text = "Weld";
 	element[14].type = PU_T_BOTTOM;
@@ -434,7 +434,7 @@ void la_pu_edge(BInputState *input, uint *edge)
 	static float x, y;
 	uint ring;
 	element[0].type = PU_T_ANGLE;
-	element[0].text = "Select border";
+	element[0].text = "Select Border";
 	element[0].data.angle[0] = 0;
 	element[0].data.angle[1] = 60;
 	element[1].type = PU_T_ANGLE;
@@ -450,11 +450,11 @@ void la_pu_edge(BInputState *input, uint *edge)
 	element[3].data.angle[0] = 180;
 	element[3].data.angle[1] = 240;
 	element[4].type = PU_T_ANGLE;
-	element[4].text = "Colapse";
+	element[4].text = "Collapse";
 	element[4].data.angle[0] = 240;
 	element[4].data.angle[1] = 300;
 	element[5].type = PU_T_ANGLE;
-	element[5].text = "Messiure Grid";
+	element[5].text = "Measure Grid";
 	element[5].data.angle[0] = 300;
 	element[5].data.angle[1] = 360;
 
@@ -542,7 +542,7 @@ void la_pu_polygon(BInputState *input, uint polygon)
 	element[4].data.angle[0] = 240;
 	element[4].data.angle[1] = 300;
 	element[5].type = PU_T_ANGLE;
-	element[5].text = "Slice off";
+	element[5].text = "Slice Off";
 	element[5].data.angle[0] = 300;
 	element[5].data.angle[1] = 360;
 
