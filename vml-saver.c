@@ -194,6 +194,7 @@ static void save_material(FILE *f, ENode *m_node)
 	VMatFrag *frag;
 	VNMFragmentID id;
 	uint i;
+
 	fprintf(f, "\t<fragments>\n");
 	for(id = e_nsm_get_fragment_next(m_node, 0); id != (uint16)-1 ; id = e_nsm_get_fragment_next(m_node, id + 1))
 	{
@@ -305,12 +306,12 @@ static void save_bitmap(FILE *f, ENode *b_node)
 	EBitLayer *layer;
 	uint size[3], i, j, k, start, tiles[2];
 	void *data;
+
 	e_nsb_get_size(b_node, &size[0], &size[1], &size[2]);
 	fprintf(f, "\t<layers size=\"%u %u %u\">\n", size[0], size[1], size[2]);
 	
 	tiles[0] = ((size[0] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE);
 	tiles[1] = ((size[1] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE);
-
 	
 	for(layer = e_nsb_get_layer_next(b_node, 0); layer != NULL; layer = e_nsb_get_layer_next(b_node, e_nsb_get_layer_id(layer) + 1))
 	{
@@ -546,6 +547,7 @@ static void save_data(FILE *f)
 {
 	ENode *node;
 	uint i;
+
 	fprintf(f, "<vml>\n");
 	for(i = 0; i < V_NT_NUM_TYPES; i++)
 		for(node = e_ns_get_node_next(0, 0, i); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, i))
@@ -558,6 +560,7 @@ static void download_data(void)
 {
 	void *layer;
 	ENode *node;
+
 	for(node = e_ns_get_node_next(0, 0, V_NT_GEOMETRY); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_GEOMETRY))
 		for(layer = e_nsg_get_layer_next(node, 0); layer != NULL; layer = e_nsg_get_layer_next(node, e_nsg_get_layer_id(layer) + 1))
 			e_nsg_get_layer_data(node, layer);
@@ -566,11 +569,12 @@ static void download_data(void)
 			e_nsb_get_layer_data(node, layer);
 }
 
-static char * find_param(int argc, char **argv, char *gear, char *default_text)
+static const char * find_param(int argc, char **argv, const char *option, const char *default_text)
 {
-	uint i;
+	int i;
+
 	for(i = 1; i < argc - 1; i++)
-		if(strcmp(argv[i], gear) == 0)
+		if(strcmp(argv[i], option) == 0)
 			return argv[i + 1];
 	return default_text;
 }
@@ -578,7 +582,7 @@ static char * find_param(int argc, char **argv, char *gear, char *default_text)
 int main(int argc, char **argv)
 {
 	uint32 i, seconds, s, interval = 10;
-	char *name, *pass, *address, *file;
+	const char *name, *pass, *address, *file;
 	FILE *f;
 	int	repeat = 0;
 
