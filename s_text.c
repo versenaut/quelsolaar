@@ -2,9 +2,6 @@
 
 #include "seduce.h"
 
-extern void sui_draw_letter(uint8 letter, float red, float green, float blue);
-extern float sui_get_letter_size(char letter);
-
 void sui_draw_text(float pos_x, float pos_y, float size, float spacing, const char *text, float red, float green, float blue)
 {
 	uint i;
