@@ -127,7 +127,7 @@ void uv_draw_menu(BInputState *input)
 		sui_draw_text(-0.98, -0.03, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), 0.2, 0.6, 1);
 
 		sui_prev_node(-0.56, -0.025, 0.2, 0.6, 1);
-		uv_draw_menu_tool_help(aspect, -0.56, 0.03, "Previus Node");
+		uv_draw_menu_tool_help(aspect, -0.56, 0.03, "Previous Node");
 		sui_next_node(-0.535, -0.025, 0.2, 0.6, 1);
 		uv_draw_menu_tool_help(aspect, -0.535, 0.03, "Next Node");
 
