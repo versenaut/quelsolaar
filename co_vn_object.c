@@ -206,6 +206,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 						"REAL32_MAT16", "REAL64_MAT4", "REAL64_MAT9", "REAL64_MAT16", "STRING",
 						"NODE", "LAYER" };
 					static uint pu_g = -1, pu_m = -1, pu_p = 0;
+
 					y_meth -= 0.05;
 					sui_draw_2d_line_gl(0.05, y_meth + 0.03, 0.65, y_meth + 0.03, color_light, color_light, color_light);
 					sui_draw_text(0.0, y_meth, SUI_T_SIZE, SUI_T_SPACE, "Param:", color_light, color_light, color_light);
@@ -267,7 +268,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 						}
 
 						output = sui_draw_popup(input, 0.15, y_meth, element, VN_O_METHOD_PTYPE_LAYER + 1, 0);
-						if(output <= VN_O_METHOD_PTYPE_REAL64_MAT16)
+						if(output <= VN_O_METHOD_PTYPE_LAYER)
 						{
 							VNOParamType temp;
 							temp = types[pu_p];
