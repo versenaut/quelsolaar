@@ -365,7 +365,7 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 	ENode *node;
 	uint i, j, *ref, ref_count, vertex_count;
 	double select, *vertex;
-	boolean comuted;
+	boolean computed;
 	udg_get_geometry(&vertex_count, &ref_count, &vertex, &ref, NULL);
 
 	GlobalTransformManipulator.data_length = vertex_count;
@@ -454,18 +454,18 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 					poly = 3;
 				else
 					poly = 4;
-				comuted = FALSE;
+				computed = FALSE;
 				for(j = 0; j < poly; j++)
 				{
 					if(udg_get_select(pos[j]) > 0.01 &&  edge[pos[j]])
 					{
-						if(comuted != TRUE)
+						if(computed != TRUE)
 						{
 							x = ((vertex[pos[0] * 3 + 1] - vertex[pos[1] * 3 + 1]) * (vertex[pos[2] * 3 + 2] - vertex[pos[1] * 3 + 2]) - (vertex[pos[0] * 3 + 2] - vertex[pos[1] * 3 + 2]) * (vertex[pos[2] * 3 + 1] - vertex[pos[1] * 3 + 1]));
 							y = ((vertex[pos[0] * 3 + 2] - vertex[pos[1] * 3 + 2]) * (vertex[pos[2] * 3] - vertex[pos[1] * 3]) - (vertex[pos[0] * 3] - vertex[pos[1] * 3]) * (vertex[pos[2] * 3 + 2] - vertex[pos[1] * 3 + 2]));
 							z = ((vertex[pos[0] * 3] - vertex[pos[1] * 3]) * (vertex[pos[2] * 3 + 1] - vertex[pos[1] * 3 + 1]) - (vertex[pos[0] * 3 + 1] - vertex[pos[1] * 3 + 1]) * (vertex[pos[2] * 3] - vertex[pos[1] * 3]));
 							r = sqrt(x * x + y * y + z * z);
-							comuted = TRUE;
+							computed = TRUE;
 						}
 						GlobalTransformManipulator.normal[pos[j] * 3] = x / r;
 						GlobalTransformManipulator.normal[pos[j] * 3 + 1] = y / r;
