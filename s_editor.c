@@ -557,7 +557,7 @@ void se_save_font(char *file_name)
 			fprintf(file, "\t\tfont_array[%u] = font_%u;\n", i, i);
 	fprintf(file, "\t}\n\tif(font_size[letter] != 0)\n");
 	fprintf(file, "\t\tsui_draw_gl(GL_LINES, font_array[letter], font_size[letter], 2, red, green, blue);\n}\n\n");
-	fprintf(file, "float sui_get_letter_size(char letter)\n{\n");
+	fprintf(file, "float sui_get_letter_size(unsigned char letter)\n{\n");
 		fprintf(file, "\tstatic const float font_width[] = {%f", width[0]);
 	for(i = 1; i < 256; i++)
 	{

@@ -550,7 +550,7 @@ void sui_draw_letter(uint8 letter, float red, float green, float blue)
 		sui_draw_gl(GL_LINES, font_array[letter], font_size[letter], 2, red, green, blue);
 }
 
-float sui_get_letter_size(char letter)
+float sui_get_letter_size(unsigned char letter)
 {
 	static const float font_width[] = {0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000
 			, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000, (float)0.100000

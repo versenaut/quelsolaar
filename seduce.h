@@ -46,7 +46,7 @@ extern void sui_draw_set_ivec4(uint *array, uint pos, uint a, uint b, uint c, ui
 #define SUI_T_SPACE 0.3
 
 extern void		sui_draw_letter(uint8 letter, float red, float green, float blue);
-extern float	sui_get_letter_size(char letter);
+extern float	sui_get_letter_size(unsigned char letter);
 
 extern void		sui_draw_text(float pos_x, float pos_y, float size, float spacing, const char *text, float red, float green, float blue);
 extern float	sui_compute_text_length(float size, float spacing, const char *text);
