@@ -71,7 +71,7 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 	if(rot_size > 0.001)
 	{	
 		y -= 0.05;
-		sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Whith:", color_light, color_light, color_light);  
+		sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Width:", color_light, color_light, color_light);  
 		if(sui_type_number_uint(input, 0.15, y, 0.5, SUI_T_SIZE, &create_size[0], &create_size[0], color, color, color) && create_size[0] * create_size[1] * create_size[2] != 0)
 			verse_send_b_dimensions_set(change_b_node_id, create_size[0], create_size[1], create_size[2]);
 		y -= 0.05;
