@@ -195,7 +195,7 @@ void callback_send_connect_accept(void *user, uint32 avatar, void *address)
 	verse_send_node_list(mask);
 }
 
-uint e_vc_connect(char	*server_address, char *name, char *pass, uint8 *server_id)
+uint e_vc_connect(const char *server_address, const char *name, const char *pass, const uint8 *server_id)
 {
 	uint	connection;
 	VSession *session;
@@ -203,7 +203,7 @@ uint e_vc_connect(char	*server_address, char *name, char *pass, uint8 *server_id
 	if(connection == MAX_CONNECTIONS)
 		return -1;
 	ENSGlobal.context[connection].accepted = FALSE;
-	session = verse_send_connect(name, pass, server_address, server_id);
+	session = verse_send_connect(name, pass, server_address, (uint8 *) server_id);
 	if(session  != NULL)
 		e_vc_connect_internal(session, connection);
 	return connection;
