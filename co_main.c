@@ -49,7 +49,9 @@ void co_intro_handler(BInputState *input, void *user)
 		glDisable(GL_DEPTH_TEST);
 	}
 	co_intro_draw();
-	if((input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE) || (input->mouse_button[1] == FALSE && input->last_mouse_button[1] == TRUE) || (input->mouse_button[2] == FALSE && input->last_mouse_button[2] == TRUE))
+	if((input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE) ||
+	   (input->mouse_button[1] == FALSE && input->last_mouse_button[1] == TRUE) ||
+	   (input->mouse_button[2] == FALSE && input->last_mouse_button[2] == TRUE))
 		active = TRUE;
 
 /*	if(active)
@@ -85,7 +87,7 @@ void co_intro_handler(BInputState *input, void *user)
 		if(e_vc_check_connected_slot(0))
 		{
 			if(input->mode == BAM_DRAW)
-				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECTING...") * -0.5, -0.3, 0.02, 2, "CONNECTING...", 0, 0, 0);    
+				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECTING...") * -0.5, -0.3, 0.02, 2, "CONNECTING...", 0, 0, 0);
 		}
 		else
 		{
