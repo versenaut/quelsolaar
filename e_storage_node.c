@@ -186,7 +186,7 @@ void e_vc_connect_internal(VSession *session, uint	connection)
 
 void callback_send_connect_accept(void *user, uint32 avatar, void *address)
 {
-	uint i, mask;
+	uint i, mask = 0;
 	ENSGlobal.connected = TRUE;
 	for(i = 0; i < V_NT_NUM_TYPES; i++)
 		if(ENSGlobal.auto_subscribe[i] == TRUE || TRUE)
