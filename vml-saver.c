@@ -11,11 +11,21 @@
 
 static void save_object(FILE *f, ENode *o_node)
 {
-	char *method_types[] = {"VN_O_METHOD_PTYPE_INT8", "VN_O_METHOD_PTYPE_INT16", "VN_O_METHOD_PTYPE_INT32", "VN_O_METHOD_PTYPE_UINT8", "VN_O_METHOD_PTYPE_UINT16", "VN_O_METHOD_PTYPE_UINT32", "VN_O_METHOD_PTYPE_REAL32", "VN_O_METHOD_PTYPE_REAL64", "VN_O_METHOD_PTYPE_REAL32_VEC2", "VN_O_METHOD_PTYPE_REAL32_VEC3", "VN_O_METHOD_PTYPE_REAL32_VEC4", "VN_O_METHOD_PTYPE_REAL64_VEC2", "VN_O_METHOD_PTYPE_REAL64_VEC3", "VN_O_METHOD_PTYPE_REAL64_VEC4", "VN_O_METHOD_PTYPE_REAL32_MAT4", "VN_O_METHOD_PTYPE_REAL32_MAT9", "VN_O_METHOD_PTYPE_REAL32_MAT16", "VN_O_METHOD_PTYPE_REAL64_MAT4", "VN_O_METHOD_PTYPE_REAL64_MAT9", "VN_O_METHOD_PTYPE_REAL64_MAT16", "VN_O_METHOD_PTYPE_NODE", "VN_O_METHOD_PTYPE_LAYER"};
+	static const char *method_types[] = {
+		"VN_O_METHOD_PTYPE_INT8", "VN_O_METHOD_PTYPE_INT16", "VN_O_METHOD_PTYPE_INT32",
+		"VN_O_METHOD_PTYPE_UINT8", "VN_O_METHOD_PTYPE_UINT16", "VN_O_METHOD_PTYPE_UINT32",
+		"VN_O_METHOD_PTYPE_REAL32", "VN_O_METHOD_PTYPE_REAL64",
+		"VN_O_METHOD_PTYPE_REAL32_VEC2", "VN_O_METHOD_PTYPE_REAL32_VEC3", "VN_O_METHOD_PTYPE_REAL32_VEC4",
+		"VN_O_METHOD_PTYPE_REAL64_VEC2", "VN_O_METHOD_PTYPE_REAL64_VEC3", "VN_O_METHOD_PTYPE_REAL64_VEC4",
+		"VN_O_METHOD_PTYPE_REAL32_MAT4", "VN_O_METHOD_PTYPE_REAL32_MAT9", "VN_O_METHOD_PTYPE_REAL32_MAT16",
+		"VN_O_METHOD_PTYPE_REAL64_MAT4", "VN_O_METHOD_PTYPE_REAL64_MAT9", "VN_O_METHOD_PTYPE_REAL64_MAT16",
+		"VN_O_METHOD_PTYPE_STRING",
+		"VN_O_METHOD_PTYPE_NODE", "VN_O_METHOD_PTYPE_LAYER"};
 	double tmp[4];
 	uint32 time[2], i;
 	EObjLink *link;
 	uint16 group_id, method_id;
+
 	fprintf(f, "\t<position>\n");
 	e_nso_get_pos(o_node, tmp, NULL, NULL, NULL, NULL, time);
 	fprintf(f, "\t\t%f %f %f\n", tmp[0], tmp[1], tmp[2]);
@@ -448,13 +458,13 @@ static void save_curve(FILE *f, ENode *c_node)
 
 static void save_node(FILE *f, ENode *node)
 {
-	char *node_type[] = {"V_NT_OBJECT", "V_NT_GEOMETRY", "V_NT_MATERIAL", "V_NT_BITMAP", "V_NT_TEXT", "V_NT_CURVE", "V_NT_AUDIO"};
-	char *tag_type[] = {"VN_TAG_BOOLEAN", "VN_TAG_UINT32", "VN_TAG_REAL64", "VN_TAG_STRING", "VN_TAG_REAL64_VEC3", "VN_TAG_LINK", "VN_TAG_ANIMATION", "VN_TAG_BLOB", "VN_TAG_TYPE_COUNT"};
+	static const char *node_type[] = {"V_NT_OBJECT", "V_NT_GEOMETRY", "V_NT_MATERIAL", "V_NT_BITMAP", "V_NT_TEXT", "V_NT_CURVE", "V_NT_AUDIO"};
+	static const char *tag_type[] = {"VN_TAG_BOOLEAN", "VN_TAG_UINT32", "VN_TAG_REAL64", "VN_TAG_STRING", "VN_TAG_REAL64_VEC3", "VN_TAG_LINK", "VN_TAG_ANIMATION", "VN_TAG_BLOB", "VN_TAG_TYPE_COUNT"};
 	uint16 group_id, tag_id;
 	uint i;
 	VNTag *tag;
+
 	fprintf(f, "<node id=\"%u\" type=\"%s\" name=\"%s\">\n", e_ns_get_node_id(node), node_type[e_ns_get_node_type(node)], e_ns_get_node_name(node));
-	
 	if(e_ns_get_next_tag_group(node, 0) != (uint16)-1)
 	{
 		fprintf(f, "\t<tags>\n");
