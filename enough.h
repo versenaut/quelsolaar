@@ -42,7 +42,7 @@ typedef void ENode;
 extern ENode *		e_ns_get_node(uint connection, uint node_id);
 extern ENode *		e_ns_get_node_next(uint id, uint connection, VNodeType type);
 extern ENode *		e_ns_get_node_avatar(uint connection);
-extern ENode *		e_ns_get_node_link(ENode *parent, uint node_id);
+extern ENode *		e_ns_get_node_link(const ENode *parent, uint node_id);
 
 extern uint			e_ns_get_node_count(uint connection, VNodeType type);
 

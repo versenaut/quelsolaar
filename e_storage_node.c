@@ -280,7 +280,7 @@ ENodeHead *	e_ns_get_node(uint connection, uint node_id)
 	return find_dlut(&ENSGlobal.context[connection].look_up_table, node_id);
 }
 
-ENodeHead *	 e_ns_get_node_link(ENodeHead *parent, uint node_id)
+ENodeHead *	 e_ns_get_node_link(const ENodeHead *parent, uint node_id)
 {
 	return find_dlut(&ENSGlobal.context[parent->session].look_up_table, node_id);
 }
