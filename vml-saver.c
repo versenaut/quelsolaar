@@ -203,13 +203,19 @@ static void save_material(FILE *f, ENode *m_node)
 		switch(e_nsm_get_fragment_type(m_node, id))
 		{
 			case VN_M_FT_COLOR :
-				fprintf(f, "\t\t\t<fragcolorparam color=\"%f %f %f\"/>\n", 
+				fprintf(f, "\t\t\t<color>%f %f %f</color>\n", 
 					frag->color.red, 
 					frag->color.green, 
 					frag->color.blue);
 			break;
 			case VN_M_FT_LIGHT :
-				fprintf(f, "\t\t\t<fraglightparam type=\"%s\" normal_falloff=\"%f\" brdf=\"%u\" brdf_r=\"%s\" brdf_g=\"%s\" brdf_b=\"%s\"/>\n", 
+				fprintf(f,
+					"\t\t\t<type>%s</type>\n"
+					"\t\t\t<normal_falloff>%f</normal_falloff>\n"
+					"\t\t\t<brdf>%u</brdf>\n"
+					"\t\t\t<brdf_r>%s</brdf_r>\n"
+					"\t\t\t<brdf_g>%s</brdf_g>\n"
+					"\t\t\t<brdf_b>%s</brdf_b>\n",
 					light_type[frag->light.type],
 					frag->light.normal_falloff,
 					frag->light.brdf,
@@ -218,27 +224,40 @@ static void save_material(FILE *f, ENode *m_node)
 					frag->light.brdf_b);
 			break;
 			case VN_M_FT_REFLECTION :
-				fprintf(f, "\t\t\t<fragreflectionparam normal_falloff=\"%f\"/>\n",
+				fprintf(f, "\t\t\t<normal_falloff>%f</normal_falloff>\n",
 					frag->reflection.normal_falloff);
 			break;
 			case VN_M_FT_TRANSPARENCY :
-				fprintf(f, "\t\t\t<fragtransparencyparam normal_falloff=\"%f\" refraction_index=\"%f\"/>\n",
+				fprintf(f,
+					"\t\t\t<normal_falloff>%f</normal_falloff>\n"
+					"\t\t\t<refraction_index>%f</refraction_index>\n",
 					frag->transparency.normal_falloff, frag->transparency.refraction_index);
 			break;
 			case VN_M_FT_VOLUME :
-				fprintf(f, "\t\t\t<fragvolumeparam diffusion=\"%f\" col=\"%f %f %f\" color=\"%u\"/>\n",
+				fprintf(f,
+					"\t\t\t<diffusion>%f</diffusion>\n"
+					"\t\t\t<col>%f %f %f</col>\n"
+					"\t\t\t<color>%u</color>\n",
 					frag->volume.diffusion,
 					frag->volume.col_r, frag->volume.col_g, frag->volume.col_b,
 					frag->volume.color);
 			break;
 			case VN_M_FT_GEOMETRY :
-				fprintf(f, "\t\t\t<fraggeometyparam layer_r=\"%s\" layer_g=\"%s\" layer_b=\"%s\"/>\n",
+				fprintf(f,
+					"\t\t\t<layer_r>%s</layer_r>\n"
+					"\t\t\t<layer_g>%s</layer_g>\n"
+					"\t\t\t<layer_b>%s</layer_b>\n",
 					frag->geometry.layer_r,
 					frag->geometry.layer_g,
 					frag->geometry.layer_b);
 			break;
 			case VN_M_FT_TEXTURE :
-				fprintf(f, "\t\t\t<fragtextureparam bitmap=\"%u\" layer_r=\"%s\" layer_g=\"%s\" layer_b=\"%s\" mapping = \"%u\"/>\n",
+				fprintf(f,
+					"\t\t\t<bitmap>%u</bitmap>\n"
+					"\t\t\tlayer_r>%s</layer_r>\n"
+					"\t\t\tlayer_g>%s</layer_g>\n"
+					"\t\t\tlayer_b>%s</layer_b>\n"
+					"mapping>%u</mapping>\n",
 					frag->texture.bitmap,
 					frag->texture.layer_r,
 					frag->texture.layer_g,
@@ -246,50 +265,65 @@ static void save_material(FILE *f, ENode *m_node)
 					frag->texture.mapping);
 			break;
 			case VN_M_FT_NOISE :
-				fprintf(f, "\t\t\t<fragnoiseparam type=\"%u\" mapping=\"%u\"/>\n",
+				fprintf(f,
+					"\t\t\t<type>%s</type>\n"
+					"\t\t\t<mapping>%u</mapping>\n",
 					noise_type[frag->noise.type],
 					frag->noise.mapping);
 			break;
 			case VN_M_FT_BLENDER :
-				fprintf(f, "\t\t\t<fragblenderparam type=\"%s\" data_a=\"%u\" data_b=\"%u\" control=\"%u\"/>\n",
+				fprintf(f,
+					"\t\t\t<type>%s</type>\n"
+					"\t\t\t<data_a>%u</data_a>\n"
+					"\t\t\t<data_b>%u</data_b>\n"
+					"\t\t\t<control>%u</control>\n",
 					blend_type[frag->blender.type],
 					frag->blender.data_a,
 					frag->blender.data_b,
 					frag->blender.control);
 			break;
 			case VN_M_FT_MATRIX :
-				fprintf(f, "\t\t\t<fragmatrixparam mapping=\"%u\">\n",
-					frag->noise.mapping);
+				fprintf(f,
+					"\t\t\t<mapping>%u</mapping>\n", frag->noise.mapping);
+				fprintf(f, "\t\t\t<matrix>\n");
 				fprintf(f, "\t\t\t\t%f %f %f %f\n", frag->matrix.matrix[0], frag->matrix.matrix[1], frag->matrix.matrix[2], frag->matrix.matrix[3]);
 				fprintf(f, "\t\t\t\t%f %f %f %f\n", frag->matrix.matrix[4], frag->matrix.matrix[5], frag->matrix.matrix[6], frag->matrix.matrix[7]);
 				fprintf(f, "\t\t\t\t%f %f %f %f\n", frag->matrix.matrix[8], frag->matrix.matrix[9], frag->matrix.matrix[10], frag->matrix.matrix[11]);
 				fprintf(f, "\t\t\t\t%f %f %f %f\n", frag->matrix.matrix[12], frag->matrix.matrix[13], frag->matrix.matrix[14], frag->matrix.matrix[15]);
-				fprintf(f, "\t\t\t</fragmatrixparam>\n");
+				fprintf(f, "\t\t\t</matrix>\n");
 			break;
 			case VN_M_FT_RAMP :
-				fprintf(f, "\t\t\t<fragrampparam type=\"%s\" channel=\"%s\" mapping=\"%u\">\n",
+				fprintf(f,
+					"\t\t\t<type>%s</ramp>\n"
+					"\t\t\t<channel>%s</channel>\n"
+					"\t\t\t<mapping>%u</mapping>\n",
 					ramp_type[frag->ramp.type],
 					ramp_channel[frag->ramp.channel],
 					frag->ramp.mapping);
+				fprintf(f, "\t\t\t<ramp>\n");
 				for(i = 0; i < frag->ramp.point_count; i++)
-					fprintf(f, "\t\t\t<ramppoint color=\"%f %f %f\" pos=\"%f\">\n",
+					fprintf(f, "\t\t\t\t<ramppoint><color>%f %f %f</color><pos>%f</pos></ramppoint>\n",
 						frag->ramp.ramp[i].red,
 						frag->ramp.ramp[i].green,
 						frag->ramp.ramp[i].blue,
 						frag->ramp.ramp[i].pos);
-				fprintf(f, "\t\t\t</fragrampparam>\n");
+				fprintf(f, "\t\t\t</ramp>\n");
 			break;
 			case VN_M_FT_ANIMATION :
-				fprintf(f, "\t\t\t<fraganimationparam label=\"%s\"/>\n",
-					frag->animation.label);
+				fprintf(f, "\t\t\t<label>%s</label>\n", frag->animation.label);
 			break;
 			case VN_M_FT_ALTERNATIVE :
-				fprintf(f, "\t\t\t<fragalternativeparam alt_a=\"%u\" alt_b=\"%u\"/>\n",
+				fprintf(f,
+					"\t\t\t<alt_a>%u</alt_a>\n"
+					"\t\t\t<alt_b>%u</alt_b>>\n",
 					frag->alternative.alt_a,
 					frag->alternative.alt_b);
 			break;
 			case VN_M_FT_OUTPUT :
-				fprintf(f, "\t\t\t<fragoutputparam label=\"%s\" front=\"%u\" back=\"%u\"/>\n",
+				fprintf(f,
+					"\t\t\t<label>%s</label>\n"
+					"\t\t\t<front>%u</front>\n"
+					"\t\t\t<back>%u</back>\n",
 					frag->output.label,
 					frag->output.front,
 					frag->output.back);
