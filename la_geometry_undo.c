@@ -1,3 +1,6 @@
+
+#include <stdlib.h>
+
 #include "la_includes.h"
 
 #include "la_particle_fx.h"
@@ -368,7 +371,7 @@ boolean udg_update_geometry(void)
 		}else
 		{
 			UNDOGlobal.crease = NULL;
-			UNDOGlobal.crease_layer = NULL;				
+			UNDOGlobal.crease_layer = 0;
 		}
 		layer = e_nsg_get_layer_by_type(g_node, VN_G_LAYER_VERTEX_REAL, "select");
 		if(layer != NULL)
