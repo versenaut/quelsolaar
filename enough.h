@@ -52,8 +52,8 @@ extern VNodeOwner	e_ns_get_node_owner(const ENode *node);
 extern char *		e_ns_get_node_name(ENode *node);
 extern uint			e_ns_get_node_connection(const ENode *node);
 
-extern uint			e_ns_get_node_version_struct(ENode *node);
-extern uint			e_ns_get_node_version_data(ENode *node);
+extern uint			e_ns_get_node_version_struct(const ENode *node);
+extern uint			e_ns_get_node_version_data(const ENode *node);
 extern void			e_ns_update_node_version_struct(ENode *node);
 extern void			e_ns_update_node_version_data(ENode *node);
 
@@ -66,12 +66,12 @@ extern void			e_ns_set_node_selected(uint connection, uint id, VNodeType type);
 extern uint			e_ns_get_node_selected_id(uint connection, VNodeType type);
 extern void			e_ns_set_node_create_func(void (* func)(uint connection, uint id, VNodeType type, void *user), void *user);
 
-extern char *			e_ns_get_tag_group(ENode *node, uint16 group_id);
-extern uint			e_ns_get_next_tag_group(ENode *node, uint16 group_id);
-extern uint			e_ns_get_next_tag(ENode *node, uint16 group_id, uint16 tag_id);
-extern char *			e_ns_get_tag_name(ENode *node, uint16 group_id, uint16 tag_id);
-extern VNTagType	e_ns_get_tag_type(ENode *node, uint16 group_id, uint16 tag_id);
-extern VNTag *		e_ns_get_tag(ENode *node, uint16 group_id, uint16 tag_id);
+extern char *			e_ns_get_tag_group(const ENode *node, uint16 group_id);
+extern uint			e_ns_get_next_tag_group(const ENode *node, uint16 group_id);
+extern uint			e_ns_get_next_tag(const ENode *node, uint16 group_id, uint16 tag_id);
+extern char *			e_ns_get_tag_name(const ENode *node, uint16 group_id, uint16 tag_id);
+extern VNTagType	e_ns_get_tag_type(const ENode *node, uint16 group_id, uint16 tag_id);
+extern VNTag *		e_ns_get_tag(const ENode *node, uint16 group_id, uint16 tag_id);
 
 /* object node storage ----------------------------------------------------------------------------------------------------------------*/
 
