@@ -123,8 +123,8 @@ extern void		*	e_nsg_get_layer_data(ENode *g_node, EGeoLayer *layer);
 extern VNGLayerType e_nsg_get_layer_type(EGeoLayer *layer);
 extern uint			e_nsg_get_layer_id(EGeoLayer *layer);
 extern uint			e_nsg_get_layer_version(EGeoLayer *layer);
-extern uint			e_nsg_get_vertex_legnth(ENode *g_node);
-extern uint			e_nsg_get_polygon_legnth(ENode *g_node);
+extern uint			e_nsg_get_vertex_length(ENode *g_node);
+extern uint			e_nsg_get_polygon_length(ENode *g_node);
 extern char	*		e_nsg_get_layer_name(EGeoLayer *layer);
 
 extern void			e_nsg_get_center(ENode *node, egreal *center);
