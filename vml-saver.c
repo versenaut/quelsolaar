@@ -251,7 +251,7 @@ static void save_material(FILE *f, ENode *m_node)
 					frag->noise.mapping);
 			break;
 			case VN_M_FT_BLENDER :
-				fprintf(f, "\t\t\t<fragblenderparam type=\"%s\" data_a=\"%u\" data_b=\"%u\" contol=\"%u\"/>\n",
+				fprintf(f, "\t\t\t<fragblenderparam type=\"%s\" data_a=\"%u\" data_b=\"%u\" control=\"%u\"/>\n",
 					blend_type[frag->blender.type],
 					frag->blender.data_a,
 					frag->blender.data_b,
