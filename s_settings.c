@@ -83,22 +83,19 @@ void sui_set_setting_int(char *setting, uint value)
 	SUIGlobalSettings.version++;
 }
 
-char *sui_get_setting_text(const char *setting, const char *default_text)
+char * sui_get_setting_text(const char *setting, const char *default_text)
 {
 	Setting	 *s;
 	s = get_setting(setting);
 	if(s == NULL)
 	{
-		uint i;
+		size_t	len;
+
 		s = add_setting(setting);
-		for(i = 0; default_text[i] != 0; i++)
-			;
-		s->text = malloc((sizeof *s->text) * ++i);
-		for(i = 0; default_text[i] != 0; i++)
-			s->text[i] = default_text[i]; 
-/*
-		s->text = default_text;
-*/	}
+		len = strlen(default_text);
+		s->text = malloc(len + 1);
+		strcpy(s->text, default_text);
+	}
 	return s->text;
 }
 
