@@ -150,7 +150,7 @@ void sui_load_settings(const char *file_name)
 	float	r;
 	FILE	*settings;
 
-	if((settings = fopen(file_name, "rt")) != NULL)
+	if((settings = fopen(file_name, "r")) != NULL)
 	{
 /*		uint i;
 		for(i = 0; i < 512; i++)
