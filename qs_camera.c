@@ -15,7 +15,7 @@ struct{
 }GDroppShip;
 
 
-void g_dropp_ship_init()
+void g_drop_ship_init(void)
 {
 	uint i;
 	for(i = 0; i < 16; i++)

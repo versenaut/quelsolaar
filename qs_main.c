@@ -147,8 +147,8 @@ void qs_intro_handler(BInputState *input, void *user)
 
 extern void *se_symbol_editor_func(BInputState *input, void *user_pointer);
 extern void *se_font_editor_func(BInputState *input, void *user_pointer);
-extern void qs_intro_init();
-void g_dropp_ship_init();
+extern void qs_intro_init(void);
+void g_drpp_ship_init(void);
 
 int main(int argc, char **argv)
 {
@@ -163,7 +163,7 @@ int main(int argc, char **argv)
 	persuade_init(3, betray_get_gl_proc_address());
 #endif
 	qs_intro_init();
-	g_dropp_ship_init();
+	g_drop_ship_init();
 //	betray_set_mouse_warp(TRUE);
 
 	betray_set_action_func(qs_intro_handler, NULL);
