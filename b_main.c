@@ -4,12 +4,8 @@
 #include "betray.h"
 #ifdef WIN32
 	#include <windows.h>
-	#include <GL/gl.h>
 #else
-//	#include <gl.h>
-	#include <GLUT/glut.h>
 	#include <sys/time.h>
-/*	#include <GL/glut.h>*/
 #endif
 
 extern boolean b_sdl_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
