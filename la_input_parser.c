@@ -24,19 +24,19 @@ typedef enum {
 	PIM_SHOW_MANIPULATOR_MENY,
 	PIM_SHOW_POLY_MENY,
 	PIM_CHANGE_VIEW
-}ParceInputMode;
+}ParseInputMode;
 
 struct{
-	ParceInputMode	mode;
+	ParseInputMode	mode;
 	uint			start_vertex;
 	uint			closest_vertex;
 	double			depth[3];
 	uint			click_time;
-}ParceInputData;
+}ParseInputData;
 
 boolean draw_view_cage(void)
 {
-	return ParceInputData.mode != PIM_CHANGE_VIEW;
+	return ParseInputData.mode != PIM_CHANGE_VIEW;
 }
 
 void la_parse_input(BInputState *input)
@@ -50,27 +50,27 @@ void la_parse_input(BInputState *input)
 		distance = 1E100;
 		selected_distance = 1E100;
 		p_find_closest_vertex(&closest, &select_closest, &distance, &selected_distance, input->pointer_x, input->pointer_y);
-		if(selected_distance > VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) && ParceInputData.mode != PIM_SHOW_EDGE_MENY)
+		if(selected_distance > VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) && ParseInputData.mode != PIM_SHOW_EDGE_MENY)
 			p_find_closest_edge(edge, input->pointer_x, input->pointer_y);
 	}else
 		la_pfx_select_vertex();
-	switch(ParceInputData.mode)
+	switch(ParseInputData.mode)
 	{
 		case PIM_IDLE :
 			if(input->mode == BAM_EVENT)
 			{
 				if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
 				{
-					ParceInputData.click_time = 0;
+					ParseInputData.click_time = 0;
 					if(la_t_tm_grabb(input))
 					{
-						ParceInputData.mode = PIM_DRAG_MANIPULATOR;
+						ParseInputData.mode = PIM_DRAG_MANIPULATOR;
 						return;
 					}
 					if(selected_distance < VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE))
 					{
-						udg_get_vertex_pos(ParceInputData.depth, select_closest);
-						ParceInputData.start_vertex = select_closest;
+						udg_get_vertex_pos(ParseInputData.depth, select_closest);
+						ParseInputData.start_vertex = select_closest;
 					}
 					else
 					{
@@ -78,42 +78,42 @@ void la_parse_input(BInputState *input)
 						{
 							if(udg_get_select(edge[0]) > 0.01 && udg_get_select(edge[1]) > 0.01)
 							{
-								ParceInputData.mode = PIM_RESHAPE;								
+								ParseInputData.mode = PIM_RESHAPE;								
 								la_t_reshape_hull_start(input, edge);
 							}else
 							{
-								ParceInputData.mode = PIM_SPLIT;
+								ParseInputData.mode = PIM_SPLIT;
 								la_t_edge_spliter_start(input, edge);
 							}
 							return;
 						}
-						p_get_projection_vertex(ParceInputData.depth, ParceInputData.depth, input->pointer_x, input->pointer_y);
-						ParceInputData.start_vertex = -1;
+						p_get_projection_vertex(ParseInputData.depth, ParseInputData.depth, input->pointer_x, input->pointer_y);
+						ParseInputData.start_vertex = -1;
 					}
-					if(ParceInputData.start_vertex != -1 && udg_get_select(ParceInputData.start_vertex) > 0.5)
+					if(ParseInputData.start_vertex != -1 && udg_get_select(ParseInputData.start_vertex) > 0.5)
 					{
-                    	ParceInputData.mode = PIM_DRAG_ONE_VERTEX;
-                        grab_one_vertex(input, ParceInputData.start_vertex, ParceInputData.depth);
+                    	ParseInputData.mode = PIM_DRAG_ONE_VERTEX;
+                        grab_one_vertex(input, ParseInputData.start_vertex, ParseInputData.depth);
 					}
                     else
-						ParceInputData.mode = PIM_DRAW;
+						ParseInputData.mode = PIM_DRAW;
 					la_t_new_draw_line();
 				}else if(input->mouse_button[2] == TRUE && input->last_mouse_button[2] == FALSE)
 				{
-					ParceInputData.start_vertex = select_closest;
+					ParseInputData.start_vertex = select_closest;
 					if(la_t_tm_test_center(input))
-						ParceInputData.mode = PIM_SHOW_MANIPULATOR_MENY;
+						ParseInputData.mode = PIM_SHOW_MANIPULATOR_MENY;
 					else if(selected_distance < VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE))
 					{
-						ParceInputData.mode = PIM_SHOW_VERTEX_MENY;
-						la_pu_vertex(input, ParceInputData.start_vertex);
+						ParseInputData.mode = PIM_SHOW_VERTEX_MENY;
+						la_pu_vertex(input, ParseInputData.start_vertex);
 					}
 					else if(edge[0] != -1 && edge[1] != -1)
-						ParceInputData.mode = PIM_SHOW_EDGE_MENY;
+						ParseInputData.mode = PIM_SHOW_EDGE_MENY;
 					else if((polygon = la_t_poly_test(input)) != -1)
-						ParceInputData.mode = PIM_SHOW_POLY_MENY;
+						ParseInputData.mode = PIM_SHOW_POLY_MENY;
 					else
-						ParceInputData.mode = PIM_SHOW_EMPTY_MENY;
+						ParseInputData.mode = PIM_SHOW_EMPTY_MENY;
 				}
 				if(input->mouse_button[1] == TRUE && input->last_mouse_button[1] == FALSE)
 				{
@@ -121,7 +121,7 @@ void la_parse_input(BInputState *input)
 						la_t_tm_view_center();
 					else
 					{
-						ParceInputData.mode = PIM_CHANGE_VIEW;
+						ParseInputData.mode = PIM_CHANGE_VIEW;
 						p_view_change_start(input);
 					}
 				}
@@ -129,7 +129,7 @@ void la_parse_input(BInputState *input)
 			{
 				if(la_t_tm_test_center(input) == FALSE)
 				{
-					if((ParceInputData.mode == PIM_IDLE && selected_distance < VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE)) || (ParceInputData.mode == PIM_DRAW || ParceInputData.mode == PIM_DRAG_MANIPULATOR || ParceInputData.mode == PIM_DRAG_ONE_VERTEX) && input->mouse_button[1] == TRUE)
+					if((ParseInputData.mode == PIM_IDLE && selected_distance < VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE)) || (ParseInputData.mode == PIM_DRAW || ParseInputData.mode == PIM_DRAG_MANIPULATOR || ParseInputData.mode == PIM_DRAG_ONE_VERTEX) && input->mouse_button[1] == TRUE)
 					{
 						double closest[3];
 						udg_get_vertex_pos(closest, select_closest);
@@ -138,21 +138,21 @@ void la_parse_input(BInputState *input)
 						la_do_draw_closest_edge(edge, input->pointer_x, input->pointer_y, FALSE);
 	
 				}
-					la_t_tm_draw(input, ParceInputData.mode == PIM_DRAG_MANIPULATOR);
+					la_t_tm_draw(input, ParseInputData.mode == PIM_DRAG_MANIPULATOR);
 			}
-			if(ParceInputData.mode != PIM_IDLE)
+			if(ParseInputData.mode != PIM_IDLE)
 				la_parse_input(input);
 		break;
 		case PIM_DRAW :
 			udg_get_vertex_pos(snap, select_closest);
 			glDisable(GL_DEPTH_TEST);
-			if(selected_distance > VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) && ParceInputData.start_vertex == -1 && input->mode == BAM_DRAW)
+			if(selected_distance > VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) && ParseInputData.start_vertex == -1 && input->mode == BAM_DRAW)
 				la_t_draw_line_draw_delete_overlay();
 			glEnable(GL_DEPTH_TEST);
-			p_get_projection_vertex_with_axis(output, ParceInputData.depth, input->pointer_x, input->pointer_y, input->mouse_button[1], snap);
-			if(ParceInputData.start_vertex == -1)
+			p_get_projection_vertex_with_axis(output, ParseInputData.depth, input->pointer_x, input->pointer_y, input->mouse_button[1], snap);
+			if(ParseInputData.start_vertex == -1)
 				if(la_t_draw_select_meny_test())
-					ParceInputData.mode = PIM_DRAW_SELECT;
+					ParseInputData.mode = PIM_DRAW_SELECT;
 			if(input->mode == BAM_EVENT)
 			{			
 				if((input->mouse_button[2] == FALSE && input->last_mouse_button[2] == TRUE) || (input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE))
@@ -162,22 +162,22 @@ void la_parse_input(BInputState *input)
 					if(selected_distance < VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) && input->mouse_button[1] != TRUE)
 					{
 						vertex[1] = select_closest;
-						if(ParceInputData.start_vertex == select_closest)
+						if(ParseInputData.start_vertex == select_closest)
 						{
 							udg_set_select(select_closest, 1);
 							break;
-						}else if(ParceInputData.start_vertex != -1)
+						}else if(ParseInputData.start_vertex != -1)
 						{
-							vertex[0] = ParceInputData.start_vertex;
+							vertex[0] = ParseInputData.start_vertex;
 							if(la_t_edge_connector(vertex) == TRUE)
-								udg_create_edge(ParceInputData.start_vertex, vertex[1]);
-							ParceInputData.start_vertex = vertex[1];
-							udg_get_vertex_pos(ParceInputData.depth, ParceInputData.start_vertex);
+								udg_create_edge(ParseInputData.start_vertex, vertex[1]);
+							ParseInputData.start_vertex = vertex[1];
+							udg_get_vertex_pos(ParseInputData.depth, ParseInputData.start_vertex);
 							break;
 						}
 					}else
 					{
-						if(ParceInputData.start_vertex == -1 && input->mouse_button[1] != TRUE && input->last_mouse_button[2] != TRUE)
+						if(ParseInputData.start_vertex == -1 && input->mouse_button[1] != TRUE && input->last_mouse_button[2] != TRUE)
 						{
 							if(la_t_draw_line_test_delete() || la_t_draw_line_test_select(SM_SELECT))
 								break;
@@ -186,7 +186,7 @@ void la_parse_input(BInputState *input)
 								polygon = la_t_poly_test(input);
 								if(polygon == -1)
 								{
-									la_pfx_create_dust_selected_vertexes(ParceInputData.depth);
+									la_pfx_create_dust_selected_vertexes(ParseInputData.depth);
 									udg_clear_select(0);
 								}								
 								else
@@ -194,28 +194,28 @@ void la_parse_input(BInputState *input)
 								break;
 							}
 						}
-						p_get_projection_vertex_with_axis(pos, ParceInputData.depth, input->pointer_x, input->pointer_y, input->mouse_button[1], snap);
+						p_get_projection_vertex_with_axis(pos, ParseInputData.depth, input->pointer_x, input->pointer_y, input->mouse_button[1], snap);
 						vertex[1] = udg_find_empty_slot_vertex();
 						udg_vertex_set(vertex[1], NULL, pos[0], pos[1], pos[2]);
-						ParceInputData.depth[0] = pos[0];
-						ParceInputData.depth[1] = pos[1];
-						ParceInputData.depth[2] = pos[2];
+						ParseInputData.depth[0] = pos[0];
+						ParseInputData.depth[1] = pos[1];
+						ParseInputData.depth[2] = pos[2];
 					}
-					if(ParceInputData.start_vertex == -1)
+					if(ParseInputData.start_vertex == -1)
 					{
-						p_get_projection_vertex_with_axis(pos, ParceInputData.depth, input->click_pointer_x, input->click_pointer_y, FALSE, snap);
-						ParceInputData.start_vertex = udg_find_empty_slot_vertex();
-						udg_vertex_set(ParceInputData.start_vertex, NULL, pos[0], pos[1], pos[2]);				
+						p_get_projection_vertex_with_axis(pos, ParseInputData.depth, input->click_pointer_x, input->click_pointer_y, FALSE, snap);
+						ParseInputData.start_vertex = udg_find_empty_slot_vertex();
+						udg_vertex_set(ParseInputData.start_vertex, NULL, pos[0], pos[1], pos[2]);				
 					}
-					udg_create_edge(ParceInputData.start_vertex, vertex[1]);
-					ParceInputData.start_vertex = vertex[1];
+					udg_create_edge(ParseInputData.start_vertex, vertex[1]);
+					ParseInputData.start_vertex = vertex[1];
 					if(input->mouse_button[2] == FALSE && input->last_mouse_button[2] == TRUE)
 						undo_event_done();
 				}
 			}else
 			{
-				la_do_draw(ParceInputData.depth, output, input->mouse_button[1], snap);
-				if(ParceInputData.start_vertex == -1)
+				la_do_draw(ParseInputData.depth, output, input->mouse_button[1], snap);
+				if(ParseInputData.start_vertex == -1)
 					la_t_draw_line_add(input->pointer_x, input->pointer_y, TRUE);
 				if(selected_distance < VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) || input->mouse_button[1])
 				{
@@ -240,7 +240,7 @@ void la_parse_input(BInputState *input)
 			if(input->mode == BAM_EVENT)
 				la_t_tm_manipulate(input, snap);
 			else
-				la_t_tm_draw(input, ParceInputData.mode == PIM_DRAG_MANIPULATOR);
+				la_t_tm_draw(input, ParseInputData.mode == PIM_DRAG_MANIPULATOR);
 		break;
 		case PIM_DRAG_ONE_VERTEX :
 			{
@@ -250,19 +250,19 @@ void la_parse_input(BInputState *input)
 
 				if(input->mode == BAM_EVENT)
 				{
-                    p_get_projection_vertex_with_axis(vertex, ParceInputData.depth, input->pointer_x, input->pointer_y, input->mouse_button[1], snap);
-                    grab_one_vertex(input, ParceInputData.start_vertex, vertex);
-//                  udg_vertex_move(ParceInputData.start_vertex, vertex[0], vertex[1], vertex[2]);
+                    p_get_projection_vertex_with_axis(vertex, ParseInputData.depth, input->pointer_x, input->pointer_y, input->mouse_button[1], snap);
+                    grab_one_vertex(input, ParseInputData.start_vertex, vertex);
+//                  udg_vertex_move(ParseInputData.start_vertex, vertex[0], vertex[1], vertex[2]);
                     if(input->mouse_button[0] == FALSE)
-						ParceInputData.mode = PIM_IDLE;
+						ParseInputData.mode = PIM_IDLE;
                     
 /*					if(input->last_mouse_button[0] != TRUE)
-						collapse = ParceInputData.start_vertex;
+						collapse = ParseInputData.start_vertex;
 					if(input->mouse_button[2] != TRUE)
-						p_get_projection_vertex_with_axis(vertex, ParceInputData.depth, input->pointer_x, input->pointer_y, input->mouse_button[1], snap);
+						p_get_projection_vertex_with_axis(vertex, ParseInputData.depth, input->pointer_x, input->pointer_y, input->mouse_button[1], snap);
 					else
 					{
-						if(closest != ParceInputData.start_vertex)
+						if(closest != ParseInputData.start_vertex)
 							collapse = select_closest;
 						vertex[0] = snap[0];
 						vertex[1] = snap[1];
@@ -271,16 +271,16 @@ void la_parse_input(BInputState *input)
 					if(input->mouse_button[0] == FALSE)
 					{
 						if(input->mouse_button[2] != TRUE)
-							udg_vertex_set(ParceInputData.start_vertex, ParceInputData.depth, vertex[0], vertex[1], vertex[2]);
+							udg_vertex_set(ParseInputData.start_vertex, ParseInputData.depth, vertex[0], vertex[1], vertex[2]);
 						else
-							la_t_collapse_two_vertexes(ParceInputData.start_vertex, select_closest);
-						ParceInputData.mode = PIM_IDLE;
+							la_t_collapse_two_vertexes(ParseInputData.start_vertex, select_closest);
+						ParseInputData.mode = PIM_IDLE;
 					}else
-						udg_vertex_move(ParceInputData.start_vertex, vertex[0], vertex[1], vertex[2]);*/
+						udg_vertex_move(ParseInputData.start_vertex, vertex[0], vertex[1], vertex[2]);*/
 				}else
 				{
-					la_do_xyz_lines(ParceInputData.depth, input->mouse_button[1]);
-					if(select_closest != ParceInputData.start_vertex && selected_distance < VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) && input->mouse_button[1] == TRUE)
+					la_do_xyz_lines(ParseInputData.depth, input->mouse_button[1]);
+					if(select_closest != ParseInputData.start_vertex && selected_distance < VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) && input->mouse_button[1] == TRUE)
 						la_do_active_vertex(snap, FALSE);
 				}
 			}
@@ -300,15 +300,15 @@ void la_parse_input(BInputState *input)
 		case PIM_SHOW_EMPTY_MENY :
 			if(la_pu_empty(input))
 			{
-				ParceInputData.depth[0] = 0;
-				ParceInputData.depth[1] = 0;
-				ParceInputData.depth[2] = 0;
+				ParseInputData.depth[0] = 0;
+				ParseInputData.depth[1] = 0;
+				ParseInputData.depth[2] = 0;
 			}
 			if((input->mouse_button[2] == FALSE && input->last_mouse_button[2] == TRUE) || (input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE))
-				ParceInputData.mode = PIM_IDLE;
+				ParseInputData.mode = PIM_IDLE;
 		break;
 		case PIM_SHOW_VERTEX_MENY :
-			la_pu_vertex(input, ParceInputData.start_vertex);
+			la_pu_vertex(input, ParseInputData.start_vertex);
 		break;
 		case PIM_SHOW_EDGE_MENY :
 			la_pu_edge(input, edge);
@@ -328,16 +328,16 @@ void la_parse_input(BInputState *input)
 	}
 	if(input->mode != BAM_EVENT)
 /*	{
-		la_t_tm_draw(input, ParceInputData.mode == PIM_DRAG_MANIPULATOR);
+		la_t_tm_draw(input, ParseInputData.mode == PIM_DRAG_MANIPULATOR);
 		la_pu_type(input);
 	}*/
 	if(input->mouse_button[0] == FALSE && input->last_mouse_button[0] == FALSE && input->mouse_button[1] == FALSE && input->last_mouse_button[1] == FALSE && input->mouse_button[2] == FALSE && input->last_mouse_button[2] == FALSE)
 	{
 		undo_event_done();
-		ParceInputData.mode = PIM_IDLE;
-		ParceInputData.click_time = 0;
+		ParseInputData.mode = PIM_IDLE;
+		ParseInputData.click_time = 0;
 	}
-//	ParceInputData.mode = PIM_CHANGE_VIEW;
+//	ParseInputData.mode = PIM_CHANGE_VIEW;
 }
 
 extern void la_pu_browser(BInputState *input, uint node);
