@@ -7,11 +7,11 @@ void sui_set_blend_gl(uint source, uint destination)
 	glEnable(GL_BLEND);
 }
 
-void sui_draw_gl(uint draw_type, float *array, uint length, uint dimentions, float red, float green, float blue)
+void sui_draw_gl(uint draw_type, float *array, uint length, uint dimensions, float red, float green, float blue)
 {
 	glColor4f(red, green, blue, 0);	
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(dimentions, GL_FLOAT , 0, array);
+	glVertexPointer(dimensions, GL_FLOAT , 0, array);
 	glDrawArrays(draw_type, 0, length);
 	glDisable(GL_BLEND);
 	glDisableClientState(GL_COLOR_ARRAY);
@@ -43,11 +43,11 @@ void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end
 	sui_draw_gl(GL_LINES, array, 2, 3, red, green, blue);
 }
 
-void sui_draw_elements_gl(uint draw_type, float *array, uint *reference, uint length, uint dimentions, float red, float green, float blue)
+void sui_draw_elements_gl(uint draw_type, float *array, uint *reference, uint length, uint dimensions, float red, float green, float blue)
 {
 	glColor3f(red, green, blue);
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(dimentions, GL_FLOAT, 0, array);
+	glVertexPointer(dimensions, GL_FLOAT, 0, array);
 	glDrawElements(draw_type, length, GL_UNSIGNED_INT, reference);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
@@ -75,10 +75,10 @@ void sui_set_normal_array_gl(float *array, uint length)
 	glEnable(GL_LIGHTING);
 }
 
-void sui_set_texture2D_array_gl(float *array, uint length, uint dimentions, uint texture)
+void sui_set_texture2D_array_gl(float *array, uint length, uint dimensions, uint texture)
 {
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glTexCoordPointer(dimentions, GL_FLOAT , 0 , array);
+	glTexCoordPointer(dimensions, GL_FLOAT , 0 , array);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texture);
 }
