@@ -144,7 +144,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 			for(m_group = e_nso_get_next_method_group(node, 0); m_group != (uint16)-1 ; m_group = e_nso_get_next_method_group(node, m_group + 1))
 				i++;
 			sprintf(nr, "group_%u", i);
-			verse_send_o_method_group_create(e_ns_get_node_id(node), (uint16)-1, nr);
+			verse_send_o_method_group_create(e_ns_get_node_id(node), ~0, nr);
 		}
 		if(NULL == e_nso_get_method_group(node, 0))
 		{
