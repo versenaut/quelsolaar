@@ -76,7 +76,9 @@ static void save_object(FILE *f, ENode *o_node)
 
 static void save_geometry(FILE *f, ENode *g_node)
 {
-	char *layer_type[] = {"VN_G_LAYER_VERTEX_XYZ", "VN_G_LAYER_VERTEX_UINT32", "VN_G_LAYER_VERTEX_REAL", "VN_G_LAYER_POLYGON_CORNER_UINT32", "VN_G_LAYER_POLYGON_CORNER_REAL", "VN_G_LAYER_POLYGON_FACE_UINT8", "VN_G_LAYER_POLYGON_FACE_UINT32", "VN_G_LAYER_POLYGON_FACE_REAL"};
+	static const char *layer_type[] = {"VN_G_LAYER_VERTEX_XYZ", "VN_G_LAYER_VERTEX_UINT32", "VN_G_LAYER_VERTEX_REAL",
+		"VN_G_LAYER_POLYGON_CORNER_UINT32", "VN_G_LAYER_POLYGON_CORNER_REAL", "VN_G_LAYER_POLYGON_FACE_UINT8",
+		"VN_G_LAYER_POLYGON_FACE_UINT32", "VN_G_LAYER_POLYGON_FACE_REAL"};
 	EGeoLayer *layer;
 	uint *vertex_holes = NULL, *polygon_holes = NULL;
 	uint i, vertex_count = 0, poly_count = 0;
@@ -183,12 +185,12 @@ static void save_geometry(FILE *f, ENode *g_node)
 
 static void save_material(FILE *f, ENode *m_node)
 {
-	char *light_type[] = {"VN_M_LIGHT_DIRECT", "VN_M_LIGHT_AMBIENT", "VN_M_LIGHT_DIRECT_AND_AMBIENT", "VN_M_LIGHT_BACK_DIRECT", "VN_M_LIGHT_BACK_AMBIENT", "VN_M_LIGHT_BACK_DIRECT_AND_AMBIENT"};
-	char *noise_type[] = {"VN_M_NOISE_PERLIN_ZERO_TO_ONE", "VN_M_NOISE_PERLIN_MINUS_ONE_TO_ONE"};
-	char *ramp_type[] = {"VN_M_RAMP_SQUARE", "VN_M_RAMP_LINEAR", "VN_M_RAMP_SMOOTH"};
-	char *ramp_channel[] = {"VN_M_RAMP_RED", "VN_M_RAMP_GREEN", "VN_M_RAMP_BLUE"};
-	char *blend_type[] = {"VN_M_BLEND_FADE", "VN_M_BLEND_ADD", "VN_M_BLEND_SUBTRACT", "VN_M_BLEND_MULTIPLY", "VN_M_BLEND_DIVIDE", "VN_M_BLEND_DOT"};
-	char *frag_names[] = {"VN_M_FT_COLOR", "VN_M_FT_LIGHT", "VN_M_FT_REFLECTION", "VN_M_FT_TRANSPARENCY", "VN_M_FT_VOLUME", "VN_M_FT_GEOMETRY", "VN_M_FT_TEXTURE", "VN_M_FT_NOISE", "VN_M_FT_BLENDER", "VN_M_FT_MATRIX", "VN_M_FT_RAMP", "VN_M_FT_ANIMATION", "VN_M_FT_ALTERNATIVE", "VN_M_FT_OUTPUT"};
+	static const char *light_type[] = {"VN_M_LIGHT_DIRECT", "VN_M_LIGHT_AMBIENT", "VN_M_LIGHT_DIRECT_AND_AMBIENT", "VN_M_LIGHT_BACK_DIRECT", "VN_M_LIGHT_BACK_AMBIENT", "VN_M_LIGHT_BACK_DIRECT_AND_AMBIENT"};
+	static const char *noise_type[] = {"VN_M_NOISE_PERLIN_ZERO_TO_ONE", "VN_M_NOISE_PERLIN_MINUS_ONE_TO_ONE"};
+	static const char *ramp_type[] = {"VN_M_RAMP_SQUARE", "VN_M_RAMP_LINEAR", "VN_M_RAMP_SMOOTH"};
+	static const char *ramp_channel[] = {"VN_M_RAMP_RED", "VN_M_RAMP_GREEN", "VN_M_RAMP_BLUE"};
+	static const char *blend_type[] = {"VN_M_BLEND_FADE", "VN_M_BLEND_ADD", "VN_M_BLEND_SUBTRACT", "VN_M_BLEND_MULTIPLY", "VN_M_BLEND_DIVIDE", "VN_M_BLEND_DOT"};
+	static const char *frag_names[] = {"VN_M_FT_COLOR", "VN_M_FT_LIGHT", "VN_M_FT_REFLECTION", "VN_M_FT_TRANSPARENCY", "VN_M_FT_VOLUME", "VN_M_FT_GEOMETRY", "VN_M_FT_TEXTURE", "VN_M_FT_NOISE", "VN_M_FT_BLENDER", "VN_M_FT_MATRIX", "VN_M_FT_RAMP", "VN_M_FT_ANIMATION", "VN_M_FT_ALTERNATIVE", "VN_M_FT_OUTPUT"};
 	VMatFrag *frag;
 	VNMFragmentID id;
 	uint i;
@@ -299,7 +301,7 @@ static void save_material(FILE *f, ENode *m_node)
 
 static void save_bitmap(FILE *f, ENode *b_node)
 {
-	char *layer_type[] = {"VN_B_LAYER_UINT1", "VN_B_LAYER_UINT8", "VN_B_LAYER_UINT16", "VN_B_LAYER_REAL32", "VN_B_LAYER_REAL64"};
+	static const char *layer_type[] = {"VN_B_LAYER_UINT1", "VN_B_LAYER_UINT8", "VN_B_LAYER_UINT16", "VN_B_LAYER_REAL32", "VN_B_LAYER_REAL64"};
 	EBitLayer *layer;
 	uint size[3], i, j, k, start, tiles[2];
 	void *data;
