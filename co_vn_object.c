@@ -199,7 +199,12 @@ boolean co_handle_object(BInputState *input, ENode *node)
 				}			
 				for(i = 0; i < count; i++)
 				{
-					char *type_names[] = {"INT8", "INT16", "INT32", "UINT8", "UINT16", "UINT32", "REAL32", "REAL64", "REAL32_VEC2", "REAL32_VEC3", "REAL32_VEC4", "REAL64_VEC2", "REAL64_VEC3", "REAL64_VEC4", "REAL32_MAT4", "REAL32_MAT9", "REAL32_MAT16", "REAL64_MAT4", "REAL64_MAT9", "REAL64_MAT16", "STRING", "NODE", "LAYER"};
+					static const char *type_names[] = {
+						"INT8", "INT16", "INT32", "UINT8", "UINT16",
+						"UINT32", "REAL32", "REAL64", "REAL32_VEC2", "REAL32_VEC3", "REAL32_VEC4",
+						"REAL64_VEC2", "REAL64_VEC3", "REAL64_VEC4", "REAL32_MAT4", "REAL32_MAT9",
+						"REAL32_MAT16", "REAL64_MAT4", "REAL64_MAT9", "REAL64_MAT16", "STRING",
+						"NODE", "LAYER" };
 					static uint pu_g = -1, pu_m = -1, pu_p = 0;
 					y_meth -= 0.05;
 					sui_draw_2d_line_gl(0.05, y_meth + 0.03, 0.65, y_meth + 0.03, color_light, color_light, color_light);
@@ -220,7 +225,6 @@ boolean co_handle_object(BInputState *input, ENode *node)
 							}
 						}
 						verse_send_o_method_create(e_ns_get_node_id(node), m_group, method, e_nso_get_method(node, m_group, method), count - 1, new_types, new_names);
-
 					}
 
 					co_w_type_in(input, 0.15, y_meth, 0.5, SUI_T_SIZE, names[i], 16, rename_param_func, names[i], color, color_light);
