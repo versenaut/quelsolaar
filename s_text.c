@@ -87,9 +87,9 @@ char *sui_type_in_copy = 0;
 char *sui_return_text = 0;
 void (* sui_type_in_done_func)(void *user, char *text); 
 
-void sui_end_type_func(void *user, boolean cancle)
+void sui_end_type_func(void *user, boolean cancel)
 {
-	if(cancle == FALSE)
+	if(cancel == FALSE)
 		if(sui_type_in_done_func != NULL)
 			sui_type_in_done_func(user, sui_type_in_copy);
 	sui_return_text = sui_type_in_text;
@@ -166,9 +166,9 @@ char *sui_type_in_number_text;
 double sui_type_in_number_output = SUI_ILLEGAL_NUMBER;
 void *sui_type_in_number_id;
 
-void sui_end_type_number_func(void *user, boolean cancle)
+void sui_end_type_number_func(void *user, boolean cancel)
 {
-	if(cancle != TRUE)
+	if(cancel != TRUE)
 		sscanf(sui_type_in_number_text, "%lf", &sui_type_in_number_output);
 	free(sui_type_in_number_text);
 	sui_type_in_number_text = NULL;

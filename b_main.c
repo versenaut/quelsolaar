@@ -163,7 +163,7 @@ uint type_in_length = 0;
 void (*type_in_done_func)(void *user, boolean cansle) = NULL;
 void *func_param;
 
-void betray_start_type_in(char *string, uint length, void (*done_func)(void *user, boolean cancle), uint *cursor, void *user_pointer)
+void betray_start_type_in(char *string, uint length, void (*done_func)(void *user, boolean cancel), uint *cursor, void *user_pointer)
 {
 	uint	i;
 
@@ -182,7 +182,7 @@ void betray_start_type_in(char *string, uint length, void (*done_func)(void *use
 
 }
 
-void betray_end_type_in_mode(boolean cancle)
+void betray_end_type_in_mode(boolean cancel)
 {
 	if(type_in_done_func != NULL)
 	{
@@ -194,7 +194,7 @@ void betray_end_type_in_mode(boolean cancle)
 		type_in_done_func = NULL;
 		*cursor_pos_pointer = 0;
 		if(func != NULL)
-			func(func_param, cancle);
+			func(func_param, cancel);
 	}
 }
 
