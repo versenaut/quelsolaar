@@ -299,7 +299,7 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 
 	y = co_handle_node_head(input, node);
 
-	co_vng_divider(input, 0.2, y, &rot_curve, &color, &color_light, &show_curve, "Layers");
+	co_vng_divider(input, 0.2, y, &rot_curve, &color, &color_light, &show_curve, "Curves");
 
 	pre_expander = y;
 	if(rot_curve > 0.001)
@@ -331,7 +331,7 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 				verse_send_c_curve_destroy(change_c_node_id, e_nsc_get_curve_id(curve));
 			y -= 0.05;
 			dim = e_nsc_get_curve_dimensions(curve);
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Dimentions:", color_light, color_light, color_light); 
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Dimensions:", color_light, color_light, color_light); 
 			if(sui_type_number_uint(input, 0.15, y, 0.5, SUI_T_SIZE, &dim, curve, color, color, color))
 				if(dim > 0 && dim < 5)
 					verse_send_c_curve_create(change_c_node_id, e_nsc_get_curve_id(curve), e_nsc_get_curve_name(curve), dim);
