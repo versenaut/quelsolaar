@@ -49,7 +49,7 @@ static void save_object(FILE *f, ENode *o_node)
 	{
 		fprintf(f, "\t<links>\n");
 		for(link = e_nso_get_next_link(o_node, 0); link != NULL; link = e_nso_get_next_link(o_node, 1 + e_nso_get_link_id(link)))
-			fprintf(f, "\t\t<link node=\"%u\" name=\"%s\" target=\"%u\"/>\n", e_nso_get_link_node(link), e_nso_get_link_name(link), e_nso_get_link_target_id(link));
+			fprintf(f, "\t\t<link node=\"%u\" label=\"%s\" target=\"%u\"/>\n", e_nso_get_link_node(link), e_nso_get_link_name(link), e_nso_get_link_target_id(link));
 		fprintf(f, "\t</links>\n");
 	}
 
@@ -342,7 +342,8 @@ static void save_bitmap(FILE *f, ENode *b_node)
 	void *data;
 
 	e_nsb_get_size(b_node, &size[0], &size[1], &size[2]);
-	fprintf(f, "\t<layers size=\"%u %u %u\">\n", size[0], size[1], size[2]);
+	fprintf(f, "\t<dimensions>%u %u %u</dimensions>\n", size[0], size[1], size[2]);
+	fprintf(f, "\t<layers>\n");
 	
 	tiles[0] = ((size[0] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE);
 	tiles[1] = ((size[1] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE);
@@ -350,6 +351,7 @@ static void save_bitmap(FILE *f, ENode *b_node)
 	for(layer = e_nsb_get_layer_next(b_node, 0); layer != NULL; layer = e_nsb_get_layer_next(b_node, e_nsb_get_layer_id(layer) + 1))
 	{
 		fprintf(f, "\t\t<layer name=\"%s\" type=\"%s\">\n", e_nsb_get_layer_name(layer), layer_type[e_nsb_get_layer_type(layer)]);
+		fprintf(f, "\t\t<tiles>\n");
 		data = e_nsb_get_layer_data(b_node, layer);
 
 		switch(e_nsb_get_layer_type(layer))
@@ -433,6 +435,7 @@ static void save_bitmap(FILE *f, ENode *b_node)
 				}
 			break;
 		}
+		fprintf(f, "\t\t</tiles>\n");
 		fprintf(f, "\t\t</layer>\n");
 	}
 	fprintf(f, "\t</layers>\n");
