@@ -8,7 +8,7 @@
 	#include <windows.h>
 	#include <GL/gl.h>
 #else
-	#include <gl.h>
+	#include <GL/gl.h>
 #endif
 
 #include "st_types.h"
