@@ -43,11 +43,12 @@ void la_parce_input(BInputState *input)
 {
 	double output[3]; 
 	static double snap[3], distance, selected_distance;
-	static closest, select_closest, edge[2], polygon;
+	static int closest, select_closest, edge[2], polygon;
+
 	if(input->mode == BAM_EVENT)
 	{
-		distance = 10000000000000;
-		selected_distance = 10000000000000;
+		distance = 1E100;
+		selected_distance = 1E100;
 		p_find_closest_vertex(&closest, &select_closest, &distance, &selected_distance, input->pointer_x, input->pointer_y);
 		if(selected_distance > VERTEX_SNAPP_DISTANCE - (0.1 * VERTEX_SNAPP_DISTANCE) && ParceInputData.mode != PIM_SHOW_EDGE_MENY)
 			p_find_closest_edge(edge, input->pointer_x, input->pointer_y);
