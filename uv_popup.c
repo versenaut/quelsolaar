@@ -251,7 +251,7 @@ void uv_pu_manip(BInputState *input)
 	float *cam;
 	uint ring;
 	element[0].type = PU_T_ANGLE;
-	element[0].text = "Flip Horozontal";
+	element[0].text = "Flip Horizontal";
 	element[0].data.angle[0] = 45;
 	element[0].data.angle[1] = 90;
 
