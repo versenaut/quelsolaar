@@ -580,33 +580,37 @@ int main(int argc, char **argv)
 	uint32 i, seconds, s, interval = 10;
 	char *name, *pass, *address, *file;
 	FILE *f;
+	int	repeat = 0;
 
 	enough_init();
 	name = find_param(argc, argv, "-n", "saver");
 	pass = find_param(argc, argv, "-p", "pass");
 	address = find_param(argc, argv, "-a", "localhost");
 	file = find_param(argc, argv, "-f", "dump.vml");
+	repeat = find_param(argc, argv, "-r", NULL) != NULL;
 
 	for(i = 1; i < argc; i++)
 	{
-		if(strcmp(argv[i], "help") == 0)
+		if(strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "help") == 0)
 		{
 			printf("usage: verse_saver <pamams>\n");
 			printf("params:\n");
-			printf("\n-n <name>\n");
-			printf("\n-p <pass>\n");
-			printf("\n-a <address>\n");
-			printf("\n-f <filename>\n");
-			printf("\n-i <save interval in seconds>\n");
+			printf("-h This text.\n");
+			printf("-n <name>\n");
+			printf("-p <pass>\n");
+			printf("-a <address>\n");
+			printf("-f <filename>\n");
+			printf("-i <save interval in seconds>\n");
+			printf("-1 Save only once, then exit\n");
 			return FALSE;
 		}
 	}
 	if(e_vc_connect(address, name, pass, NULL) == -1)
 	{
-		printf("Error: invalid address\n");
+		printf("Error: Invalid server address '%s'\n", address);
 		return TRUE;
 	}
-	printf("connecting to %s\n", address);
+	printf("Connecting to %s\n", address);
 	while(interval != 0)
 	{
 		verse_session_get_time(&seconds, NULL);
@@ -619,9 +623,9 @@ int main(int argc, char **argv)
 		}
 		if((f = fopen(file, "w")) != NULL)
 			save_data(f);
-		printf("save comlpete\n");
-		sscanf(find_param(argc, argv, "-i", "0"), "%u", &interval);
-		interval = 10;
+		printf("Save complete\n");
+		if(!repeat)
+			break;
 	}
 	return TRUE;
 }
