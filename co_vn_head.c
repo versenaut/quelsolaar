@@ -287,12 +287,12 @@ float co_handle_node_head(BInputState *input, ENode *node)
 			verse_send_tag_group_create(e_ns_get_node_id(node), -1, nr);
 		}
 		y -= 0.05;
-		if(-1 == e_ns_get_next_tag_group(node, 0))
+		if((uint16) -1 == e_ns_get_next_tag_group(node, 0))
 		{
 			sui_draw_text(-0.3, y, SUI_T_SIZE, SUI_T_SPACE, "No Tag Groups", color_light, color_light, color_light);  
 			y -= 0.05;
 		}
-		for(i = e_ns_get_next_tag_group(node, 0); i != -1 ; i = e_ns_get_next_tag_group(node, i + 1))
+		for(i = e_ns_get_next_tag_group(node, 0); i != (uint16) -1 ; i = e_ns_get_next_tag_group(node, i + 1))
 		{
 			size = 0.0;
 			sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Group name:", color_light, color_light, color_light);  
@@ -310,9 +310,8 @@ float co_handle_node_head(BInputState *input, ENode *node)
 			if(co_w_close_button(input, 0.635, y + size, color, color, color))
 				verse_send_tag_group_destroy(e_ns_get_node_id(node), i);
 			size = -0.05;
-			for(j = e_ns_get_next_tag(node, i, 0); j != -1 ; j = e_ns_get_next_tag(node, i, j + 1))
+			for(j = e_ns_get_next_tag(node, i, 0); j != (uint16) -1 ; j = e_ns_get_next_tag(node, i, j + 1))
 			{
-			
 				static char *tag_type_names[] = {"VN_TAG_BOOLEAN", "VN_TAG_UINT32","VN_TAG_REAL64", "VN_TAG_STRING", "VN_TAG_REAL64_VEC3", "VN_TAG_LINK", "VN_TAG_ANIMATION", "VN_TAG_BLOB"};
 				tag = e_ns_get_tag(node, i, j);
 				k = e_ns_get_tag_type(node, i, j);
