@@ -612,9 +612,8 @@ void co_vng_divider(BInputState *input, float pos_x, float pos_y, float *rotate,
 
 /*
 sui_set_color_array_gl(float *array, uint length, uint channels);
-sui_draw_gl(uint draw_type, float *array, uint length, uint dimentions, float red, float green, float blue);
+sui_draw_gl(uint draw_type, float *array, uint length, uint dimensions, float red, float green, float blue);
 
 void sui_set_normal_array_gl(float *array, uint length);
-void sui_set_texture2D_array_gl(float *array, uint length, uint dimentions, uint texture);
+void sui_set_texture2D_array_gl(float *array, uint length, uint dimensions, uint texture);
 */
-

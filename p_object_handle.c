@@ -275,11 +275,11 @@ void p_render_object(ENode *node)
 	glPopMatrix();
 }
 
-void simple_draw_gl(uint draw_type, float *array, uint length, uint dimentions, float red, float green, float blue)
+void simple_draw_gl(uint draw_type, float *array, uint length, uint dimensions, float red, float green, float blue)
 {
 	glColor4f(red, green, blue, 0);	
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(dimentions, GL_FLOAT , 0, array);
+	glVertexPointer(dimensions, GL_FLOAT , 0, array);
 	glDrawArrays(draw_type, 0, length);
 	glDisable(GL_BLEND);
 	glDisableClientState(GL_COLOR_ARRAY);
