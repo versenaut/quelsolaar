@@ -84,7 +84,7 @@ boolean sw_text_button(BInputState *input, float pos_x, float pos_y, float cente
 	return FALSE;
 }
 
-uint sui_type_in_curser = 0;
+uint sui_type_in_cursor = 0;
 char *sui_type_in_text = 0;
 char *sui_type_in_copy = 0;
 char *sui_return_text = 0;
@@ -122,7 +122,7 @@ boolean sui_type_in(BInputState *input, float pos_x, float pos_y, float length, 
 		if(sui_type_in_text == text)
 		{
 			pos = pos_x;
-			for(i = 0; i < sui_type_in_curser && t[i] != 0; i++)
+			for(i = 0; i < sui_type_in_cursor && t[i] != 0; i++)
 				pos += (sui_get_letter_size(t[i]) / sui_get_letter_size(97) + SUI_T_SPACE) * size;
 			sui_draw_text(pos + SUI_T_SPACE * 0.5 * size, pos_y, size, SUI_T_SPACE, "|", red, green, blue);
 		}
@@ -141,15 +141,15 @@ boolean sui_type_in(BInputState *input, float pos_x, float pos_y, float length, 
 					sui_type_in_copy = malloc((sizeof *sui_type_in_copy) * buffer_size);
 					for(i = 0; i < buffer_size; i++)
 						sui_type_in_copy[i] = text[i];
-					betray_start_type_in(sui_type_in_copy, buffer_size, sui_end_type_func, &sui_type_in_curser, user);
+					betray_start_type_in(sui_type_in_copy, buffer_size, sui_end_type_func, &sui_type_in_cursor, user);
 				}else
 				{
-					betray_start_type_in(text, buffer_size, sui_end_type_func, &sui_type_in_curser, user);
+					betray_start_type_in(text, buffer_size, sui_end_type_func, &sui_type_in_cursor, user);
 					sui_type_in_copy = text;
 				}
 				for(i = 0; text[i] != 0 && i < buffer_size && pos < input->pointer_x; i++);
 					pos = sui_get_letter_size(text[i]) * size;
-				sui_type_in_curser = i;
+				sui_type_in_cursor = i;
 			}
 		}
 		if(sui_return_text = text)
@@ -188,7 +188,7 @@ boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, flo
 		{
 			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, sui_type_in_number_text, red, green, blue);
 			pos = pos_x;
-			for(i = 0; i < sui_type_in_curser && sui_type_in_number_text[i] != 0; i++)
+			for(i = 0; i < sui_type_in_cursor && sui_type_in_number_text[i] != 0; i++)
 				pos += (sui_get_letter_size(sui_type_in_number_text[i]) / sui_get_letter_size(97) + SUI_T_SPACE) * size;
 			sui_draw_text(pos + SUI_T_SPACE * 0.5 * size, pos_y, size, SUI_T_SPACE, "|", red, green, blue);
 		}else
@@ -207,12 +207,12 @@ boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, flo
 				pos = pos_x;
 				sui_type_in_number_text = malloc((sizeof *sui_type_in_number_text) * 64);
 				sprintf(sui_type_in_number_text, "%.3f", *number);
-				betray_start_type_in(sui_type_in_number_text, 64, sui_end_type_number_func, &sui_type_in_curser, NULL);
+				betray_start_type_in(sui_type_in_number_text, 64, sui_end_type_number_func, &sui_type_in_cursor, NULL);
 				sui_type_in_number_id = id;
 				sui_type_in_number_output = SUI_ILLEGAL_NUMBER;
 				for(i = 0; sui_type_in_number_text[i] != 0 && i < 64 && pos < input->pointer_x; i++);
 					pos = sui_get_letter_size(sui_type_in_number_text[i]) * size;
-				sui_type_in_curser = i;
+				sui_type_in_cursor = i;
 			}
 		}
 		if(sui_type_in_number_id == id && sui_type_in_number_output != SUI_ILLEGAL_NUMBER)
@@ -235,7 +235,7 @@ boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float
 		{
 			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, sui_type_in_number_text, red, green, blue);
 			pos = pos_x;
-			for(i = 0; i < sui_type_in_curser && sui_type_in_number_text[i] != 0; i++)
+			for(i = 0; i < sui_type_in_cursor && sui_type_in_number_text[i] != 0; i++)
 				pos += (sui_get_letter_size(sui_type_in_number_text[i]) / sui_get_letter_size(97) + SUI_T_SPACE) * size;
 			sui_draw_text(pos + SUI_T_SPACE * 0.5 * size, pos_y, size, SUI_T_SPACE, "|", red, green, blue);
 		}else
@@ -254,12 +254,12 @@ boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float
 				pos = pos_x;
 				sui_type_in_number_text = malloc((sizeof *sui_type_in_number_text) * 64);
 				sprintf(sui_type_in_number_text, "%u", *number);
-				betray_start_type_in(sui_type_in_number_text, 64, sui_end_type_number_func, &sui_type_in_curser, NULL);
+				betray_start_type_in(sui_type_in_number_text, 64, sui_end_type_number_func, &sui_type_in_cursor, NULL);
 				sui_type_in_number_id = id;
 				sui_type_in_number_output = SUI_ILLEGAL_NUMBER;
 				for(i = 0; sui_type_in_number_text[i] != 0 && i < 64 && pos < input->pointer_x; i++);
 					pos = sui_get_letter_size(sui_type_in_number_text[i]) * size;
-				sui_type_in_curser = i;
+				sui_type_in_cursor = i;
 			}
 		}
 		if(sui_type_in_number_id == id && sui_type_in_number_output != SUI_ILLEGAL_NUMBER)

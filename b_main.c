@@ -163,7 +163,7 @@ uint type_in_length = 0;
 void (*type_in_done_func)(void *user, boolean cansle) = NULL;
 void *func_param;
 
-void betray_start_type_in(char *string, uint length, void (*done_func)(void *user, boolean cancle), uint *curser, void *user_pointer)
+void betray_start_type_in(char *string, uint length, void (*done_func)(void *user, boolean cancle), uint *cursor, void *user_pointer)
 {
 	uint	i;
 
@@ -171,10 +171,10 @@ void betray_start_type_in(char *string, uint length, void (*done_func)(void *use
 	type_in_alocated = length;
 	type_in_done_func = done_func;
 	func_param = user_pointer;
-	if(curser == NULL)
+	if(cursor == NULL)
 		cursor_pos_pointer = &cursor_pos;
 	else
-		cursor_pos_pointer = curser;
+		cursor_pos_pointer = cursor;
 	cursor_pos = 0;
 	for(type_in_length = 0; string[type_in_length] != 0; type_in_length++);
 /*	for(i = AXIS_BUTTON_VECTOR_1_X; i <= AXIS_BUTTON_VECTOR_2_Z; i++)

@@ -72,7 +72,7 @@ extern boolean	betray_set_screen_mode(uint x_size, uint y_size, boolean fullscre
 extern double	betray_get_screen_mode(uint *x_size, uint *y_size, boolean *fullscreen);
 
 
-extern void		betray_start_type_in(char *text, uint size, void (*done_func)(void *user, boolean cancle), uint *curser, void *user_pointer);
+extern void		betray_start_type_in(char *text, uint size, void (*done_func)(void *user, boolean cancel), uint *cursor, void *user_pointer);
 extern void		betray_end_type_in_mode(boolean cancle);
 
 extern boolean	betray_is_type_in(void);
