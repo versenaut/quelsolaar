@@ -5,7 +5,7 @@
 extern void sui_draw_letter(uint8 letter, float red, float green, float blue);
 extern float sui_get_letter_size(char letter);
 
-void sui_draw_text(float pos_x, float pos_y, float size, float spacing, char *text, float red, float green, float blue)
+void sui_draw_text(float pos_x, float pos_y, float size, float spacing, const char *text, float red, float green, float blue)
 {
 	uint i;
 //	glEnable(GL_LINE_SMOOTH);
@@ -23,7 +23,7 @@ void sui_draw_text(float pos_x, float pos_y, float size, float spacing, char *te
 //	glDisable(GL_LINE_SMOOTH);
 }
 
-float sui_compute_text_length(float size, float spacing, char *text)
+float sui_compute_text_length(float size, float spacing, const char *text)
 {
 	uint i;
 	float sum;
@@ -68,7 +68,7 @@ void sui_draw_code(float pos_x, float pos_y, float size, float spacing, char *te
 	glDisable(GL_LINE_SMOOTH);
 }*/
 
-boolean sw_text_button(BInputState *input, float pos_x, float pos_y, float center, float size, float spacing, char *text, float red, float green, float blue)
+boolean sw_text_button(BInputState *input, float pos_x, float pos_y, float center, float size, float spacing, const char *text, float red, float green, float blue)
 {
 	if(input->mode == BAM_DRAW)
 	{

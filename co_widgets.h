@@ -4,7 +4,8 @@
 
 extern boolean	co_w_checkbox(BInputState *input, float pos_x, float pos_y, boolean *state,
 			      float red, float green, float blue);
-extern boolean	co_w_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size,
+extern boolean	co_w_type_in(BInputState *input, float pos_x, float pos_y, float length, float size,
+			     char *text, uint buffer_size,
 			     void (*done_func)(void *user, char *text), void* user, float text_color, float line_color);
 extern boolean	co_w_slider(BInputState *input, float pos_x, float pos_y, float length, double *nr,
 			    float red, float green, float blue);

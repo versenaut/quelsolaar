@@ -18,7 +18,7 @@ struct{
 }SUIGlobalSettings;
 
 
-Setting	 *get_setting(char *name)
+static Setting * get_setting(const char *name)
 {
 	uint i;
 	for(i = 0; i < SUIGlobalSettings.count; i++)
@@ -27,7 +27,7 @@ Setting	 *get_setting(char *name)
 	return NULL;
 }
 
-Setting	 *add_setting(char *name)
+static Setting * add_setting(const char *name)
 {
 	uint i;
 	for(i = 0; i < 32 && name[i] != 0; i++)
@@ -83,7 +83,7 @@ void sui_set_setting_int(char *setting, uint value)
 	SUIGlobalSettings.version++;
 }
 
-char *sui_get_setting_text(char *setting, char *default_text)
+char *sui_get_setting_text(const char *setting, const char *default_text)
 {
 	Setting	 *s;
 	s = get_setting(setting);
@@ -91,17 +91,18 @@ char *sui_get_setting_text(char *setting, char *default_text)
 	{
 		uint i;
 		s = add_setting(setting);
-		for(i = 0; default_text[i] != 0; i++);
+		for(i = 0; default_text[i] != 0; i++)
+			;
 		s->text = malloc((sizeof *s->text) * ++i);
 		for(i = 0; default_text[i] != 0; i++)
 			s->text[i] = default_text[i]; 
-
+/*
 		s->text = default_text;
-	}
+*/	}
 	return s->text;
 }
 
-void sui_set_setting_text(char *setting, char *text)
+void sui_set_setting_text(const char *setting, const char *text)
 {
 	Setting	 *s;
 	uint i;
@@ -111,11 +112,12 @@ void sui_set_setting_text(char *setting, char *text)
 	else
 		free(s->text);
 	SUIGlobalSettings.version++;
-	for(i = 0; text[i] != 0; i++);
+	for(i = 0; text[i] != 0; i++)
+		;
 	s->text = malloc((sizeof *s->text) * ++i);
 	for(i = 0; text[i] != 0; i++)
 		s->text[i] = text[i]; 
-	s->text = text;
+/*	s->text = text;*/
 }
 
 boolean sui_test_setting_version(uint *version)
@@ -126,11 +128,12 @@ boolean sui_test_setting_version(uint *version)
 	return TRUE;
 }
 
-void sui_save_settings(char *file_name)
+void sui_save_settings(const char *file_name)
 {
 	uint i;
 	FILE *settings;
-	settings = fopen(file_name, "w");
+
+	settings = fopen(file_name, "wt");
 	for(i = 0; i < SUIGlobalSettings.count; i++)
 	{
 		if(SUIGlobalSettings.array[i].text != NULL)
@@ -144,12 +147,13 @@ void sui_save_settings(char *file_name)
 	fclose(settings);
 }
 
-void sui_load_settings(char *file_name)
+void sui_load_settings(const char *file_name)
 {
 	char	line[512], key[64], value[32];
 	float	r;
 	FILE	*settings;
-	if((settings = fopen(file_name, "r")) != NULL)
+
+	if((settings = fopen(file_name, "rt")) != NULL)
 	{
 /*		uint i;
 		for(i = 0; i < 512; i++)

@@ -46,11 +46,11 @@ extern ENode *		e_ns_get_node_link(ENode *parent, uint node_id);
 
 extern uint			e_ns_get_node_count(uint connection, VNodeType type);
 
-extern uint			e_ns_get_node_id(ENode *node);
-extern VNodeType	e_ns_get_node_type(ENode *node);
-extern VNodeOwner	e_ns_get_node_owner(ENode *node);
+extern uint			e_ns_get_node_id(const ENode *node);
+extern VNodeType	e_ns_get_node_type(const ENode *node);
+extern VNodeOwner	e_ns_get_node_owner(const ENode *node);
 extern char *		e_ns_get_node_name(ENode *node);
-extern uint			e_ns_get_node_connection(ENode *node);
+extern uint			e_ns_get_node_connection(const ENode *node);
 
 extern uint			e_ns_get_node_version_struct(ENode *node);
 extern uint			e_ns_get_node_version_data(ENode *node);

@@ -366,35 +366,35 @@ uint  e_ns_get_node_count(uint connection, VNodeType type)
 	return ENSGlobal.context[connection].node_type_count[type];
 }
 
-uint  e_ns_get_node_id(ENodeHead *node)
+uint  e_ns_get_node_id(const ENodeHead *node)
 {
 	if(node != NULL)	
 		return node->node_id;
 	return -1;
 }
 
-VNodeType  e_ns_get_node_type(ENodeHead *node)
+VNodeType  e_ns_get_node_type(const ENodeHead *node)
 {
 	if(node != NULL)
 		return node->node_type;
 	return 0;
 }
 
-char *e_ns_get_node_name(ENodeHead *node)
+char * e_ns_get_node_name(ENodeHead *node)
 {
 	if(node != NULL)
 		return node->node_name;
 	return NULL;
 }
 
-VNodeOwner e_ns_get_node_owner(ENodeHead *node)
+VNodeOwner e_ns_get_node_owner(const ENodeHead *node)
 {
 	if(node != NULL)
 		return node->owner;
 	return -1;
 }
 
-uint e_ns_get_node_connection(ENodeHead *node)
+uint e_ns_get_node_connection(const ENodeHead *node)
 {
 	if(node != NULL)
 		return node->session;
@@ -407,9 +407,9 @@ void e_ns_set_custom_data(ENodeHead *node, uint slot, void *data)
 }
 
 
-void *e_ns_get_custom_data(ENodeHead *node, uint slot)
+void * e_ns_get_custom_data(const ENodeHead *node, uint slot)
 {
-	return node->user_data[slot];
+	return node != NULL ? node->user_data[slot] : NULL;
 }
 
 
@@ -426,29 +426,26 @@ void e_ns_execute(ENodeHead *node, ECustomDataCommand command)
 			ENSGlobal.e_custom_func[node->node_type][i](node, command);
 }
 
-uint e_ns_get_node_version_struct(ENodeHead *node)
+uint e_ns_get_node_version_struct(const ENodeHead *node)
 {
 	return node->structure_version;
-	node->data_version++;
-
+/*	node->data_version++;*/
 }
-uint e_ns_get_node_version_data(ENodeHead *node)
+
+uint e_ns_get_node_version_data(const ENodeHead *node)
 {
 	return node->data_version;
 }
+
 void e_ns_update_node_version_struct(ENodeHead *node)
 {
 	node->structure_version++;
 	node->data_version++;
 	e_ns_execute(node, E_CDC_STRUCT);
 }
+
 void e_ns_update_node_version_data(ENodeHead *node)
 {
 	node->data_version++;
 	e_ns_execute(node, E_CDC_DATA);
 }
-
-
-
-
-

@@ -48,10 +48,10 @@ extern void sui_draw_set_ivec4(uint *array, uint pos, uint a, uint b, uint c, ui
 extern void		sui_draw_letter(uint8 letter, float red, float green, float blue);
 extern float	sui_get_letter_size(char letter);
 
-extern void		sui_draw_text(float pos_x, float pos_y, float size, float spacing, char *text, float red, float green, float blue);
-extern float	sui_compute_text_length(float size, float spacing, char *text);
+extern void		sui_draw_text(float pos_x, float pos_y, float size, float spacing, const char *text, float red, float green, float blue);
+extern float	sui_compute_text_length(float size, float spacing, const char *text);
 
-extern boolean	sw_text_button(BInputState *input, float pos_x, float pos_y, float center, float size, float spacing, char *text, float red, float green, float blue);
+extern boolean	sw_text_button(BInputState *input, float pos_x, float pos_y, float center, float size, float spacing, const char *text, float red, float green, float blue);
 
 extern boolean	sui_type_number_double(BInputState *input, float pos_x, float pos_y, float length, float size, double *number, void *id, float red, float green, float blue);
 extern boolean	sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float length, float size, uint32 *number, void *id, float red, float green, float blue);
@@ -68,12 +68,12 @@ extern double	sui_get_setting_double(char *setting, double default_value); /* ge
 extern void		sui_set_setting_double(char *setting, double value); /* changed / set double setting */
 extern uint		sui_get_setting_int(char *setting, uint default_value); /* get uint setting */
 extern void		sui_set_setting_int(char *setting, uint value); /* changed / set uint setting */
-extern char		*sui_get_setting_text(char *setting, char *default_text); /* get text setting */
-extern void		sui_set_setting_text(char *setting, char *text); /* changed / set text setting */
+extern char		*sui_get_setting_text(const char *setting, const char *default_text); /* get text setting */
+extern void		sui_set_setting_text(const char *setting, const char *text); /* changed / set text setting */
 extern boolean	sui_test_setting_version(uint *version); /* check if your version of the setting have changed */
 
-extern void		sui_save_settings(char *file_name); /* saves all settings to a file */
-extern void		sui_load_settings(char *file_name); /* loads all settings from a file */
+extern void		sui_save_settings(const char *file_name); /* saves all settings to a file */
+extern void		sui_load_settings(const char *file_name); /* loads all settings from a file */
 
 /* Creates a shadow edge around a shape*/
 
@@ -91,7 +91,7 @@ typedef enum{
 
 typedef struct{
 	SUIPUType	type;
-	char		*text;
+	const char	*text;
 	union{
 		float angle[2];
 		struct{

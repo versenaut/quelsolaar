@@ -43,22 +43,27 @@ void co_handle_view(BInputState *input, float *pos, boolean active)
 			view_cam_pos_goal[1] += (input->pointer_y - view_cam_move_start[1]) * view_cam_pos[2];
 			view_cam_speed = 0.3;
 		}
-	}else if(active && input->mouse_button[0])
-	if(0.025 * 0.025 < (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
+	}
+	else if(active && input->mouse_button[0])
 	{
-		if(input->click_pointer_x > 0.9 || input->click_pointer_x < -0.9)
+		if(0.025 * 0.025 < (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) +
+		   (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
 		{
-			view_cam_pos_goal[2] *= 1 + 2 * ((input->pointer_y - view_cam_move_start[1]) + (input->pointer_x - view_cam_move_start[0]));
-			if(view_cam_pos_goal[2] < 0.5)
-				view_cam_pos_goal[2] = 0.5;
-			view_cam_speed = 0.1;
-		}else
-		{
-			view_cam_pos_goal[0] += (input->pointer_x - view_cam_move_start[0]) * view_cam_pos[2];
-			view_cam_pos_goal[1] += (input->pointer_y - view_cam_move_start[1]) * view_cam_pos[2];
-			view_cam_speed = 0.3;
+			if(input->click_pointer_x > 0.9 || input->click_pointer_x < -0.9)
+			{
+				view_cam_pos_goal[2] *= 1 + 2 * ((input->pointer_y - view_cam_move_start[1]) +
+								 (input->pointer_x - view_cam_move_start[0]));
+				if(view_cam_pos_goal[2] < 0.5)
+					view_cam_pos_goal[2] = 0.5;
+				view_cam_speed = 0.1;
+			}else
+			{
+				view_cam_pos_goal[0] += (input->pointer_x - view_cam_move_start[0]) * view_cam_pos[2];
+				view_cam_pos_goal[1] += (input->pointer_y - view_cam_move_start[1]) * view_cam_pos[2];
+					view_cam_speed = 0.3;
+			}
 		}
-	}	
+	}
 	view_cam_move_start[0] = input->pointer_x;
 	view_cam_move_start[1] = input->pointer_y;
 	pos[0] = view_cam_pos[0] = (view_cam_pos_goal[0] * view_cam_speed) + (view_cam_pos[0] * (1.0 - view_cam_speed));

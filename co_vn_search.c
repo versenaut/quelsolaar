@@ -9,7 +9,7 @@
 #include "co_vn_handle.h"
 #include "co_widgets.h"
 
-boolean co_text_search(char *text, char *search)
+boolean co_text_search(const char *text, const char *search)
 {
 	uint i, j;
 	for(i = 0; text[i] != 0; i++)

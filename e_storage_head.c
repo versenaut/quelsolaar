@@ -163,7 +163,7 @@ void callback_send_tag_destroy(void *user, VNodeID node_id, uint16 group_id, uin
 		((ETagGroup *)node->tag_groups)[group_id].tags[tag_id].tag_name[0] = 0;
 }
 
-char *e_ns_get_tag_group(ENodeHead *node, uint16 group_id)
+char *e_ns_get_tag_group(const ENodeHead *node, uint16 group_id)
 {
 	if(node->group_count > group_id)
 		if(((ETagGroup *)node->tag_groups)[group_id].group_name[0] != 0)
@@ -171,7 +171,7 @@ char *e_ns_get_tag_group(ENodeHead *node, uint16 group_id)
 	return NULL;
 }
 
-uint e_ns_get_next_tag_group(ENodeHead *node, uint16 group_id)
+uint e_ns_get_next_tag_group(const ENodeHead *node, uint16 group_id)
 {
 	for(;node->group_count > group_id && ((ETagGroup *)node->tag_groups)[group_id].group_name[0] == 0; group_id++);
 	if(node->group_count == group_id)
@@ -179,7 +179,7 @@ uint e_ns_get_next_tag_group(ENodeHead *node, uint16 group_id)
 	return group_id;
 }
 
-uint e_ns_get_next_tag(ENodeHead *node, uint16 group_id, uint16 tag_id)
+uint e_ns_get_next_tag(const ENodeHead *node, uint16 group_id, uint16 tag_id)
 {	
 	if(node->group_count <= group_id || ((ETagGroup *)node->tag_groups)[group_id].group_name[0] == 0)
 		return -1;
@@ -189,21 +189,21 @@ uint e_ns_get_next_tag(ENodeHead *node, uint16 group_id, uint16 tag_id)
 	return tag_id;
 }
 
-char *e_ns_get_tag_name(ENodeHead *node, uint16 group_id, uint16 tag_id)
+char *e_ns_get_tag_name(const ENodeHead *node, uint16 group_id, uint16 tag_id)
 {
 	if(node->group_count >= group_id && ((ETagGroup *)node->tag_groups)[group_id].group_name[0] != 0 && ((ETagGroup *)node->tag_groups)[group_id].tag_count > tag_id)
 		return ((ETagGroup *)node->tag_groups)[group_id].tags[tag_id].tag_name;
 	return NULL;
 }
 
-VNTagType e_ns_get_tag_type(ENodeHead *node, uint16 group_id, uint16 tag_id)
+VNTagType e_ns_get_tag_type(const ENodeHead *node, uint16 group_id, uint16 tag_id)
 {
 	if(node->group_count >= group_id && ((ETagGroup *)node->tag_groups)[group_id].group_name[0] != 0 && ((ETagGroup *)node->tag_groups)[group_id].tag_count > tag_id)
 		return ((ETagGroup *)node->tag_groups)[group_id].tags[tag_id].type;
 	return 0;
 }
 
-VNTag *e_ns_get_tag(ENodeHead *node, uint16 group_id, uint16 tag_id)
+VNTag *e_ns_get_tag(const ENodeHead *node, uint16 group_id, uint16 tag_id)
 {
 	if(node->group_count >= group_id && ((ETagGroup *)node->tag_groups)[group_id].group_name[0] != 0 && ((ETagGroup *)node->tag_groups)[group_id].tag_count > tag_id)
 		return &((ETagGroup *)node->tag_groups)[group_id].tags[tag_id].tag;
@@ -231,7 +231,3 @@ void es_head_init(void)
 	verse_callback_set(verse_send_tag_destroy, callback_send_tag_destroy, NULL);
 	verse_callback_set(verse_send_node_name_set, callback_send_node_name_set, NULL);
 }
-
-
-
-

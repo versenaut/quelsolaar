@@ -477,7 +477,7 @@ void co_vng_saturn_ring()
 	glPopMatrix();
 }
 
-uint co_vng_render_name(BInputState *input, char *name, float pos_x, float pos_y, float pointer_x, float pointer_y)
+uint co_vng_render_name(BInputState *input, const char *name, float pos_x, float pos_y, float pointer_x, float pointer_y)
 {
 	float color = 0;
 	if(input->mode == BAM_DRAW)

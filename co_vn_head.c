@@ -244,7 +244,6 @@ boolean co_handle_head(BInputState *input, ENode *node, float *length)
 
 float co_handle_node_head(BInputState *input, ENode *node)
 {
-
 	static float pos = 0, grab = 0, tag_rot = 0;
 	static boolean show_tags = TRUE;
 	static uint16 a_tag = -1, a_group = -1;
