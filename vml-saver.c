@@ -54,7 +54,7 @@ static void save_object(FILE *f, ENode *o_node)
 				fprintf(f, "\t\t\t<method name=\"%s\">\n", e_nso_get_method(o_node, group_id, method_id));
 				for(i = 0; i < e_nso_get_method_param_count(o_node, group_id, method_id); i++)
 				{
-					fprintf(f, "\t\t\t<methodparam name=\"%s\", type=\"%s\"/>\n", e_nso_get_method_param_names(o_node, group_id, method_id)[i], method_types[e_nso_get_method_param_types(o_node, group_id, method_id)[i]]);
+					fprintf(f, "\t\t\t<methodparam name=\"%s\" type=\"%s\"/>\n", e_nso_get_method_param_names(o_node, group_id, method_id)[i], method_types[e_nso_get_method_param_types(o_node, group_id, method_id)[i]]);
 				}
 				fprintf(f, "\t\t\t</method>\n");
 			}
