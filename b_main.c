@@ -296,12 +296,12 @@ void betray_get_current_time(uint32 *seconds, uint32 *fractions)
 
 #endif
 
-double betray_get_delta_time()
+double betray_get_delta_time(void)
 {
 	return BGlobal.delta_time;
 }
 
-void betray_time_update()
+void betray_time_update(void)
 {
 	uint32 seconds, fractions;
 	betray_get_current_time(&seconds, &fractions);
