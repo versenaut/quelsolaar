@@ -14,13 +14,13 @@ APPS=connector uvedit loqairou
 
 ALL:		$(APPS)
 
-connector:	co_main.o co_vn_bitmap.o co_vn_geometry.o co_vn_graphics.o co_vn_handle.o co_vn_head.o \
-		co_vn_mat_render.o co_vn_material.o co_vn_object.o co_vn_search.o co_vn_text.o co_widgets.o \
-		st_types.o \
+connector:	co_main.o co_game.o co_intro.o co_vn_bitmap.o co_vn_curve.o co_vn_geometry.o co_vn_graphics.o \
+		co_vn_handle.o co_vn_head.o co_vn_mat_render.o co_vn_material.o co_vn_object.o co_vn_search.o \
+		co_vn_text.o co_widgets.o st_types.o \
 		libseduce.a libbetray.a libenough.a
 		gcc -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
-uvedit:		uv_draw.o uv_geometry.o uv_main.o uv_menu.o uv_overlay.o uv_popup.o uv_tool_corner.o\
+uvedit:		uv_draw.o uv_edge_colapse.o uv_geometry.o uv_main.o uv_menu.o uv_overlay.o uv_popup.o uv_tool_corner.o\
 		uv_tool_edge.o uv_tool_polygon.o uv_transform.o uv_unfold.o uv_view.o uv_input_parse.o \
 		libseduce.a libbetray.a libenough.a st_types.o
 		gcc -o $@ $^ $(LDFLAGS) $(LDLIBS)
@@ -40,7 +40,7 @@ libseduce.a:	s_background.o s_draw.o s_editor.o s_line_font.o s_main.o s_popup.o
 libbetray.a:	b_glut.o b_main.o b_sdl.o
 		ar -cr $@ $^
 
-libenough.a:	e_storage_bitmap.o e_storage_code.o e_storage_geometry.o e_storage_head.o e_storage_material.o \
+libenough.a:	e_storage_bitmap.o e_storage_curve.o e_storage_code.o e_storage_geometry.o e_storage_head.o e_storage_material.o \
 		e_storage_node.o e_storage_object.o
 		ar -cr $@ $^
 
