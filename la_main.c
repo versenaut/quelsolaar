@@ -23,7 +23,7 @@ extern void init_draw_line(void);
 extern void init_transform_manupulator(void);
 extern void	la_intro(void);
 extern void init_key_input(void);
-extern void parce_input(BInputState *input, void *user);
+extern void parse_input(BInputState *input, void *user);
 extern void draw_browser_menu(BInputState *input, void *user);
 
 

@@ -39,7 +39,7 @@ boolean draw_view_cage(void)
 	return ParceInputData.mode != PIM_CHANGE_VIEW;
 }
 
-void la_parce_input(BInputState *input)
+void la_parse_input(BInputState *input)
 {
 	double output[3]; 
 	static double snap[3], distance, selected_distance;
@@ -141,7 +141,7 @@ void la_parce_input(BInputState *input)
 					la_t_tm_draw(input, ParceInputData.mode == PIM_DRAG_MANIPULATOR);
 			}
 			if(ParceInputData.mode != PIM_IDLE)
-				la_parce_input(input);
+				la_parse_input(input);
 		break;
 		case PIM_DRAW :
 			udg_get_vertex_pos(snap, select_closest);
@@ -359,7 +359,7 @@ void la_edit_func(BInputState *input, void *user)
 	}
 	if(udg_update_geometry())
 	{
-		la_parce_input(input);
+		la_parse_input(input);
 	}else
 	{
 		ENode *node;

@@ -3,7 +3,7 @@
 #include "la_geometry_undo.h"
 #include "la_projection.h"
 
-extern void parce_input(BInputState *input, void *user);
+extern void parse_input(BInputState *input, void *user);
 
 void layer_name_func(void *user, char *text)
 {
@@ -74,7 +74,7 @@ void draw_settings_menu(BInputState *input, void *user)
 		betray_set_action_func(la_edit_func, NULL);
 */
 /*	if(udg_update_geometry())
-		betray_set_action_func(parce_input, NULL);
+		betray_set_action_func(parse_input, NULL);
 */
 /*
 	sui_draw_text("Geometry complexity", SUITM_NORMAL, NULL, NULL, 0, pos[0] + 0.1, -0.1 , 0, sui_get_material(SUIM_BLACK_FONT));
