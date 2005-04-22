@@ -256,7 +256,7 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 				for(l = 0; l < LIGHT_SAMPLES; l++)
 				{
 					co_compute_stocastic_vector(vec, normal, line * LIGHT_SAMPLES * size + i * LIGHT_SAMPLES + l, frag->transparency.normal_falloff);
-					co_compute_reflect_color(vec, light);
+					co_compute_reflect_color(vec, &light);
 				}
 				buffer[k++] = light[0] / LIGHT_SAMPLES;
 				buffer[k++] = light[1] / LIGHT_SAMPLES;
@@ -296,8 +296,8 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		}
 		case VN_M_FT_ANIMATION :
 		{
-			for(i = 0; i < size * 3; i++)
-				buffer[i] = 0.5f;
+			for(i = 0; i < size * size * 3; i++)
+				buffer[i] = 0.5;
 			break;
 		}
 		case VN_M_FT_NOISE :
