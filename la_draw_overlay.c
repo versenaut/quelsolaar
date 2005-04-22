@@ -5,6 +5,7 @@
 #include "la_tool.h"
 #include "st_matrix_operations.h"
 
+#include "persuade.h"
 
 struct{
 	float		*active_vertex;
@@ -316,6 +317,76 @@ void la_do_draw_closest_edge(uint *edge, double x, double y, boolean snap)
 	}
 }
 
+void draw_persuade_surface(ENode *node)
+{
+#ifdef PERSUADE_H
+	static PMesh	*mesh = NULL, *next = NULL;
+
+	if((mesh == NULL || !p_rm_validate(mesh)) && next == NULL)
+		next = p_rm_create(node);
+	if(next != NULL)
+	{
+		if(p_rm_validate(next))
+			p_rm_service(next, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
+		else
+		{
+			p_rm_destroy(next);
+			next = NULL;
+		}
+	}
+	if(next != NULL && p_rm_drawable(next))
+	{
+		if(mesh != NULL)
+			p_rm_destroy(mesh);
+		mesh = next;
+		next = NULL; 
+	}
+	if(mesh != NULL)
+	{
+		glPushMatrix();
+		glPolygonMode(GL_FRONT, GL_LINE);
+		p_rm_compute(mesh, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_COLOR_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glDisable(GL_LIGHTING);
+		glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+		glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+		glBindTexture(GL_TEXTURE_2D, la_pfx_surface_material());
+		glDisable(GL_BLEND);
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_TEXTURE_GEN_S);
+		glEnable(GL_TEXTURE_GEN_T);
+		glEnable(GL_NORMALIZE);
+//		glDisable(GL_LIGHTING);
+//		glDisable(GL_TEXTURE_2D);
+
+
+#ifdef E_GEOMETRY_REAL_PRESISSION_64_BIT
+		glVertexPointer(3, GL_DOUBLE, 0, p_rm_get_vertex(mesh));
+		glNormalPointer(GL_DOUBLE, 0 , p_rm_get_normal(mesh));
+//		glNormalPointer(GL_DOUBLE, 0 , p_rm_get_vertex(mesh));
+#endif
+#ifdef E_GEOMETRY_REAL_PRESISSION_32_BIT
+		glVertexPointer(3, GL_FLOAT, 0, p_rm_get_vertex(mesh));
+		glNormalPointer(GL_FLOAT, 0 , p_rm_get_normal(mesh));
+#endif
+//		glEnable(GL_LIGHTING);
+		glColor4f(1, 1, 1, 1);
+
+		glDrawElements(GL_TRIANGLES, p_rm_get_ref_length(mesh), GL_UNSIGNED_INT, p_rm_get_reference(mesh));
+		glDisableClientState(GL_NORMAL_ARRAY);
+
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_TEXTURE_GEN_S);
+		glDisable(GL_TEXTURE_GEN_T);
+		glDisable(GL_NORMALIZE);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glPopMatrix();
+	}
+#endif
+}
 void draw_owerlay_surface(void)
 {
 	static uint version, draw;
@@ -375,8 +446,14 @@ void draw_owerlay_surface(void)
 		GlobalOverlay.tri_count = 0;
 		GlobalOverlay.quad_count = 0;
 		udg_get_geometry(&length, &ref_length, &vertex, &ref, NULL);
-		if(sui_test_setting_version(&version))
+	
+		#ifdef PERSUADE_H
+			draw = TRUE;
+		#else
+	//	if(sui_test_setting_version(&version))
 			draw = FALSE; /*sui_get_setting_int("RENDER_AS_SDS", TRUE);*/
+		#endif
+
 
 		for(i = 0; i < ref_length; i++)
 		{
@@ -462,6 +539,7 @@ void draw_owerlay_surface(void)
 		}
 	}
 	GlobalOverlay.surface_version = udg_get_version(TRUE, TRUE, FALSE, FALSE);
+	draw_persuade_surface(e_ns_get_node(0, udg_get_modeling_node()));
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	if(GlobalOverlay.tri_count != 0)
@@ -471,26 +549,33 @@ void draw_owerlay_surface(void)
 		sui_set_blend_gl(GL_ONE, GL_ONE);
 		sui_set_color_array_gl(GlobalOverlay.tri_normal, GlobalOverlay.tri_count, 3);
 		sui_draw_gl(GL_TRIANGLES, GlobalOverlay.tri, GlobalOverlay.tri_count, 3, 1, 1, 1);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		sui_set_blend_gl(GL_ONE, GL_ONE);
-		sui_draw_gl(GL_TRIANGLES, GlobalOverlay.tri, GlobalOverlay.tri_count, 3, 0.1, 0.05, 0.15);
-		glCullFace(GL_BACK);
-		sui_draw_gl(GL_TRIANGLES, GlobalOverlay.tri, GlobalOverlay.tri_count, 3, 0.05, 0.05, 0.05);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+
 	if(GlobalOverlay.quad_count != 0)
 	{
 		glCullFace(GL_FRONT);
 		sui_set_blend_gl(GL_ONE, GL_ONE);
 		sui_set_color_array_gl(GlobalOverlay.quad_normal, GlobalOverlay.quad_count, 3);
 		sui_draw_gl(GL_QUADS, GlobalOverlay.quad, GlobalOverlay.quad_count, 3, 1, 1, 1);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	if(GlobalOverlay.tri_count != 0)
+	{
+		glCullFace(GL_FRONT);
 		sui_set_blend_gl(GL_ONE, GL_ONE);
+		sui_draw_gl(GL_TRIANGLES, GlobalOverlay.tri, GlobalOverlay.tri_count, 3, 0.1, 0.05, 0.15);
+		glCullFace(GL_BACK);
+		sui_draw_gl(GL_TRIANGLES, GlobalOverlay.tri, GlobalOverlay.tri_count, 3, 0.05, 0.05, 0.05);
+	}	
+	if(GlobalOverlay.quad_count != 0)
+	{
+		sui_set_blend_gl(GL_ONE, GL_ONE);
+		glCullFace(GL_FRONT);
 		sui_draw_gl(GL_QUADS, GlobalOverlay.quad, GlobalOverlay.quad_count, 3, 0.1, 0.05, 0.15);
 		glCullFace(GL_BACK);
 		sui_draw_gl(GL_QUADS, GlobalOverlay.quad, GlobalOverlay.quad_count, 3, 0.05, 0.05, 0.05);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 }
@@ -643,7 +728,7 @@ void draw_owerlay_edge(void)
 	{
 		sui_set_blend_gl(GL_ONE, GL_ONE);
 		sui_set_color_array_gl(edge_color, el * 5, 3);
-		sui_draw_elements_gl(GL_LINES, edge_array, edge_ref, el * 8, 3, 1, 1, 1);
+		sui_draw_ellements_gl(GL_LINES, edge_array, edge_ref, el * 8, 3, 1, 1, 1);
 	}
 }
 
