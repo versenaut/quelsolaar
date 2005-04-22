@@ -7,7 +7,8 @@
 #include "persuade.h"
 
 #define GAME_BULLET_COUNT 32
-#define GAME_DUST_COUNT 320
+#define GAME_DUST_COUNT 3200
+#define GAME_REVIVE_TIME 2
 
 typedef struct{
 	float pos[3];
@@ -42,6 +43,7 @@ struct{
 	uint		dust_next;
 	boolean		engine;
 	float		time;
+	float		revive_time;
 	uint		lifes;
 	float		aspect;
 }COGame;
@@ -64,6 +66,7 @@ void co_init_game(uint count)
 	COGame.dust_next = 0;
 	COGame.engine = FALSE;
 	COGame.time = 0;
+	COGame.revive_time = GAME_REVIVE_TIME + 0.1;
 	COGame.lifes = 3;
 	for(i = 0; i < GAME_BULLET_COUNT; i++)
 		COGame.fire[i].time = 0;
@@ -89,7 +92,18 @@ void co_spread_dust(float *pos, float *vec, float blast_size, float object_size,
 	}
 }
 
-void co_end_game(void)
+void co_fire(float rotation)
+{
+	COGame.fire[COGame.fire_next].vec[0] = -sin(rotation * PI / 180);
+	COGame.fire[COGame.fire_next].vec[1] = cos(rotation * PI / 180);
+	COGame.fire[COGame.fire_next].pos[0] = COGame.player_pos[0] + COGame.fire[COGame.fire_next].vec[0] * 0.04;
+	COGame.fire[COGame.fire_next].pos[1] = COGame.player_pos[1] + COGame.fire[COGame.fire_next].vec[1] * 0.04;
+	COGame.fire[COGame.fire_next].time = 0;
+	COGame.fire_next = (COGame.fire_next + 1) % GAME_BULLET_COUNT;
+	COGame.fire_time = 0;
+}
+
+void co_end_game()
 {
 	uint i;
 	for(i = 0; i < COGame.pebbel_count; i++)
@@ -111,7 +125,7 @@ void co_create_pebel(uint type, float pos_x, float pos_y, float scale)
 	COGame.pebbel_count++;
 }
 
-boolean co_is_game_active(void)
+boolean co_is_game_active()
 {
 	return active_game;
 }
@@ -341,9 +355,9 @@ void co_game_draw_rocket(float pos_x, float pos_y, float rot, float red, float g
 	glPopMatrix();
 }
 
-#define SHIP_COUNT 8
+#define SHIP_COUNT 3
 
-boolean co_draw_ships(BInputState *input, boolean clickable)
+boolean co_draw_ships(BInputState *input)
 {
 	static float pos[SHIP_COUNT][2], vec[SHIP_COUNT][2], rot[SHIP_COUNT];
 	static uint rand[SHIP_COUNT];
@@ -355,8 +369,8 @@ boolean co_draw_ships(BInputState *input, boolean clickable)
 		{
 			float f;
 			rand[i] = i * 50 + i;
-			pos[i][0] = (get_rand(rand[i] * 4) - 0.5);
-			pos[i][1] = (get_rand(rand[i] * 4 + 1) - 0.5);
+			pos[i][0] = (get_rand(rand[i] * 4) - 0.5) * 3;
+			pos[i][1] = (get_rand(rand[i] * 4 + 1) - 0.5) * 3;
 			vec[i][0] = get_rand(rand[i] * 4 + 2) - 0.5;
 			vec[i][1] = get_rand(rand[i] * 4 + 3) - 0.5;
 			f = sqrt(vec[i][0] * vec[i][0] + vec[i][1] * vec[i][1]) * 2;
@@ -370,7 +384,6 @@ boolean co_draw_ships(BInputState *input, boolean clickable)
 	{
 		for(i = 0; i < SHIP_COUNT; i++)
 		{
-			float color = 0.9;
 			pos[i][0] += vec[i][0] * betray_get_delta_time();
 			pos[i][1] += vec[i][1] * betray_get_delta_time();
 			rot[i] += betray_get_delta_time() * (get_rand(rand[i]) - 0.5) * 100;
@@ -389,25 +402,23 @@ boolean co_draw_ships(BInputState *input, boolean clickable)
 				vec[i][1] /= f;
 				rand[i]++;
 			}
-			if(clickable)
-				color = 0.8;
 			switch(rand[i] % 4)
 			{
 				case 0 :
-				co_game_draw_lander(pos[i][0], pos[i][1], rot[i], color, color, color);
+				co_game_draw_lander(pos[i][0], pos[i][1], rot[i], 0.8, 0.8, 0.8);
 				break;
 				case 1 :
-				co_game_draw_station(pos[i][0], pos[i][1], rot[i], color, color, color);
+				co_game_draw_station(pos[i][0], pos[i][1], rot[i], 0.8, 0.8, 0.8);
 				break;
 				case 2 :
-				co_game_draw_sputnik(pos[i][0], pos[i][1], rot[i], color, color, color);
+				co_game_draw_sputnik(pos[i][0], pos[i][1], rot[i], 0.8, 0.8, 0.8);
 				break;
 				case 3 :
-				co_game_draw_rocket(pos[i][0], pos[i][1], rot[i], color, color, color);
+				co_game_draw_rocket(pos[i][0], pos[i][1], rot[i], 0.8, 0.8, 0.8);
 				break;
 			}
 		}
-	}else if(clickable)
+	}else
 	{
 		for(i = 0; i < SHIP_COUNT; i++)
 			if(input->last_mouse_button[0] == FALSE && input->mouse_button[0] == TRUE)
@@ -429,7 +440,7 @@ void co_pos_wrap(float *pos)
 		pos[1] += 2 * COGame.aspect; 
 }
 
-void co_draw_dust(void)
+void co_draw_dust()
 {
 	boolean alive = FALSE;
 	COParticle *p;
@@ -451,7 +462,6 @@ void co_draw_dust(void)
 		active_game = FALSE;
 	glPopMatrix();
 }
-
 void co_play_game(BInputState *input)
 {
 	uint i, j, k;
@@ -481,14 +491,17 @@ void co_play_game(BInputState *input)
 		draw_ship5(1, 1, 0.1, 0.1, 0.1);
 		draw_ship6(2, 1, 0.1, 0.1, 0.1);*/
 		glPopMatrix();
-		glPushMatrix();
-		glTranslatef(COGame.player_pos[0], COGame.player_pos[1], 0);
-		glRotatef(COGame.player_rot, 0, 0, 1);
-		if(COGame.engine)
-			co_draw_ship_engine(0, 0, 0, 0, 0);
-		else
-			co_draw_ship(0, 0, 0, 0, 0);
-		glPopMatrix();
+		if(COGame.revive_time > GAME_REVIVE_TIME)
+		{
+			glPushMatrix();
+			glTranslatef(COGame.player_pos[0], COGame.player_pos[1], 0);
+			glRotatef(COGame.player_rot, 0, 0, 1);
+			if(COGame.engine)
+				co_draw_ship_engine(0, 0, 0, 0, 0);
+			else
+				co_draw_ship(0, 0, 0, 0, 0);
+			glPopMatrix();
+		}
 		for(i = 0; i < COGame.lifes; i++)
 			co_draw_ship(0.95 - 0.04 * (float)i, COGame.aspect - 0.05, 0, 0, 0);
 		for(i = 0; i < COGame.pebbel_count; i++)
@@ -566,43 +579,55 @@ void co_play_game(BInputState *input)
 
 	}else
 	{
-		static boolean d = FALSE, d_l = FALSE, a = FALSE, a_l = FALSE, w = FALSE, w_l = FALSE, s = FALSE, s_l = FALSE, space = FALSE, space_l = FALSE;
+		static boolean d = FALSE, d_l = FALSE, a = FALSE, a_l = FALSE, w = FALSE, w_l = FALSE, s = FALSE, s_l = FALSE,
+			space = FALSE, space_l = FALSE, quit = FALSE, quit_l = FALSE;
 		betray_get_key_up_down(&d, &d_l, 'd');
 		betray_get_key_up_down(&a, &a_l, 'a');
 		betray_get_key_up_down(&w, &w_l, 'w');
 		betray_get_key_up_down(&s, &s_l, 's');
 		betray_get_key_up_down(&space, &space_l, ' ');
-		if(d)
-			COGame.player_rot -= betray_get_delta_time() * 200;
-		if(a)
-			COGame.player_rot += betray_get_delta_time() * 200;
-		if(w)
+		betray_get_key_up_down(&quit, &quit_l, 'q');
+		if(quit)
 		{
-			COGame.player_vec[0] *= 0.9 + (1 - betray_get_delta_time()) * 0.1;
-			COGame.player_vec[1] *= 0.9 + (1 - betray_get_delta_time()) * 0.1;
-			COGame.player_vec[0] -= sin(COGame.player_rot * PI / 180) * betray_get_delta_time();
-			COGame.player_vec[1] += cos(COGame.player_rot * PI / 180) * betray_get_delta_time();
+			active_game = FALSE;
+			return;
 		}
-		COGame.engine = w;
-		if(s)
+		COGame.revive_time += betray_get_delta_time();
+		if(COGame.revive_time > GAME_REVIVE_TIME)
 		{
-			COGame.player_vec[0] *= 0.9;
-			COGame.player_vec[1] *= 0.9;
-		}
-		COGame.player_pos[0] += COGame.player_vec[0] * betray_get_delta_time();
-		COGame.player_pos[1] += COGame.player_vec[1] * betray_get_delta_time();
+			if(d)
+				COGame.player_rot -= betray_get_delta_time() * 200;
+			if(a)
+				COGame.player_rot += betray_get_delta_time() * 200;
+			if(w)
+			{
+				COGame.player_vec[0] *= 0.9 + (1 - betray_get_delta_time()) * 0.1;
+				COGame.player_vec[1] *= 0.9 + (1 - betray_get_delta_time()) * 0.1;
+				COGame.player_vec[0] -= sin(COGame.player_rot * PI / 180) * betray_get_delta_time();
+				COGame.player_vec[1] += cos(COGame.player_rot * PI / 180) * betray_get_delta_time();
+			}
+			COGame.engine = w;
+			if(s)
+			{
+				COGame.player_vec[0] *= 0.9;
+				COGame.player_vec[1] *= 0.9;
+			}
+			COGame.player_pos[0] += COGame.player_vec[0] * betray_get_delta_time();
+			COGame.player_pos[1] += COGame.player_vec[1] * betray_get_delta_time();
 
-		COGame.fire_time += betray_get_delta_time();
-		if(space && (COGame.fire_time > 0.23 /*|| space_l == FALSE*/))
-		{
+			COGame.fire_time += betray_get_delta_time();
+			if(space && (COGame.fire_time > 0.23 /*|| space_l == FALSE*/))
+				co_fire(COGame.player_rot);
+/*			{
 
-			COGame.fire[COGame.fire_next].vec[0] = -sin(COGame.player_rot * PI / 180);
-			COGame.fire[COGame.fire_next].vec[1] = cos(COGame.player_rot * PI / 180);
-			COGame.fire[COGame.fire_next].pos[0] = COGame.player_pos[0] + COGame.fire[COGame.fire_next].vec[0] * 0.04;
-			COGame.fire[COGame.fire_next].pos[1] = COGame.player_pos[1] + COGame.fire[COGame.fire_next].vec[1] * 0.04;
-			COGame.fire[COGame.fire_next].time = 0;
-			COGame.fire_next = (COGame.fire_next + 1) % GAME_BULLET_COUNT;
-			COGame.fire_time = 0;
+				COGame.fire[COGame.fire_next].vec[0] = -sin(COGame.player_rot * PI / 180);
+				COGame.fire[COGame.fire_next].vec[1] = cos(COGame.player_rot * PI / 180);
+				COGame.fire[COGame.fire_next].pos[0] = COGame.player_pos[0] + COGame.fire[COGame.fire_next].vec[0] * 0.04;
+				COGame.fire[COGame.fire_next].pos[1] = COGame.player_pos[1] + COGame.fire[COGame.fire_next].vec[1] * 0.04;
+				COGame.fire[COGame.fire_next].time = 0;
+				COGame.fire_next = (COGame.fire_next + 1) % GAME_BULLET_COUNT;
+				COGame.fire_time = 0;
+			}*/
 		}
 
 		co_pos_wrap(COGame.player_pos);
@@ -635,18 +660,28 @@ void co_play_game(BInputState *input)
 			COGame.pebbels[i].pos[0] += COGame.pebbels[i].vec[0] * betray_get_delta_time();
 			COGame.pebbels[i].pos[1] += COGame.pebbels[i].vec[1] * betray_get_delta_time();
 			co_pos_wrap(COGame.pebbels[i].pos);
-			size = COGame.pebbels[i].size * COGame.pebbels[i].size * 0.4 * 0.4;
-			if(size > (COGame.pebbels[i].pos[0] - COGame.player_pos[0]) * (COGame.pebbels[i].pos[0] - COGame.player_pos[0]) + (COGame.pebbels[i].pos[1] - COGame.player_pos[1]) * (COGame.pebbels[i].pos[1] - COGame.player_pos[1]))
+			if(COGame.revive_time > GAME_REVIVE_TIME)
 			{
-				co_spread_dust(COGame.player_pos, COGame.player_vec, 2, 0.2, 192);
-				COGame.lifes--;
-				if(COGame.lifes == 0)
-					co_end_game();
-				COGame.player_pos[0] = 0;
-				COGame.player_pos[1] = 0;
-				COGame.player_vec[0] = 0;
-				COGame.player_vec[1] = 0;
-				COGame.player_rot = 0;
+				size = COGame.pebbels[i].size * COGame.pebbels[i].size * 0.4 * 0.4;
+				if(size > (COGame.pebbels[i].pos[0] - COGame.player_pos[0]) * (COGame.pebbels[i].pos[0] - COGame.player_pos[0]) + (COGame.pebbels[i].pos[1] - COGame.player_pos[1]) * (COGame.pebbels[i].pos[1] - COGame.player_pos[1]))
+				{
+					co_spread_dust(COGame.player_pos, COGame.player_vec, 2, 0.2, 192);
+					co_fire(COGame.player_rot + 0);
+					co_fire(COGame.player_rot + 60);
+					co_fire(COGame.player_rot + 120);
+					co_fire(COGame.player_rot + 180);
+					co_fire(COGame.player_rot + 240);
+					co_fire(COGame.player_rot + 300);
+					COGame.lifes--;
+					if(COGame.lifes == 0)
+						co_end_game();
+					COGame.player_pos[0] = 0;
+					COGame.player_pos[1] = 0;
+					COGame.player_vec[0] = 0;
+					COGame.player_vec[1] = 0;
+					COGame.player_rot = 0;
+					COGame.revive_time = 0;
+				}
 			}
 			for(j = 0; j < GAME_BULLET_COUNT; j++)
 			{
@@ -658,7 +693,7 @@ void co_play_game(BInputState *input)
 					{
 						COGame.fire[j].time = 10;
 						COGame.pebbels[i].generation++;
-						co_spread_dust(COGame.pebbels[i].pos, COGame.fire[j].vec, 1 + 1 / COGame.pebbels[i].generation, COGame.pebbels[i].size, 192 / COGame.pebbels[i].generation);
+						co_spread_dust(COGame.pebbels[i].pos, COGame.fire[j].vec, 1 + 1 / COGame.pebbels[i].generation, COGame.pebbels[i].size, GAME_DUST_COUNT / COGame.pebbels[i].generation / 4);
 						if(COGame.pebbels[i].generation < 4)
 						{
 	
