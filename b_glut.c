@@ -16,7 +16,7 @@
 void b_glut_idle_func(void)
 {
 	betray_action(BAM_MAIN);
-    glutPostRedisplay();
+	glutPostRedisplay();
 }
 
 void b_glut_reshape_func(int width, int height)
@@ -52,6 +52,8 @@ void b_glut_mouse_func(int button, int state, int x, int y)
 		input->mouse_button[button] = !state;
 
 }
+
+//glutSpecialFunc(void (GLUTCALLBACK *func)(int key, int x, int y));
 
 void betray_insert_caracter_b(char caracter);
 
@@ -170,9 +172,10 @@ boolean b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boo
 {
 	 glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STENCIL);
-/*	glutInitDisplayString("stencil>=1 rgb depth double");*/
+//	glutInitDisplayString("stencil>=1 rgb depth double");
 	glutInitWindowPosition(10, 10);
-	glutInitWindowSize(size_x, size_y);
+//	glutInitWindowSize(size_x, size_y);
+	glutInitWindowSize(100, 100);
 	glutCreateWindow(caption);
 	glutDisplayFunc(b_glut_display_func);
 	glutReshapeFunc(b_glut_reshape_func);
