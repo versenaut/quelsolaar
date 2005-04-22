@@ -144,9 +144,9 @@ boolean co_handle_object(BInputState *input, ENode *node)
 			for(m_group = e_nso_get_next_method_group(node, 0); m_group != (uint16)-1 ; m_group = e_nso_get_next_method_group(node, m_group + 1))
 				i++;
 			sprintf(nr, "group_%u", i);
-			verse_send_o_method_group_create(e_ns_get_node_id(node), ~0, nr);
+			verse_send_o_method_group_create(e_ns_get_node_id(node), (uint16)-1, nr);
 		}
-		if(e_nso_get_next_method_group(node, 0) == (uint16) ~0)
+		if(NULL == e_nso_get_method_group(node, 0))
 		{
 			sui_draw_text(-0.3, y - 0.1, SUI_T_SIZE, SUI_T_SPACE, "NO METHOD GROUPS", color_light, color_light, color_light);
 			y -= 0.05;
@@ -199,14 +199,8 @@ boolean co_handle_object(BInputState *input, ENode *node)
 				}			
 				for(i = 0; i < count; i++)
 				{
-					static const char *type_names[] = {
-						"INT8", "INT16", "INT32", "UINT8", "UINT16",
-						"UINT32", "REAL32", "REAL64", "REAL32_VEC2", "REAL32_VEC3", "REAL32_VEC4",
-						"REAL64_VEC2", "REAL64_VEC3", "REAL64_VEC4", "REAL32_MAT4", "REAL32_MAT9",
-						"REAL32_MAT16", "REAL64_MAT4", "REAL64_MAT9", "REAL64_MAT16", "STRING",
-						"NODE", "LAYER" };
+					char *type_names[] = {"INT8", "INT16", "INT32", "UINT8", "UINT16", "UINT32", "REAL32", "REAL64", "REAL32_VEC2", "REAL32_VEC3", "REAL32_VEC4", "REAL64_VEC2", "REAL64_VEC3", "REAL64_VEC4", "REAL32_MAT4", "REAL32_MAT9", "REAL32_MAT16", "REAL64_MAT4", "REAL64_MAT9", "REAL64_MAT16", "STRING", "NODE", "LAYER"};
 					static uint pu_g = -1, pu_m = -1, pu_p = 0;
-
 					y_meth -= 0.05;
 					sui_draw_2d_line_gl(0.05, y_meth + 0.03, 0.65, y_meth + 0.03, color_light, color_light, color_light);
 					sui_draw_text(0.0, y_meth, SUI_T_SIZE, SUI_T_SPACE, "Param:", color_light, color_light, color_light);
@@ -268,7 +262,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 						}
 
 						output = sui_draw_popup(input, 0.15, y_meth, element, VN_O_METHOD_PTYPE_LAYER + 1, 0);
-						if(output <= VN_O_METHOD_PTYPE_LAYER)
+						if(output <= VN_O_METHOD_PTYPE_REAL64_MAT16)
 						{
 							VNOParamType temp;
 							temp = types[pu_p];
@@ -382,23 +376,23 @@ boolean co_handle_object(BInputState *input, ENode *node)
 		EObjLink *link;
 		if(sw_text_button(input, -0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new link", color, color, color))
 		{
-			verse_send_o_link_set(rename_o_node_id, -1, -1, "new_link", 0);
+			verse_send_o_link_set(rename_o_node_id, -1, -1, 0, "new_link");
 		}
 		y -= 0.05;
 		for(link = e_nso_get_next_link(node, 0); link != NULL; link = e_nso_get_next_link(node, e_nso_get_link_id(link) + 1))
 		{
 			ENode *l_node;
-			uint32 target;
+			uint32 link_id, target;
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Link name:", color_light, color_light, color_light);  
-			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nso_get_link_name(link), 16, rename_link_func, e_nso_get_link_name(link), color, color_light);
+			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nso_get_link_name(link), 16, rename_link_func, link, color, color_light);
 			y -= 0.05;
 
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Node ID:", color_light, color_light, color_light);  
-			target = e_nso_get_link_node(link);
-			if(sui_type_number_uint(input, 0.15, y, 0.5, SUI_T_SIZE, &target, link, color, color, color));	
-				verse_send_o_link_set(rename_o_node_id, e_nso_get_link_id(link), target, e_nso_get_link_name(link), e_nso_get_link_target_id(link));
+			link_id = e_nso_get_link_node(link);
+			if(sui_type_number_uint(input, 0.15, y, 0.5, SUI_T_SIZE, &link_id, link, color, color, color))
+				verse_send_o_link_set(rename_o_node_id, e_nso_get_link_id(link), link_id, e_nso_get_link_name(link), e_nso_get_link_target_id(link));
 			
-			if(input->mode == BAM_DRAW && (l_node = e_ns_get_node(0, target)) != NULL)
+			if(input->mode == BAM_DRAW && (l_node = e_ns_get_node(0, link_id)) != NULL)
 			{
 				nr[256];
 				glPushMatrix();
@@ -413,7 +407,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Target ID:", color_light, color_light, color_light);  
 			target = e_nso_get_link_target_id(link);
-			if(sui_type_number_uint(input, 0.15, y, 0.5, SUI_T_SIZE, &target, link, color, color, color));
+			if(sui_type_number_uint(input, 0.15, y, 0.5, SUI_T_SIZE, &target, ((uint8 *)link) + 1, color, color, color))
 				verse_send_o_link_set(rename_o_node_id, e_nso_get_link_id(link), e_nso_get_link_node(link), e_nso_get_link_name(link), target);
 			sui_draw_rounded_square(-0.3, y + 0.125, 1, -0.15, color_light, color_light, color_light);
 			y -= 0.075;
