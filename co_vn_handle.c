@@ -43,27 +43,22 @@ void co_handle_view(BInputState *input, float *pos, boolean active)
 			view_cam_pos_goal[1] += (input->pointer_y - view_cam_move_start[1]) * view_cam_pos[2];
 			view_cam_speed = 0.3;
 		}
-	}
-	else if(active && input->mouse_button[0])
+	}else if(active && input->mouse_button[0])
+	if(0.025 * 0.025 < (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
 	{
-		if(0.025 * 0.025 < (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) +
-		   (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
+		if(input->click_pointer_x > 0.9 || input->click_pointer_x < -0.9)
 		{
-			if(input->click_pointer_x > 0.9 || input->click_pointer_x < -0.9)
-			{
-				view_cam_pos_goal[2] *= 1 + 2 * ((input->pointer_y - view_cam_move_start[1]) +
-								 (input->pointer_x - view_cam_move_start[0]));
-				if(view_cam_pos_goal[2] < 0.5)
-					view_cam_pos_goal[2] = 0.5;
-				view_cam_speed = 0.1;
-			}else
-			{
-				view_cam_pos_goal[0] += (input->pointer_x - view_cam_move_start[0]) * view_cam_pos[2];
-				view_cam_pos_goal[1] += (input->pointer_y - view_cam_move_start[1]) * view_cam_pos[2];
-					view_cam_speed = 0.3;
-			}
+			view_cam_pos_goal[2] *= 1 + 2 * ((input->pointer_y - view_cam_move_start[1]) + (input->pointer_x - view_cam_move_start[0]));
+			if(view_cam_pos_goal[2] < 0.5)
+				view_cam_pos_goal[2] = 0.5;
+			view_cam_speed = 0.1;
+		}else
+		{
+			view_cam_pos_goal[0] += (input->pointer_x - view_cam_move_start[0]) * view_cam_pos[2];
+			view_cam_pos_goal[1] += (input->pointer_y - view_cam_move_start[1]) * view_cam_pos[2];
+			view_cam_speed = 0.3;
 		}
-	}
+	}	
 	view_cam_move_start[0] = input->pointer_x;
 	view_cam_move_start[1] = input->pointer_y;
 	pos[0] = view_cam_pos[0] = (view_cam_pos_goal[0] * view_cam_speed) + (view_cam_pos[0] * (1.0 - view_cam_speed));
@@ -98,9 +93,8 @@ COVerseNode *create_verse_node(ENode *node)
 	co_node->node_id = e_ns_get_node_id(node);
 	co_node->pos_x = co_get_pos_x(((float)e_ns_get_node_type(node) - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8);
 	co_node->pos_y = co_get_pos_y(0);
-	co_node->hidden = TRUE /*e_ns_get_node_owner(node) == VN_OWNER_MINE*/;
+	co_node->hidden = e_ns_get_node_owner(node) != VN_OWNER_MINE;
 	e_ns_set_custom_data(node, CONNECTOR_ENOUGH_SLOTT, co_node);
-/*	printf("creating node");*/
 	return co_node;
 }
 
@@ -151,7 +145,7 @@ void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 					if(mesh != 0)
 					{
 						while(p_rm_validate(mesh) && p_rm_drawable(mesh) == FALSE)
-							p_rm_service(mesh, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
+							p_rm_service(mesh, node, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
 					//	scale = p_rm_compute_bounding_box(node, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)), center, NULL);
 						scale = e_nsg_get_size(node);
 						e_nsg_get_center(node, center);
@@ -236,15 +230,15 @@ typedef enum{
 extern boolean co_handle_head(BInputState *input, ENode *node, float *length);
 extern void co_material_compute(uint lines);
 
-boolean get_stop_sign(void);
+boolean get_stop_sign();
 
 extern void co_init_game(uint count);
-extern void co_end_game(void);
+extern void co_end_game();
 extern void co_create_pebel(uint type, float pos_x, float pos_y, float scale);
-extern boolean co_is_game_active(void);
+extern boolean co_is_game_active();
 extern void co_play_game(BInputState *input);
 
-extern boolean co_draw_ships(BInputState *input, boolean clickable);
+extern boolean co_draw_ships(BInputState *input);
 
 void co_input_handler(BInputState *input, void *user_pointer)
 {
@@ -272,7 +266,6 @@ void co_input_handler(BInputState *input, void *user_pointer)
 	if(input->mode == BAM_DRAW)
 	{
 		glDisable(GL_DEPTH_TEST);
-//		glEnable(GL_LINE_SMOOTH);		
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	}
 
@@ -280,7 +273,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 	{
 		co_play_game(input);
 		return;
-	}else if(co_draw_ships(input, mode == COIM_NONE))
+	}else if(co_draw_ships(input))
 	{
 		uint i = 0;
 		for(type = 0; type < V_NT_NUM_TYPES; type++)
@@ -327,6 +320,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 					glTranslatef(co_get_pos_x(((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8) * create_move + co_node->pos_x * (1 - create_move),
 						co_get_pos_y((float)type_count * -0.2) * create_move + co_node->pos_y * (1 - create_move), 0);
 					glScalef(view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move));
+
 					if(mode == COIM_CREATE)
 					{
 						glPushMatrix();
@@ -335,6 +329,13 @@ void co_input_handler(BInputState *input, void *user_pointer)
 						glPopMatrix();
 					}
 					co_node_draw(node, type, FALSE);
+					if(mode == COIM_LINK && (co_get_pos_x(input->pointer_x) - co_node->pos_x) * (co_get_pos_x(input->pointer_x) - co_node->pos_x) + (co_get_pos_y(input->pointer_y) - co_node->pos_y) * (co_get_pos_y(input->pointer_y) - co_node->pos_y) < 0.4 * 0.4)
+					{
+						glPushMatrix();
+						glScalef(1.1, 1.1, 1.1);
+						co_vng_ring();
+						glPopMatrix();
+					}
 				}else
 				{
 					if(mode == COIM_NONE)
@@ -395,8 +396,9 @@ void co_input_handler(BInputState *input, void *user_pointer)
 							co_link->pos_x = co_node->pos_x + 2;
 							co_link->pos_y = co_node->pos_y + 2 - i;
 						}
-
-						if((co_link != NULL && co_vng_render_link(input, i, TRUE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), -co_node->pos_x + co_link->pos_x, -co_node->pos_y + co_link->pos_y, e_nso_get_link_name(link)))
+						if(mode == COIM_LINK && active == e_ns_get_node_id(node) && link_id == e_nso_get_link_id(link))
+							co_vng_render_link(input, i, TRUE, 0, 0, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), e_nso_get_link_name(link));
+						else if((co_link != NULL && co_vng_render_link(input, i, TRUE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), -co_node->pos_x + co_link->pos_x, -co_node->pos_y + co_link->pos_y, e_nso_get_link_name(link)))
 						||	(co_link == NULL && co_vng_render_link(input, i, FALSE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), 0, 0, e_nso_get_link_name(link))))
 						{
 							mode = COIM_LINK;
@@ -405,7 +407,9 @@ void co_input_handler(BInputState *input, void *user_pointer)
 						}
 						i++;
 					}
-					if(co_vng_render_link(input, i, FALSE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), 0, 0, "New"))
+					if(mode == COIM_LINK && active == e_ns_get_node_id(node) && link_id == -1)
+						co_vng_render_link(input, i, TRUE, 0, 0, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), e_nso_get_link_name(link));
+					else if(co_vng_render_link(input, i, FALSE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), 0, 0, "New"))
 					{
 						mode = COIM_LINK;
 						link_id = -1;
@@ -478,14 +482,21 @@ void co_input_handler(BInputState *input, void *user_pointer)
 					glPopMatrix();
 			}else if(input->mode == BAM_DRAW && mode == COIM_CREATE)
 			{
-				glPushMatrix();
-				glTranslatef(co_get_pos_x(((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8),
-					co_get_pos_y((float)type_count * -0.2), 0);
-				glScalef(view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move));
-				co_node_draw(node, type, FALSE);
-				glScalef(4, 4, 4);
-				sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), 0.5, 0.5, 0.5);
-				glPopMatrix();
+				float x, y, aspect;
+				x = co_get_pos_x(((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8);
+				y = co_get_pos_y((float)type_count * -0.2);
+				aspect = (betray_get_screen_mode(NULL, NULL, NULL) + 0.3) * 4;
+				if(y > -aspect && y < aspect)
+				{
+					glPushMatrix();
+					glTranslatef(co_get_pos_x(((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8),
+						co_get_pos_y((float)type_count * -0.2), 0);
+					glScalef(view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move));
+					co_node_draw(node, type, FALSE);
+					glScalef(4, 4, 4);
+					sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), 0.5, 0.5, 0.5);
+					glPopMatrix();
+				}
 			}
 		}
 	}
@@ -591,10 +602,19 @@ void co_input_handler(BInputState *input, void *user_pointer)
 			{
 				if(V_NT_OBJECT == e_ns_get_node_type(linker))
 				{
-					if((link = e_nso_get_link(linker, link_id)) != NULL)
+					if((link = e_nso_get_link(linker, link_id)) != NULL && found == -1)
+							verse_send_o_link_destroy(active, link_id);
+					if((link = e_nso_get_link(linker, link_id)) != NULL && found != -1 && e_ns_get_node_type(e_ns_get_node(0, found)) == e_ns_get_node_type(e_ns_get_node(0, e_nso_get_link_id(link))))
 						verse_send_o_link_set(active, link_id, found, e_nso_get_link_name(link), e_nso_get_link_target_id(link));
-					else
-						verse_send_o_link_set(active, link_id, found, "my_link", 0);
+					else if(found != -1)
+					{
+						if(e_ns_get_node_type(e_ns_get_node(0, found)) == V_NT_GEOMETRY)
+							verse_send_o_link_set(active, link_id, found, "geometry", 0);
+						else if(e_ns_get_node_type(e_ns_get_node(0, found)) == V_NT_MATERIAL)
+							verse_send_o_link_set(active, link_id, found, "material", 0);
+						else
+							verse_send_o_link_set(active, link_id, found, "my_link", 0);
+					}
 				}
 				if(V_NT_MATERIAL == e_ns_get_node_type(linker))
 				{
@@ -655,7 +675,6 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		glPopMatrix();
 	glEnable(GL_DEPTH_TEST);
 }
-
 void co_init_handle_verse_node(void)
 {
 	e_ns_set_custom_func(1, V_NT_OBJECT, verse_node_create_func);
