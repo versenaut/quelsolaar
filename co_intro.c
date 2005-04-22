@@ -2,11 +2,10 @@
 #include <stdlib.h>
 #include <math.h>
 
-/*
+#include "verse.h"
+
 #include "st_types.h"
 #include "st_text.h"
-#include "verse.h"
-*/
 #include "enough.h"
 #include "seduce.h"
 
