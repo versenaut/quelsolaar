@@ -20,6 +20,7 @@ typedef struct {
 	uint			version;
 	VMatFrag		frag;
 	void			*user[E_CDC_COUNT];
+	boolean			mutex;
 }ESFragmen;
 
 typedef struct{
@@ -47,6 +48,24 @@ VMatFrag *e_nsm_get_fragment(ENode *node, VNMFragmentID id)
 		return NULL;
 	return &((ESMaterialNode *)node)->fragments[id].frag;
 }
+
+boolean e_nsm_enter_fragment(ENode *node, VNMFragmentID id)
+{
+	if(id >= ((ESMaterialNode *)node)->alocated || ((ESMaterialNode *)node)->fragments[id].type > VN_M_FT_OUTPUT)
+		return FALSE;
+	if(((ESMaterialNode *)node)->fragments[id].mutex == TRUE)
+		return FALSE;
+	((ESMaterialNode *)node)->fragments[id].mutex = TRUE;
+	return TRUE;	
+}
+
+void e_nsm_leave_fragment(ENode *node, VNMFragmentID id)
+{
+	if(id >= ((ESMaterialNode *)node)->alocated || ((ESMaterialNode *)node)->fragments[id].type > VN_M_FT_OUTPUT)
+		return;
+	((ESMaterialNode *)node)->fragments[id].mutex = FALSE;	
+}
+
 
 uint e_nsm_get_fragment_version(ENode *node, VNMFragmentID id)
 {
@@ -127,6 +146,7 @@ void callback_send_m_fragment_create(void *user_data, VNodeID node_id, VNMFragme
 	node->fragments[frag_id].type = type;
 	node->fragments[frag_id].version++;
 	node->fragments[frag_id].frag = *fragment;
+	node->fragments[frag_id].mutex = FALSE;
 	if(node->fragments[frag_id].type == VN_M_FT_OUTPUT)
 	{
 		if(strcmp(fragment->output.label, "color") == 0)
