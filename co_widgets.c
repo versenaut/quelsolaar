@@ -420,7 +420,7 @@ boolean co_w_slider(BInputState *input, float pos_x, float pos_y, float length, 
 	}else
 	{
 		static double *drag = NULL;
-		if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == TRUE)
+		if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
 			if(sui_box_click_test(pos_x/* + 0.22*/, pos_y + -0.025, (length/* - 0.04 - 0.22*/), 0.05))
 				drag = nr;
 		if(input->mouse_button[0] != TRUE)
