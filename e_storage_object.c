@@ -35,10 +35,7 @@ typedef struct{
 	double		pos_drag;
 	uint32		pos_time_s;
 	uint32		pos_time_f;
-	double		rot[4];
-	double		rot_speed[4];
-	double		rot_accelerate[4];
-	double		rot_drag_normal[4];
+	VNQuat64	rot, rot_speed, rot_accelerate, rot_drag_normal;
 	double		rot_drag;
 	uint32		rot_time_s;
 	uint32		rot_time_f;
@@ -58,6 +55,22 @@ typedef struct{
 extern void		e_ns_update_node_version_struct(ESObjectNode *node);
 extern void		e_ns_update_node_version_data(ESObjectNode *node);
 
+static void quat64_clear(VNQuat64 *q)
+{
+	q->x = q->y = q->z = 0.0;
+	q->w = 1.0;
+}
+
+static void quat64_from_quat32(VNQuat64 *x, const VNQuat32 *y)
+{
+	if(x == NULL || y == NULL)
+		return;
+	x->x = y->x;
+	x->y = y->y;
+	x->z = y->z;
+	x->w = y->w;
+}
+
 ESObjectNode *e_create_o_node(VNodeID node_id, VNodeOwner owner)
 {
 	ESObjectNode	*node;
@@ -72,9 +85,10 @@ ESObjectNode *e_create_o_node(VNodeID node_id, VNodeOwner owner)
 
 		for(i = 0; i < 3; i++)
 			node->trans.pos[i] = node->trans.pos_speed[i] = node->trans.pos_accelerate[i] = node->trans.pos_drag_normal[i] = 0;
-		for(i = 0; i < 3; i++)
-			node->trans.rot[i] = node->trans.rot_speed[i] = node->trans.rot_accelerate[i] = node->trans.rot_drag_normal[i] = 0;
-		node->trans.rot[i] = node->trans.rot_speed[i] = node->trans.rot_accelerate[i] = node->trans.rot_drag_normal[i] = 1;
+		quat64_clear(&node->trans.rot);
+		quat64_clear(&node->trans.rot_speed);
+		quat64_clear(&node->trans.rot_accelerate);
+		quat64_clear(&node->trans.rot_drag_normal);
 		for(i = 0; i < 3; i++)
 			node->trans.scale[i] = 1;
 		node->trans.pos_drag = 0;
@@ -96,16 +110,25 @@ void callback_send_o_transform_pos_real64(void *user_data, VNodeID node_id, uint
 	t = &node->trans;
 	t->pos[0] = pos[0]; 
 	t->pos[1] = pos[1]; 
-	t->pos[2] = pos[2]; 
-	t->pos_speed[0] = speed[0];
-	t->pos_speed[1] = speed[1];
-	t->pos_speed[2] = speed[2];
-	t->pos_accelerate[0] = accelerate[0]; 
-	t->pos_accelerate[1] = accelerate[1]; 
-	t->pos_accelerate[2] = accelerate[2];
-	t->pos_drag_normal[0] = drag_normal[0]; 
-	t->pos_drag_normal[1] = drag_normal[1]; 
-	t->pos_drag_normal[2] = drag_normal[2]; 
+	t->pos[2] = pos[2];
+	if(speed != NULL)
+	{
+		t->pos_speed[0] = speed[0];
+		t->pos_speed[1] = speed[1];
+		t->pos_speed[2] = speed[2];
+	}
+	if(accelerate != NULL)
+	{
+		t->pos_accelerate[0] = accelerate[0]; 
+		t->pos_accelerate[1] = accelerate[1]; 
+		t->pos_accelerate[2] = accelerate[2];
+	}
+	if(drag_normal != NULL)
+	{
+		t->pos_drag_normal[0] = drag_normal[0]; 
+		t->pos_drag_normal[1] = drag_normal[1]; 
+		t->pos_drag_normal[2] = drag_normal[2];
+	}
 	t->pos_drag = drag;
 	t->pos_time_s = time_s;
 	t->pos_time_f = time_f;
@@ -119,71 +142,63 @@ void callback_send_o_transform_pos_real32(void *user_data, VNodeID node_id, uint
 	t = &node->trans;
 	t->pos[0] = (double)pos[0]; 
 	t->pos[1] = (double)pos[1]; 
-	t->pos[2] = (double)pos[2]; 
-	t->pos_speed[0] = (double)speed[0];
-	t->pos_speed[1] = (double)speed[1];
-	t->pos_speed[2] = (double)speed[2];
-	t->pos_accelerate[0] = (double)accelerate[0]; 
-	t->pos_accelerate[1] = (double)accelerate[1]; 
-	t->pos_accelerate[2] = (double)accelerate[2];
-	t->pos_drag_normal[0] = (double)drag_normal[0]; 
-	t->pos_drag_normal[1] = (double)drag_normal[1]; 
-	t->pos_drag_normal[2] = (double)drag_normal[2]; 
+	t->pos[2] = (double)pos[2];
+	if(speed != NULL)
+	{
+		t->pos_speed[0] = (double)speed[0];
+		t->pos_speed[1] = (double)speed[1];
+		t->pos_speed[2] = (double)speed[2];
+	}
+	if(accelerate != NULL)
+	{
+		t->pos_accelerate[0] = (double)accelerate[0]; 
+		t->pos_accelerate[1] = (double)accelerate[1]; 
+		t->pos_accelerate[2] = (double)accelerate[2];
+	}
+	if(drag_normal != NULL)
+	{
+		t->pos_drag_normal[0] = (double)drag_normal[0]; 
+		t->pos_drag_normal[1] = (double)drag_normal[1];
+		t->pos_drag_normal[2] = (double)drag_normal[2];
+	}
 	t->pos_drag = drag;
 	t->pos_time_s = time_s;
 	t->pos_time_f = time_f;
 }
 
-
-void callback_send_o_transform_rot_real64(void *user_data, VNodeID node_id, uint32 time_s, uint32 time_f, real64 *rot, real64 *speed, real64 *accelerate, real64 *drag_normal, real64 drag)
+void callback_send_o_transform_rot_real64(void *user_data, VNodeID node_id, uint32 time_s, uint32 time_f,
+					  const VNQuat64 *rot, const VNQuat64 *speed, const VNQuat64 *accelerate, const VNQuat64 *drag_normal, real64 drag)
 {
 	ESObjectNode *node;
 	ESObjectTrans *t;
 	node = e_create_o_node(node_id, 0);
 	t = &node->trans;
-	t->rot[0] = rot[0]; 
-	t->rot[1] = rot[1]; 
-	t->rot[2] = rot[2]; 
-	t->rot[3] = rot[3]; 
-	t->rot_speed[0] = speed[0];
-	t->rot_speed[1] = speed[1];
-	t->rot_speed[2] = speed[2];
-	t->rot_speed[3] = speed[3];
-	t->rot_accelerate[0] = accelerate[0]; 
-	t->rot_accelerate[1] = accelerate[1]; 
-	t->rot_accelerate[2] = accelerate[2];
-	t->rot_accelerate[3] = accelerate[3];
-	t->rot_drag_normal[0] = drag_normal[0]; 
-	t->rot_drag_normal[1] = drag_normal[1]; 
-	t->rot_drag_normal[2] = drag_normal[2]; 
-	t->rot_drag_normal[3] = drag_normal[3];
+	t->rot = *rot;
+	if(speed != NULL)
+		t->rot_speed = *speed;
+	if(accelerate != NULL)
+		t->rot_accelerate = *accelerate;
+	if(drag_normal != NULL)
+		t->rot_drag_normal = *drag_normal;
 	t->rot_drag = drag;
 	t->rot_time_s = time_s;
 	t->rot_time_f = time_f;
 }
 
-void callback_send_o_transform_rot_real32(void *user_data, VNodeID node_id, uint32 time_s, uint32 time_f, real32 *rot, real32 *speed, real32 *accelerate, real32 *drag_normal, real32 drag)
+void callback_send_o_transform_rot_real32(void *user_data, VNodeID node_id, uint32 time_s, uint32 time_f,
+					  const VNQuat32 *rot, const VNQuat32 *speed, const VNQuat32 *accelerate, const VNQuat32 *drag_normal, real32 drag)
 {
 	ESObjectNode *node;
 	ESObjectTrans *t;
 	node = e_create_o_node(node_id, 0);
 	t = &node->trans;
-	t->rot[0] = (double)rot[0]; 
-	t->rot[1] = (double)rot[1]; 
-	t->rot[2] = (double)rot[2]; 
-	t->rot[3] = (double)rot[3]; 
-	t->rot_speed[0] = (double)speed[0];
-	t->rot_speed[1] = (double)speed[1];
-	t->rot_speed[2] = (double)speed[2];
-	t->rot_speed[3] = (double)speed[3];
-	t->rot_accelerate[0] = (double)accelerate[0]; 
-	t->rot_accelerate[1] = (double)accelerate[1]; 
-	t->rot_accelerate[2] = (double)accelerate[2];
-	t->rot_accelerate[3] = (double)accelerate[3];
-	t->rot_drag_normal[0] = (double)drag_normal[0]; 
-	t->rot_drag_normal[1] = (double)drag_normal[1]; 
-	t->rot_drag_normal[2] = (double)drag_normal[2]; 
-	t->rot_drag_normal[3] = (double)drag_normal[3]; 
+	t->rot.x = rot->x;
+	t->rot.y = rot->y;
+	t->rot.z = rot->z;
+	t->rot.w = rot->w;
+	quat64_from_quat32(&t->rot_speed, speed);
+	quat64_from_quat32(&t->rot_accelerate, accelerate);
+	quat64_from_quat32(&t->rot_drag_normal, drag_normal);
 	t->rot_drag = drag;
 	t->rot_time_s = time_s;
 	t->rot_time_f = time_f;
@@ -237,23 +252,21 @@ void e_nso_get_pos(ESObjectNode *node, double *pos, double *speed, double *accel
 		time[1] = t->pos_time_f;
 	}
 }
-void e_nso_get_rot(ESObjectNode *node, double *rot, double *speed, double *accelerate, double *drag_normal, double *drag, uint32 *time)
+
+void e_nso_get_rot(ESObjectNode *node, VNQuat64 *rot, VNQuat64 *speed, VNQuat64 *accelerate, VNQuat64 *drag_normal, real64 *drag, uint32 *time)
 {
 	ESObjectTrans *t;
 	uint i;
+
 	t = &((ESObjectNode *)node)->trans;
 	if(rot != NULL)
-		for(i = 0; i < 4; i++)
-			rot[i] = t->rot[i]; 
+		*rot = t->rot;
 	if(speed != NULL)
-		for(i = 0; i < 4; i++)
-			speed[i] = t->rot_speed[i]; 
+		*speed = t->rot_speed;
 	if(accelerate != NULL)
-		for(i = 0; i < 4; i++)
-			accelerate[i] = t->rot_accelerate[i]; 
+		*accelerate = t->rot_accelerate;
 	if(drag_normal != NULL)
-		for(i = 0; i < 4; i++)
-			drag_normal[i] = t->rot_drag_normal[i]; 
+		*drag_normal = t->rot_drag_normal;
 	if(drag != NULL)
 		*drag = t->rot_drag; 
 	if(time != NULL)
@@ -280,16 +293,17 @@ void e_nso_get_pos_time(ESObjectNode *node, double *pos, uint32 time_s, uint32 t
 	pos[2] = t->pos[2] + t->pos_speed[2] * dt + t->pos_accelerate[2] * dt * dt;
 }
 
-void e_nso_get_rot_time(ESObjectNode *node, double *rot, uint32 time_s, uint32 time_f)
+void e_nso_get_rot_time(ESObjectNode *node, VNQuat64 *rot, uint32 time_s, uint32 time_f)
 {
 	ESObjectTrans *t;
 	double dt;
+
 	t = &((ESObjectNode *)node)->trans;
 	dt = e_get_delta_time(time_s, time_f);
-	rot[0] = t->rot[0] + t->rot_speed[0] * dt + t->rot_accelerate[0] * dt * dt;
-	rot[1] = t->rot[1] + t->rot_speed[1] * dt + t->rot_accelerate[1] * dt * dt;
-	rot[2] = t->rot[2] + t->rot_speed[2] * dt + t->rot_accelerate[2] * dt * dt;
-	rot[3] = t->rot[3] + t->rot_speed[3] * dt + t->rot_accelerate[3] * dt * dt;
+	rot->x = t->rot.x + t->rot_speed.x * dt + t->rot_accelerate.x * dt * dt;
+	rot->y = t->rot.y + t->rot_speed.y * dt + t->rot_accelerate.y * dt * dt;
+	rot->z = t->rot.z + t->rot_speed.y * dt + t->rot_accelerate.y * dt * dt;
+	rot->w = t->rot.w + t->rot_speed.w * dt + t->rot_accelerate.w * dt * dt;
 }
 
 void e_nso_get_scale(ESObjectNode *node, double *scale)
@@ -302,27 +316,28 @@ void e_nso_get_scale(ESObjectNode *node, double *scale)
 
 void e_nso_get_rot_matrix(ESObjectNode *node, double *matrix, uint32 time_s, uint32 time_f)
 {
-	double r[4];
-	e_nso_get_rot_time(node, r, time_s, time_f);
-	matrix[0] = r[3] * r[3] + r[0] * r[0] - r[1] * r[1] - r[2] * r[2];
-	matrix[4] = 2 * r[0] * r[1] - 2 * r[3] * r[2];
-	matrix[8] = 2 * r[0] * r[2] + 2 * r[3] * r[1];
+	VNQuat64	rot;
+
+	e_nso_get_rot_time(node, &rot, time_s, time_f);
+	matrix[0] = rot.w * rot.w + rot.x * rot.x - rot.y * rot.y - rot.z * rot.z;
+	matrix[4] = 2 * rot.x * rot.y - 2 * rot.w * rot.z;
+	matrix[8] = 2 * rot.x * rot.z + 2 * rot.w * rot.y;
 	matrix[12] = 0; 
 
-	matrix[1] = 2 * r[0] * r[1] + 2 * r[3] * r[2];
-	matrix[5] = r[3] * r[3] - r[0] * r[0] + r[1] * r[1] - r[2] * r[2]; 
-	matrix[9] = 2 * r[1] * r[2] - 2 * r[3] * r[0];
+	matrix[1] = 2 * rot.x * rot.y + 2 * rot.w * rot.z;
+	matrix[5] = rot.w * rot.w - rot.x * rot.x + rot.y * rot.y - rot.z * rot.z; 
+	matrix[9] = 2 * rot.y * rot.z - 2 * rot.w * rot.x;
 	matrix[13] = 0;
 
-	matrix[2] = 2 * r[0] * r[2] - 2 * r[3] * r[1];
-	matrix[6] = 2 * r[1] * r[2] + 2 * r[3] * r[0]; 
-	matrix[10] = r[3] * r[3] - r[0] * r[0] - r[1] * r[1] + r[2] * r[2];
+	matrix[2] = 2 * rot.x * rot.z - 2 * rot.w * rot.y;
+	matrix[6] = 2 * rot.y * rot.z + 2 * rot.w * rot.x; 
+	matrix[10] = rot.w * rot.w - rot.x * rot.x - rot.y * rot.y + rot.z * rot.z;
 	matrix[14] = 0; 
 
-	matrix[3] = 0;
-	matrix[7] = 0; 
-	matrix[11] = 0;
-	matrix[15] = 1; 
+	matrix[3]  = 0.0;
+	matrix[7]  = 0.0; 
+	matrix[11] = 0.0;
+	matrix[15] = 1.0; 
 }
 
 void e_nso_get_matrix(ESObjectNode *node, double *matrix, uint32 time_s, uint32 time_f)
@@ -472,7 +487,7 @@ void callback_send_o_method_destroy(void *user_data, VNodeID node_id, uint16 gro
 	}
 }
 
-void callback_send_o_method_create(void *user_data, VNodeID node_id, uint16 group_id, uint16 method_id, const char *name, uint8 param_count, VNOParamType *param_types, const char * *param_names)
+void callback_send_o_method_create(void *user_data, VNodeID node_id, uint16 group_id, uint16 method_id, const char *name, uint8 param_count, VNOParamType *param_types, char * *param_names)
 {
 	ESObjectNode	*node;
 	uint i, j;
