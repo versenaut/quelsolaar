@@ -30,7 +30,7 @@ struct{
 	float	*qubes;
 	float	*rays;
 	float	*color_vertex;
-	uint	*color_ref;
+	float	*color_ref;
 	float	*color_color;
 	float	*name;
 	float	*dust;
@@ -44,7 +44,7 @@ struct{
 	double	time;
 }COVNGraphicsData;
 
-void co_vng_init(void)
+void co_vng_init()
 {
 	uint i, temp;
 	double x, y, z, size;
@@ -70,7 +70,7 @@ void co_vng_init(void)
 		sui_draw_set_vec3(COVNGraphicsData.color_color, i, 1, 1, 1);
 		sui_draw_set_ivec3(COVNGraphicsData.color_ref, i, i, (i + 1) % COLOR_RING_SPLITS, COLOR_RING_SPLITS);
 	}
-/*	sui_draw_set_vec2(COVNGraphicsData.color_vertex, i, 0, 0);*/
+	sui_draw_set_vec2(COVNGraphicsData.color_vertex, i, 0, 0);
 
 	/* Saturn rings */
 
@@ -117,8 +117,8 @@ void co_vng_init(void)
 		temp = (temp<<13) ^ temp;
 		y = (((temp * (temp * temp * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0) - 1;
 
-		COVNGraphicsData.particles_array[i * 4] = sin(((double)i / SUN_PARTICLES) * 2 * 3.14) * /*1.0*/2;
-		COVNGraphicsData.particles_array[i * 4 + 1] = cos(((double)i / SUN_PARTICLES) * 2 * 3.14) * /*1.0*/2;
+		COVNGraphicsData.particles_array[i * 4] = sin(((double)i / SUN_PARTICLES) * 2 * 3.14) * 1.02;
+		COVNGraphicsData.particles_array[i * 4 + 1] = cos(((double)i / SUN_PARTICLES) * 2 * 3.14) * 1.02;
 		COVNGraphicsData.particles_array[i * 4 + 2] = 0;
 		COVNGraphicsData.particles_array[i * 4 + 3] = 0;
 	}
@@ -239,10 +239,11 @@ void co_vng_update_time()
 {
 	uint i, temp;
 	float outbreak, length, x, y;
+
 	COVNGraphicsData.time = betray_get_time();
 	temp = COVNGraphicsData.time;
 	temp = (temp<<13) ^ temp;
-	outbreak = (float)((temp * (temp * temp * (uint)15731 + (uint)789221) + (uint)1376312589) & 0x7fffffff) / 1073741824.0;
+	outbreak = (((temp * (temp * temp * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0);
 	x = COVNGraphicsData.particles_array[(uint)(outbreak * SUN_PARTICLES / 2) * 2];
 	y = COVNGraphicsData.particles_array[(uint)(outbreak * SUN_PARTICLES / 2) * 2 + 1];
 	for(i = 0; i < SUN_PARTICLES; i++)
@@ -256,7 +257,7 @@ void co_vng_update_time()
 	{
 		temp = i * 4;
 		temp = (temp<<13) ^ temp;
-		x = (float)((temp * (temp * temp * (uint)15731 + (uint)789221) + (uint)1376312589) & 0x7fffffff)  - 1;
+		x = (((temp * (temp * temp * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0) - 1;
 		COVNGraphicsData.particles_array[(SUN_PARTICLES + i) * 2 + 0] *= 0.98;
 		COVNGraphicsData.particles_array[(SUN_PARTICLES + i) * 2 + 1] *= 0.98;
 		COVNGraphicsData.particles_array[(SUN_PARTICLES + i) * 2 + 0] -= COVNGraphicsData.particles_array[i * 2] * 0.02;
@@ -293,7 +294,7 @@ void co_vng_color(float red, float green, float blue)
 	glBlendFunc(GL_DST_COLOR, GL_ZERO);
 	sui_draw_set_vec3(COVNGraphicsData.color_color, COLOR_RING_SPLITS, red, green, blue);
 	sui_set_color_array_gl(COVNGraphicsData.color_color, COLOR_RING_SPLITS, 3);
-	sui_draw_elements_gl(GL_TRIANGLES, COVNGraphicsData.color_vertex, COVNGraphicsData.color_ref, COLOR_RING_SPLITS * 3, 2, red, green, blue);
+	sui_draw_ellements_gl(GL_TRIANGLES, COVNGraphicsData.color_vertex, COVNGraphicsData.color_ref, COLOR_RING_SPLITS * 3, 2, red, green, blue);
 }
 
 void co_vng_sunrays()
@@ -477,7 +478,7 @@ void co_vng_saturn_ring()
 	glPopMatrix();
 }
 
-uint co_vng_render_name(BInputState *input, const char *name, float pos_x, float pos_y, float pointer_x, float pointer_y)
+uint co_vng_render_name(BInputState *input, char *name, float pos_x, float pos_y, float pointer_x, float pointer_y)
 {
 	float color = 0;
 	if(input->mode == BAM_DRAW)
@@ -548,8 +549,8 @@ boolean co_vng_render_link(BInputState *input, uint id, boolean connected, float
 			d_x = link_x - x * 0.5;
 			d_y = link_y - y * 0.5;
 			r = sqrt(d_x * d_x + d_y * d_y);
-
-			sui_draw_2d_line_gl((d_x / r) * 0.1 + x * 0.5, (d_y / r) * 0.1 + y * 0.5, link_x - ((d_x / r) * 0.45), link_y - ((d_y / r) * 0.45), 0, 0, 0);
+			if(r > 0.55)
+				sui_draw_2d_line_gl((d_x / r) * 0.1 + x * 0.5, (d_y / r) * 0.1 + y * 0.5, link_x - ((d_x / r) * 0.45), link_y - ((d_y / r) * 0.45), 0, 0, 0);
 		}
 		else
 		{
@@ -612,8 +613,9 @@ void co_vng_divider(BInputState *input, float pos_x, float pos_y, float *rotate,
 
 /*
 sui_set_color_array_gl(float *array, uint length, uint channels);
-sui_draw_gl(uint draw_type, float *array, uint length, uint dimensions, float red, float green, float blue);
+sui_draw_gl(uint draw_type, float *array, uint length, uint dimentions, float red, float green, float blue);
 
 void sui_set_normal_array_gl(float *array, uint length);
-void sui_set_texture2D_array_gl(float *array, uint length, uint dimensions, uint texture);
+void sui_set_texture2D_array_gl(float *array, uint length, uint dimentions, uint texture);
 */
+
