@@ -260,7 +260,7 @@ uint e_nsg_get_vertex_length(ESGeometryNode *node)
 	return node->vertex_length;
 }
 
-uint e_nsg_get_polygon_length(ESGeometryNode *node)
+uint e_nsg_get_polygon_legnth(ESGeometryNode *node)
 {
 	return node->polygon_length;
 }
@@ -389,7 +389,7 @@ void callback_send_g_polygon_set_face_real(void *user_data, VNodeID node_id, VLa
 extern void *p_sub_get_anim_data(void *mesh);
 extern void p_geo_update_anim(void *data, uint layer_id, uint vertex_id, float x, float y, float z);
 
-void callback_send_g_vertex_set_xyz_real(void *user_data, VNodeID node_id, VLayerID layer_id, uint32 vertex_id, egreal x, egreal y, egreal z)
+void callback_send_g_vertex_set_real_xyz(void *user_data, VNodeID node_id, VLayerID layer_id, uint32 vertex_id, egreal x, egreal y, egreal z)
 {
 	ESGeometryNode	*node;
 	egreal			*write, input[3];
@@ -499,7 +499,7 @@ ESGeometryNode	*e_create_g_node(VNodeID node_id, VNodeOwner owner)
 	return node;
 }
 
-void callback_send_g_layer_create(void *user_data, VNodeID node_id, VLayerID layer_id, const char *name, VNGLayerType type, uint32 def_integer, real64 def_real)
+void callback_send_g_layer_create(void *user_data, VNodeID node_id, VLayerID layer_id, char *name, VNGLayerType type, uint32 def_integer, real64 def_real)
 {
 	ESGeometryNode	*node;
 	EGeoLayer		*layer;
@@ -540,6 +540,7 @@ void callback_send_g_layer_create(void *user_data, VNodeID node_id, VLayerID lay
 				e_nsg_get_layer_data(node, layer);
 		}
 	}
+	e_nsg_get_layer_data(node, layer);
 	for(i = 0; name[i] != 0 && i < 15; i++)
 		layer->name[i] = name[i];
 	layer->name[i] = 0;
@@ -609,7 +610,7 @@ void delete_geometry(ESGeometryNode	*g_node)
 	free(g_node);
 }
 
-void callback_send_g_crease_set_vertex(void *user_data, VNodeID node_id, const char *layer, uint32 def_crease)
+void callback_send_g_crease_set_vertex(void *user_data, VNodeID node_id, char *layer, uint32 def_crease)
 {
 	ESGeometryNode	*node;
 	EGeoLayer	*crease_layer;
@@ -625,7 +626,7 @@ void callback_send_g_crease_set_vertex(void *user_data, VNodeID node_id, const c
 	e_ns_update_node_version_struct(node);
 }
 
-void callback_send_g_crease_set_edge(void *user_data, VNodeID node_id, const char *layer, uint32 def_crease)
+void callback_send_g_crease_set_edge(void *user_data, VNodeID node_id, char *layer, uint32 def_crease)
 {
 	ESGeometryNode	*node;
 	EGeoLayer	*crease_layer;
@@ -772,7 +773,7 @@ void callback_send_g_bone_destroy(void *user, VNodeID node_id, uint16 bone_id)
 }
 
 
-uint16 e_nsg_get_bone_by_weight(ESGeometryNode *g_node, const char *name)
+uint16 e_nsg_get_bone_by_weight(ESGeometryNode *g_node, char *name)
 {
 	uint i, j;
 	for(i = 0; i < g_node->bones_allocated; i++)
@@ -784,7 +785,7 @@ uint16 e_nsg_get_bone_by_weight(ESGeometryNode *g_node, const char *name)
 	return -1;
 }
 
-uint16 e_nsg_get_bone_next(ESGeometryNode *g_node, uint16 bone_id)
+uint16 e_nsg_get_bone_next(ESGeometryNode	*g_node, uint16 bone_id)
 {
 	for(; bone_id < g_node->bones_allocated; bone_id++)
 		if(g_node->bones[bone_id].weight[0] != 0)
@@ -955,14 +956,14 @@ void es_geometry_init(void)
 	verse_callback_set(verse_send_g_layer_destroy,					callback_send_g_layer_destroy,					NULL);
 
 #ifdef E_GEOMETRY_REAL_PRESISSION_64_BIT
-	verse_callback_set(verse_send_g_vertex_set_xyz_real64,			callback_send_g_vertex_set_xyz_real,			NULL);
+	verse_callback_set(verse_send_g_vertex_set_xyz_real64,			callback_send_g_vertex_set_real_xyz,			NULL);
 	verse_callback_set(verse_send_g_vertex_set_real64,				callback_send_g_vertex_set_real,				NULL);
 	verse_callback_set(verse_send_g_polygon_set_corner_real64,		callback_send_g_polygon_set_corner_real,		NULL);
 	verse_callback_set(verse_send_g_polygon_set_face_real64,		callback_send_g_polygon_set_face_real,			NULL);
 #endif
 
 #ifdef E_GEOMETRY_REAL_PRESISSION_32_BIT
-	verse_callback_set(verse_send_g_vertex_set_real32_xyz,			callback_send_g_vertex_set_real_xyz,			NULL);
+	verse_callback_set(verse_send_g_vertex_set_xyz_real32,			callback_send_g_vertex_set_real_xyz,			NULL);
 	verse_callback_set(verse_send_g_vertex_set_real32,				callback_send_g_vertex_set_real,				NULL);
 	verse_callback_set(verse_send_g_polygon_set_corner_real32,		callback_send_g_polygon_set_corner_real,		NULL);
 	verse_callback_set(verse_send_g_polygon_set_face_real32,		callback_send_g_polygon_set_face_real,			NULL);
