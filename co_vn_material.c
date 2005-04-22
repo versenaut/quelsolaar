@@ -249,9 +249,9 @@ void co_m_place_frag(ENode *node, uint16 id, float pos_x, float vec, uint gen)
 				co_m_place_frag(node, frag->noise.mapping, pos_x, vec, gen + 1);
 				break;
 			case VN_M_FT_BLENDER :
+				co_m_place_frag(node, frag->blender.data_a, pos_x, vec - 0.1, gen + 1);
+				co_m_place_frag(node, frag->blender.data_b, pos_x, vec, gen + 1);
 				co_m_place_frag(node, frag->blender.control, pos_x, vec + 0.1, gen + 1);
-				co_m_place_frag(node, frag->blender.data_a, pos_x, vec, gen + 1);
-				co_m_place_frag(node, frag->blender.data_b, pos_x, vec - 0.1, gen + 1);
 				break;
 			case VN_M_FT_MATRIX :
 				co_m_place_frag(node, frag->matrix.data, pos_x, vec, gen + 1);
@@ -260,8 +260,8 @@ void co_m_place_frag(ENode *node, uint16 id, float pos_x, float vec, uint gen)
 				co_m_place_frag(node, frag->ramp.mapping, pos_x, vec, gen + 1);
 				break;
 			case VN_M_FT_ALTERNATIVE :
-				co_m_place_frag(node, frag->alternative.alt_a, pos_x, vec + 0.1, gen + 1);
-				co_m_place_frag(node, frag->alternative.alt_b, pos_x, vec - 0.1, gen + 1);
+				co_m_place_frag(node, frag->alternative.alt_a, pos_x, vec - 0.1, gen + 1);
+				co_m_place_frag(node, frag->alternative.alt_b, pos_x, vec + 0.1, gen + 1);
 				break;
 			case VN_M_FT_OUTPUT :
 				co_m_place_frag(node, frag->output.front, pos_x, vec, gen + 1);
@@ -324,16 +324,70 @@ void draw_frag_link(float x, float y, float rot, float color)
 }
 
 
-
-
-boolean handle_link(BInputState *input, ENode *node, uint16 *link, char *text, uint frag_id, float angle, float scroll, float length, float color)
+void set_out_link(ENode *node, uint16 id, uint16 link)
 {
-	static void *move = NULL;
+	VMatFrag *frag, f;
+	if((frag = e_nsm_get_fragment(node, id)) == NULL)
+		return;
+	f = *frag;
+	switch(e_nsm_get_fragment_type(node, id))
+	{
+		case VN_M_FT_VOLUME :
+			f.volume.color = link;
+			verse_send_m_fragment_create(e_ns_get_node_id(node), id, VN_M_FT_VOLUME, &f);
+		break;
+		case VN_M_FT_TEXTURE :
+			f.texture.mapping = link;
+			verse_send_m_fragment_create(e_ns_get_node_id(node), id, VN_M_FT_TEXTURE, &f);
+		break;
+		case VN_M_FT_NOISE :
+			f.noise.mapping = link;
+			verse_send_m_fragment_create(e_ns_get_node_id(node), id, VN_M_FT_NOISE, &f);
+		break;
+		case VN_M_FT_BLENDER :
+			if((frag = e_nsm_get_fragment(node, f.blender.data_a)) == NULL)
+				f.blender.data_a = link;
+			else if((frag = e_nsm_get_fragment(node, f.blender.data_b)) == NULL)
+				f.blender.data_b = link;
+			else if((frag = e_nsm_get_fragment(node, f.blender.control)) == NULL && f.blender.type == VN_M_BLEND_FADE)
+				f.blender.control = link;
+			else
+				f.blender.data_a = link;
+			verse_send_m_fragment_create(e_ns_get_node_id(node), id, VN_M_FT_BLENDER, &f);
+		break;
+		case VN_M_FT_MATRIX :
+			f.matrix.data = link;
+			verse_send_m_fragment_create(e_ns_get_node_id(node), id, VN_M_FT_MATRIX, &f);
+		break;
+		case VN_M_FT_RAMP :
+			f.ramp.mapping = link;
+			verse_send_m_fragment_create(e_ns_get_node_id(node), id, VN_M_FT_RAMP, &f);
+		break;
+		case VN_M_FT_ALTERNATIVE :
+			if((frag = e_nsm_get_fragment(node, f.alternative.alt_a)) == NULL)
+				f.alternative.alt_a = link;
+			if((frag = e_nsm_get_fragment(node, f.alternative.alt_b)) == NULL)
+				f.alternative.alt_b = link;
+			else
+				f.alternative.alt_a = link;
+			verse_send_m_fragment_create(e_ns_get_node_id(node), id, VN_M_FT_ALTERNATIVE, &f);
+		break;
+		case VN_M_FT_OUTPUT :
+			f.output.front = link;
+			verse_send_m_fragment_create(e_ns_get_node_id(node), id, VN_M_FT_OUTPUT, &f);
+	}
+
+}
+
+boolean handle_link(BInputState *input, ENode *node, uint16 *link, char *text, uint frag_id, float angle, float scroll, float length, float color, uint16 move)
+{
+	static void *drag = NULL;
 	COVNMaterial *pos, *target;
 	VMatFrag *frag;
 	uint i, *active;
 	VNMFragmentID id;
 	float f, pos_x, pos_y;
+	float a, b;
 
 	pos_x = sin(-angle * PI / 180); 
 	pos_y = cos(-angle * PI / 180); 
@@ -343,32 +397,93 @@ boolean handle_link(BInputState *input, ENode *node, uint16 *link, char *text, u
 	if(input->mode == BAM_DRAW)
 	{
 		draw_frag_link(pos->pos[0], pos->pos[1] - length + scroll, angle, color);
-		if(move == link)
+		if(drag == link)
 			draw_spline(pos->pos[0] - pos_x * 0.17, pos->pos[1] - length + scroll - pos_y * 0.17,
 						pos->pos[0] - pos_x * 0.5, pos->pos[1] - length + scroll - pos_y * 0.5,
 						pos->pos[0] + (input->pointer_x - pos->pos[0]) / pos->size, pos->pos[1] + scroll + (input->pointer_y - scroll - pos->pos[1]) / pos->size + 0.05 / pos->size,
 						pos->pos[0] + (input->pointer_x - pos->pos[0]) / pos->size, pos->pos[1] + scroll + (input->pointer_y - scroll - pos->pos[1]) / pos->size, color);
 		else if(frag != NULL && target != NULL)
+		{
 			draw_spline(pos->pos[0] - pos_x * 0.17, pos->pos[1] - length + scroll - pos_y * 0.17,
 						pos->pos[0] - pos_x * 0.5, pos->pos[1] - length + scroll - pos_y * 0.5,
 						pos->pos[0] + (target->pos[0] - pos->pos[0]) / pos->size, pos->pos[1] + scroll + (target->pos[1] - pos->pos[1]) / pos->size + 0.05 / pos->size,
 						pos->pos[0] + (target->pos[0] - pos->pos[0]) / pos->size, pos->pos[1] + scroll + (target->pos[1] - pos->pos[1]) / pos->size, color);
+		
+			a = compute_spline(0.5, pos->pos[0] - pos_x * 0.17, pos->pos[0] - pos_x * 0.5, pos->pos[0] + (target->pos[0] - pos->pos[0]) / pos->size, pos->pos[0] + (target->pos[0] - pos->pos[0]) / pos->size);
+			b = compute_spline(0.5, pos->pos[1] - length + scroll - pos_y * 0.17, pos->pos[1] - length + scroll - pos_y * 0.5, pos->pos[1] + scroll + (target->pos[1] - pos->pos[1]) / pos->size + 0.05 / pos->size, pos->pos[1] + scroll + (target->pos[1] - pos->pos[1]) / pos->size);
+			glPushMatrix();
+			glTranslatef(a, b, 0);
+			a = compute_spline(0.5, 
+				pos->pos[0] - (pos_x * 0.17) * pos->size, 
+				pos->pos[0] - (pos_x * 0.5) * pos->size, 
+				target->pos[0], 
+				target->pos[0]);
+			b = compute_spline(0.5, 
+				pos->pos[1] + scroll - (length + pos_y * 0.17) * pos->size, 
+				pos->pos[1] + scroll - (length + pos_y * 0.5) * pos->size, 
+				scroll + target->pos[1] + 0.05, 
+				scroll + target->pos[1]);
+
+			if(0.02 * 0.02 > (input->pointer_x - a) * (input->pointer_x - a) + (input->pointer_y - b) * (input->pointer_y - b))
+				glScalef(0.05 / pos->size, 0.05 / pos->size, 0.05 / pos->size);
+			else
+				glScalef(0.02 / pos->size, 0.02 / pos->size, 0.02 / pos->size);
+			co_vng_ring();
+			glPopMatrix();
+		}
 	}else
 	{
-		if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
-			if((input->pointer_x - (pos->pos[0] - pos_x * 0.15)) * (input->pointer_x - (pos->pos[0] - pos_x * 0.15)) + (input->pointer_y - (pos->pos[1] - length + scroll - pos_y * 0.15)) * (input->pointer_y - (pos->pos[1] - length + scroll - pos_y * 0.15)) < 0.02 * 0.02)
-				move = link;
-		if(input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE && move == link)
+		if(pos->expand)
 		{
-			*link = (VNMFragmentID)-1;
-			for(id = e_nsm_get_fragment_next(node, 0); id != (VNMFragmentID)-1; id = e_nsm_get_fragment_next(node, id + 1))
-				if((target = e_nsm_get_custom_data(node, id, CO_ENOUGH_NODE_SLOT)) != NULL)
-					if(sui_box_click_test(target->pos[0] - 0.15 * target->size, target->pos[1] - 0.05 + scroll, 0.3 * target->size, 0.4 * target->size))
-						*link = id;
-			move = NULL;
-			return TRUE;
+			if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
+				if((input->pointer_x - (pos->pos[0] - pos_x * 0.15)) * 
+					(input->pointer_x - (pos->pos[0] - pos_x * 0.15)) + 
+					(input->pointer_y - (pos->pos[1] - length + scroll - pos_y * 0.15)) * 
+					(input->pointer_y - (pos->pos[1] - length + scroll - pos_y * 0.15)) < 0.02 * 0.02)
+					drag = link;
+			if(input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE && drag == link)
+			{
+				*link = (VNMFragmentID)-1;
+				for(id = e_nsm_get_fragment_next(node, 0); id != (VNMFragmentID)-1; id = e_nsm_get_fragment_next(node, id + 1))
+					if((target = e_nsm_get_custom_data(node, id, CO_ENOUGH_NODE_SLOT)) != NULL)
+						if(sui_box_click_test(target->pos[0] - 0.15 * target->size, target->pos[1] - 0.05 + scroll, 0.3 * target->size, 0.4 * target->size))
+							*link = id;
+				return TRUE;
+			}
+		}
+		if(drag != link && input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE && move != -1)
+		{
+			if((input->pointer_x - (pos->pos[0] - pos_x * 0.15)) * 
+				(input->pointer_x - (pos->pos[0] - pos_x * 0.15)) + 
+				(input->pointer_y - (pos->pos[1] - length + scroll - pos_y * 0.15)) * 
+				(input->pointer_y - (pos->pos[1] - length + scroll - pos_y * 0.15)) < 0.02 * 0.02)
+			{
+				*link = move;
+				return TRUE;
+			}
+			if(frag != NULL && target != NULL)
+			{
+				a = compute_spline(0.5, 
+					pos->pos[0] - (pos_x * 0.17) * pos->size, 
+					pos->pos[0] - (pos_x * 0.5) * pos->size, 
+					target->pos[0], 
+					target->pos[0]);
+				b = compute_spline(0.5, 
+					pos->pos[1] + scroll - (length + pos_y * 0.17) * pos->size, 
+					pos->pos[1] + scroll - (length + pos_y * 0.5) * pos->size, 
+					scroll + target->pos[1] + 0.05, 
+					scroll + target->pos[1]);
+				if(0.02 * 0.02 > (input->pointer_x - a) * (input->pointer_x - a) + (input->pointer_y - b) * (input->pointer_y - b))
+				{
+					set_out_link(node, move, *link);
+					*link = move;
+					return TRUE;
+				}
+			}
 		}
 	}
+	if(input->mouse_button[0] == FALSE && input->last_mouse_button[0] == FALSE)
+		drag = NULL;
 	return FALSE;
 }
 
@@ -474,7 +589,7 @@ void co_draw_material_texture(COVNMaterial *mat, float x, float y)
 	glTranslatef(x, y, 0);
 	sui_set_texture2D_array_gl(uv, 65, 2, mat->texture_id);
 //	sui_draw_gl(GL_TRIANGLES, vertex, 65, 2, 0, 0, 0);
-	sui_draw_elements_gl(GL_TRIANGLES, vertex, ref, 64 * 3, 2, 1, 1, 1);
+	sui_draw_ellements_gl(GL_TRIANGLES, vertex, ref, 64 * 3, 2, 1, 1, 1);
 	glPopMatrix();
 }
 
@@ -484,7 +599,7 @@ void co_draw_material(ENode *node)
 	COVNMaterial *mat;
 	VNMFragmentID id;
 	id = e_nsm_get_fragment_color_front(node);
-	if(id == (VNMFragmentID) ~0)
+	if(id == -1)
 		id = e_nsm_get_fragment_color_back(node);
 	if(e_nsm_get_fragment(node, id) != NULL)
 	{
@@ -496,18 +611,73 @@ void co_draw_material(ENode *node)
 	}
 }
 	
-boolean co_material_click_test(BInputState *input, COVNMaterial *mat, float pos_x, float pos_y, float length)
+boolean co_material_click_test(BInputState *input, COVNMaterial *mat, VNMFragmentID id, float pos_x, float pos_y, float length, VNMFragmentID *move)
 {
-	if(input->mode == BAM_EVENT && input->last_mouse_button[0] == TRUE && input->mouse_button[0] == FALSE && 0.15 * 0.15 * mat->size * mat->size > (pos_x - input->click_pointer_x) * (pos_x - input->click_pointer_x) + (pos_y - input->click_pointer_y - length * mat->size) * (pos_y - input->click_pointer_y - length * mat->size))
-		mat->expand = !mat->expand;
+	static float delta_x, delta_y;
+
+	if(input->mode != BAM_EVENT)
+		return mat->expand;
+	
 	if(mat->expand)
+	{
 		mat->size = 0.1 + mat->size * 0.9;
+		if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
+		{
+			if(sui_box_click_test(pos_x - 0.15, pos_y - 0.025, 0.3, 0.045))
+			{
+				*move = id;
+				delta_x = mat->pos[0] - input->pointer_x;
+				delta_y = mat->pos[1] - input->pointer_y;
+			}
+			if(0.15 * 0.15 > (pos_x - input->click_pointer_x) * (pos_x - input->click_pointer_x) + (pos_y - input->click_pointer_y - length) * (pos_y - input->click_pointer_y - length))
+			{
+				*move = id;
+				delta_x = mat->pos[0] - input->pointer_x;
+				delta_y = mat->pos[1] - input->pointer_y;
+			}
+		}
+		if(*move == id && input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE)
+			if(0.15 * 0.15 > (pos_x - input->click_pointer_x) * (pos_x - input->click_pointer_x) + (pos_y - input->click_pointer_y - length) * (pos_y - input->click_pointer_y - length))
+				if(0.005 * 0.005 > (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
+					mat->expand = FALSE;
+	}
 	else
+	{
+		if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
+		{
+			if(sui_box_click_test(pos_x - 0.15 * mat->size, pos_y - 0.335 * mat->size, 0.3 * mat->size, 0.355 * mat->size))
+			{
+				*move = id;
+				delta_x = mat->pos[0] - input->pointer_x;
+				delta_y = mat->pos[1] - input->pointer_y;
+			}
+		}
+		if(*move == id && input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE)
+			if(0.005 * 0.005 > (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
+				mat->expand = TRUE;
 		mat->size = 0.002 + mat->size * 0.98;
+	}
+	
+	if(*move == id)
+	{
+		mat->pos[0] = input->pointer_x + delta_x;
+		mat->pos[1] = input->pointer_y + delta_y;
+	}
+	if(input->last_mouse_button[0] == FALSE && input->mouse_button[0] == FALSE)
+		*move = -1;
+
 	return mat->expand;
 }
 	
-
+void co_draw_lable(COVNMaterial *mat, float y, float color, char *lable)
+{
+	glPushMatrix();
+	glTranslatef(mat->pos[0], mat->pos[1] + y, 0);
+	glScalef(1 / mat->size, 1 / mat->size, 1);
+	sui_draw_2d_line_gl(mat->size * 0.2, -0.015, mat->size * 0.2 + 0.04, 0, color, color, color);
+	sui_draw_text(mat->size * 0.2 + 0.04, 0, SUI_T_SIZE, SUI_T_SPACE, lable, color, color, color);  		
+	glPopMatrix();
+}
 
 extern float co_handle_node_head(BInputState *input, ENode *node);
 
@@ -515,7 +685,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 {
 	static char *material_type_names[] = {"COLOR", "LIGHT", "REFLECTION", "TRANSPARENCY", "VOLUME", "GEOMETRY", "TEXTURE",  "NOISE", "BLENDER", "MATRIX", "RAMP", "ANIMATION", "ALTERNATIVE", "OUTPUT"};
 	static boolean show_tree = TRUE;
-	static COVNMaterial *move = NULL;
+	static VNMFragmentID move = -1;
 	static float rot_tree = 1;
 	COVNMaterial *mat_pos;
 	float expand, place[3] = {0, 0, 0};
@@ -528,7 +698,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 	y = co_handle_node_head(input, node);
 	change_m_node_id = e_ns_get_node_id(node);
 
-	co_vng_divider(input, 0.2, y, &rot_tree, &color, &color_light, &show_tree, "Fragments");
+	co_vng_divider(input, 0.2, y, &rot_tree, &color, &color_light, &show_tree, "LIGHT");
 	pre_expander = y;
 
 	if(rot_tree > 0.001)
@@ -559,11 +729,11 @@ boolean co_handle_material(BInputState *input, ENode *node)
 					{
 						char *text[3] = {"Red", "Green", "Blue"};
 						expand = 0.2 + 0.15 * mat_pos->size;
-						place[0] = mat_pos->pos[0] + 0.015;
-						place[1] = mat_pos->pos[1] + 0.015 + y;
-						co_vng_fragment(place[0], place[1] - 0.015, expand, color);
-						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - expand);
-						if(co_material_click_test(input, mat_pos, place[0], place[1] - 0.015, expand))
+						place[0] = mat_pos->pos[0];
+						place[1] = mat_pos->pos[1] + y;
+						co_vng_fragment(place[0], place[1], expand, color);
+						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - expand);
+						if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 						{
 							co_draw_param_text(place[0], place[1], 3, text, color_light);
 
@@ -590,7 +760,8 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_COLOR, frag);
 								frag->color.blue = f.color.blue;
 							}
-						}
+						}else if(input->mode == BAM_DRAW)
+							co_draw_lable(mat_pos, y, color_light, "Color");
 					}
 					break;
 					case VN_M_FT_LIGHT :
@@ -598,13 +769,14 @@ boolean co_handle_material(BInputState *input, ENode *node)
 						static uint active = FALSE;
 						char *text[6] = {"Type", "Normal Falloff", "BRDF", "Red", "Green", "Blue"};
 						char *light_types[] = {"DIRECT", "AMBIENT", "D_AND_A", "BACK_DIRECT", "BACK_AMBIENT", "BACK_D_AND_A"};
+						char *light_labels[] = {"Direct Light", "Ambient Light", "Direct and Ambient Light", "Back Direct light", "Back Ambient Light", "Back Direct and Ambient Light"};
 						ENode *b_node;
 						expand = 0.2 + 0.3 * mat_pos->size;
-						place[0] = mat_pos->pos[0] + 0.015;
-						place[1] = mat_pos->pos[1] + 0.015 + y;
-						co_vng_fragment(place[0], place[1] - 0.015, expand, color);
-						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - expand);
-						if(co_material_click_test(input, mat_pos, place[0], place[1] - 0.015, expand))
+						place[0] = mat_pos->pos[0];
+						place[1] = mat_pos->pos[1] + y;
+						co_vng_fragment(place[0], place[1], expand, color);
+						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - expand);
+						if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 						{
 							co_draw_param_text(place[0], place[1], 6, text, color_light);
 							if(sw_text_button(input, place[0] - 0.12, place[1] - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, light_types[frag->light.type], color, color, color))
@@ -650,7 +822,8 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.25, 0.24, SUI_T_SIZE, f.light.brdf_r, 16, rename_m_fragment, frag->light.brdf_r, color, color_light);
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.3, 0.24, SUI_T_SIZE, f.light.brdf_g, 16, rename_m_fragment, frag->light.brdf_g, color, color_light);
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.35, 0.24, SUI_T_SIZE, f.light.brdf_b, 16, rename_m_fragment, frag->light.brdf_b, color, color_light);
-						}
+						}else if(input->mode == BAM_DRAW)
+							co_draw_lable(mat_pos, y, color_light, light_labels[frag->light.type]);
 					}
 					break;
 					case VN_M_FT_REFLECTION :
@@ -658,11 +831,11 @@ boolean co_handle_material(BInputState *input, ENode *node)
 						static uint active = FALSE;
 						char *text[1] = {"Normal Falloff"};
 						expand = 0.2 + 0.05 * mat_pos->size;
-						place[0] = mat_pos->pos[0] + 0.015;
-						place[1] = mat_pos->pos[1] + 0.015 + y;
-						co_vng_fragment(place[0], place[1] - 0.015, expand, color);
-						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - expand);
-						if(co_material_click_test(input, mat_pos, place[0], place[1] - 0.015, expand))
+						place[0] = mat_pos->pos[0];
+						place[1] = mat_pos->pos[1] + y;
+						co_vng_fragment(place[0], place[1], expand, color);
+						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - expand);
+						if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 						{
 							co_draw_param_text(place[0], place[1], 1, text, color_light);
 							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.1, 0.12, SUI_T_SIZE, &f.reflection.normal_falloff, &frag->reflection.normal_falloff, color, color, color))
@@ -672,18 +845,19 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_REFLECTION, frag);
 								frag->reflection.normal_falloff = f.reflection.normal_falloff;
 							}
-						}
+						}if(input->mode == BAM_DRAW)
+							co_draw_lable(mat_pos, y, color_light, "Reflection");
 					}
 					break;
 					case VN_M_FT_TRANSPARENCY :
 					{
 						char *text[2] = {"Normal Falloff", "Refraction index"};
 						expand = 0.2 + 0.1 * mat_pos->size;
-						place[0] = mat_pos->pos[0] + 0.015;
-						place[1] = mat_pos->pos[1] + 0.015 + y;
-						co_vng_fragment(place[0], place[1] - 0.015, expand, color);
-						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - expand);
-						if(co_material_click_test(input, mat_pos, place[0], place[1] - 0.015, expand))
+						place[0] = mat_pos->pos[0];
+						place[1] = mat_pos->pos[1] + y;
+						co_vng_fragment(place[0], place[1], expand, color);
+						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - expand);
+						if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 						{
 							co_draw_param_text(place[0], place[1], 2, text, color_light);
 							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.1, 0.12, SUI_T_SIZE, &f.transparency.normal_falloff, &frag->transparency.normal_falloff, color, color, color))
@@ -700,18 +874,19 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_TRANSPARENCY, frag);
 								frag->transparency.refraction_index = f.transparency.refraction_index;
 							}
-						}
+						}else if(input->mode == BAM_DRAW)
+							co_draw_lable(mat_pos, y, color_light, "Transparancy");
 					}
 					break;
 					case VN_M_FT_VOLUME :
 					{
-						char *text[] = { "Diffusion", "Red", "Green", "Blue" };
+						char *text[4] = {"Diffucion", "Red", "Green", "Blue"};
 						expand = 0.2 + 0.2 * mat_pos->size;
-						place[0] = mat_pos->pos[0] + 0.015;
-						place[1] = mat_pos->pos[1] + 0.015 + y;
-						co_vng_fragment(place[0], place[1] - 0.015, expand, color);
-						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - expand);
-						if(co_material_click_test(input, mat_pos, place[0], place[1] - 0.015, expand))
+						place[0] = mat_pos->pos[0];
+						place[1] = mat_pos->pos[1] + y;
+						co_vng_fragment(place[0], place[1], expand, color);
+						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - expand);
+						if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 						{
 							co_draw_param_text(place[0], place[1], 4, text, color_light);
 							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.1, 0.12, SUI_T_SIZE, &f.volume.diffusion, &frag->volume.diffusion, color, color, color))
@@ -742,8 +917,9 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_VOLUME, frag);
 								frag->volume.col_b = f.volume.col_b;
 							}
-						}
-						if(handle_link(input, node, &frag->volume.color, "Color", i, 0, y, expand, color))
+						}if(input->mode == BAM_DRAW)
+							co_draw_lable(mat_pos, y, color_light, "Volume");
+						if(handle_link(input, node, &frag->volume.color, "Color", i, 0, y, expand, color, move))
 						{
 							verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_VOLUME, frag);
 							*frag = f;
@@ -754,17 +930,18 @@ boolean co_handle_material(BInputState *input, ENode *node)
 					{
 						char *text[3] = {"Red", "Green", "Blue"};
 						expand = 0.2 + 0.15 * mat_pos->size;
-						place[0] = mat_pos->pos[0] + 0.015;
-						place[1] = mat_pos->pos[1] + 0.015 + y;
-						co_vng_fragment(place[0], place[1] - 0.015, expand, color);
-						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - expand);
-						if(co_material_click_test(input, mat_pos, place[0], place[1] - 0.015, expand))
+						place[0] = mat_pos->pos[0];
+						place[1] = mat_pos->pos[1] + y;
+						co_vng_fragment(place[0], place[1], expand, color);
+						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - expand);
+						if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 						{
 							co_draw_param_text(place[0], place[1], 3, text, color_light);
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.1, 0.24, SUI_T_SIZE, f.geometry.layer_r, 16, rename_m_fragment, frag->geometry.layer_r, color, color_light);
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.15, 0.24, SUI_T_SIZE, f.geometry.layer_g, 16, rename_m_fragment, frag->geometry.layer_g, color, color_light);
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.2, 0.24, SUI_T_SIZE, f.geometry.layer_b, 16, rename_m_fragment, frag->geometry.layer_b, color, color_light);
-						}
+						}else if(input->mode == BAM_DRAW)
+							co_draw_lable(mat_pos, y, color_light, "Geometry");
 					}
 					break;
 					case VN_M_FT_TEXTURE :
@@ -772,11 +949,11 @@ boolean co_handle_material(BInputState *input, ENode *node)
 						char *text[4] = {"Texture", "Red", "Green", "Blue"};
 						ENode *b_node;
 						expand = 0.2 + 0.2 * mat_pos->size;
-						place[0] = mat_pos->pos[0] + 0.015;
-						place[1] = mat_pos->pos[1] + 0.015 + y;
-						co_vng_fragment(place[0], place[1] - 0.015, expand, color);
-						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - expand);
-						if(co_material_click_test(input, mat_pos, place[0], place[1] - 0.015, expand))
+						place[0] = mat_pos->pos[0];
+						place[1] = mat_pos->pos[1] + y;
+						co_vng_fragment(place[0], place[1], expand, color);
+						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - expand);
+						if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 						{
 							co_draw_param_text(place[0], place[1], 4, text, color_light);
 							b_node = e_ns_get_node(0, f.texture.bitmap);
@@ -787,8 +964,9 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.15, 0.24, SUI_T_SIZE, f.texture.layer_r, 16, rename_m_fragment, frag->texture.layer_r, color, color_light);
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.2, 0.24, SUI_T_SIZE, f.texture.layer_g, 16, rename_m_fragment, frag->texture.layer_g, color, color_light);
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.25, 0.24, SUI_T_SIZE, f.texture.layer_b, 16, rename_m_fragment, frag->texture.layer_b, color, color_light);
-						}
-						if(handle_link(input, node, &frag->texture.mapping, "Mapping", i, 0, y, expand, color))
+						}else if(input->mode == BAM_DRAW)
+							co_draw_lable(mat_pos, y, color_light, "Texture");
+						if(handle_link(input, node, &frag->texture.mapping, "Mapping", i, 0, y, expand, color, move))
 							verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_TEXTURE, frag);
 						*frag = f;
 					}
@@ -798,12 +976,13 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							static uint active = FALSE;
 							char *text[1] = {"Type"};
 							char *noise_types[] = {"PERLIN 0 - 1", "PERLIN -1 - 1"};
+							char *noise_labels[] = {"Perlin 0 - 1 Noice", "Perlin -1 - 1 Noice"};
 							expand = 0.2 + 0.05 * mat_pos->size;
-							place[0] = mat_pos->pos[0] + 0.015;
-							place[1] = mat_pos->pos[1] + 0.015 + y;
-							co_vng_fragment(place[0], place[1] - 0.015, expand, color);
-							co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - expand);
-							if(co_material_click_test(input, mat_pos, place[0], place[1] - 0.015, expand))
+							place[0] = mat_pos->pos[0];
+							place[1] = mat_pos->pos[1] + y;
+							co_vng_fragment(place[0], place[1], expand, color);
+							co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - expand);
+							if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 							{
 								co_draw_param_text(place[0], place[1], 1, text, color_light);
 								if(sw_text_button(input, place[0] - 0.12, place[1] - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, noise_types[frag->noise.type], color, color, color))
@@ -831,8 +1010,9 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								}
 								if(input->last_mouse_button[0] == FALSE && input->mouse_button[0] == FALSE)
 									active = -1;
-							}
-							if(handle_link(input, node, &frag->noise.mapping, "B", i, 0, y, expand, color))
+							}else if(input->mode == BAM_DRAW)
+								co_draw_lable(mat_pos, y, color_light, noise_labels[frag->noise.type]);
+							if(handle_link(input, node, &frag->noise.mapping, "B", i, 0, y, expand, color, move))
 							{
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_NOISE, frag);
 								*frag = f;
@@ -844,12 +1024,13 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							static uint active = FALSE;
 							char *text[1] = {"Type"};
 							char *blend_types[] = {"FADE", "ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "DOT"};
+							char *blender_labels[] = {"Blend Fade", "Blend Add", "Blend Subtract", "Blend Multiply", "Blend Divide", "Blend Dot"};
 							expand = 0.2 + 0.05 * mat_pos->size;
-							place[0] = mat_pos->pos[0] + 0.015;
-							place[1] = mat_pos->pos[1] + 0.015 + y;
-							co_vng_fragment(place[0], place[1] - 0.015, expand, color);
-							co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - expand);
-							if(co_material_click_test(input, mat_pos, place[0], place[1] - 0.015, expand))
+							place[0] = mat_pos->pos[0];
+							place[1] = mat_pos->pos[1] + y;
+							co_vng_fragment(place[0], place[1], expand, color);
+							co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - expand);
+							if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 							{
 								co_draw_param_text(place[0], place[1], 1, text, color_light);
 								if(sw_text_button(input, place[0] - 0.12, place[1] - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, blend_types[frag->blender.type], color, color, color))
@@ -877,12 +1058,13 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								}
 								if(input->last_mouse_button[0] == FALSE && input->mouse_button[0] == FALSE)
 									active = -1;
-							}
-							if(handle_link(input, node, &frag->blender.data_a, "A", i, -30, y, expand, color))
+							}else if(input->mode == BAM_DRAW)
+								co_draw_lable(mat_pos, y, color_light, blender_labels[frag->blender.type]);
+							if(handle_link(input, node, &frag->blender.data_a, "A", i, -30, y, expand, color, move))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_BLENDER, frag);
-							if(handle_link(input, node, &frag->blender.data_b, "B", i, 0, y, expand, color))
+							if(handle_link(input, node, &frag->blender.data_b, "B", i, 0, y, expand, color, move))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_BLENDER, frag);
-							if(handle_link(input, node, &frag->blender.control, "Control", i, 30, y, expand, color))
+							if(handle_link(input, node, &frag->blender.control, "Control", i, 30, y, expand, color, move))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_BLENDER, frag);
 							*frag = f;
 						}
@@ -892,8 +1074,8 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							static uint mode = 2, active = -1;
 							float size = 0.3, reset[] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
 							char *matrix_types[] = {"Matrix", "Balance", "Color Balance"};
-							place[0] = mat_pos->pos[0] + 0.015;
-							place[1] = mat_pos->pos[1] + 0.015 + y;
+							place[0] = mat_pos->pos[0];
+							place[1] = mat_pos->pos[1] + y;
 
 
 							if(mode == 0)
@@ -903,7 +1085,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							if(mode == 2)
 								expand = 0.2 + 0.25 * mat_pos->size;
 
-							if(co_material_click_test(input, mat_pos, place[0], place[1] - 0.015, expand))
+							if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 							{
 								if(sw_text_button(input, place[0] - 0.12, place[1] - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, matrix_types[mode], color, color, color))
 									active = i;
@@ -1040,10 +1222,11 @@ boolean co_handle_material(BInputState *input, ENode *node)
 									}
 									break;
 								}
-							}
-							co_vng_fragment(place[0], place[1] - 0.015, expand, color);
+							}else if(input->mode == BAM_DRAW)
+								co_draw_lable(mat_pos, y, color_light, "Matrix");
+							co_vng_fragment(place[0] - 0.015, place[1] - 0.015, expand, color);
 							co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - expand);
-							if(handle_link(input, node, &frag->matrix.data, "Input", i, 0, y, expand, color))
+							if(handle_link(input, node, &frag->matrix.data, "Input", i, 0, y, expand, color, move))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, frag);
 							*frag = f;
 						}
@@ -1060,12 +1243,12 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							float col_range[12], vertex[8];
 							uint mode;
 							expand = 0.2 + 0.35 * mat_pos->size;
-							place[0] = mat_pos->pos[0] + 0.015;
-							place[1] = mat_pos->pos[1] + 0.015 + y;
-							co_vng_fragment(place[0], place[1] - 0.015, expand, color);
-							co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - expand);
+							place[0] = mat_pos->pos[0];
+							place[1] = mat_pos->pos[1] + y;
+							co_vng_fragment(place[0], place[1], expand, color);
+							co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - expand);
 							f = *frag;
-							if(co_material_click_test(input, mat_pos, place[0], place[1] - 0.015, expand))
+							if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 							{
 								co_draw_param_text(place[0], place[1], 7, text, color_light);
 								if(sw_text_button(input, place[0] - 0.12, place[1] - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, ramp_channels[frag->ramp.channel], color, color, color))
@@ -1278,8 +1461,9 @@ boolean co_handle_material(BInputState *input, ENode *node)
 										frag->color.blue = f.color.blue;
 									}
 								}
-							}
-							if(handle_link(input, node, &frag->ramp.mapping, "MAPPING", i, 0, y, expand, color))
+							}else if(input->mode == BAM_DRAW)
+								co_draw_lable(mat_pos, y, color_light, "Ramp");
+							if(handle_link(input, node, &frag->ramp.mapping, "MAPPING", i, 0, y, expand, color, move))
 							{
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_RAMP, frag);
 								*frag = f;
@@ -1290,79 +1474,63 @@ boolean co_handle_material(BInputState *input, ENode *node)
 					{
 						char *text[3] = {"Red", "Green", "Blue"};
 						expand = 0.2 + 0.15 * mat_pos->size;
-						place[0] = mat_pos->pos[0] + 0.015;
-						place[1] = mat_pos->pos[1] + 0.015 + y;
-						co_vng_fragment(place[0], place[1] - 0.015, expand, color);
-						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - expand);
-						if(co_material_click_test(input, mat_pos, place[0], place[1] - 0.015, expand))
+						place[0] = mat_pos->pos[0];
+						place[1] = mat_pos->pos[1] + y;
+						co_vng_fragment(place[0], place[1], expand, color);
+						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - expand);
+						if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 						{
 							co_draw_param_text(place[0], place[1], 3, text, color_light);
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.1, 0.24, SUI_T_SIZE, f.animation.label, 16, rename_m_fragment, frag->animation.label, color, color_light);
-						}
+						}else if(input->mode == BAM_DRAW)
+							co_draw_lable(mat_pos, y, color_light, "Animation");
 					}
 					case VN_M_FT_ALTERNATIVE :
 						{	
-							place[0] = mat_pos->pos[0] + 0.015;
-							place[1] = mat_pos->pos[1] + 0.015 + y;
-							co_vng_fragment(place[0], place[1] - 0.015, 0.20, color);
-							co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - 0.20);
-							co_material_click_test(input, mat_pos, place[0], place[1] - 0.015, 0.2);
-							if(handle_link(input, node, &frag->alternative.alt_a, "A", i, -30, y, expand, color))
+							place[0] = mat_pos->pos[0];
+							place[1] = mat_pos->pos[1] + y;
+							co_vng_fragment(place[0], place[1], 0.20, color);
+							co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.20);
+							if(!co_material_click_test(input, mat_pos, i, place[0], place[1], 0.2, &move))
+								co_draw_lable(mat_pos, y, color_light, "Alternative");
+							if(handle_link(input, node, &frag->alternative.alt_a, "A", i, -30, y, expand, color, move))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_ALTERNATIVE, frag);
-							if(handle_link(input, node, &frag->alternative.alt_b, "B", i, 0, y, expand, color))
+							if(handle_link(input, node, &frag->alternative.alt_b, "B", i, 0, y, expand, color, move))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_ALTERNATIVE, frag);
 							*frag = f;
-						}
+						}							
 						break;
 					case VN_M_FT_OUTPUT :
 						{	
 							static uint active = FALSE;
 							char *text[1] = {"Output"};
 							expand = 0.2 + 0.05 * mat_pos->size;
-							place[0] = mat_pos->pos[0] + 0.015;
-							place[1] = mat_pos->pos[1] + 0.015 + y;
-							co_vng_fragment(place[0], place[1] - 0.015, expand, color);
-							co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - expand);
-							if(co_material_click_test(input, mat_pos, place[0], place[1] - 0.015, expand))
+							place[0] = mat_pos->pos[0];
+							place[1] = mat_pos->pos[1] + y;
+							co_vng_fragment(place[0], place[1], expand, color);
+							co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - expand);
+							if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 							{
 								co_draw_param_text(place[0], place[1], 1, text, color_light);
 								co_w_type_in(input, place[0] - 0.12, place[1] - 0.1, 0.24, SUI_T_SIZE, f.output.label, 16, rename_m_fragment, frag->output.label, color, color_light);
-							}
-							if(handle_link(input, node, &frag->output.front, "Front", i, -20, y, expand, color))
+							}else if(input->mode == BAM_DRAW)
+								co_draw_lable(mat_pos, y, color_light, "Output");
+							if(handle_link(input, node, &frag->output.front, "Front", i, -20, y, expand, color, move))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_OUTPUT, frag);
-							if(handle_link(input, node, &frag->output.back, "Back", i, 20, y, expand, color))
+							if(handle_link(input, node, &frag->output.back, "Back", i, 20, y, expand, color, move))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_OUTPUT, frag);
 							*frag = f;
 						}
 						break;
 				}
-				if(co_w_close_button(input, mat_pos->pos[0] + 0.12, mat_pos->pos[1] - 0.015 + y, color, color, color))
-					verse_send_m_fragment_destroy(e_ns_get_node_id(node), i);
+				if(mat_pos->expand)
+					if(co_w_close_button(input, mat_pos->pos[0] + 0.1, mat_pos->pos[1] - 0.015 + y, color, color, color))
+						verse_send_m_fragment_destroy(e_ns_get_node_id(node), i);
 
 				if(input->mode == BAM_DRAW)
 				{
 					sui_draw_text(mat_pos->pos[0] - 0.12, mat_pos->pos[1] - 0.035 + y, SUI_T_SIZE, SUI_T_SPACE, material_type_names[type], color_light, color_light, color_light);  
 					glPopMatrix();
-				}else
-				{
-					if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE && move == NULL)
-						if(sui_box_click_test(mat_pos->pos[0] - 0.15 * mat_pos->size, mat_pos->pos[1] - 0.05 * mat_pos->size + y, 0.25 * mat_pos->size, 0.1 * mat_pos->size))
-							move = mat_pos;
-					if(move == mat_pos)
-					{
-						move->pos[0] = input->pointer_x;
-						move->pos[1] = input->pointer_y - y;
-						if(move->pos[0] > 0.9)
-							move->pos[0] = 0.9;
-						if(move->pos[0] < -0.9)
-							move->pos[0] = -0.9;
-						if(move->pos[1] > -0.05)
-							move->pos[1] = -0.05;
-						if(move->pos[1] < -2)
-							move->pos[1] = -2;
-					}
-					if(input->mouse_button[0] != TRUE)
-						move = NULL;
 				}
 			}
 		}
