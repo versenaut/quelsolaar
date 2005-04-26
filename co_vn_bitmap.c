@@ -171,8 +171,6 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 				output = sui_draw_popup(input, 0.15, y, e, 5, 0);
 				if(output != -1 && output != type)
 				{
-					if(output > 3)
-						output -=  VN_G_LAYER_POLYGON_CORNER_UINT32 - VN_G_LAYER_VERTEX_REAL - 1; 
 					verse_send_b_layer_create(e_ns_get_node_id(node), popup, e_nsb_get_layer_name(layer), output);
 				}
 			}
