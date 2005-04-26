@@ -667,6 +667,10 @@ void co_input_handler(BInputState *input, void *user_pointer)
 					if(!co_handle_curve(input, node))
 						mode = COIM_NONE;
 					break;
+				case V_NT_AUDIO :
+					if(!co_handle_audio(input, node))
+						mode = COIM_NONE;
+					break;
 			}
 		}
 	}else
