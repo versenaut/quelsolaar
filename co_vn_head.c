@@ -303,7 +303,7 @@ float co_handle_node_head(BInputState *input, ENode *node)
 				k = 0;
 				for(j = e_ns_get_next_tag(node, i, 0); j != -1 ; j = e_ns_get_next_tag(node, i, j + 1))
 					k++;
-				sprintf(nr, "method_%u", k);
+				sprintf(nr, "tag_%u", k);
 				t.vboolean = TRUE;
 				verse_send_tag_create(e_ns_get_node_id(node), i, -1, nr, VN_TAG_BOOLEAN, &t);
 			}
