@@ -19,6 +19,7 @@ typedef struct {
 	DynLookUpTable	look_up_table;
 	uint32			node_type_count[V_NT_NUM_TYPES];
 	uint32			selected_node[V_NT_NUM_TYPES];
+	uint32			global_version[V_NT_NUM_TYPES];
 	VSession		*session;
 	uint			avatar; 
 } ENSConnection;
@@ -39,19 +40,22 @@ extern void	delete_object(ENodeHead *node);
 extern void	delete_geometry(ENodeHead *node);
 extern void	delete_material(ENodeHead *node);
 extern void	delete_bitmap(ENodeHead *node);
-extern void	delete_code(ENodeHead *node);
+extern void	delete_text(ENodeHead *node);
+extern void	delete_curve(ENodeHead *node);
+extern void	delete_audio(ENodeHead *node);
 
-extern void es_head_init(void);
-extern void	es_object_init(void);
-extern void	es_geometry_init(void);
-extern void	es_material_init(void);
-extern void	es_bitmap_init(void);
-extern void es_code_init(void);
-extern void	es_curve_init(void);
-
+extern void es_head_init();
+extern void	es_object_init();
+extern void	es_geometry_init();
+extern void	es_material_init();
+extern void	es_bitmap_init();
+extern void es_text_init();
+extern void	es_curve_init();
+extern void	es_audio_init();
 /* ------------------------------------------------------------------------------------------------------------------------- */
 
-static void e_ns_del_node(uint key, void *value, void *user_data)
+
+boolean   e_ns_del_node(uint key, void *value, void *user_data)
 {
 	switch(((ENodeHead *)value)->node_type)
 	{
@@ -67,12 +71,17 @@ static void e_ns_del_node(uint key, void *value, void *user_data)
 		case V_NT_BITMAP :
 			delete_bitmap((ENodeHead *)value);
 			break;
-/*		case V_NT_PARTICLE :
+		case V_NT_TEXT :
+			delete_text((ENodeHead *)value);
 			break;
-*/		case V_NT_TEXT :
-/*			delete_code((ENodeHead *)value);
-*/			break;
+		case V_NT_CURVE :
+			delete_curve((ENodeHead *)value);
+			break;
+		case V_NT_AUDIO :
+			delete_audio((ENodeHead *)value);
+			break;
 	}
+	return TRUE;
 }
 /*
 typedef enum {
@@ -86,6 +95,7 @@ extern ENodeHead *e_create_m_node(VNodeID node_id, VNodeOwner owner);
 extern ENodeHead *e_create_b_node(VNodeID node_id, VNodeOwner owner);
 extern ENodeHead *e_create_t_node(VNodeID node_id, VNodeOwner owner);
 extern ENodeHead *e_create_c_node(VNodeID node_id, VNodeOwner owner);
+extern ENodeHead *e_create_a_node(VNodeID node_id, VNodeOwner owner);
 
 ENodeHead *e_create_node(VNodeID node_id, VNodeType type, VNodeOwner owner)
 {
@@ -112,6 +122,9 @@ ENodeHead *e_create_node(VNodeID node_id, VNodeType type, VNodeOwner owner)
 			break;
 			case V_NT_CURVE :
 				node = e_create_c_node(node_id, owner);
+			break;
+			case V_NT_AUDIO :
+				node = e_create_a_node(node_id, owner);
 			break;
 		}
 	}
@@ -328,8 +341,9 @@ void enough_init(void)
 	es_geometry_init();
 	es_material_init();
 	es_bitmap_init();
-//	es_code_init();
+	es_text_init();
 	es_curve_init();
+	es_audio_init();
 }
 
 ENodeHead *e_ns_get_node_next(uint id, uint connection, VNodeType type)
@@ -429,7 +443,6 @@ void e_ns_execute(ENodeHead *node, ECustomDataCommand command)
 uint e_ns_get_node_version_struct(const ENodeHead *node)
 {
 	return node->structure_version;
-/*	node->data_version++;*/
 }
 
 uint e_ns_get_node_version_data(const ENodeHead *node)
@@ -441,11 +454,18 @@ void e_ns_update_node_version_struct(ENodeHead *node)
 {
 	node->structure_version++;
 	node->data_version++;
+	ENSGlobal.context[node->session].global_version[node->node_type]++;
 	e_ns_execute(node, E_CDC_STRUCT);
 }
 
 void e_ns_update_node_version_data(ENodeHead *node)
 {
 	node->data_version++;
+	ENSGlobal.context[node->session].global_version[node->node_type]++;
 	e_ns_execute(node, E_CDC_DATA);
+}
+
+uint e_ns_get_global_version(uint connection, VNodeType type)
+{
+	return ENSGlobal.context[connection].global_version[type];
 }
