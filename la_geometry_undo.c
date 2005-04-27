@@ -1,6 +1,3 @@
-
-#include <stdlib.h>
-
 #include "la_includes.h"
 
 #include "la_particle_fx.h"
@@ -103,6 +100,7 @@ void init_undo(void)
 	UNDOGlobal.vertex_delete = FALSE;
 	UNDOGlobal.distance = 0.01;
 	UNDOGlobal.select_local = FALSE;
+	UNDOGlobal.select = NULL;
 	for(i = 0; i < UNDOGlobal.length; i++)
 		UNDOGlobal.event[i].type = UNDOET_STOPP;
 	UNDOGlobal.grid_active = FALSE;
@@ -173,8 +171,8 @@ void udg_create_func(uint connection, uint id, VNodeType type, void *user)
 {
 	if(type == V_NT_GEOMETRY)
 	{
-		verse_send_g_layer_create(id, -1, "crease", VN_G_LAYER_POLYGON_CORNER_UINT32, 0, 0);
-		verse_send_g_layer_create(id, -2, "select", VN_G_LAYER_VERTEX_REAL, 0, 0);
+		verse_send_g_layer_create(id, ~0u, "crease", VN_G_LAYER_POLYGON_CORNER_UINT32, 0, 0);
+		verse_send_g_layer_create(id, ~0u, "select", VN_G_LAYER_VERTEX_REAL, 0, 0);
 		verse_send_g_crease_set_edge(id, "crease", 0);
 		UNDOGlobal.g_node = id;
 	}
@@ -206,7 +204,7 @@ void udg_clone_node(uint32 node_id)
 	for(i = 0; i < vertex_length; i++)
 	{
 		if(vertex[i].x < 1.9)
-			verse_send_g_vertex_set_real64_xyz(node_id, 0, i, vertex[i].x, vertex[i].y , vertex[i].z);
+			verse_send_g_vertex_set_xyz_real64(node_id, 0, i, vertex[i].x, vertex[i].y , vertex[i].z);
 	}	
 	for(i = 0; i < length; i++)
 	{
@@ -228,7 +226,7 @@ void execute_event(UNDOEvent *event, uint direction)
 			if(event->event[direction].vertex.layer == 65535)
 				verse_send_g_vertex_delete_real64(UNDOGlobal.g_node, event->id);
 			else
-				verse_send_g_vertex_set_real64_xyz(UNDOGlobal.g_node, event->event[direction].vertex.layer, event->id, event->event[direction].vertex.x, event->event[direction].vertex.y, event->event[direction].vertex.z);
+				verse_send_g_vertex_set_xyz_real64(UNDOGlobal.g_node, event->event[direction].vertex.layer, event->id, event->event[direction].vertex.x, event->event[direction].vertex.y, event->event[direction].vertex.z);
 		break;
 		case UNDOET_POLYGON :
 			if(event->event[direction].polygon.a == -1)
@@ -237,7 +235,7 @@ void execute_event(UNDOEvent *event, uint direction)
 				verse_send_g_polygon_set_corner_uint32(UNDOGlobal.g_node, 1, event->id, event->event[direction].polygon.a, event->event[direction].polygon.b, event->event[direction].polygon.c, event->event[direction].polygon.d);
 		break;
 		case UNDOET_CREASE :
-			verse_send_g_polygon_set_corner_uint32(UNDOGlobal.g_node, event->id, UNDOGlobal.crease_layer, event->event[direction].crease.a, event->event[direction].crease.b, event->event[direction].crease.c, event->event[direction].crease.d);
+			verse_send_g_polygon_set_corner_uint32(UNDOGlobal.g_node, UNDOGlobal.crease_layer, event->id, event->event[direction].crease.a, event->event[direction].crease.b, event->event[direction].crease.c, event->event[direction].crease.d);
 		break;
 		case UNDOET_SELECT :
 			if(UNDOGlobal.select_local)
@@ -341,7 +339,7 @@ boolean udg_check_g_node(uint32 node_id)
 {
 	ENode *g_node;
 	g_node = e_ns_get_node(0, node_id);
-	if(g_node != NULL)
+	if(g_node != NULL && e_ns_get_node_type(g_node) == V_NT_GEOMETRY)
 	{
 
 		if(e_nsg_get_layer_by_id(g_node, 1) == NULL || e_nsg_get_layer_by_id(g_node, 0) == NULL)
@@ -371,7 +369,7 @@ boolean udg_update_geometry(void)
 		}else
 		{
 			UNDOGlobal.crease = NULL;
-			UNDOGlobal.crease_layer = 0;
+			UNDOGlobal.crease_layer = 0;				
 		}
 		layer = e_nsg_get_layer_by_type(g_node, VN_G_LAYER_VERTEX_REAL, "select");
 		if(layer != NULL)
@@ -399,7 +397,7 @@ boolean udg_update_geometry(void)
 					UNDOGlobal.select = realloc(UNDOGlobal.select, (sizeof *UNDOGlobal.select) * e_nsg_get_vertex_length(g_node));
 					for(i = UNDOGlobal.vertex_length; i < e_nsg_get_vertex_length(g_node); i++)
 						UNDOGlobal.select[i] = 0;
-				}else
+				}else if(UNDOGlobal.select != NULL)
 				{
 					free(UNDOGlobal.select);
 					UNDOGlobal.select = NULL;
@@ -413,7 +411,7 @@ boolean udg_update_geometry(void)
 			layer = e_nsg_get_layer_by_id(g_node, 0);	
 		UNDOGlobal.vertex_version = e_nsg_get_layer_version(layer);
 		UNDOGlobal.vertex = e_nsg_get_layer_data(g_node, layer);
-		UNDOGlobal.vertex_layer = 0/*e_nsg_get_layer_id(layer)*/;
+		UNDOGlobal.vertex_layer = e_nsg_get_layer_id(layer);
 		return TRUE;
 	}
 	return FALSE;
@@ -503,7 +501,7 @@ void udg_vertex_set(uint32 id, double *state, double x, double y, double z)
 }
 void udg_vertex_move(uint32 id, double x, double y, double z)
 {
-	verse_send_g_vertex_set_real64_xyz(UNDOGlobal.g_node, UNDOGlobal.vertex_layer, id, x, y, z);
+	verse_send_g_vertex_set_xyz_real64(UNDOGlobal.g_node, UNDOGlobal.vertex_layer, id, x, y, z);
 }
 
 
