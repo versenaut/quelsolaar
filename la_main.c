@@ -5,6 +5,7 @@
 #include "la_tool.h"
 #include "la_pop_up.h"
 #include "la_particle_fx.h"
+#include "persuade.h"
 
 #define THREADED FALSE
 
@@ -29,13 +30,14 @@ extern void draw_browser_menu(BInputState *input, void *user);
 
 int main(int argc, char **argv)
 {
-	betray_init(argc, argv, 800, 600, FALSE, "Loq Airou");
+	betray_init(argc, argv, 1500, 1100, FALSE, "Loq Airou");
 	sui_init_settings("settngs.cfg");
 	sui_init();
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);	
 	enough_init();
+
 	la_do_init();
 	p_init();
 	init_key_input();
@@ -49,7 +51,9 @@ int main(int argc, char **argv)
 /*	p_op_lod_settings(sui_get_setting_int("MIN_TESS_LEVEL", 1),	sui_get_setting_double("GEOMETRY_COMPLEXITY", 40), sui_get_setting_double("LOD_TRESHOLD", 1.5), FALSE);
 	p_op_lod_set_tess_levels(limit, 5);
 	p_op_service_set_auto(TRUE); /* choosing to run enough lib in auto service mode */
-
+#ifdef PERSUADE_H
+	persuade_init(3, betray_get_gl_proc_address());
+#endif
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);/*GL_AMBIENT_AND_DIFFUSE*/
 
 	betray_set_action_func(la_pu_connect, NULL);
