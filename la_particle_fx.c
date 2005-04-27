@@ -50,6 +50,7 @@ struct{
 	uint			video_material;
 	uint			soft_material;
 	uint			soft_material2;
+	uint			surface_material;
 	float			*select_pos;
 	float			*select_uv;
 }GlobalParticleData;
@@ -317,7 +318,6 @@ uint create_particle_material(uint size, float *data)
 	glDisable(GL_TEXTURE_2D);
 	return texture_id;
 }
-
 uint create_def_material(void)
 {
 	uint texture_id, size = 256, i;
@@ -424,6 +424,7 @@ void la_pfx_init(uint particle_count, uint texture_size)
 		light_pos[1] = -0.3;
 		light_pos[2] = -0.3;
 		add_shade(texture_size, data, light_pos, light_color, -0.06, 0.01);
+		GlobalParticleData.surface_material = create_particle_material(texture_size, data);
 	}
 	add_video(texture_size, data);
 	GlobalParticleData.video_material = create_particle_material(texture_size, data);
@@ -950,5 +951,10 @@ void la_pfx_video_flare(void)
 	sui_draw_gl(GL_QUADS, pos, 4, 2, 1, 1, 1);
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(1);
+}
+
+uint la_pfx_surface_material()
+{
+	return GlobalParticleData.surface_material;
 }
 
