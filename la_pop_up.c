@@ -49,7 +49,7 @@ void la_pu_connect(BInputState *input, void *user)
 
 	if(input->mode == BAM_MAIN)
 	{
-		verse_callback_update(0);
+		verse_callback_update(3000);
 		return;
 	}
 
