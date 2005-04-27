@@ -130,7 +130,7 @@ void sui_save_settings(const char *file_name)
 	uint i;
 	FILE *settings;
 
-	settings = fopen(file_name, "wt");
+	settings = fopen(file_name, "w");
 	for(i = 0; i < SUIGlobalSettings.count; i++)
 	{
 		if(SUIGlobalSettings.array[i].text != NULL)
