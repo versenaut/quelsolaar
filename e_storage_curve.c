@@ -10,6 +10,8 @@
 #include "e_types.h"
 #include "e_storage_node.h"
 
+typedef float TBChanel;
+
 typedef struct{
 	real64 pre_value[4];
 	uint32 pre_pos[4];
@@ -37,11 +39,10 @@ typedef struct{
 	DynLookUpTable	curvetables;
 }ESCurveNode;
 
-
 extern void	e_ns_update_node_version_struct(ESCurveNode *node);
 extern void	e_ns_update_node_version_data(ESCurveNode *node);
 
-ESCurve *e_nsc_get_layer_by_name(ESCurveNode *node, const char *name)
+ESCurve *e_nsc_get_curve_by_name(ESCurveNode *node, const char *name)
 {
 	ESCurve *curve;
 	for(curve =	get_next_dlut(&node->curvetables, 0); curve != NULL; curve = get_next_dlut(&node->curvetables, curve->curve_id + 1))
@@ -106,6 +107,21 @@ ESCurveNode *e_create_c_node(VNodeID node_id, VNodeOwner owner)
 	}
 	return node;
 }
+
+
+void delete_curve_curves_func(uint id, ESCurve *curve, void *user_data)
+{
+	if(curve->points != NULL)
+		free(curve->points);
+	free(curve);
+}
+
+void delete_curve(ESCurveNode *node)
+{
+	foreach_remove_dlut(&node->curvetables, delete_curve_curves_func, NULL);
+	free(node);
+}
+
 
 static void callback_send_c_curve_create(void *user, VNodeID node_id, VLayerID curve_id, const char *name, uint8 dimensions)
 {
@@ -425,7 +441,41 @@ void e_nsc_send_c_key_set(ESCurveNode *node, ESCurve *curve, uint32 key_id, real
 		for(i = 0; i < curve->dimensions; i++)
 			postp[i] = point->post_pos[i];
 
-	verse_send_c_key_set(e_ns_get_node_id(node), e_nsc_get_curve_id(curve), key_id, dimensions, prev, prep, value, *pos, postv, postp);
+	verse_send_c_key_set(node->head.node_id, e_nsc_get_curve_id(curve), key_id, dimensions, prev, prep, value, *pos, postv, postp);
+}
+
+
+double e_nsc_evaluate_curve(ESCurve	*curve, double *output, double pos)
+{
+	uint32 before = 0, after, i;
+	after = curve->length - 1;
+
+	while(before + 1 != after)
+	{
+		if(curve->points[curve->points[(after + before) / 2].sorted_pos].pos > pos)
+			after = (after + before) / 2;
+		else
+			before = (after + before) / 2;
+	}
+	before = curve->points[before].sorted_pos;
+	after = curve->points[after].sorted_pos;
+	pos = (pos - curve->points[before].pos) / (curve->points[after].pos - curve->points[before].pos);
+	if(output != NULL)
+	{
+		if(curve->dimensions == 1)
+		{
+			output[0] = curve->points[before].value[0] * (1 - pos) + curve->points[before].value[0] * pos;
+			output[3] =	output[2] =	output[1] =	output[0];
+		}else
+		{
+			for(i = 0; i < curve->dimensions; i++)
+				output[i] = curve->points[before].value[i] * (1 - pos) + curve->points[before].value[i] * pos;
+			for(; i < 4; i++)
+				output[i] = 0;
+		}
+		return output[0];
+	}else
+		return curve->points[before].value[0] * (1 - pos) + curve->points[before].value[0] * pos;
 }
 
 void e_nsc_get_segment(ESCurve *curve, uint segment_nr, uint axis, real64 *point_0, real64 *point_1, real64 *point_2, real64 *point_3)
