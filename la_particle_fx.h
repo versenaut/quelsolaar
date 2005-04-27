@@ -11,3 +11,5 @@ extern void la_pfx_video_flare(void);
 extern void la_pfx_select_vertex(void);
 extern void la_pfx_draw(boolean intro);
 extern void la_pfx_draw_intro(void);
+extern uint la_pfx_surface_material(void);
+
