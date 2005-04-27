@@ -69,9 +69,9 @@ void co_init_game(uint count)
 	COGame.revive_time = GAME_REVIVE_TIME + 0.1;
 	COGame.lifes = 3;
 	for(i = 0; i < GAME_BULLET_COUNT; i++)
-		COGame.fire[i].time = 0;
+		COGame.fire[i].time = 2;
 	for(i = 0; i < GAME_DUST_COUNT; i++)
-		COGame.dust[i].time = 0;	
+		COGame.dust[i].time = 2;	
 }
 
 void co_spread_dust(float *pos, float *vec, float blast_size, float object_size, uint count)
@@ -579,8 +579,7 @@ void co_play_game(BInputState *input)
 
 	}else
 	{
-		static boolean d = FALSE, d_l = FALSE, a = FALSE, a_l = FALSE, w = FALSE, w_l = FALSE, s = FALSE, s_l = FALSE,
-			space = FALSE, space_l = FALSE, quit = FALSE, quit_l = FALSE;
+		static boolean d = FALSE, d_l = FALSE, a = FALSE, a_l = FALSE, w = FALSE, w_l = FALSE, s = FALSE, s_l = FALSE, space = FALSE, space_l = FALSE, quit = FALSE, quit_l = FALSE;
 		betray_get_key_up_down(&d, &d_l, 'd');
 		betray_get_key_up_down(&a, &a_l, 'a');
 		betray_get_key_up_down(&w, &w_l, 'w');
