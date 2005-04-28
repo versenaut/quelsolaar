@@ -953,8 +953,7 @@ void la_pfx_video_flare(void)
 	glDepthMask(1);
 }
 
-uint la_pfx_surface_material()
+uint la_pfx_surface_material(void)
 {
 	return GlobalParticleData.surface_material;
 }
-

@@ -230,12 +230,12 @@ typedef enum{
 extern boolean co_handle_head(BInputState *input, ENode *node, float *length);
 extern void co_material_compute(uint lines);
 
-boolean get_stop_sign();
+boolean get_stop_sign(void);
 
 extern void co_init_game(uint count);
-extern void co_end_game();
+extern void co_end_game(void);
 extern void co_create_pebel(uint type, float pos_x, float pos_y, float scale);
-extern boolean co_is_game_active();
+extern boolean co_is_game_active(void);
 extern void co_play_game(BInputState *input);
 
 extern boolean co_draw_ships(BInputState *input);
