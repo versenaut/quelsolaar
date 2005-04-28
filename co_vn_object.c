@@ -380,7 +380,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 		EObjLink *link;
 		if(sw_text_button(input, -0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new link", color, color, color))
 		{
-			verse_send_o_link_set(rename_o_node_id, -1, -1, 0, "new_link");
+			verse_send_o_link_set(rename_o_node_id, (uint16) ~0u, ~0u, "new_link", 0);
 		}
 		y -= 0.05;
 		for(link = e_nso_get_next_link(node, 0); link != NULL; link = e_nso_get_next_link(node, e_nso_get_link_id(link) + 1))
