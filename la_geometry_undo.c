@@ -171,8 +171,8 @@ void udg_create_func(uint connection, uint id, VNodeType type, void *user)
 {
 	if(type == V_NT_GEOMETRY)
 	{
-		verse_send_g_layer_create(id, ~0u, "crease", VN_G_LAYER_POLYGON_CORNER_UINT32, 0, 0);
-		verse_send_g_layer_create(id, ~0u, "select", VN_G_LAYER_VERTEX_REAL, 0, 0);
+		verse_send_g_layer_create(id, (VLayerID) ~0u, "crease", VN_G_LAYER_POLYGON_CORNER_UINT32, 0, 0);
+		verse_send_g_layer_create(id, (VLayerID) ~0u, "select", VN_G_LAYER_VERTEX_REAL, 0, 0);
 		verse_send_g_crease_set_edge(id, "crease", 0);
 		UNDOGlobal.g_node = id;
 	}
