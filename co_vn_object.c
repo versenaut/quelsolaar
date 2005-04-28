@@ -352,7 +352,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 		sui_draw_2d_line_gl(-0.25, y - 0.45, 0.65, y - 0.45, color_light, color_light, color_light);
 
 		/* Scale. */
-		e_nso_get_scale(node, &transform[4]);
+		e_nso_get_scale(node, &transform[3]);
 		sui_draw_text(-0.3, y - 0.50, SUI_T_SIZE, SUI_T_SPACE, "SCALE", color_light, color_light, color_light);
 
 		sui_draw_text(0.0, y - 0.50, SUI_T_SIZE, SUI_T_SPACE, "X:", color_light, color_light, color_light);  
