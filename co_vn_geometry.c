@@ -186,8 +186,8 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 		y -= 0.05;
 		for(bone = e_nsg_get_bone_next(node, 0); bone != (uint16)-1; bone = e_nsg_get_bone_next(node, bone + 1))
 		{
-			static double t[3];
-			static VNQuat64	rot;
+			double t[3];
+			VNQuat64	rot;
 			char *ref, *text[] = {"X", "Y", "Z", "X", "Y", "Z", "W"};
 			uint i;
 			uint32 parent;
