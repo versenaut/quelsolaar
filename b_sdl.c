@@ -171,7 +171,9 @@ SDL_BUTTON_LEFT		1
 			{
 				if(betray_is_type_in())
 				{
-					if(event.key.keysym.sym == SDLK_RETURN)
+/*					if(event.key.keysym.sym >= SDLK_NUMLOCK && event.key.keysym.sym <= SDLK_COMPOSE)
+						;
+*/					if(event.key.keysym.sym == SDLK_RETURN)
 						betray_end_type_in_mode(FALSE);
 					else if(event.key.keysym.sym == SDLK_ESCAPE)
 						betray_end_type_in_mode(TRUE);
@@ -196,8 +198,11 @@ SDL_BUTTON_LEFT		1
 					{
 						betray_move_cursor(-32000);
 						betray_insert_character(0);
-					}else
-						betray_insert_character(event.key.keysym.sym);
+					}
+					else if(event.key.keysym.unicode > 0 && event.key.keysym.unicode < 128)
+					{
+						betray_insert_character(event.key.keysym.unicode);
+					}
 				}
 				else
 				{
