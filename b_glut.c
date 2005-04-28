@@ -174,8 +174,7 @@ boolean b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boo
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STENCIL);
 //	glutInitDisplayString("stencil>=1 rgb depth double");
 	glutInitWindowPosition(10, 10);
-//	glutInitWindowSize(size_x, size_y);
-	glutInitWindowSize(100, 100);
+	glutInitWindowSize(size_x, size_y);
 	glutCreateWindow(caption);
 	glutDisplayFunc(b_glut_display_func);
 	glutReshapeFunc(b_glut_reshape_func);
