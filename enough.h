@@ -56,6 +56,7 @@ extern uint			e_ns_get_node_version_struct(const ENode *node);
 extern uint			e_ns_get_node_version_data(const ENode *node);
 extern void			e_ns_update_node_version_struct(ENode *node);
 extern void			e_ns_update_node_version_data(ENode *node);
+extern uint			e_ns_get_global_version(uint connection, VNodeType type);
 
 extern void			e_ns_set_custom_data(ENode *node, uint slot, void *data);
 extern void			e_ns_set_custom_func(uint slot, VNodeType type, void (*func)(ENode *node, ECustomDataCommand command));
@@ -94,6 +95,14 @@ extern VNodeID		e_nso_get_link_node(EObjLink *link);
 extern char *		e_nso_get_link_name(EObjLink *link);
 extern uint32		e_nso_get_link_target_id(EObjLink *link);
 
+extern void		e_nso_get_anim_time(EObjLink *link, uint32 *time_s, uint32 *time_f);
+extern double		e_nso_get_anim_pos(EObjLink *link);
+extern double		e_nso_get_anim_speed(EObjLink *link);
+extern double		e_nso_get_anim_accel(EObjLink *link);
+extern double		e_nso_get_anim_scale(EObjLink *link);
+extern double		e_nso_get_anim_scale_speed(EObjLink *link);
+extern boolean		e_nso_get_anim_active(EObjLink *link);
+
 extern char *		e_nso_get_method_group(ENode *node, uint16 group_id);
 extern uint16		e_nso_get_next_method_group(ENode *node, uint16 group_id);
 extern char *		e_nso_get_method(ENode *node, uint16 group_id, uint16 method_id);
@@ -102,6 +111,10 @@ extern uint			e_nso_get_method_param_count(ENode *node, uint16 group_id, uint16 
 extern char **		e_nso_get_method_param_names(ENode *node, uint16 group_id, uint16 method_id);
 extern VNOParamType *	e_nso_get_method_param_types(ENode *node, uint16 group_id, uint16 method_id);
 
+/*
+extern double		e_nso_evaluate_anim_handle_single(EOAnimhandle *handle, uint seconds, uint fractions);
+extern double		e_nso_evaluate_anim_handle_mult(double *output, EOAnimhandle *handle, uint seconds, uint fractions);
+*/
 /* geometry node storage ----------------------------------------------------------------------------------------------------------------*/
 
 typedef void EGeoLayer;
@@ -155,9 +168,8 @@ extern void			e_nsg_get_bone_matrix64(ENode *o_node, ENode *g_node, uint16 bone_
 /* material node storage ----------------------------------------------------------------------------------------------------------------*/
 
 extern VNMFragmentID	e_nsm_get_fragment_next(ENode *node, VNMFragmentID id);
-extern VMatFrag	*	e_nsm_get_fragment(ENode *node, VNMFragmentID id);
+extern VMatFrag *	e_nsm_get_fragment(ENode *node, VNMFragmentID id);
 extern VNMFragmentType	e_nsm_get_fragment_type(ENode *node, VNMFragmentID id);
-
 
 extern VNMFragmentID	e_nsm_get_fragment_color_front(ENode *node);
 extern VNMFragmentID	e_nsm_get_fragment_color_back(ENode *node);
@@ -204,26 +216,7 @@ extern void			e_nsb_evaluate_image_handle_tile(EBMHandle *handle, ebreal *output
 extern void			e_nsb_evaluate_image_handle_clamp(EBMHandle *handle, ebreal *output, ebreal u, ebreal v, ebreal w);
 extern void			e_nsb_destroy_image_handle(EBMHandle *handle);
 
-/* code node storage ----------------------------------------------------------------------------------------------------------------*/
-
-
-typedef void ETextBuffer;
-
-extern char *			e_nst_get_language(ENode *t_node);
-extern char *			e_nst_get_info(ENode *t_node);
-
-extern ETextBuffer *	e_nst_get_buffer_by_name(ENode *t_node, const char *name);
-extern ETextBuffer *	e_nst_get_buffer_by_id(ENode *t_node, uint buffer_id);
-extern ETextBuffer *	e_nst_get_buffer_next(ENode *t_node, uint buffer_id);
-
-extern char *			e_nst_get_buffer_name(ETextBuffer *buffer);
-extern uint				e_nst_get_buffer_id(ETextBuffer *buffer);
-extern uint				e_nst_get_buffer_length(ETextBuffer *buffer);
-extern char *			e_nst_get_buffer_text(ETextBuffer *buffer);
-
-
 /* curve node storage ----------------------------------------------------------------------------------------------------------------*/
-
 
 typedef void ECurve;
 
@@ -245,6 +238,46 @@ extern void				e_nsc_get_point(ECurve *curve, uint point_id, real64 *pre_value, 
 extern void				e_nsc_get_point_double(ECurve *curve, uint point_id, real64 *pre_value, real64 *pre_pos, real64 *value, real64 *pos, real64 *post_value, real64 *post_pos);
 extern void				e_nsc_get_segment(ECurve *curve, uint segment_nr, uint axis, real64 *point_0, real64 *point_1, real64 *point_2, real64 *point_3);
 
-extern void				e_nsc_send_c_key_set(ENode *node, ECurve *curve, uint32 key_id, real64 *pre_value, real64 *pre_pos, real64 *value, real64 *pos, real64 *post_value, real64 *post_pos);
+extern double				e_nsc_evaluate_curve(ECurve *curve, double *output, double pos);
 
+extern void				e_nsc_send_c_key_set(ENode *node, ECurve *curve, uint32 key_id, real64 *pre_value, real64 *pre_pos, real64 *value, real64 *pos, real64 *post_value, real64 *post_pos);
 #endif
+
+/* Text node storage ----------------------------------------------------------------------------------------------------------------*/
+
+
+typedef void ETextBuffer;
+
+extern char *			e_nst_get_language(ENode *t_node);
+extern ETextBuffer *	e_nst_get_buffer_by_name(ENode *node, char *name);
+extern ETextBuffer *	e_nst_get_buffer_by_id(ENode *node,  uint buffer_id);
+extern ETextBuffer *	e_nst_get_buffer_next(ENode *node, uint buffer_id);
+extern char *			e_nst_get_buffer_data(ENode *node, ETextBuffer *buffer);
+extern uint				e_nst_get_buffer_data_length(ENode *node, ETextBuffer *buffer);
+extern uint				e_nst_get_buffer_id(ETextBuffer *buffer);
+extern char *			e_nst_get_buffer_name(ETextBuffer *buffer);
+extern uint				e_nst_get_buffer_version(ETextBuffer *buffer);
+
+
+/* Audio node storage ----------------------------------------------------------------------------------------------------------------*/
+
+typedef void EAudioBuffer;
+typedef void EAudioStream;
+
+extern EAudioBuffer *		e_nsa_get_buffer_by_name(ENode *node, char *name);
+extern EAudioBuffer *		e_nsa_get_buffer_by_id(ENode *node,  uint buffer_id);
+extern EAudioBuffer *		e_nsa_get_buffer_next(ENode *node, uint buffer_id);
+extern char *			e_nsa_get_buffer_data(ENode *node, EAudioBuffer *buffer);
+extern uint			e_nsa_get_buffer_data_length(ENode *node, EAudioBuffer *buffer);
+extern uint			e_nsa_get_buffer_id(EAudioBuffer *buffer);
+extern char *			e_nsa_get_buffer_name(EAudioBuffer *buffer);
+extern VNABlockType		e_nsa_get_buffer_type(EAudioBuffer *buffer);
+extern double			e_nsa_get_buffer_frequency(EAudioBuffer *buffer);
+extern uint			e_nsa_get_buffer_version(EAudioBuffer *buffer);
+
+extern EAudioStream *		e_nsa_get_stream_by_name(ENode *node, char *name);
+extern EAudioBuffer *		e_nsa_get_stream_by_id(ENode *node,  uint stream_id);
+extern EAudioBuffer *		e_nsa_get_stream_next(ENode *node, uint stream_id);
+extern uint			e_nsa_get_stream_id(EAudioStream *stream);
+extern char *			e_nsa_get_stream_name(EAudioStream *stream);
+extern uint			e_nsa_get_stream_version(EAudioStream *stream);
