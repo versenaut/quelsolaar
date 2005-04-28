@@ -294,7 +294,7 @@ void co_vng_color(float red, float green, float blue)
 	glBlendFunc(GL_DST_COLOR, GL_ZERO);
 	sui_draw_set_vec3(COVNGraphicsData.color_color, COLOR_RING_SPLITS, red, green, blue);
 	sui_set_color_array_gl(COVNGraphicsData.color_color, COLOR_RING_SPLITS, 3);
-	sui_draw_ellements_gl(GL_TRIANGLES, COVNGraphicsData.color_vertex, COVNGraphicsData.color_ref, COLOR_RING_SPLITS * 3, 2, red, green, blue);
+	sui_draw_elements_gl(GL_TRIANGLES, COVNGraphicsData.color_vertex, COVNGraphicsData.color_ref, COLOR_RING_SPLITS * 3, 2, red, green, blue);
 }
 
 void co_vng_sunrays()
