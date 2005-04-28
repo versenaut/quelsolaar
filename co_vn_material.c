@@ -451,7 +451,7 @@ boolean handle_link(BInputState *input, ENode *node, uint16 *link, char *text, u
 				return TRUE;
 			}
 		}
-		if(drag != link && input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE && move != -1)
+		if(drag != link && input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE && move != (uint16) ~0u)
 		{
 			if((input->pointer_x - (pos->pos[0] - pos_x * 0.15)) * 
 				(input->pointer_x - (pos->pos[0] - pos_x * 0.15)) + 
@@ -599,7 +599,7 @@ void co_draw_material(ENode *node)
 	COVNMaterial *mat;
 	VNMFragmentID id;
 	id = e_nsm_get_fragment_color_front(node);
-	if(id == -1)
+	if(id == (VNMFragmentID) ~0u)
 		id = e_nsm_get_fragment_color_back(node);
 	if(e_nsm_get_fragment(node, id) != NULL)
 	{
