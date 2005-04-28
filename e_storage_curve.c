@@ -109,11 +109,13 @@ ESCurveNode *e_create_c_node(VNodeID node_id, VNodeOwner owner)
 }
 
 
-void delete_curve_curves_func(uint id, ESCurve *curve, void *user_data)
+void delete_curve_curves_func(uint id, void *curve, void *user_data)
 {
-	if(curve->points != NULL)
-		free(curve->points);
-	free(curve);
+	ESCurve	*real_curve = curve;
+
+	if(real_curve->points != NULL)
+		free(real_curve->points);
+	free(real_curve);
 }
 
 void delete_curve(ESCurveNode *node)
