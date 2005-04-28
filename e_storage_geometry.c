@@ -955,14 +955,14 @@ void es_geometry_init(void)
 	verse_callback_set(verse_send_g_layer_create,					callback_send_g_layer_create,					NULL);
 	verse_callback_set(verse_send_g_layer_destroy,					callback_send_g_layer_destroy,					NULL);
 
-#ifdef E_GEOMETRY_REAL_PRESISSION_64_BIT
+#ifdef E_GEOMETRY_REAL_PRECISION_64_BIT
 	verse_callback_set(verse_send_g_vertex_set_xyz_real64,			callback_send_g_vertex_set_real_xyz,			NULL);
 	verse_callback_set(verse_send_g_vertex_set_real64,				callback_send_g_vertex_set_real,				NULL);
 	verse_callback_set(verse_send_g_polygon_set_corner_real64,		callback_send_g_polygon_set_corner_real,		NULL);
 	verse_callback_set(verse_send_g_polygon_set_face_real64,		callback_send_g_polygon_set_face_real,			NULL);
 #endif
 
-#ifdef E_GEOMETRY_REAL_PRESISSION_32_BIT
+#ifdef E_GEOMETRY_REAL_PRECISION_32_BIT
 	verse_callback_set(verse_send_g_vertex_set_xyz_real32,			callback_send_g_vertex_set_real_xyz,			NULL);
 	verse_callback_set(verse_send_g_vertex_set_real32,				callback_send_g_vertex_set_real,				NULL);
 	verse_callback_set(verse_send_g_polygon_set_corner_real32,		callback_send_g_polygon_set_corner_real,		NULL);

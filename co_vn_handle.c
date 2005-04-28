@@ -156,11 +156,11 @@ void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 				*/		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 						glEnableClientState(GL_NORMAL_ARRAY);
 						glEnableClientState(GL_VERTEX_ARRAY);
-		#ifdef E_GEOMETRY_REAL_PRESISSION_64_BIT
+		#ifdef E_GEOMETRY_REAL_PRECISION_64_BIT
 						glVertexPointer(3, GL_DOUBLE, 0, p_rm_get_vertex(mesh));
 						glNormalPointer(GL_DOUBLE, 0 , p_rm_get_normal(mesh));
 		#endif
-		#ifdef E_GEOMETRY_REAL_PRESISSION_32_BIT
+		#ifdef E_GEOMETRY_REAL_PRECISION_32_BIT
 						glVertexPointer(3, GL_FLOAT, 0, p_rm_get_vertex(mesh));
 						glNormalPointer(GL_FLOAT, 0 , p_rm_get_normal(mesh));
 		#endif

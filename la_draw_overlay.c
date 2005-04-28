@@ -363,12 +363,12 @@ void draw_persuade_surface(ENode *node)
 //		glDisable(GL_TEXTURE_2D);
 
 
-#ifdef E_GEOMETRY_REAL_PRESISSION_64_BIT
+#ifdef E_GEOMETRY_REAL_PRECISION_64_BIT
 		glVertexPointer(3, GL_DOUBLE, 0, p_rm_get_vertex(mesh));
 		glNormalPointer(GL_DOUBLE, 0 , p_rm_get_normal(mesh));
 //		glNormalPointer(GL_DOUBLE, 0 , p_rm_get_vertex(mesh));
 #endif
-#ifdef E_GEOMETRY_REAL_PRESISSION_32_BIT
+#ifdef E_GEOMETRY_REAL_PRECISION_32_BIT
 		glVertexPointer(3, GL_FLOAT, 0, p_rm_get_vertex(mesh));
 		glNormalPointer(GL_FLOAT, 0 , p_rm_get_normal(mesh));
 #endif
