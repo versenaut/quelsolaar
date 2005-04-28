@@ -54,8 +54,7 @@ extern void	es_curve_init(void);
 extern void	es_audio_init(void);
 /* ------------------------------------------------------------------------------------------------------------------------- */
 
-
-boolean   e_ns_del_node(uint key, void *value, void *user_data)
+static void e_ns_del_node(uint key, void *value, void *user_data)
 {
 	switch(((ENodeHead *)value)->node_type)
 	{
@@ -81,7 +80,6 @@ boolean   e_ns_del_node(uint key, void *value, void *user_data)
 			delete_audio((ENodeHead *)value);
 			break;
 	}
-	return TRUE;
 }
 /*
 typedef enum {
