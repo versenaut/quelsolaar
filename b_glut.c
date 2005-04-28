@@ -55,7 +55,7 @@ void b_glut_mouse_func(int button, int state, int x, int y)
 
 //glutSpecialFunc(void (GLUTCALLBACK *func)(int key, int x, int y));
 
-void betray_insert_caracter_b(char caracter);
+void betray_insert_character_b(char character);
 
 void b_glut_special_keyboard_func(int key, int x, int y)
 {
@@ -64,7 +64,7 @@ void b_glut_special_keyboard_func(int key, int x, int y)
 	b_glut_passive_mouse_func(x, y);
 	if(betray_is_type_in())
 	{
-/*		betray_insert_caracter_b(key);
+/*		betray_insert_character_b(key);
 		return;
 */		if(key == GLUT_KEY_LEFT)
 			betray_move_cursor(-1);
@@ -85,7 +85,7 @@ void b_glut_keyboard_func(unsigned char key, int x, int y)
 
 	if(betray_is_type_in())
 	{
-/*		betray_insert_caracter(key);
+/*		betray_insert_character(key);
 		return;
 */		if(key == 13) /* RETURN */
 			betray_end_type_in_mode(FALSE);
@@ -94,18 +94,18 @@ void b_glut_keyboard_func(unsigned char key, int x, int y)
 		else if(key == 127) /* DELETE */
 		{
 			betray_move_cursor(1);
-			betray_delete_caracter();
+			betray_delete_character();
 		}
 		else if(key == 8) /* MACKSPACE */
 		{
-			betray_delete_caracter();
+			betray_delete_character();
 		}
 		else if(key == 12) /* CLEAR */
 		{
 			betray_move_cursor(-32000);
-			betray_insert_caracter(0);
+			betray_insert_character(0);
 		}else
-			betray_insert_caracter(key);
+			betray_insert_character(key);
 	}else
 	{
 		if(input->event_count >= MAX_EVENT_COUNT)

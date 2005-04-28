@@ -10,8 +10,8 @@
  * BETRAY_GLUT_SYSTEM_WRAPPER to use plain old GLUT.
 */
 
-#define BETRAY_GLUT_SYSTEM_WRAPPER
-/* define BETRAY_SDL_SYSTEM_WRAPPER */
+/*#define BETRAY_GLUT_SYSTEM_WRAPPER*/
+#define BETRAY_SDL_SYSTEM_WRAPPER
 
 #if defined BETRAY_SDL_SYSTEM_WRAPPER
 
@@ -102,8 +102,8 @@ extern void		betray_end_type_in_mode(boolean cancel);
 
 extern boolean	betray_is_type_in(void);
 extern void		betray_move_cursor(int move);
-extern void		betray_insert_caracter(char caracter);
-extern void		betray_delete_caracter(void);
+extern void		betray_insert_character(char character);
+extern void		betray_delete_character(void);
 
 extern char		*betray_debug(void);
 extern void		betray_launch_main_loop(void);

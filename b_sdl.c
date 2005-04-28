@@ -178,7 +178,7 @@ SDL_BUTTON_LEFT		1
 					else if(event.key.keysym.sym == SDLK_DELETE) /* DELETE */
 					{
 						betray_move_cursor(1);
-						betray_delete_caracter();
+						betray_delete_character();
 					}
 					else if(event.key.keysym.sym == SDLK_RIGHT)
 						betray_move_cursor(1);
@@ -190,14 +190,14 @@ SDL_BUTTON_LEFT		1
 						betray_move_cursor(-32000);
 					else if(event.key.keysym.sym == SDLK_BACKSPACE) /* MACKSPACE */
 					{
-						betray_delete_caracter();
+						betray_delete_character();
 					}
 					else if(event.key.keysym.sym == SDLK_CLEAR) /* CLEAR */
 					{
 						betray_move_cursor(-32000);
-						betray_insert_caracter(0);
+						betray_insert_character(0);
 					}else
-						betray_insert_caracter(event.key.keysym.sym);
+						betray_insert_character(event.key.keysym.sym);
 				}
 				else
 				{

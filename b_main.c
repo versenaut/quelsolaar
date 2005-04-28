@@ -198,24 +198,24 @@ void betray_end_type_in_mode(boolean cancel)
 	}
 }
 
-void betray_insert_caracter(char caracter)
+void betray_insert_character(char character)
 {
 	int i;
 	char temp;
-/*	sprintf(type_in_string, "%u", caracter);
+/*	sprintf(type_in_string, "%u", character);
 	return;
 */	if(type_in_length + 1 == type_in_alocated)
 		return;
 	for(i = (*cursor_pos_pointer)++; i < type_in_alocated; i++)
 	{
 		temp = type_in_string[i];
-		type_in_string[i] = caracter;
-		caracter = temp;
+		type_in_string[i] = character;
+		character = temp;
 	}
 	type_in_length++;
 }
 
-void betray_delete_caracter(void)
+void betray_delete_character(void)
 {
 	int i;
 	char temp , temp2 = 0;
