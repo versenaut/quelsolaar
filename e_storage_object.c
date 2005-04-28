@@ -297,6 +297,7 @@ void e_nso_get_pos_time(ESObjectNode *node, double *pos, uint32 time_s, uint32 t
 	double dt;
 	t = &((ESObjectNode *)node)->trans;
 	dt = e_get_delta_time(time_s, time_f);
+	/* FIXME: These equations seem to miss a 0.5 factor in the last term. /emil */
 	pos[0] = t->pos[0] + t->pos_speed[0] * dt + t->pos_accelerate[0] * dt * dt;
 	pos[1] = t->pos[1] + t->pos_speed[1] * dt + t->pos_accelerate[1] * dt * dt;
 	pos[2] = t->pos[2] + t->pos_speed[2] * dt + t->pos_accelerate[2] * dt * dt;
@@ -307,6 +308,7 @@ void e_nso_get_rot_time(ESObjectNode *node, VNQuat64 *rot, uint32 time_s, uint32
 	ESObjectTrans *t;
 	double dt;
 
+	/* FIXME: This code is very certainly incorrect -- you can't interpolate quaternions like this, can you? */
 	t = &((ESObjectNode *)node)->trans;
 	dt = e_get_delta_time(time_s, time_f);
 	rot->x = t->rot.x + t->rot_speed.x * dt + t->rot_accelerate.x * dt * dt;
