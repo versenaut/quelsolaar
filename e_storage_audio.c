@@ -157,14 +157,16 @@ ESAudioNode *e_create_a_node(VNodeID node_id, VNodeOwner owner)
 }
 
 
-void delete_audio_buffer_func(uint id, ESAudioBuffer *buffer, void *user_data)
+void delete_audio_buffer_func(uint id, void *buffer, void *user_data)
 {
-	if(buffer->data != NULL)
-		free(buffer->data);
-	free(buffer);
+	ESAudioBuffer	*real_buffer = buffer;
+
+	if(real_buffer->data != NULL)
+		free(real_buffer->data);
+	free(real_buffer);
 }
 
-void delete_audio_stream_func(uint id, ESAudioBuffer *buffer, void *user_data)
+void delete_audio_stream_func(uint id, void *buffer, void *user_data)
 {
 	free(buffer);
 }
