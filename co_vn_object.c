@@ -42,7 +42,8 @@ void rename_method_func(void *user, char *text)
 			for(j = e_nso_get_next_method(node, i, 0); j != (uint16)-1 && user != e_nso_get_method(node, i, j); j = e_nso_get_next_method(node, i, j + 1))
 			if(j != -1)
 			{
-				verse_send_o_method_create(rename_o_node_id, i, j, text, e_nso_get_method_param_count(node, i, j), e_nso_get_method_param_types(node, i, j), e_nso_get_method_param_names(node, i, j));
+				verse_send_o_method_create(rename_o_node_id, i, j, text, e_nso_get_method_param_count(node, i, j), e_nso_get_method_param_types(node, i, j),
+							   (const char **) e_nso_get_method_param_names(node, i, j));
 				return;
 			}
 		}
@@ -70,7 +71,7 @@ void rename_param_func(void *user, char *text)
 				{
 					temp_name = names[k];
 					names[k] = text;
-					verse_send_o_method_create(rename_o_node_id, i, j, e_nso_get_method(node, i, j), count, types, names);
+					verse_send_o_method_create(rename_o_node_id, i, j, e_nso_get_method(node, i, j), count, types, (const char **) names);
 					names[k] = temp_name;
 					return;
 				}
