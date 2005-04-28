@@ -123,11 +123,7 @@ uint system_wrapper_eventloop(BInputState *input)
 			break;
  
 			case SDL_MOUSEBUTTONUP: 
-			{/*
-SDL_BUTTON_LEFT		1
-#define SDL_BUTTON_MIDDLE	2
-#define SDL_BUTTON_RIGHT	3
-				*/
+			{
 				if(event.button.button == SDL_BUTTON_LEFT)
 					input->mouse_button[0] = FALSE;
 				else if(event.button.button == SDL_BUTTON_MIDDLE)
@@ -162,7 +158,6 @@ SDL_BUTTON_LEFT		1
 			break;
 			case SDL_QUIT:
 				return FALSE;
-			break;
 			break;
 			case SDL_VIDEORESIZE :
 				betray_reshape_view(event.resize.w, event.resize.h);
