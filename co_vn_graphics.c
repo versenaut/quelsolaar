@@ -30,7 +30,7 @@ struct{
 	float	*qubes;
 	float	*rays;
 	float	*color_vertex;
-	float	*color_ref;
+	uint	*color_ref;
 	float	*color_color;
 	float	*name;
 	float	*dust;
@@ -44,7 +44,7 @@ struct{
 	double	time;
 }COVNGraphicsData;
 
-void co_vng_init()
+void co_vng_init(void)
 {
 	uint i, temp;
 	double x, y, z, size;
