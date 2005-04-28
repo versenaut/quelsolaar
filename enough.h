@@ -157,8 +157,8 @@ extern char	*		e_nsg_get_bone_reference(ENode *g_node, uint16 bone_id);
 extern uint16		e_nsg_get_bone_parent(ENode *g_node, uint16 bone_id);
 extern void			e_nsg_get_bone_pos32(ENode *g_node, uint16 bone_id, float *pos);
 extern void			e_nsg_get_bone_pos64(ENode *g_node, uint16 bone_id, double *pos);
-extern void			e_nsg_get_bone_rot32(ENode *g_node, uint16 bone_id, float *rot);
-extern void			e_nsg_get_bone_rot64(ENode *g_node, uint16 bone_id, double *rot);
+extern void			e_nsg_get_bone_rot32(ENode *g_node, uint16 bone_id, VNQuat32 *rot);
+extern void			e_nsg_get_bone_rot64(ENode *g_node, uint16 bone_id, VNQuat64 *rot);
 /*
 extern void			e_nsg_get_bone_matrix32(ENode *o_node, ENode *g_node, uint16 bone_id, float *matrix);
 extern void			e_nsg_get_bone_matrix64(ENode *o_node, ENode *g_node, uint16 bone_id, double *matrix);
