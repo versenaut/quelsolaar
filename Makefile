@@ -14,7 +14,7 @@ ALL:		$(APPS)
 
 # -----------------------------------------------
 
-connector:	co_main.o co_game.o co_intro.o co_vn_bitmap.o co_vn_curve.o co_vn_geometry.o co_vn_graphics.o \
+connector:	co_main.o co_game.o co_intro.o co_vn_audio.o co_vn_bitmap.o co_vn_curve.o co_vn_geometry.o co_vn_graphics.o \
 		co_vn_handle.o co_vn_head.o co_vn_mat_render.o co_vn_material.o co_vn_object.o co_vn_search.o \
 		co_vn_text.o co_widgets.o  \
 		libseduce.a libbetray.a libenough.a
@@ -49,8 +49,8 @@ libseduce.a:	s_background.o s_draw.o s_editor.o s_line_font.o s_main.o s_popup.o
 libbetray.a:	b_glut.o b_main.o b_sdl.o
 		ar -cr $@ $^
 
-libenough.a:	e_storage_bitmap.o e_storage_curve.o e_storage_code.o e_storage_geometry.o e_storage_head.o e_storage_material.o \
-		e_storage_node.o e_storage_object.o st_types.o
+libenough.a:	e_storage_audio.o e_storage_bitmap.o e_storage_curve.o e_storage_geometry.o e_storage_head.o e_storage_material.o \
+		e_storage_node.o e_storage_object.o e_storage_text.o st_types.o
 		ar -cr $@ $^
 
 libpersuade.a:	p_geo_back_ref.o p_geo_renderable_mesh.o p_geo_subdivide.o p_geo_subdivide_basic.o p_geo_subdivide_depend.o \
