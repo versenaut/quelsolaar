@@ -276,7 +276,6 @@ float co_handle_node_head(BInputState *input, ENode *node)
 	
 	if(tag_rot > 0.01)
 	{
-		
 		if(sw_text_button(input, -0.3, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new tag group", color, color, color))
 		{
 			char nr[32];
