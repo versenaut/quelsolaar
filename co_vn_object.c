@@ -196,7 +196,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 					}
 					new_names[i] = "param";
 					new_types[i] = VN_O_METHOD_PTYPE_INT32;
-					verse_send_o_method_create(e_ns_get_node_id(node), m_group, method, e_nso_get_method(node, m_group, method), count + 1, new_types, new_names);
+					verse_send_o_method_create(e_ns_get_node_id(node), m_group, method, e_nso_get_method(node, m_group, method), count + 1, new_types, (const char **) new_names);
 				}			
 				for(i = 0; i < count; i++)
 				{
@@ -220,7 +220,8 @@ boolean co_handle_object(BInputState *input, ENode *node)
 								new_types[k++] = types[j];
 							}
 						}
-						verse_send_o_method_create(e_ns_get_node_id(node), m_group, method, e_nso_get_method(node, m_group, method), count - 1, new_types, new_names);
+						verse_send_o_method_create(e_ns_get_node_id(node), m_group, method, e_nso_get_method(node, m_group, method), count - 1,
+									   new_types, (const char **) new_names);
 					}
 
 					co_w_type_in(input, 0.15, y_meth, 0.5, SUI_T_SIZE, names[i], 16, rename_param_func, names[i], color, color_light);
@@ -268,7 +269,8 @@ boolean co_handle_object(BInputState *input, ENode *node)
 							VNOParamType temp;
 							temp = types[pu_p];
 							types[pu_p] = output;
-							verse_send_o_method_create(e_ns_get_node_id(node), m_group, method, e_nso_get_method(node, m_group, method), count, types, names);
+							verse_send_o_method_create(e_ns_get_node_id(node), m_group, method, e_nso_get_method(node, m_group, method), count,
+										   types, (const char **) names);
 							types[pu_p] = temp;
 							pu_g = -1;
 						}
