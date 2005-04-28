@@ -81,7 +81,7 @@ typedef void EObjLink;
 extern void			e_nso_get_pos(ENode *node, double *pos, double *speed, double *accelerate, double *drag_normal, double *drag, uint32 *time);
 extern void			e_nso_get_rot(ENode *node, VNQuat64 *rot, VNQuat64 *speed, VNQuat64 *accelerate, VNQuat64 *drag_normal, double *drag, uint32 *time);
 extern void			e_nso_get_pos_time(ENode *node, double *pos, uint32 time_s, uint32 time_f);
-extern void			e_nso_get_rot_time(ENode *node, double *rot, uint32 time_s, uint32 time_f);
+extern void			e_nso_get_rot_time(ENode *node, VNQuat64 *rot, uint32 time_s, uint32 time_f);
 extern void			e_nso_get_scale(ENode *node, double *scale);
 extern void			e_nso_get_rot_matrix(ENode *node, double *matrix, uint32 time_s, uint32 time_f);
 extern void			e_nso_get_matrix(ENode *node, double *matrix, uint32 time_s, uint32 time_f);
