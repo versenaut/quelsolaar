@@ -54,12 +54,12 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 	
 	y = co_handle_node_head(input, node);
 
-	co_vng_divider(input, 0.2, y, &rot_buffer, &color, &color_light, &show_buffer, "Layers");
+	co_vng_divider(input, 0.2, y, &rot_buffer, &color, &color_light, &show_buffer, "Buffers");
 	pre_expander = y;
 
 	if(rot_buffer > 0.001)
 	{
-		if(sw_text_button(input, -0.3, y - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new Layer", color, color, color))
+		if(sw_text_button(input, -0.3, y - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new buffer", color, color, color))
 		{
 
 			char nr[32];
@@ -81,13 +81,13 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 		for(buffer = e_nsa_get_buffer_next(node, 0); buffer != NULL ; buffer = e_nsa_get_buffer_next(node, e_nsa_get_buffer_id(buffer) + 1))
 		{
 			boolean e;
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer name:", color_light, color_light, color_light);  
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Buffer name:", color_light, color_light, color_light);  
 			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nsa_get_buffer_name(buffer), 16, rename_a_buffer_func, buffer, color, color_light);
 			if(co_w_close_button(input, 0.635, y, color, color, color))
 				verse_send_a_buffer_destroy(e_ns_get_node_id(node), e_nsa_get_buffer_id(buffer));
 			y -= 0.05;
 	
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer type:", color_light, color_light, color_light);  
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Buffer type:", color_light, color_light, color_light);  
 			sui_draw_text(0.15, y, SUI_T_SIZE, SUI_T_SPACE, buffer_type_names[e_nsa_get_buffer_type(buffer)], color, color, color);  
 
 			if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE && sui_box_click_test(0.0, y - SUI_T_SIZE, 0.7, SUI_T_SIZE * 3))
