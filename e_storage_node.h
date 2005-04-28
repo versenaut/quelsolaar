@@ -30,7 +30,7 @@ typedef struct{
 
 
 extern ENodeHead *e_ns_get_node_networking(uint node_id);
-extern void e_ns_init_head(ENodeHead *head, VNodeType type, VNodeID node_id, VNodeID owner_id);
+extern void e_ns_init_head(ENodeHead *head, VNodeType type, VNodeID node_id, VNodeOwner owner);
 extern void e_ns_execute(ENodeHead *head, ECustomDataCommand command);
 extern void e_ns_head_copy(ENodeHead *node_from, ENodeHead *node_to, VNodeType type);
 
