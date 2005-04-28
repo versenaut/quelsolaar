@@ -44,14 +44,14 @@ extern void	delete_text(ENodeHead *node);
 extern void	delete_curve(ENodeHead *node);
 extern void	delete_audio(ENodeHead *node);
 
-extern void es_head_init();
-extern void	es_object_init();
-extern void	es_geometry_init();
-extern void	es_material_init();
-extern void	es_bitmap_init();
-extern void es_text_init();
-extern void	es_curve_init();
-extern void	es_audio_init();
+extern void es_head_init(void);
+extern void	es_object_init(void);
+extern void	es_geometry_init(void);
+extern void	es_material_init(void);
+extern void	es_bitmap_init(void);
+extern void es_text_init(void);
+extern void	es_curve_init(void);
+extern void	es_audio_init(void);
 /* ------------------------------------------------------------------------------------------------------------------------- */
 
 
