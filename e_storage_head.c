@@ -175,7 +175,7 @@ uint16 e_ns_get_next_tag_group(const ENodeHead *node, uint16 group_id)
 {
 	for(;node->group_count > group_id && ((ETagGroup *)node->tag_groups)[group_id].group_name[0] == 0; group_id++);
 	if(node->group_count == group_id)
-		return -1;
+		return (uint16) ~0u;
 	return group_id;
 }
 
