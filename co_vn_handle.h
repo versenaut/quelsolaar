@@ -2,7 +2,7 @@
 #define CO_ENOUGH_NODE_SLOT 2
 #define CO_ENOUGH_DATA_SLOT 1
 
-extern void co_init_handle_verse_node();
+extern void co_init_handle_verse_node(void);
 
 extern uint co_vn_mouse_over(BInputState *input);
 extern void co_vn_unhide_node(uint node_id, float pos_x, float pos_y);
@@ -34,6 +34,6 @@ extern boolean co_vn_position_get(uint node_id, float *pos);
 extern void material_func(ENode *node, VNMFragmentID frag, ECustomDataCommand command);
 
 extern void co_vn_link_init(void);
-extern void co_vn_link_start(uint node_id,	VNodeType node_type, uint fragment);
+extern void co_vn_link_start(uint node_id, VNodeType node_type, uint fragment);
 extern void co_vn_link_continue(BInputState *input, float pos_x, float pos_y);
-boolean co_vn_link_active(void);
+extern boolean co_vn_link_active(void);
