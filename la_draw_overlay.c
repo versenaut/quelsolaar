@@ -728,7 +728,7 @@ void draw_owerlay_edge(void)
 	{
 		sui_set_blend_gl(GL_ONE, GL_ONE);
 		sui_set_color_array_gl(edge_color, el * 5, 3);
-		sui_draw_ellements_gl(GL_LINES, edge_array, edge_ref, el * 8, 3, 1, 1, 1);
+		sui_draw_elements_gl(GL_LINES, edge_array, edge_ref, el * 8, 3, 1, 1, 1);
 	}
 }
 
