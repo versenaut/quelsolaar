@@ -281,10 +281,10 @@ float co_handle_node_head(BInputState *input, ENode *node)
 		{
 			char nr[32];
 			j = 0;
-			for(i = e_ns_get_next_tag_group(node, 0); i != -1 ; i = e_ns_get_next_tag_group(node, i + 1))
+			for(i = e_ns_get_next_tag_group(node, 0); i != (uint16) ~0u ; i = e_ns_get_next_tag_group(node, i + 1))
 				j++;
 			sprintf(nr, "group_%u", j);
-			verse_send_tag_group_create(e_ns_get_node_id(node), -1, nr);
+			verse_send_tag_group_create(e_ns_get_node_id(node), (uint16) ~0u, nr);
 		}
 		y -= 0.05;
 		if((uint16) -1 == e_ns_get_next_tag_group(node, 0))
