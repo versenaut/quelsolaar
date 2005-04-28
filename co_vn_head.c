@@ -300,16 +300,16 @@ float co_handle_node_head(BInputState *input, ENode *node)
 			{
 				char nr[32];
 				k = 0;
-				for(j = e_ns_get_next_tag(node, i, 0); j != -1 ; j = e_ns_get_next_tag(node, i, j + 1))
+				for(j = e_ns_get_next_tag(node, i, 0); j != (uint16) ~0u ; j = e_ns_get_next_tag(node, i, j + 1))
 					k++;
 				sprintf(nr, "tag_%u", k);
 				t.vboolean = TRUE;
-				verse_send_tag_create(e_ns_get_node_id(node), i, -1, nr, VN_TAG_BOOLEAN, &t);
+				verse_send_tag_create(e_ns_get_node_id(node), i, (uint16) ~0u, nr, VN_TAG_BOOLEAN, &t);
 			}
 			if(co_w_close_button(input, 0.635, y + size, color, color, color))
 				verse_send_tag_group_destroy(e_ns_get_node_id(node), i);
 			size = -0.05;
-			for(j = e_ns_get_next_tag(node, i, 0); j != (uint16) -1 ; j = e_ns_get_next_tag(node, i, j + 1))
+			for(j = e_ns_get_next_tag(node, i, 0); j != (uint16) ~0u ; j = e_ns_get_next_tag(node, i, j + 1))
 			{
 				static char *tag_type_names[] = {"VN_TAG_BOOLEAN", "VN_TAG_UINT32","VN_TAG_REAL64", "VN_TAG_STRING", "VN_TAG_REAL64_VEC3", "VN_TAG_LINK", "VN_TAG_ANIMATION", "VN_TAG_BLOB"};
 				tag = e_ns_get_tag(node, i, j);
