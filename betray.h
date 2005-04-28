@@ -4,21 +4,45 @@
 
 #include "st_types.h"
 
-/* Basic functionality */
+/* ----------------------------------------------------------------------------------------- */
 
-/* Define this to use SDL, otherwise GLUT is used as the back end layer. */
-/*#define BETRAY_SDL_SYSTEM_WRAPPER*/
+/* Define BETRAY_SDL_SYSTEM_WRAPPER to use SDL for system access, or define
+ * BETRAY_GLUT_SYSTEM_WRAPPER to use plain old GLUT.
+*/
 
-#if !defined(BETRAY_SDL_SYSTEM_WRAPPER)
 #define BETRAY_GLUT_SYSTEM_WRAPPER
-#include <GL/glut.h>
-#else
+/* define BETRAY_SDL_SYSTEM_WRAPPER */
+
+#if defined BETRAY_SDL_SYSTEM_WRAPPER
+
 #include <SDL/SDL.h>
+
+/* On Windows, we also need the main platform header file. */
 #ifdef WIN32
-	#include <windows.h>
+#include <windows.h>
 #endif
+
+/* Get hold of OpenGL main header, gl.h. */
+#if defined __APPLE_CC__
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
 #endif
+
+#elif defined BETRAY_GLUT_SYSTEM_WRAPPER
+
+/* Get hold of glut.h include file. Need to be Mac-specific, here. */
+#if defined __APPLE_CC__
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
+
+#else
+#error "Please choose a system wrapper to use."
+#endif
+
+/* ----------------------------------------------------------------------------------------- */
 
 #define DEVICE_BUTTONS_COUNT 16
 #define MAX_EVENT_COUNT 64
