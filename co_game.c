@@ -103,7 +103,7 @@ void co_fire(float rotation)
 	COGame.fire_time = 0;
 }
 
-void co_end_game()
+void co_end_game(void)
 {
 	uint i;
 	for(i = 0; i < COGame.pebbel_count; i++)
@@ -125,7 +125,7 @@ void co_create_pebel(uint type, float pos_x, float pos_y, float scale)
 	COGame.pebbel_count++;
 }
 
-boolean co_is_game_active()
+boolean co_is_game_active(void)
 {
 	return active_game;
 }
@@ -440,7 +440,7 @@ void co_pos_wrap(float *pos)
 		pos[1] += 2 * COGame.aspect; 
 }
 
-void co_draw_dust()
+void co_draw_dust(void)
 {
 	boolean alive = FALSE;
 	COParticle *p;
