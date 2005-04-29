@@ -22,6 +22,7 @@ static void save_object(FILE *f, ENode *o_node)
 		"VN_O_METHOD_PTYPE_STRING",
 		"VN_O_METHOD_PTYPE_NODE", "VN_O_METHOD_PTYPE_LAYER"};
 	double tmp[4];
+	VNQuat64	rot;
 	uint32 time[2], i;
 	EObjLink *link;
 	uint16 group_id, method_id;
@@ -31,8 +32,8 @@ static void save_object(FILE *f, ENode *o_node)
 	fprintf(f, "\t\t%f %f %f\n", tmp[0], tmp[1], tmp[2]);
 	fprintf(f, "\t</position>\n");
 	fprintf(f, "\t<rotation>\n");
-	e_nso_get_rot(o_node, tmp, NULL, NULL, NULL, NULL, time);
-	fprintf(f, "\t\t%f %f %f %f\n", tmp[0], tmp[1], tmp[2], tmp[3]);
+	e_nso_get_rot(o_node, &rot, NULL, NULL, NULL, NULL, time);
+	fprintf(f, "\t\t%f %f %f %f\n", rot.x, rot.y, rot.z, rot.w);
 	fprintf(f, "\t</rotation>\n");
 	fprintf(f, "\t<scale>\n");
 	e_nso_get_scale(o_node, tmp);
@@ -450,7 +451,7 @@ static void save_text(FILE *f, ENode *t_node)
 	for(buffer = e_nst_get_buffer_next(t_node, 0); buffer != NULL; buffer = e_nst_get_buffer_next(t_node, e_nst_get_buffer_id(buffer) + 1))
 	{
 		fprintf(f, "\t<buffer>\n");
-		fprintf(f, "%s", e_nst_get_buffer_text(buffer));
+		fprintf(f, "%s", e_nst_get_buffer_data(t_node, buffer));
 		fprintf(f, "\t</buffer>\n");
 	}
 	fprintf(f, "\t</buffers>\n");
