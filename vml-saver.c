@@ -369,7 +369,7 @@ static void save_bitmap(FILE *f, ENode *b_node)
 						for(k = 0; k < VN_B_TILE_SIZE && (i % tiles[0]) * VN_B_TILE_SIZE - size[0]; k++)
 							fprintf(f, "%u ", ((uint8 *)data)[start + k + j * size[0]]);
 						for(; k < VN_B_TILE_SIZE; k++)
-							fprintf(f, "%u ", ((uint8 *)data)[start + k + j * size[0]]);
+							fprintf(f, "0 ");
 						fprintf(f, "\n\t\t\t");
 					}
 					for(; j < VN_B_TILE_SIZE; j++)
@@ -661,6 +661,7 @@ int main(int argc, char **argv)
 		while(seconds < s + interval/* && verse_session_get_size() == 0*/)
 		{
 			verse_callback_update(1000);
+			download_data();
 			verse_session_get_time(&seconds, NULL);
 		//	printf(".");
 		}
