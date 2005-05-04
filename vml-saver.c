@@ -581,7 +581,7 @@ static void save_data(FILE *f)
 
 static void download_data(void)
 {
-	void *layer;
+	void *layer, *buffer;
 	ENode *node;
 
 	for(node = e_ns_get_node_next(0, 0, V_NT_GEOMETRY); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_GEOMETRY))
@@ -590,6 +590,9 @@ static void download_data(void)
 	for(node = e_ns_get_node_next(0, 0, V_NT_BITMAP); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_BITMAP))
 		for(layer = e_nsb_get_layer_next(node, 0); layer != NULL; layer = e_nsb_get_layer_next(node, e_nsb_get_layer_id(layer) + 1))
 			e_nsb_get_layer_data(node, layer);
+	for(node = e_ns_get_node_next(0, 0, V_NT_TEXT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_TEXT))
+		for(buffer = e_nst_get_buffer_next(node, 0); buffer != NULL; buffer = e_nst_get_buffer_next(node, e_nst_get_buffer_id(buffer) + 1))
+			e_nst_get_buffer_data(node, buffer);
 }
 
 static const char * find_param(int argc, char **argv, const char *option, const char *default_text)
