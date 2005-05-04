@@ -2,6 +2,7 @@
  * 
 */
 
+#include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -335,106 +336,89 @@ static void save_material(FILE *f, ENode *m_node)
 	fprintf(f, "\t</fragments>\n");
 }
 
+static void tile_get(VNBTile *tile, int x, int y, int z, const void *data, VNBLayerType type, const uint *size)
+{
+	uint32	wt = (size[0] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE, ht = (size[1] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE,
+		tw = x == (wt - 1) && (size[0] % VN_B_TILE_SIZE) != 0 ? size[0] % VN_B_TILE_SIZE : VN_B_TILE_SIZE,
+		th = y == (ht - 1) && (size[1] % VN_B_TILE_SIZE) != 0 ? size[1] % VN_B_TILE_SIZE : VN_B_TILE_SIZE,
+		zoff, tx, ty, put, get;
+
+	zoff = z * size[0] * size[1];	/* Z offset, in pixels. */
+
+	printf("tile (%u,%u) is %ux%u\n", x, y, tw, th);
+	memset(tile, 0, sizeof *tile);
+	for(ty = 0; ty < th; ty++)
+	{
+		get = zoff + (y * VN_B_TILE_SIZE + ty) * size[0] + x * VN_B_TILE_SIZE;
+		put = ty * VN_B_TILE_SIZE;	/* Reset for each row, as they might be short. */
+		for(tx = 0; tx < tw; tx++, put++, get++)
+		{
+			if(type == VN_B_LAYER_UINT1)
+				tile->vuint1[put] = 0;	/* FIXME: Code missing here. Not certain of Enough's 1-bit format. */
+			else if(type == VN_B_LAYER_UINT8)
+				tile->vuint8[put] = ((uint8 *) data)[get];
+			else if(type == VN_B_LAYER_UINT16)
+				tile->vuint16[put] = ((uint16 *) data)[get];
+			else if(type == VN_B_LAYER_REAL32)
+				tile->vreal32[put] = ((real32 *) data)[get];
+			else if(type == VN_B_LAYER_REAL64)
+				tile->vreal64[put] = ((real64 *) data)[get];
+		}
+	}
+}
+
 static void save_bitmap(FILE *f, ENode *b_node)
 {
 	static const char *layer_type[] = {"VN_B_LAYER_UINT1", "VN_B_LAYER_UINT8", "VN_B_LAYER_UINT16", "VN_B_LAYER_REAL32", "VN_B_LAYER_REAL64"};
 	EBitLayer *layer;
-	uint size[3], i, j, k, start, tiles[2];
+	uint size[3], i, j, k, start, tiles[2], tx, ty;
 	void *data;
+	VNBTile	tile;
+	VNBLayerType	type;
 
 	e_nsb_get_size(b_node, &size[0], &size[1], &size[2]);
 	fprintf(f, "\t<dimensions>%u %u %u</dimensions>\n", size[0], size[1], size[2]);
 	fprintf(f, "\t<layers>\n");
 	
-	tiles[0] = ((size[0] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE);
-	tiles[1] = ((size[1] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE);
+	tiles[0] = (size[0] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE;
+	tiles[1] = (size[1] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE;
 	
 	for(layer = e_nsb_get_layer_next(b_node, 0); layer != NULL; layer = e_nsb_get_layer_next(b_node, e_nsb_get_layer_id(layer) + 1))
 	{
 		fprintf(f, "\t\t<layer name=\"%s\" type=\"%s\">\n", e_nsb_get_layer_name(layer), layer_type[e_nsb_get_layer_type(layer)]);
 		fprintf(f, "\t\t<tiles>\n");
 		data = e_nsb_get_layer_data(b_node, layer);
+		type = e_nsb_get_layer_type(layer);
 
-		switch(e_nsb_get_layer_type(layer))
+		for(i = 0; i < size[2]; i++)
 		{
-			case VN_B_LAYER_UINT1 :
-			break;
-			case VN_B_LAYER_UINT8 :
-				for(i = 0; i < ((size[0] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE) * ((size[1] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE) * size[2]; i++)
+			for(j = 0; j < tiles[1]; j++)
+			{
+				for(k = 0; k < tiles[0]; k++)
 				{
-					fprintf(f, "\t\t<tile tile_x=\"%u\" tile_y=\"%u\" tile_z=\"%u\">\n\t\t\t", i % tiles[0], (i / tiles[0]) % tiles[1], (i / (tiles[0] * tiles[1])) % (tiles[0] * tiles[1]));
-					start = i * VN_B_TILE_SIZE * VN_B_TILE_SIZE;
-					for(j = 0; j < VN_B_TILE_SIZE && ((i / tiles[0]) % tiles[1]) * VN_B_TILE_SIZE - size[1]; j++)
+					fprintf(f, "\t\t<tile tile_x=\"%u\" tile_y=\"%u\" tile_z=\"%u\">\n", k, j, i);
+					tile_get(&tile, k, j, i, data, e_nsb_get_layer_type(layer), size);
+					for(ty = 0; ty < VN_B_TILE_SIZE; ty++)
 					{
-						for(k = 0; k < VN_B_TILE_SIZE && (i % tiles[0]) * VN_B_TILE_SIZE - size[0]; k++)
-							fprintf(f, "%u ", ((uint8 *)data)[start + k + j * size[0]]);
-						for(; k < VN_B_TILE_SIZE; k++)
-							fprintf(f, "0 ");
-						fprintf(f, "\n\t\t\t");
+						fprintf(f, "\t\t");
+						for(tx = 0; tx < VN_B_TILE_SIZE; tx++)
+						{
+							if(type == VN_B_LAYER_UINT1)
+								fprintf(f, " %c", tile.vuint1[ty * VN_B_TILE_SIZE / CHAR_BIT] & (1 << (CHAR_BIT - tx - 1)) ? '1' : '0');
+							else if(type == VN_B_LAYER_UINT8)
+								fprintf(f, " %u", tile.vuint8[ty * VN_B_TILE_SIZE + tx]);
+							else if(type == VN_B_LAYER_UINT16)
+								fprintf(f, " %u", tile.vuint16[ty * VN_B_TILE_SIZE + tx]);
+							else if(type == VN_B_LAYER_REAL32)
+								fprintf(f, " %g", tile.vreal32[ty * VN_B_TILE_SIZE + tx]);
+							else if(type == VN_B_LAYER_REAL64)
+								fprintf(f, " %g", tile.vreal64[ty * VN_B_TILE_SIZE + tx]);
+						}
+						fprintf(f, "\n");
 					}
-					for(; j < VN_B_TILE_SIZE; j++)
-						for(k = 0; k < VN_B_TILE_SIZE; k++)
-							fprintf(f, "0 ");
-					fprintf(f, "</tile>\n");
+					fprintf(f, "\t\t</tile>\n");
 				}
-			break;
-			case VN_B_LAYER_UINT16 :
-				for(i = 0; i < ((size[0] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE) * ((size[1] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE) * size[2]; i++)
-				{
-					fprintf(f, "\t\t<tile tile_x=\"%u\" tile_y=\"%u\" tile_z=\"%u\">\n\t\t\t", i % tiles[0], (i / tiles[0]) % tiles[1], (i / (tiles[0] * tiles[1])) % (tiles[0] * tiles[1]));
-					start = i * VN_B_TILE_SIZE * VN_B_TILE_SIZE;
-					for(j = 0; j < VN_B_TILE_SIZE && ((i / tiles[0]) % tiles[1]) * VN_B_TILE_SIZE - size[1]; j++)
-					{
-						for(k = 0; k < VN_B_TILE_SIZE && (i % tiles[0]) * VN_B_TILE_SIZE - size[0]; k++)
-							fprintf(f, "%u ", ((uint16 *)data)[start + k + j * size[0]]);
-						for(; k < VN_B_TILE_SIZE; k++)
-							fprintf(f, "%u ", ((uint16 *)data)[start + k + j * size[0]]);
-						fprintf(f, "\n\t\t\t");
-					}
-					for(; j < VN_B_TILE_SIZE; j++)
-						for(k = 0; k < VN_B_TILE_SIZE; k++)
-							fprintf(f, "0 ");
-					fprintf(f, "</tile>\n");
-				}
-			break;
-			case VN_B_LAYER_REAL32 :
-				for(i = 0; i < ((size[0] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE) * ((size[1] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE) * size[2]; i++)
-				{
-					fprintf(f, "\t\t<tile tile_x=\"%u\" tile_y=\"%u\" tile_z=\"%u\">\n\t\t\t", i % tiles[0], (i / tiles[0]) % tiles[1], (i / (tiles[0] * tiles[1])) % (tiles[0] * tiles[1]));
-					start = i * VN_B_TILE_SIZE * VN_B_TILE_SIZE;
-					for(j = 0; j < VN_B_TILE_SIZE && ((i / tiles[0]) % tiles[1]) * VN_B_TILE_SIZE - size[1]; j++)
-					{
-						for(k = 0; k < VN_B_TILE_SIZE && (i % tiles[0]) * VN_B_TILE_SIZE - size[0]; k++)
-							fprintf(f, "%f ", ((float *)data)[start + k + j * size[0]]);
-						for(; k < VN_B_TILE_SIZE; k++)
-							fprintf(f, "%f ", ((float *)data)[start + k + j * size[0]]);
-						fprintf(f, "\n\t\t\t");
-					}
-					for(; j < VN_B_TILE_SIZE; j++)
-						for(k = 0; k < VN_B_TILE_SIZE; k++)
-							fprintf(f, "0 ");
-					fprintf(f, "</tile>\n");
-				}
-			break;
-			case VN_B_LAYER_REAL64 :
-				for(i = 0; i < ((size[0] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE) * ((size[1] + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE) * size[2]; i++)
-				{
-					fprintf(f, "\t\t<tile tile_x=\"%u\" tile_y=\"%u\" tile_z=\"%u\">\n\t\t\t", i % tiles[0], (i / tiles[0]) % tiles[1], (i / (tiles[0] * tiles[1])) % (tiles[0] * tiles[1]));
-					start = i * VN_B_TILE_SIZE * VN_B_TILE_SIZE;
-					for(j = 0; j < VN_B_TILE_SIZE && ((i / tiles[0]) % tiles[1]) * VN_B_TILE_SIZE - size[1]; j++)
-					{
-						for(k = 0; k < VN_B_TILE_SIZE && (i % tiles[0]) * VN_B_TILE_SIZE - size[0]; k++)
-							fprintf(f, "%f ", ((double *)data)[start + k + j * size[0]]);
-						for(; k < VN_B_TILE_SIZE; k++)
-							fprintf(f, "%f ", ((double *)data)[start + k + j * size[0]]);
-						fprintf(f, "\n\t\t\t");
-					}
-					for(; j < VN_B_TILE_SIZE; j++)
-						for(k = 0; k < VN_B_TILE_SIZE; k++)
-							fprintf(f, "0 ");
-					fprintf(f, "</tile>\n");
-				}
-			break;
+			}
 		}
 		fprintf(f, "\t\t</tiles>\n");
 		fprintf(f, "\t\t</layer>\n");
