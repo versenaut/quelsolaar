@@ -506,78 +506,75 @@ void callback_send_b_tile_set(void *user_data, VNodeID node_id, VLayerID layer_i
 	ESBitmapNode		*node;
 	ESBitmapLayer		*layer;
 	float				*buf;
-	uint32				i, x, y, x_ofset, y_ofset, z_ofset, pixel_id, x_tilesize, y_tilesize;
+	uint32				i, x, y, x_ofset, y_ofset, z_ofset, pixel_id, x_tilesize, y_tilesize, tw, th;
 	node = e_create_b_node(node_id, 0);
 
 	layer = find_dlut(&node->layertables, layer_id);
 	if(layer == NULL)
 		return;
 
+	if(layer->type != type)
+		return;
 	x_ofset = tile_x * VN_B_TILE_SIZE;
 	y_ofset = tile_y * VN_B_TILE_SIZE;
 	z_ofset = node->size_x * node->size_y * z;
-	if(layer->type != type)
-		return;
+	x_tilesize = (node->size_x + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE;
+	y_tilesize = (node->size_y + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE;
+	tw = (tile_x == x_tilesize - 1) && (node->size_x % VN_B_TILE_SIZE) != 0 ? node->size_x % VN_B_TILE_SIZE : VN_B_TILE_SIZE;
+	th = (tile_y == y_tilesize - 1) && (node->size_y % VN_B_TILE_SIZE) != 0 ? node->size_y % VN_B_TILE_SIZE : VN_B_TILE_SIZE;
+	printf("tile (%u,%u) is %ux%u\n", tile_x, tile_y, tw, th);
 	switch(type)
 	{
 		case VN_B_LAYER_UINT1 :
-		printf("ONE BIT TEXTURE LAYERS NOT SUPORTED");
+		fprintf(stderr, "ONE-BIT BITMAP LAYERS NOT SUPPORTED");
 		break;
 		case VN_B_LAYER_UINT8 :
 		{
-			uint8	*array, value;
-			array = layer->data;
-			for(y = 0; y < VN_B_TILE_SIZE; y++)
+			uint8	*array = layer->data;
+			for(y = 0; y < th; y++)
 			{
-				for(x = 0; x < VN_B_TILE_SIZE; x++)
+				for(x = 0; x < tw; x++)
 				{
-					pixel_id = ((y_ofset + y) * node->size_x) + x_ofset + x;
-					if(pixel_id < node->size_x * node->size_y)
-						array[pixel_id + z_ofset] = tile->vuint8[(y * VN_B_TILE_SIZE) + x];
+					pixel_id = (y_ofset + y) * node->size_x + x_ofset + x;
+					array[pixel_id + z_ofset] = tile->vuint8[y * VN_B_TILE_SIZE + x];
 				}
 			}
 		}
 		break;
 		case VN_B_LAYER_UINT16 :
 		{
-			uint16	*array;
-			array = layer->data;
-			for(y = 0; y < VN_B_TILE_SIZE; y++)
+			uint16	*array = layer->data;
+			for(y = 0; y < th; y++)
 			{
-				for(x = 0; x < VN_B_TILE_SIZE; x++)
+				for(x = 0; x < tw; x++)
 				{
-					pixel_id = ((y_ofset + y) * node->size_x) + x_ofset + x;
-					if(pixel_id < node->size_x * node->size_y)
-						array[pixel_id + z_ofset] = tile->vuint16[(y * VN_B_TILE_SIZE) + x];
+					pixel_id = (y_ofset + y) * node->size_x + x_ofset + x;
+					array[pixel_id + z_ofset] = tile->vuint16[y * VN_B_TILE_SIZE + x];
 				}
 			}
 		}
 		break;
 		case VN_B_LAYER_REAL32 :
 		{
-			float	*array;
-			array = layer->data;
-			for(y = 0; y < VN_B_TILE_SIZE; y++)
+			real32	*array = layer->data;
+			for(y = 0; y < th; y++)
 			{
-				for(x = 0; x < VN_B_TILE_SIZE; x++)
+				for(x = 0; x < tw; x++)
 				{
-					pixel_id = ((y_ofset + y) * node->size_x) + x_ofset + x;
-					if(pixel_id < node->size_x * node->size_y)
-						array[pixel_id + z_ofset] = tile->vreal32[(y * VN_B_TILE_SIZE) + x];
+					pixel_id = (y_ofset + y) * node->size_x + x_ofset + x;
+					array[pixel_id + z_ofset] = tile->vreal32[y * VN_B_TILE_SIZE + x];
 				}
 			}
 		}
 		case VN_B_LAYER_REAL64 :
 		{
-			double	*array;
-			array = layer->data;
-			for(y = 0; y < VN_B_TILE_SIZE; y++)
+			real64	*array = layer->data;
+			for(y = 0; y < th; y++)
 			{
-				for(x = 0; x < VN_B_TILE_SIZE; x++)
+				for(x = 0; x < tw; x++)
 				{
-					pixel_id = ((y_ofset + y) * node->size_x) + x_ofset + x;
-					if(pixel_id < node->size_x * node->size_y)
-						array[pixel_id + z_ofset] = tile->vreal64[(y * VN_B_TILE_SIZE) + x];
+					pixel_id = (y_ofset + y) * node->size_x + x_ofset + x;
+					array[pixel_id + z_ofset] = tile->vreal64[y * VN_B_TILE_SIZE + x];
 				}
 			}
 		}
