@@ -522,7 +522,6 @@ void callback_send_b_tile_set(void *user_data, VNodeID node_id, VLayerID layer_i
 	y_tilesize = (node->size_y + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE;
 	tw = (tile_x == x_tilesize - 1) && (node->size_x % VN_B_TILE_SIZE) != 0 ? node->size_x % VN_B_TILE_SIZE : VN_B_TILE_SIZE;
 	th = (tile_y == y_tilesize - 1) && (node->size_y % VN_B_TILE_SIZE) != 0 ? node->size_y % VN_B_TILE_SIZE : VN_B_TILE_SIZE;
-	printf("tile (%u,%u) is %ux%u\n", tile_x, tile_y, tw, th);
 	switch(type)
 	{
 		case VN_B_LAYER_UINT1 :
