@@ -52,7 +52,13 @@ ESTextBuffer *e_nst_get_buffer_next(ESTextNode *node, uint buffer_id)
 
 char *e_nst_get_buffer_data(ESTextNode *node, ESTextBuffer *buffer)
 {
-	return buffer->data;
+	if(node != NULL && buffer != NULL)
+	{
+		if(buffer->data == NULL)
+			verse_send_t_buffer_subscribe(node->head.node_id, buffer->buffer_id);
+		return buffer->data;
+	}
+	return NULL;
 }
 
 uint e_nst_get_buffer_data_length(ESTextNode *node, ESTextBuffer *buffer)
@@ -132,13 +138,11 @@ void callback_send_t_buffer_create(void *user, VNodeID node_id, VBufferID buffer
 		buffer->version = 0;
 		buffer->buffer_id = buffer_id;
 		add_entry_dlut(&node->buffertables, buffer_id, buffer);
-		printf("A added new buffer\n");
 	}
 	for(i = 0; i < 15 && name[i] != 0; i++)
 		buffer->name[i] = name[i];
-	buffer->name[i] = name[i];
+	buffer->name[i] = '\0';
 	buffer->version++;
-	printf("B added new buffer\n");
 	e_ns_update_node_version_struct(node);
 }
 
@@ -157,9 +161,28 @@ void callback_send_t_buffer_destroy(void *user, VNodeID node_id, VBufferID buffe
 	}
 }
 
+void callback_send_t_text_set(void *user, VNodeID node_id, VBufferID buffer_id, uint32 pos, uint32 length, const char *text)
+{
+	ESTextNode	*node;
+	ESTextBuffer	*buffer;
+
+	node = e_create_t_node(node_id, 0);
+	if((buffer = find_dlut(&node->buffertables, buffer_id)) != NULL)
+	{
+		uint32	ins = text != NULL ? strlen(text) : 0u;
+
+		if(pos > buffer->allocated - 1)
+			pos = buffer->allocated - 1;
+		printf("setting %u bytes of text at %u.%u [%u,%u]\n", ins, node_id, buffer_id, pos, pos + length);
+		if(strlen(text) < 20)
+			printf(" [%s]\n", text);
+	}
+}
+
 void es_text_init(void)
 {
 	verse_callback_set(verse_send_t_set_language,		callback_send_t_set_language,		NULL);
 	verse_callback_set(verse_send_t_buffer_create,		callback_send_t_buffer_create,		NULL);
 	verse_callback_set(verse_send_t_buffer_destroy,		callback_send_t_buffer_destroy,		NULL);
+	verse_callback_set(verse_send_t_text_set,		callback_send_t_text_set,		NULL);
 }
