@@ -345,7 +345,6 @@ static void tile_get(VNBTile *tile, int x, int y, int z, const void *data, VNBLa
 
 	zoff = z * size[0] * size[1];	/* Z offset, in pixels. */
 
-	printf("tile (%u,%u) is %ux%u\n", x, y, tw, th);
 	memset(tile, 0, sizeof *tile);
 	for(ty = 0; ty < th; ty++)
 	{
@@ -607,8 +606,8 @@ static const char * find_param(int argc, char **argv, const char *option, const 
 
 int main(int argc, char **argv)
 {
-	uint32 i, seconds, s, interval = 10;
-	const char *name, *pass, *address, *file;
+	uint32 i, seconds, s, interval;
+	const char *name, *pass, *address, *file, *tmp;
 	FILE *f;
 	int	repeat = 0;
 
@@ -618,6 +617,9 @@ int main(int argc, char **argv)
 	address = find_param(argc, argv, "-a", "localhost");
 	file = find_param(argc, argv, "-f", "dump.vml");
 	repeat = find_param(argc, argv, "-r", NULL) != NULL;
+	tmp = find_param(argc, argv, "-i", "10");
+	if(tmp != NULL)
+		interval = strtoul(tmp, NULL, 10);
 
 	for(i = 1; i < argc; i++)
 	{
