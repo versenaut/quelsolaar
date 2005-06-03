@@ -340,10 +340,10 @@ void p_shader_param_load(ENode *parent, uint32 node_id, egreal **geom_param, uin
 		if(geom_param != NULL && geom_param[i] != NULL)
 		{
 	p_glEnableVertexAttribArrayARB(s->geometry_fragments[i * 2 + 1]);
-#ifdef E_GEOMETRY_REAL_PRESISSION_32_BIT
+#ifdef E_GEOMETRY_REAL_PRECISION_32_BIT
 			p_glVertexAttribPointerARB(s->geometry_fragments[i * 2 + 1], 3, GL_FLOAT, FALSE, 0, geom_param[i]);
 #endif
-#ifdef E_GEOMETRY_REAL_PRESISSION_64_BIT
+#ifdef E_GEOMETRY_REAL_PRECISION_64_BIT
 			p_glVertexAttribPointerARB(s->geometry_fragments[i * 2 + 1], 3, GL_DOUBLE, FALSE, 0, geom_param[i]);
 #endif
 		}else

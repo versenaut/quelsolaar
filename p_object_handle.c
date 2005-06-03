@@ -253,12 +253,12 @@ void p_render_object(ENode *node)
 				glEnableClientState(GL_NORMAL_ARRAY);
 				glEnableClientState(GL_VERTEX_ARRAY);
 				glColor3f(0.8, 0.3, 0.4);
-			#ifdef E_GEOMETRY_REAL_PRESISSION_64_BIT
+			#ifdef E_GEOMETRY_REAL_PRECISION_64_BIT
 				glVertexPointer(3, GL_DOUBLE, 0, p_rm_get_vertex(set->draw));
 				glNormalPointer(GL_DOUBLE, 0 , p_rm_get_normal(set->draw));
 		//		glNormalPointer(GL_DOUBLE, 0 , p_rm_get_vertex(set->draw));
 			#endif
-			#ifdef E_GEOMETRY_REAL_PRESISSION_32_BIT
+			#ifdef E_GEOMETRY_REAL_PRECISION_32_BIT
 				glVertexPointer(3, GL_FLOAT, 0, p_rm_get_vertex(set->draw));
 				glNormalPointer(GL_FLOAT, 0 , p_rm_get_normal(set->draw));
 		//		glNormalPointer(GL_FLOAT, 0 , p_rm_get_vertex(set->draw));
