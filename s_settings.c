@@ -11,11 +11,11 @@ typedef struct{
 	uint	integer;
 }Setting;
 
-struct{
+static struct {
 	Setting			*array;
 	uint			count;
 	uint			version;
-}SUIGlobalSettings;
+}SUIGlobalSettings = { 0 };
 
 
 static Setting * get_setting(const char *name)
@@ -30,8 +30,11 @@ static Setting * get_setting(const char *name)
 static Setting * add_setting(const char *name)
 {
 	uint i;
-	for(i = 0; i < 32 && name[i] != 0; i++)
+
+	for(i = 0; i < 31 && name[i] != 0; i++)
 		SUIGlobalSettings.array[SUIGlobalSettings.count].name[i] = name[i];
+	SUIGlobalSettings.array[SUIGlobalSettings.count].name[i] = '\0';
+
 	SUIGlobalSettings.array[SUIGlobalSettings.count].text = NULL;
 	SUIGlobalSettings.array[SUIGlobalSettings.count].real = 0;
 	SUIGlobalSettings.array[SUIGlobalSettings.count].integer = 0;
