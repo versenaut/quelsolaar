@@ -4,11 +4,13 @@
 
 VERSE=../verse
 
+.PHONY:		clean
+
 CFLAGS=-I$(VERSE) -g -Wstrict-prototypes
 LDFLAGS=-L$(VERSE) -L/usr/X11R6/lib
 LDLIBS=-lverse -lGL -lm -lglut  -lGLU -lSDL
 
-APPS=connector uvedit loqairou #quelsolaar
+APPS=connector uvedit loqairou quelsolaar
 
 ALL:		$(APPS)
 
@@ -17,7 +19,7 @@ ALL:		$(APPS)
 connector:	co_main.o co_game.o co_intro.o co_vn_audio.o co_vn_bitmap.o co_vn_curve.o co_vn_geometry.o co_vn_graphics.o \
 		co_vn_handle.o co_vn_head.o co_vn_mat_render.o co_vn_material.o co_vn_object.o co_vn_search.o \
 		co_vn_text.o co_widgets.o  \
-		libseduce.a libbetray.a libenough.a
+		libseduce.a libbetray.a libenough.a libpersuade.a
 		gcc -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 uvedit:		uv_draw.o uv_edge_collapse.o uv_geometry.o uv_main.o uv_menu.o uv_overlay.o uv_popup.o uv_tool_corner.o\
@@ -53,10 +55,13 @@ libenough.a:	e_storage_audio.o e_storage_bitmap.o e_storage_curve.o e_storage_ge
 		e_storage_node.o e_storage_object.o e_storage_text.o st_types.o
 		ar -cr $@ $^
 
-libpersuade.a:	p_geo_back_ref.o p_geo_renderable_mesh.o p_geo_subdivide.o p_geo_subdivide_basic.o p_geo_subdivide_depend.o \
-		p_geo_subdivide_edge.o p_geo_subdivide_face.o p_geo_subdivide_param.o p_geo_subdivide_select.o p_geo_subdivide_vertex.o \
-		p_geo_tesselation_table.o p_geometry.o p_object_environment.o p_object_handle.o p_object_param.o p_object_render.o \
-		p_shader_bind.o p_shader_extension.o p_shader_writer.o p_task.o p_temp_draw.o p_texture.o
+libpersuade.a:	p_extension.o p_geometry.o p_object_environment.o p_object_handle.o p_object_light.o p_object_param.o \
+		p_object_render.o p_sds_array.o p_sds_geo_clean.o p_sds_geo_debug.o p_sds_geo_divide.o p_sds_obj.o \
+		p_sds_obj_anim.o p_sds_obj_displace.o p_sds_obj_edge_normal.o p_sds_obj_param.o p_sds_obj_sort.o p_sds_obj_tess.o \
+		p_sds_table.o p_sds_table_debug.o p_sds_table_edge_sort.o p_sds_table_normals.o p_sds_table_split.o p_shader_bind.o \
+		p_shader_extension.o p_shader_gl_one_fall_back.o p_shader_writer.o p_status_print.o \
+		p_task.o p_texture.o
+		ar -cr $@ $^
 
 # -----------------------------------------------
 
