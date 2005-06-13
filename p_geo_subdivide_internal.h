@@ -11,6 +11,8 @@ typedef struct{
 	ebreal	*vertex_influence; /*[array] vertex number , andt the values it is combined by in series of 3 or 4*/
 	uint	*index; /*[array] the reference offset for the final index */
 	uint	*reference; /*[array] the vertex order of ref form the rop data */
+	uint	*normals;
+	uint	edges[4];
 	uint	vertex_count; /* number of vertex in the tesselated polygon */
 	uint	element_count; /* number of elements in the tesselated polygon */
 }PTessTableElement;
@@ -159,9 +161,10 @@ typedef struct{
 		uint	length;
 	}depend;
 	struct{
-		uint32	*reference;
-		uint32	*count;
-		egreal	*weight;
+		uint32	*normal_ref;	
+		egreal	*normals;
+		egreal	*displacement;
+		egreal	*draw_normals;
 	}normal;
 }PMesh;
 
