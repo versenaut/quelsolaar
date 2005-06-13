@@ -5,7 +5,6 @@
 #include "la_tool.h"
 #include "la_pop_up.h"
 #include "la_particle_fx.h"
-#include "persuade.h"
 
 #define THREADED FALSE
 

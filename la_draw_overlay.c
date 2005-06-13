@@ -5,8 +5,6 @@
 #include "la_tool.h"
 #include "st_matrix_operations.h"
 
-#include "persuade.h"
-
 struct{
 	float		*active_vertex;
 	float		*active_vertex_shadow;
