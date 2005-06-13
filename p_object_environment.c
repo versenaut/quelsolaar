@@ -29,6 +29,7 @@
 #define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_EXT  0x851A 
 #define GL_PROXY_TEXTURE_CUBE_MAP_EXT       0x851B 
 #define GL_MAX_CUBE_MAP_TEXTURE_SIZE_EXT    0x851C 
+#define GL_CLAMP_TO_EDGE					0x812F
         
 
 GLuint texture_id, texture_id2, sphere_map;
@@ -291,7 +292,7 @@ PObjEnv *p_env_compute(PObjEnv *env)
 		}
 
 		for(; i < p_std_env_size * p_std_env_size * 6 * 4; i++)
-			env->a_buffer[i] = 10000000000;
+			env->a_buffer[i] = 1E300f;
 		env->environment_id = p_std_environment_id;
 		env->diffuse_environment_id = p_std_diffuse_environment_id;
 		return env;
@@ -299,7 +300,6 @@ PObjEnv *p_env_compute(PObjEnv *env)
 	switch(env->stage)
 	{
 		case 0 :
-			// loop the world
 			p_env_create_sky(p_vec_buffer, env->a_buffer, 1, env->size);
 			env->stage++;
 			env->sub_stage = 0;
@@ -312,6 +312,8 @@ PObjEnv *p_env_compute(PObjEnv *env)
 			glBindTexture(GL_TEXTURE_CUBE_MAP_EXT, env->environment_id);
 			if(env->sub_stage == 1)
 			{
+				glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 				glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_EXT, 0, GL_RGB, env->size, env->size, 0, GL_RGB, GL_FLOAT, env->a_buffer); 
@@ -351,6 +353,9 @@ PObjEnv *p_env_compute(PObjEnv *env)
 			glBindTexture(GL_TEXTURE_CUBE_MAP_EXT, env->diffuse_environment_id);
 			if(env->sub_stage == 1)
 			{
+
+				glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 				glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_EXT, 0, GL_RGB, env->size, env->size, 0, GL_RGB, GL_FLOAT, env->b_buffer); 
