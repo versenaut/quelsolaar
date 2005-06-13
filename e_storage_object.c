@@ -719,7 +719,19 @@ boolean e_nso_get_anim_active(ESLink *link)
 	return link->anim_scale_speed > 0.00001 || link->anim_scale_speed < 0.00001 || link->anim_scale > 0.00001 || link->anim_scale < 0.00001;
 }
 
+double e_nso_get_anim_evaluate_pos(ESLink *link, uint32 time_s, uint32 time_f)
+{
+	double delta;
+	delta = (double)(link->anim_time_s - time_s) + ((double)link->anim_time_f - (double)time_f) / (double) 0xffffffff;
+	return link->anim_pos + link->anim_speed * delta + link->anim_accel * delta * delta;
+}
 
+double e_nso_get_anim_evaluate_scale(ESLink *link, uint32 time_s, uint32 time_f)
+{
+	double delta;
+	delta = (double)(link->anim_time_s - time_s) + ((double)link->anim_time_f - (double)time_f) / (double) 0xffffffff;
+	return link->anim_scale + link->anim_scale_speed * delta;
+}
 
 void es_object_init(void)
 {
