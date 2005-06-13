@@ -10,6 +10,7 @@
 #include "e_storage_node.h"
 
 
+
 typedef struct{
 	VBufferID		buffer_id;
 	char			name[16];
@@ -24,6 +25,8 @@ typedef struct{
 	DynLookUpTable	buffertables;
 	char			language[512];
 }ESTextNode;
+
+extern void	e_ns_update_node_version_struct(ESTextNode *node);
 
 char* e_nst_get_language(ESTextNode *t_node)
 {
