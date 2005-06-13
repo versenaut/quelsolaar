@@ -3,7 +3,7 @@ extern void p_extention_init(void *(*gl_GetProcAddress)(const char* proc));
 extern boolean p_extention_test(char *string);
 
 extern void p_shader_init(void);
-extern void p_shader_param_load(ENode *parent, uint32 node_id, egreal **geom_param, uint environment, uint diffuse_environment);
+extern void p_shader_param_load(ENode *parent, uint32 node_id, void *array, uint count, uint environment, uint diffuse_environment);
 
 extern uint p_shader_get_param_count(ENode *node);
 extern VMatFrag *p_shader_get_param(ENode *node, uint nr);
