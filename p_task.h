@@ -1,4 +1,4 @@
-#define P_MAX_TASKS 30
+#define P_MAX_TASKS 30000
 
 void p_task_add(uint id, float importance, boolean (*func)(uint id));
 void p_task_compute(uint count);
