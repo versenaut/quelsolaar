@@ -2,16 +2,20 @@
 	#include <windows.h>
 	#include <GL/gl.h>
 #else
-	#include <gl.h>
+	#include <GL/gl.h>
 #endif
 
+#include "enough.h"
 #include "st_types.h"
 #include "p_task.h"
-#include "enough.h"
+#include "p_extension.h"
 
 #define TEXTURE_DEATH_COUNT 20
 #define STD_TEXTURE_SIZE 16
 #define PIXELS_PER_UPDATE 4096
+
+#define GL_RGBA_FLOAT32                 0x8814
+#define GL_RGB_FLOAT32                  0x8815
 
 typedef struct{
 	uint	texture_id;
@@ -33,6 +37,8 @@ struct{
 	uint			handel_count;
 	uint			std_texture_id;
 	uint			update_pos;
+	boolean			use32bit;
+	uint			floating_point_enum;
 }PTextureStorage;
 
 uint p_th_create_std_texture()
@@ -76,8 +82,12 @@ void p_th_init()
 	for(i = 0; i < PTextureStorage.handel_count; i++)
 		PTextureStorage.handels[i] = NULL;
 	PTextureStorage.std_texture_id = p_th_create_std_texture();
+	PTextureStorage.use32bit = TRUE;
+	if(p_extention_test("ATI_texture_float"))
+		PTextureStorage.floating_point_enum = GL_RGB_FLOAT32;
+	else
+		PTextureStorage.floating_point_enum = GL_RGB;
 }
-
 void p_th_texture_restart()
 {
 	uint i, texture;
@@ -110,9 +120,7 @@ void p_th_create_new_texture(ENode *node, PTextureHandle *handle)
 	handle->size_version = p_th_compute_size_check_sum(handle->size);
 	if(handle->size[0] * handle->size[1] * handle->size[2] != 0)
 	{
-		printf("texture_id pre %u\n", handle->texture_id);
 		glGenTextures(1, &handle->texture_id);
-		printf("texture_id post %u\n", handle->texture_id);
 		if(handle->size[2] != 1 && FALSE /* we do suport 3d textures*/)
 		{
 			if(TRUE)/* we dont handle any sized textures*/
@@ -225,8 +233,7 @@ PTextureHandle *p_th_create_texture_handle(uint node_id, char *layer_r, char *la
 	return h;
 }
 
-void p_th_destroy_texture_handle(PTextureHandle *handle)
-{
+void p_th_destroy_texture_handle(PTextureHandle *handle){
 	handle->users--;
 }
 
@@ -234,6 +241,12 @@ uint p_th_get_texture_id(PTextureHandle *handle)
 {
 	return handle->texture_id;
 }
+
+uint p_th_get_texture_dimentions(PTextureHandle *handle)
+{
+	return GL_TEXTURE_2D;
+}
+
 
 /*
 typedef void EBMHandle;
@@ -261,7 +274,7 @@ void p_th_update_texture(PTextureHandle *handle)
 		size = handle->size[1] - handle->update_position;
 	buf = malloc((sizeof *buf) * size * handle->size[0] * 3);
 	h = e_nsb_get_image_handle(handle->node_id, handle->layer_r, handle->layer_g, handle->layer_b);
-/*	printf("handle->update_position %u, handle->size[0] %u, size %u\n", handle->update_position, handle->size[0], size);*/
+//	printf("handle->update_position %u, handle->size[0] %u, size %u\n", handle->update_position, handle->size[0], size);
 	for(i = 0; i < size * handle->size[0]; i++)
 		e_nsb_evaluate_image_handle_tile(h, &buf[i * 3], (ebreal)(i % handle->size[0]) / (ebreal)handle->size[0], (ebreal)(handle->update_position + i / handle->size[0]) / (ebreal)handle->size[1], 0.5);
 	{
@@ -271,16 +284,14 @@ void p_th_update_texture(PTextureHandle *handle)
 	}
 	glBindTexture(GL_TEXTURE_2D, handle->texture_id);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, handle->update_position, handle->size[0], size, GL_RGB, GL_FLOAT, buf);
-/*	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, handle->size[0], handle->size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, buf);*/
+//lTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, handle->size[0], handle->size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, buf);
 	free(buf);
 	e_nsb_destroy_image_handle(h);
 	handle->update_position += size;
 	if(handle->update_position >= handle->size[1])
 		handle->update_position = 0;
 }
-/*
- glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels);
-*/
+//	glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels);
 
 boolean p_th_service_handle(PTextureHandle **pointer)
 {
@@ -303,11 +314,11 @@ boolean p_th_service_handle(PTextureHandle **pointer)
 			return TRUE;
 		}
 	}
-/*	printf("serv 1\n");*/
+//printf("serv 1\n");
 	/* If the node doesnt exist or is an invalid size, show the std texture */
 	if((node = e_ns_get_node(0, handle->node_id)) != NULL && e_ns_get_node_type(node) == V_NT_BITMAP)
 		e_nsb_get_size(node, &value[0], &value[1], &value[2]);
-/*	printf("serv 2\n");*/
+//printf("serv 2\n");
 	if(value[0] * value[1] * value[2] == 0)
 	{
 		if(handle->texture_id == PTextureStorage.std_texture_id)
@@ -317,14 +328,14 @@ boolean p_th_service_handle(PTextureHandle **pointer)
 		return TRUE;
 	}
 	/* If the node is created create a texture */
-/*	printf("serv 3\n");*/
+//printf("serv 3\n");
 
 	if(handle->texture_id == PTextureStorage.std_texture_id)
 	{
 		p_th_create_new_texture(node, handle);
 		return TRUE;
 	}
-/*	printf("serv 4\n");*/
+//printf("serv 4\n");
 	/* if the texture size has changed fix it! */
 
 	if(handle->size_version != p_th_compute_size_check_sum(value))
@@ -333,13 +344,13 @@ boolean p_th_service_handle(PTextureHandle **pointer)
 		p_th_create_new_texture(node, handle);
 		return TRUE;
 	}
-/*	printf("serv 5\n");*/
+//printf("serv 5\n");
 	if(handle->update_position != 0)
 	{
 		p_th_update_texture(handle);
 		return TRUE;
 	}
-/*	printf("serv 6\n");*/
+//printf("serv 6\n");
 	if((layer = e_nsb_get_layer_by_name(node, handle->layer_r)) != NULL) /* Do we need to update the image */
 		value[0] = e_nsb_get_layer_version(layer);
 	else
@@ -352,7 +363,7 @@ boolean p_th_service_handle(PTextureHandle **pointer)
 		value[2] = e_nsb_get_layer_version(layer);
 	else
 		value[2] = -1;
-/*	printf("serv 7\n");*/
+//printf("serv 7\n");
 	if(value[0] != handle->layer_version[0] || value[0] != handle->layer_version[0] || value[0] != handle->layer_version[0])
 	{
 		p_th_update_texture(handle);
@@ -361,7 +372,7 @@ boolean p_th_service_handle(PTextureHandle **pointer)
 		handle->layer_version[2] = value[2];
 		return TRUE;
 	}
-//	printf("serv 8\n");/
+//printf("serv 8\n");
 	return FALSE;
 }
 
