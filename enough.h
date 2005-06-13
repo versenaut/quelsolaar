@@ -102,6 +102,9 @@ extern double		e_nso_get_anim_accel(EObjLink *link);
 extern double		e_nso_get_anim_scale(EObjLink *link);
 extern double		e_nso_get_anim_scale_speed(EObjLink *link);
 extern boolean		e_nso_get_anim_active(EObjLink *link);
+extern double		e_nso_get_anim_evaluate_pos(EObjLink *link, uint32 time_s, uint32 time_f);
+extern double		e_nso_get_anim_evaluate_scale(EObjLink *link, uint32 time_s, uint32 time_f);
+
 
 extern char *		e_nso_get_method_group(ENode *node, uint16 group_id);
 extern uint16		e_nso_get_next_method_group(ENode *node, uint16 group_id);
