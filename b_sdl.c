@@ -225,7 +225,7 @@ uint system_wrapper_eventloop(BInputState *input)
 
 void *betray_get_gl_proc_address()
 {
-	return SDL_GL_GetProcAddress;
+	return &SDL_GL_GetProcAddress;
 }
 
 extern void betray_time_update(void);
