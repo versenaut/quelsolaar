@@ -1,9 +1,9 @@
 
 #include <math.h>
 #include "st_matrix_operations.h"
-#include "enough.h"
-#include "seduce.h"
+/*#include "enough.h"*/
 #include "persuade.h"
+#include "seduce.h"
 
 struct{
 	float		*star_id;
