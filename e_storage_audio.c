@@ -50,6 +50,7 @@ typedef struct{
 	DynLookUpTable	streamtables;
 }ESAudioNode;
 
+extern void	e_ns_update_node_version_struct(ESAudioNode *node);
 
 ESAudioBuffer *e_nsa_get_buffer_by_name(ESAudioNode *node, char *name)
 {
