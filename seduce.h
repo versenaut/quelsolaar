@@ -62,8 +62,6 @@ extern boolean	sui_type_in(BInputState *input, float pos_x, float pos_y, float l
 /* Setting are automaticaly created if you ask for them, just use a "sui_get_setting..." to name and set a default value, and the value will
  be returned if a different value isnt found in the settings file, use the "sui_set_setting..." to set/change a value*/
 
-extern void		sui_init_settings(char *settings);
-
 extern double	sui_get_setting_double(char *setting, double default_value); /* get double setting */
 extern void		sui_set_setting_double(char *setting, double value); /* changed / set double setting */
 extern uint		sui_get_setting_int(char *setting, uint default_value); /* get uint setting */
