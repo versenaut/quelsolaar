@@ -48,7 +48,7 @@ extern void		e_ns_update_node_version_data(ESGeometryNode *node);
 extern uint	e_ns_get_node_id(ESGeometryNode *node);
 
 
-#define GEOMETRY_ARRAY_CHUNK_SIZE 64
+#define GEOMETRY_ARRAY_CHUNK_SIZE 640
 
 void vertex_append_array(ESGeometryNode	*node, uint32 id)
 {
@@ -170,7 +170,7 @@ void * e_nsg_get_layer_data(ESGeometryNode *g_node, EGeoLayer *layer)
 		{
 			layer->data = malloc(sizeof(egreal) * g_node->vertex_length);
 			for(i = 0 ; i < g_node->vertex_length; i++)
-				((double *)layer->data)[i] = layer->def_real;
+				((egreal *)layer->data)[i] = layer->def_real;
 		}
 		break;
 		case VN_G_LAYER_POLYGON_CORNER_UINT32 :
@@ -184,7 +184,7 @@ void * e_nsg_get_layer_data(ESGeometryNode *g_node, EGeoLayer *layer)
 		{
 			layer->data = malloc(sizeof(egreal) * g_node->polygon_length * 4);
 			for(i = 0 ; i < g_node->polygon_length * 4; i++)
-				((double *)layer->data)[i] = layer->def_real;
+				((egreal *)layer->data)[i] = layer->def_real;
 		}
 		break;
 		case VN_G_LAYER_POLYGON_FACE_UINT32 :
@@ -198,7 +198,7 @@ void * e_nsg_get_layer_data(ESGeometryNode *g_node, EGeoLayer *layer)
 		{
 			layer->data = malloc(sizeof(egreal) * g_node->polygon_length);
 			for(i = 0 ; i < g_node->polygon_length; i++)
-				((double *)layer->data)[i] = layer->def_real;
+				((egreal *)layer->data)[i] = layer->def_real;
 		}
 		break;
 	}		
@@ -480,6 +480,7 @@ ESGeometryNode	*e_create_g_node(VNodeID node_id, VNodeOwner owner)
 	ESGeometryNode	*node;
 	if((node = (ESGeometryNode *) e_ns_get_node_networking(node_id)) == NULL)
 	{
+		uint i;
 		node = malloc(sizeof *node);
 		node->layer_allocated = 0;
 		node->layers = NULL;
@@ -491,6 +492,8 @@ ESGeometryNode	*e_create_g_node(VNodeID node_id, VNodeOwner owner)
 		node->edge_crease = 0;
 		node->bones = NULL;
 		node->bones_allocated = 0;
+		for(i = 0; i < 6; i++)
+			node->space[i] = 0;
 		e_ns_init_head((ENodeHead *)node, V_NT_GEOMETRY, node_id, owner);
 	}
 	return node;
@@ -580,7 +583,7 @@ void callback_send_g_polygon_delete(void *user_data, VNodeID node_id, uint32 pol
 void callback_send_g_vertex_delete(void *user_data, VNodeID node_id, uint32 vertex_id)
 {
 	ESGeometryNode	*node;
-	double			*write;
+	egreal			*write;
 	EGeoLayer		*layer;
 	node = (ESGeometryNode *)e_ns_get_node_networking(node_id);
 	if(0 >= node->layer_allocated || node->layers[0].name[0] == 0 || node->layers[0].type != VN_G_LAYER_VERTEX_XYZ)
@@ -643,7 +646,7 @@ uint e_nsg_find_empty_vertex_slot(ESGeometryNode *node, uint start)
 {
 	int			i, count;
 	EGeoLayer	*layer;
-	double		*data;
+	egreal		*data;
 	layer = e_nsg_get_layer_by_id(node, 0);
 	count = node->vertex_length * 3;
 	if(layer != NULL)
@@ -754,7 +757,6 @@ void callback_send_g_bone_create(void *user, VNodeID node_id, uint16 bone_id, co
 void callback_send_g_bone_destroy(void *user, VNodeID node_id, uint16 bone_id)
 {
 	ESGeometryNode	*node;
-	uint			i;
 	node = (ESGeometryNode *)e_ns_get_node_networking(node_id);
 	if(node == NULL)
 		return;
