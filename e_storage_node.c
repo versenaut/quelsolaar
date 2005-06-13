@@ -259,6 +259,7 @@ boolean e_vc_check_accepted_slot(uint connection)
 void e_ns_init_head(ENodeHead *head, VNodeType type, VNodeID node_id, VNodeOwner owner)
 {
 	uint i;
+
 	head->node_type = type;
 	head->node_id = node_id;
 	head->owner = owner;
