@@ -5,16 +5,16 @@
 	#include <windows.h>
 	#include <GL/gl.h>
 #else
-	#include <gl.h>
+	#include <GL/gl.h>
+#define APIENTRY
 #endif
 #include "verse.h"
-#include "enough.h"
-#include "p_task.h"
 #include "persuade.h"
+#include "p_task.h"
+#include "p_extension.h"
+#include "p_sds_array.h"
 
-void *(*p_gl_GetProcAddress)(const char* proc) = NULL;
-
-typedef unsigned int GLhandleARB;
+/*typedef unsigned int GLhandleARB;*/
 
 #define GL_VERTEX_SHADER_ARB                        0x8B31
 #define GL_FRAGMENT_SHADER_ARB                      0x8B30
@@ -36,42 +36,15 @@ GLint       (APIENTRY *p_glGetAttribLocationARB)(GLhandleARB programObj, const c
 GLvoid		(APIENTRY *p_glVertexAttrib4fARB)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 GLvoid		(APIENTRY *p_glActiveTextureARB)(GLenum texture);
 
+GLvoid		(APIENTRY *p_glBindAttribLocationARB)(GLhandleARB programObj, GLuint index, const char *name);
 GLvoid		(APIENTRY *p_glVertexAttribPointerARB)(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
 GLvoid		(APIENTRY *p_glEnableVertexAttribArrayARB)(GLuint index);
 GLvoid		(APIENTRY *p_glDisableVertexAttribArrayARB)(GLuint index);
 
 GLvoid		(APIENTRY *p_glGetInfoLogARB)(GLhandleARB object, GLsizei maxLenght, GLsizei *length, char *infoLog);
 
-void p_extention_init(void *(*gl_GetProcAddress)(const char* proc))
-{
-	p_gl_GetProcAddress = gl_GetProcAddress;
-}
-
-boolean p_extention_test(char *string)
-{
-	const char *start;
-	char *where, *terminator;
-	const char *extension;
-
-	extension = glGetString(GL_EXTENSIONS);
-	where = strchr(extension, ' ');
-	if(where || *extension == '\0')
-		return FALSE;
-
-	start = string;
-	while(TRUE) 
-	{
-		where = (GLubyte *) strstr( start, extension);
-		if(!where)
-			break;
-		terminator = where + strlen(extension);
-		if(where == start || *(where - 1) == ' ') 
-			if(*terminator == ' ' || *terminator == '\0') 
-				return TRUE;
-		start = terminator;
-	}
-	return FALSE;
-}
+extern void p_shader_fallback_func(ENode *node, ECustomDataCommand command);
+extern void p_shader_bind_fallback(uint32 node_id);
 
 typedef struct{
 	uint			fragment;
@@ -106,6 +79,7 @@ typedef struct{
 }PShaderGenTemp;
 
 PShader *p_standard_shader;
+boolean p_programmable_shaders_suported = FALSE;
 
 char p_standard_fragment_shader_code[256] = "void main(void)"
 "{"
@@ -142,46 +116,38 @@ extern void p_shader_func(ENode *node, ECustomDataCommand command);
 
 void p_shader_init()
 {
-	uint length;
-//	if(p_extention_test("GL_ARB_shading_language_100"))
+//	uint length;
+	if(/*p_extention_test("GL_ARB_shading_language_100")*/FALSE)
 	{
-//		exit(0);
-		p_glCreateShaderObjectARB = p_gl_GetProcAddress("glCreateShaderObjectARB");
-		p_glDeleteObjectARB = p_gl_GetProcAddress("glDeleteObjectARB");
-		p_glCreateProgramObjectARB = p_gl_GetProcAddress("glCreateProgramObjectARB");
-		p_glAttachObjectARB = p_gl_GetProcAddress("glAttachObjectARB");
-		p_glShaderSourceARB = p_gl_GetProcAddress("glShaderSourceARB");
-		p_glCompileShaderARB = p_gl_GetProcAddress("glCompileShaderARB");
-		p_glLinkProgramARB = p_gl_GetProcAddress("glLinkProgramARB");
-		p_glUseProgramObjectARB = p_gl_GetProcAddress("glUseProgramObjectARB");
+		p_glCreateShaderObjectARB = p_extention_get_address("glCreateShaderObjectARB");
+		p_glDeleteObjectARB = p_extention_get_address("glDeleteObjectARB");
+		p_glCreateProgramObjectARB = p_extention_get_address("glCreateProgramObjectARB");
+		p_glAttachObjectARB = p_extention_get_address("glAttachObjectARB");
+		p_glShaderSourceARB = p_extention_get_address("glShaderSourceARB");
+		p_glCompileShaderARB = p_extention_get_address("glCompileShaderARB");
+		p_glLinkProgramARB = p_extention_get_address("glLinkProgramARB");
+		p_glUseProgramObjectARB = p_extention_get_address("glUseProgramObjectARB");
 
-		p_glGetUniformLocationARB = p_gl_GetProcAddress("glGetUniformLocationARB");
-		p_glUniform4fARB = p_gl_GetProcAddress("glUniform4fARB");
-		p_glUniform1iARB = p_gl_GetProcAddress("glUniform1iARB");
-		p_glUniformMatrix4fvARB = p_gl_GetProcAddress("glUniformMatrix4fvARB");
-		p_glGetAttribLocationARB = p_gl_GetProcAddress("glGetAttribLocationARB");
-		p_glVertexAttrib4fARB = p_gl_GetProcAddress("glVertexAttrib4fARB");
-		p_glActiveTextureARB = p_gl_GetProcAddress("glActiveTextureARB");
+		p_glGetUniformLocationARB = p_extention_get_address("glGetUniformLocationARB");
+		p_glUniform4fARB = p_extention_get_address("glUniform4fARB");
+		p_glUniform1iARB = p_extention_get_address("glUniform1iARB");
+		p_glUniformMatrix4fvARB = p_extention_get_address("glUniformMatrix4fvARB");
+		p_glBindAttribLocationARB = p_extention_get_address("glBindAttribLocationARB");
+		p_glGetAttribLocationARB = p_extention_get_address("glGetAttribLocationARB");
+		p_glVertexAttrib4fARB = p_extention_get_address("glVertexAttrib4fARB");
+		p_glActiveTextureARB = p_extention_get_address("glActiveTextureARB");
 
-		p_glVertexAttribPointerARB = p_gl_GetProcAddress("glVertexAttribPointerARB");
-		p_glEnableVertexAttribArrayARB = p_gl_GetProcAddress("glEnableVertexAttribArrayARB");
-		p_glDisableVertexAttribArrayARB = p_gl_GetProcAddress("glDisableVertexAttribArrayARB");
+		p_glGetInfoLogARB = p_extention_get_address("glGetInfoLogARB");
+		p_programmable_shaders_suported = TRUE;
 
-		p_glGetInfoLogARB = p_gl_GetProcAddress("glGetInfoLogARB");
-
+		p_standard_shader = p_shader_allocate();
+		e_ns_set_custom_func(P_ENOUGH_SLOT, V_NT_MATERIAL, p_shader_func);
+	}else
+	{
+		p_programmable_shaders_suported = FALSE;
+		e_ns_set_custom_func(P_ENOUGH_SLOT, V_NT_MATERIAL, p_shader_fallback_func);
 	}
-
-	p_standard_shader = p_shader_allocate();
-/*	length = 256;
-	p_glShaderSourceARB(p_standard_shader->vertex_obj, 1, &p_standard_vertex_shader_code, &length);
-	p_glCompileShaderARB(p_standard_shader->vertex_obj);
-	length = 256;
-	p_glShaderSourceARB(p_standard_shader->fragment_obj, 1, &p_standard_fragment_shader_code, &length);
-	p_glCompileShaderARB(p_standard_shader->fragment_obj);
-	p_glLinkProgramARB(p_standard_shader->prog_obj);
-*/	e_ns_set_custom_func(P_ENOUGH_SLOT, V_NT_MATERIAL, p_shader_func);
 }
-
 void p_shader_destroy(PShader *shader)
 {
 	if(shader->prog_obj != p_standard_shader->prog_obj)
@@ -289,7 +255,7 @@ glUniform1iARB(my_sampler_uniform_location, i);
 
 #define GL_TEXTURE_CUBE_MAP_EXT             0x8513 
 
-void p_shader_param_load(ENode *parent, uint32 node_id, egreal **geom_param, uint environment, uint diffuse_environment)
+void p_shader_param_load(ENode *parent, uint32 node_id, PRenderArray *array, uint count, uint environment, uint diffuse_environment)
 {
 	ENode *node;
 	PShader *s;
@@ -297,6 +263,8 @@ void p_shader_param_load(ENode *parent, uint32 node_id, egreal **geom_param, uin
 	uint16 frag;
 	VMatFrag *f;
 	float m[16];
+	if(!p_programmable_shaders_suported)
+		return;
 	if((node = e_ns_get_node(0, node_id)) == NULL || V_NT_MATERIAL != e_ns_get_node_type(node))
 		return;
 	s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
@@ -335,74 +303,75 @@ void p_shader_param_load(ENode *parent, uint32 node_id, egreal **geom_param, uin
 	glEnable(GL_TEXTURE_CUBE_MAP_EXT);
 	glBindTexture(GL_TEXTURE_CUBE_MAP_EXT, diffuse_environment);
 	p_glUniform1iARB(s->environment[1], i);
-	for(i = 0; i < s->g_f_count; i++)
-	{
-		if(geom_param != NULL && geom_param[i] != NULL)
-		{
-	p_glEnableVertexAttribArrayARB(s->geometry_fragments[i * 2 + 1]);
-#ifdef E_GEOMETRY_REAL_PRECISION_32_BIT
-			p_glVertexAttribPointerARB(s->geometry_fragments[i * 2 + 1], 3, GL_FLOAT, FALSE, 0, geom_param[i]);
-#endif
-#ifdef E_GEOMETRY_REAL_PRECISION_64_BIT
-			p_glVertexAttribPointerARB(s->geometry_fragments[i * 2 + 1], 3, GL_DOUBLE, FALSE, 0, geom_param[i]);
-#endif
-		}else
-			p_glVertexAttrib4fARB(s->geometry_fragments[i * 2 + 1], 1, 1, 0, 0);
-	}
+	for(i = 0; i < s->g_f_count && i < count; i++)
+		p_ra_bind_param_array(&array[i], s->geometry_fragments[i * 2 + 1]);
 }
+
 
 uint p_shader_get_param_count(ENode *node)
 {
-	PShader *s;
-	s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
-	return s->g_f_count;
+	if(p_programmable_shaders_suported)
+	{
+		PShader *s;
+		s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
+		return s->g_f_count;
+	}else 
+		return 0;
 }
-
 VMatFrag *p_shader_get_param(ENode *node, uint nr)
 {
-	PShader *s;
-	s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
-	return e_nsm_get_fragment(node, s->geometry_fragments[nr * 2]);
+	if(p_programmable_shaders_suported)
+	{
+		PShader *s;
+		s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
+		return e_nsm_get_fragment(node, s->geometry_fragments[nr * 2]);
+	}else 
+		return NULL;
 }
 
 
 void p_shader_bind(uint32 node_id)
 {
-	PShader *s;
-	ENode *node;
-	s = p_standard_shader;
-	node = e_ns_get_node(0, node_id);
-	if(node != NULL && V_NT_MATERIAL == e_ns_get_node_type(node))
-		s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
-	p_glUseProgramObjectARB(s->prog_obj);
+	if(p_programmable_shaders_suported)
+	{
+		PShader *s;
+		ENode *node;
+		s = p_standard_shader;
+		node = e_ns_get_node(0, node_id);
+		if(node != NULL && V_NT_MATERIAL == e_ns_get_node_type(node))
+			s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
+		p_glUseProgramObjectARB(s->prog_obj);
+	}else
+		p_shader_bind_fallback(node_id);
 }
-
 void p_shader_unbind(uint32 node_id)
 {
-	PShader *s;
-	ENode *node;
-	uint i;
-	node = e_ns_get_node(0, node_id);
-	if(node != NULL && V_NT_MATERIAL == e_ns_get_node_type(node))
+	if(p_programmable_shaders_suported)
 	{
-		s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
-		for(i = 0; i < s->g_f_count; i++)
-			p_glDisableVertexAttribArrayARB(s->geometry_fragments[i * 2 + 1]);
-
-		for(i = 0; i < s->t_f_count; i++)
+		PShader *s;
+		ENode *node;
+		uint i;
+		node = e_ns_get_node(0, node_id);
+		if(node != NULL && V_NT_MATERIAL == e_ns_get_node_type(node))
 		{
-			p_glActiveTextureARB(GL_TEXTURE0_ARB + i);
-			glDisable(GL_TEXTURE_2D);
-		}
-		p_glActiveTextureARB(GL_TEXTURE0_ARB + i);
-		glDisable(GL_TEXTURE_CUBE_MAP_EXT);
-		i++;
-		p_glActiveTextureARB(GL_TEXTURE0_ARB + i);
-		glDisable(GL_TEXTURE_CUBE_MAP_EXT);
-		p_glActiveTextureARB(GL_TEXTURE0_ARB);
-	}
+			s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
+			for(i = 0; i < s->g_f_count; i++)
+				p_glDisableVertexAttribArrayARB(s->geometry_fragments[i * 2 + 1]);
 
-	p_glUseProgramObjectARB(0);
+			for(i = 0; i < s->t_f_count; i++)
+			{
+				p_glActiveTextureARB(GL_TEXTURE0_ARB + i);
+				glDisable(GL_TEXTURE_2D);
+			}
+			p_glActiveTextureARB(GL_TEXTURE0_ARB + i);
+			glDisable(GL_TEXTURE_CUBE_MAP_EXT);
+			i++;
+			p_glActiveTextureARB(GL_TEXTURE0_ARB + i);
+			glDisable(GL_TEXTURE_CUBE_MAP_EXT);
+			p_glActiveTextureARB(GL_TEXTURE0_ARB);
+		}
+		p_glUseProgramObjectARB(0);
+	}
 }
 
 
