@@ -62,7 +62,7 @@ void e_nsb_get_size(ESBitmapNode *node, uint *x, uint *y, uint *z)
 ESBitmapLayer *e_nsb_get_layer_by_name(ESBitmapNode *node, const char *name)
 {
 	ESBitmapLayer *layer;
-	for(layer =	get_next_dlut(&node->layertables, 0); layer != NULL; layer = get_next_dlut(&node->layertables, layer->layer_id + 1))
+	for(layer = get_next_dlut(&node->layertables, 0); layer != NULL; layer = get_next_dlut(&node->layertables, layer->layer_id + 1))
 		if(strcmp(name, layer->name) == 0)
 			return layer;
 	return NULL;
@@ -76,7 +76,7 @@ ESBitmapLayer *e_nsb_get_layer_by_id(ESBitmapNode *node, uint layer_id)
 ESBitmapLayer *e_nsb_get_layer_by_type(ESBitmapNode *node, VNBLayerType type, const char *name)
 {
 	ESBitmapLayer *layer;
-	for(layer =	get_next_dlut(&node->layertables, 0); layer != NULL; layer = get_next_dlut(&node->layertables, layer->layer_id + 1))
+	for(layer = get_next_dlut(&node->layertables, 0); layer != NULL; layer = get_next_dlut(&node->layertables, layer->layer_id + 1))
 		if(layer->type == type && strcmp(name, layer->name) == 0)
 			return layer;
 	return NULL;
@@ -133,6 +133,7 @@ char *e_nsb_get_layer_name(ESBitmapLayer *layer)
 {
 	return layer->name;
 }
+
 VNBLayerType e_nsb_get_layer_type(ESBitmapLayer *layer)
 {
 	return layer->type;
@@ -186,7 +187,7 @@ void callback_send_b_layer_create(void *user_data, VNodeID node_id, VLayerID lay
 	}
 	for(i = 0; i < 15 && name[i] != 0; i++)
 		layer->name[i] = name[i];
-	layer->name[i] = name[i];
+	layer->name[i] = '\0';
 	layer->layer_id = layer_id;
 	layer->type = type;
 	layer->version++;
@@ -219,6 +220,8 @@ void callback_send_b_dimensions_set(void *user_data, VNodeID node_id, uint16 wid
 	node = e_create_b_node(node_id, 0);
 	for(layer = get_next_dlut(&node->layertables, 0); layer != NULL; layer = get_next_dlut(&node->layertables, layer->layer_id + 1))
 	{
+		if(layer->data == NULL)	/* If data has not yet been subscribed to, do not resize since doing so fools the test in get_layer_data(). */
+			continue;
 		switch(layer->type)
 		{
 			case VN_B_LAYER_UINT1 :
