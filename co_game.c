@@ -2,9 +2,8 @@
 
 
 #include "st_matrix_operations.h"
-#include "enough.h"
-#include "seduce.h"
 #include "persuade.h"
+#include "seduce.h"
 
 #define GAME_BULLET_COUNT 32
 #define GAME_DUST_COUNT 3200

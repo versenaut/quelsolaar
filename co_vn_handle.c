@@ -3,7 +3,6 @@
 #include <math.h>
 
 #include "verse.h"
-#include "enough.h"
 #include "seduce.h"
 #include "persuade.h"
 

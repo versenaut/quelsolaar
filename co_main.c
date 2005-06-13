@@ -1,8 +1,7 @@
 
 #include "st_matrix_operations.h"
-#include "enough.h"
-#include "seduce.h"
 #include "persuade.h"
+#include "seduce.h"
 
 //#include "co_func_repository.h"
 //#include "co_storage.h"
