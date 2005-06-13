@@ -1,8 +1,7 @@
 
 #include "st_matrix_operations.h"
-#include "enough.h"
-#include "seduce.h"
 #include "persuade.h"
+#include "seduce.h"
 
 //#include "co_func_repository.h"
 //#include "co_storage.h"
@@ -13,26 +12,63 @@ void connect_type_in_func(void *user, char *text)
 }
 
 extern void qs_input_handler(BInputState *input, void *user);
-extern void qs_intro_draw();
+extern void qs_intro_draw(void);
 extern void g_set_ship_camera(BInputState *input, float delta_time);
+
+
+extern void sds_2_test(void);
+void draw_table_debuging(void);
+void p_status_print(void);
+
+extern void callback_send_g_vertex_set_real_xyz(void *user_data, VNodeID node_id, VLayerID layer_id, uint32 vertex_id, egreal x, egreal y, egreal z);
 
 
 void qs_draw_handler(BInputState *input, void *user)
 {
+
 	if(input->mode == BAM_MAIN)
 	{
 		verse_callback_update(30);
-		p_task_compute(6);
+		p_task_compute(8);
 		return;
 	}
-	if(input->mode == BAM_DRAW)
+/*	{
+		static float time = 0;
+		ENode *node;
+		time += 0.01;
+		node = e_ns_get_node_next(0, 0, V_NT_GEOMETRY);
+		if(node != NULL)
+			callback_send_g_vertex_set_real_xyz(NULL, e_ns_get_node_id(node), 0, 0, sin(time), sin(time * 0.87), sin(time * 0.27));
+	}
+*/	if(input->mode == BAM_DRAW)
 	{
-		glClearColor(0, 0, 0, 0);
+		glClearColor(0.2, 0.2, 0.2, 0);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 		glPushMatrix();
+
 	//	glTranslatef(0, 0, -1);
+	//	p_status_print();
+	//	draw_table_debuging();
 		g_set_ship_camera(input, betray_get_delta_time());
+	//	p_lod_set_wiev_pos(double view_cam);
+	//	p_draw_scene();
+
+	//	glScalef(12, 12, 12);
+	/*	{
+			static float rot_x = 0, rot_y = 0, delta_x = 0, delta_y = 0;
+			if(input->mouse_button[0])
+			{
+				delta_x = delta_x * 0.9 + (input->pointer_x - input->click_pointer_x) * 0.1;
+				delta_y = delta_y * 0.9 + (input->pointer_y - input->click_pointer_y) * 0.1;
+			}
+			rot_x += delta_x * 360 * betray_get_delta_time();
+			rot_y += delta_y * 360 * betray_get_delta_time();
+
+			glRotatef(rot_x, 0, 1, 0);
+			glRotatef(rot_y, 1, 0, 0);
+		}*/
 		p_draw_scene();
+//		sds_2_test();
 		glPopMatrix();
 	}
 }
@@ -63,6 +99,7 @@ void qs_intro_handler(BInputState *input, void *user)
 		glPopMatrix();
 		glPopMatrix();
 		glPushMatrix();
+
 		glTranslatef(0, 0, -1);
 		glDisable(GL_DEPTH_TEST);
 	}
@@ -148,22 +185,24 @@ void qs_intro_handler(BInputState *input, void *user)
 extern void *se_symbol_editor_func(BInputState *input, void *user_pointer);
 extern void *se_font_editor_func(BInputState *input, void *user_pointer);
 extern void qs_intro_init(void);
-void g_drpp_ship_init(void);
+void g_dropp_ship_init(void);
 
 int main(int argc, char **argv)
 {
 	betray_init(argc, argv, 1280, 1024, FALSE, "Quel Solaar");
+
 	sui_init();
+
+	sui_init_settings("qs_config.cfg");
 
 	glClearColor(1, 1, 1, 0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-	sui_init_settings("qs_config.cfg");
 	enough_init();					/* initializing the Enough Lib, setting the max subdivision level to 3*/
 #ifdef PERSUADE_H
-	persuade_init(3, betray_get_gl_proc_address());
+	persuade_init(5, betray_get_gl_proc_address());
 #endif
 	qs_intro_init();
-	g_drop_ship_init();
+	g_dropp_ship_init();
 //	betray_set_mouse_warp(TRUE);
 
 	betray_set_action_func(qs_intro_handler, NULL);
