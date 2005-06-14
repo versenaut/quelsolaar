@@ -11,19 +11,19 @@
 #include "persuade.h"
 #include "p_task.h"
 
-void *(*p_gl_GetProcAddress)(const char* proc) = NULL;
+static void *(*p_gl_GetProcAddress)(const char* proc) = NULL;
 
 void p_extention_init(void *(*gl_GetProcAddress)(const char* proc))
 {
 	p_gl_GetProcAddress = gl_GetProcAddress;
 }
 
-void *p_extention_get_address(const char* proc)
+void * p_extention_get_address(const char* proc)
 {
 	return p_gl_GetProcAddress(proc);
 }
 
-boolean p_extention_test(char *string)
+boolean p_extention_test(const char *string)
 {
 	const char *extension, *a;
 	uint i;
@@ -37,6 +37,5 @@ boolean p_extention_test(char *string)
 		if(string[i] == 0)
 			return TRUE;
 	}
-
 	return FALSE;
 }
