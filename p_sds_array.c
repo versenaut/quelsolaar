@@ -35,26 +35,24 @@ GLvoid (APIENTRY *p_glUnmapBufferARB)(GLenum target);
 #define GL_BUFFER_MAP_POINTER_ARB                       0x88BD
 #define GL_STATIC_DRAW_ARB                              0x88E4
 
-extern void *p_extention_get_address(const char* proc);
-
 boolean use_vertex_buffer_object = FALSE;
 
 void p_array_init()
 {
-	p_glVertexAttribPointerARB = p_extention_get_address("glVertexAttribPointerARB");
-	p_glEnableVertexAttribArrayARB = p_extention_get_address("glEnableVertexAttribArrayARB");
-	p_glDisableVertexAttribArrayARB = p_extention_get_address("glDisableVertexAttribArrayARB");
+	p_glVertexAttribPointerARB = p_extension_get_address("glVertexAttribPointerARB");
+	p_glEnableVertexAttribArrayARB = p_extension_get_address("glEnableVertexAttribArrayARB");
+	p_glDisableVertexAttribArrayARB = p_extension_get_address("glDisableVertexAttribArrayARB");
 
-/*	if(p_extention_test("GL_ARB_vertex_buffer_object"))
+/*	if(p_extension_test("GL_ARB_vertex_buffer_object"))
 	{
 		use_vertex_buffer_object = TRUE;
 	
-		p_glGenBuffersARB = p_extention_get_address("glGenBuffersARB");
-		p_glDeleteBuffersARB = p_extention_get_address("glDeleteBuffersARB");
-		p_glBindBufferARB = p_extention_get_address("glBindBufferARB");
-		p_glBufferDataARB = p_extention_get_address("glBufferDataARB");
-		p_glMapBufferARB = p_extention_get_address("glMapBufferARB");
-		p_glUnmapBufferARB = p_extention_get_address("glUnmapBufferARB");
+		p_glGenBuffersARB = p_extension_get_address("glGenBuffersARB");
+		p_glDeleteBuffersARB = p_extension_get_address("glDeleteBuffersARB");
+		p_glBindBufferARB = p_extension_get_address("glBindBufferARB");
+		p_glBufferDataARB = p_extension_get_address("glBufferDataARB");
+		p_glMapBufferARB = p_extension_get_address("glMapBufferARB");
+		p_glUnmapBufferARB = p_extension_get_address("glUnmapBufferARB");
 	}*/
 }
 

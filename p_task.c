@@ -104,7 +104,7 @@ extern void p_env_init(uint size);
 void persuade_init(uint max_tesselation_level, void *(*gl_GetProcAddress)(const char* proc))
 {
 	uint i;
-	p_extention_init(gl_GetProcAddress);
+	p_extension_init(gl_GetProcAddress);
 	p_array_init();
 	p_shader_init();
 	p_env_init(8);

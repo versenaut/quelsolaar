@@ -13,17 +13,17 @@
 
 static void *(*p_gl_GetProcAddress)(const char* proc) = NULL;
 
-void p_extention_init(void *(*gl_GetProcAddress)(const char* proc))
+void p_extension_init(void *(*gl_GetProcAddress)(const char* proc))
 {
 	p_gl_GetProcAddress = gl_GetProcAddress;
 }
 
-void * p_extention_get_address(const char* proc)
+void * p_extension_get_address(const char* proc)
 {
 	return p_gl_GetProcAddress(proc);
 }
 
-boolean p_extention_test(const char *string)
+boolean p_extension_test(const char *string)
 {
 	const char *extension, *a;
 	uint i;

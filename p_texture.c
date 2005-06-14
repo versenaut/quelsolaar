@@ -83,7 +83,7 @@ void p_th_init(void)
 		PTextureStorage.handels[i] = NULL;
 	PTextureStorage.std_texture_id = p_th_create_std_texture();
 	PTextureStorage.use32bit = TRUE;
-	if(p_extention_test("ATI_texture_float"))
+	if(p_extension_test("ATI_texture_float"))
 		PTextureStorage.floating_point_enum = GL_RGB_FLOAT32;
 	else
 		PTextureStorage.floating_point_enum = GL_RGB;
