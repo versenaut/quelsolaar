@@ -41,7 +41,7 @@ struct{
 	uint			floating_point_enum;
 }PTextureStorage;
 
-uint p_th_create_std_texture()
+uint p_th_create_std_texture(void)
 {
 	uint i, j, texture;
 	float *buf;
@@ -74,7 +74,7 @@ uint p_th_create_std_texture()
 	return texture;
 }
 
-void p_th_init()
+void p_th_init(void)
 {
 	uint i;
 	PTextureStorage.handel_count = 64;
@@ -88,7 +88,8 @@ void p_th_init()
 	else
 		PTextureStorage.floating_point_enum = GL_RGB;
 }
-void p_th_texture_restart()
+
+void p_th_texture_restart(void)
 {
 	uint i, texture;
 	texture = p_th_create_std_texture();
@@ -109,8 +110,6 @@ uint p_th_compute_size_check_sum(uint *size)
 {
 	return size[0] * 17 + size[1] * 23 + size[2];
 }
-
-
 
 void p_th_create_new_texture(ENode *node, PTextureHandle *handle)
 {
