@@ -56,7 +56,7 @@ libenough.a:	e_storage_audio.o e_storage_bitmap.o e_storage_curve.o e_storage_ge
 		ar -cr $@ $^
 
 libpersuade.a:	p_extension.o p_geometry.o p_object_environment.o p_object_handle.o p_object_light.o p_object_param.o \
-		p_object_render.o p_sds_array.o p_sds_geo_clean.o p_sds_geo_debug.o p_sds_geo_divide.o p_sds_obj.o \
+		p_object_render.o p_sds_array.o p_sds_geo_clean.o p_sds_geo_divide.o p_sds_obj.o \
 		p_sds_obj_anim.o p_sds_obj_displace.o p_sds_obj_edge_normal.o p_sds_obj_param.o p_sds_obj_sort.o p_sds_obj_tess.o \
 		p_sds_table.o p_sds_table_debug.o p_sds_table_edge_sort.o p_sds_table_normals.o p_sds_table_split.o p_shader_bind.o \
 		p_shader_extension.o p_shader_gl_one_fall_back.o p_shader_writer.o p_status_print.o \
