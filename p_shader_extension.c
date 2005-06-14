@@ -91,7 +91,7 @@ char p_standard_vertex_shader_code[256] = "void main(void)"
 "	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;"
 "}";
 
-PShader *p_shader_allocate()
+PShader *p_shader_allocate(void)
 {
 	PShader *s;
 	s = malloc(sizeof *s);
@@ -114,30 +114,30 @@ PShader *p_shader_allocate()
 
 extern void p_shader_func(ENode *node, ECustomDataCommand command);
 
-void p_shader_init()
+void p_shader_init(void)
 {
 //	uint length;
 	if(/*p_extention_test("GL_ARB_shading_language_100")*/FALSE)
 	{
-		p_glCreateShaderObjectARB = p_extention_get_address("glCreateShaderObjectARB");
-		p_glDeleteObjectARB = p_extention_get_address("glDeleteObjectARB");
-		p_glCreateProgramObjectARB = p_extention_get_address("glCreateProgramObjectARB");
-		p_glAttachObjectARB = p_extention_get_address("glAttachObjectARB");
-		p_glShaderSourceARB = p_extention_get_address("glShaderSourceARB");
-		p_glCompileShaderARB = p_extention_get_address("glCompileShaderARB");
-		p_glLinkProgramARB = p_extention_get_address("glLinkProgramARB");
-		p_glUseProgramObjectARB = p_extention_get_address("glUseProgramObjectARB");
+		p_glCreateShaderObjectARB = p_extension_get_address("glCreateShaderObjectARB");
+		p_glDeleteObjectARB = p_extension_get_address("glDeleteObjectARB");
+		p_glCreateProgramObjectARB = p_extension_get_address("glCreateProgramObjectARB");
+		p_glAttachObjectARB = p_extension_get_address("glAttachObjectARB");
+		p_glShaderSourceARB = p_extension_get_address("glShaderSourceARB");
+		p_glCompileShaderARB = p_extension_get_address("glCompileShaderARB");
+		p_glLinkProgramARB = p_extension_get_address("glLinkProgramARB");
+		p_glUseProgramObjectARB = p_extension_get_address("glUseProgramObjectARB");
 
-		p_glGetUniformLocationARB = p_extention_get_address("glGetUniformLocationARB");
-		p_glUniform4fARB = p_extention_get_address("glUniform4fARB");
-		p_glUniform1iARB = p_extention_get_address("glUniform1iARB");
-		p_glUniformMatrix4fvARB = p_extention_get_address("glUniformMatrix4fvARB");
-		p_glBindAttribLocationARB = p_extention_get_address("glBindAttribLocationARB");
-		p_glGetAttribLocationARB = p_extention_get_address("glGetAttribLocationARB");
-		p_glVertexAttrib4fARB = p_extention_get_address("glVertexAttrib4fARB");
-		p_glActiveTextureARB = p_extention_get_address("glActiveTextureARB");
+		p_glGetUniformLocationARB = p_extension_get_address("glGetUniformLocationARB");
+		p_glUniform4fARB = p_extension_get_address("glUniform4fARB");
+		p_glUniform1iARB = p_extension_get_address("glUniform1iARB");
+		p_glUniformMatrix4fvARB = p_extension_get_address("glUniformMatrix4fvARB");
+		p_glBindAttribLocationARB = p_extension_get_address("glBindAttribLocationARB");
+		p_glGetAttribLocationARB = p_extension_get_address("glGetAttribLocationARB");
+		p_glVertexAttrib4fARB = p_extension_get_address("glVertexAttrib4fARB");
+		p_glActiveTextureARB = p_extension_get_address("glActiveTextureARB");
 
-		p_glGetInfoLogARB = p_extention_get_address("glGetInfoLogARB");
+		p_glGetInfoLogARB = p_extension_get_address("glGetInfoLogARB");
 		p_programmable_shaders_suported = TRUE;
 
 		p_standard_shader = p_shader_allocate();
