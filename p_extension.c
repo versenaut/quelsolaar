@@ -25,9 +25,8 @@ void *p_extention_get_address(const char* proc)
 
 boolean p_extention_test(char *string)
 {
-	const char *extension;
+	const char *extension, *a;
 	uint i;
-	char *a;
 
 	extension = glGetString(GL_EXTENSIONS);
 	printf("%s\n", extension);
