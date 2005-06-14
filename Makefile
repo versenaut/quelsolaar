@@ -32,12 +32,12 @@ loqairou:	la_draw_overlay.o la_flare_fx.o la_geometry_undo.o la_input_parser.o l
 		la_settings.o la_tool_collapse.o la_tool_deploy.o la_tool_draw.o la_tool_edge_connector.o \
 		la_tool_manipulator.o la_tool_poly_select.o la_tool_reshape.o la_tool_revolve.o la_tool_select.o \
 		la_tool_slice.o la_tool_splitter.o la_tool_subdivide.o \
-		st_math.c st_matrix_operations.c st_text.c \
+		st_math.o st_matrix_operations.o st_text.o \
 		libseduce.a libbetray.a libenough.a
 		gcc -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 quelsolaar:	qs_camera.o qs_intro.o qs_main.o \
-		st_math.c st_matrix_operations.c st_text.c st_types.c \
+		st_math.o st_matrix_operations.o st_text.c st_types.o \
 		libpersuade.a libseduce.a libbetray.a libenough.a
 		gcc -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
