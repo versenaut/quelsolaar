@@ -135,7 +135,12 @@ GLUTAPI void APIENTRY glutSpecialUpFunc(void (GLUTCALLBACK *func)(int key, int x
 GLUTAPI void APIENTRY glutJoystickFunc(void (GLUTCALLBACK *func)(unsigned int buttonMask, int x, int y, int z), int pollInterval);
 */
 
-extern void betray_time_update(void);
+void * betray_get_gl_proc_address(void)
+{
+	return (void *) &glutGetProcAddress;
+}
+
+extern void betray_ime_update(void);
 
 void b_glut_display_func(void)
 {
