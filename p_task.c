@@ -92,13 +92,13 @@ void p_task_compute(uint count)
 	}
 }
 
-extern void p_th_init();
+extern void p_th_init(void);
 
 extern void p_object_func(ENode *node, ECustomDataCommand command);
 extern void p_geometry_func(ENode *node, ECustomDataCommand command);
 extern void p_shader_func(ENode *node, ECustomDataCommand command);
 extern void p_texture_func(ENode *node, ECustomDataCommand command);
-extern void p_array_init();
+extern void p_array_init(void);
 extern void p_env_init(uint size);
 
 void persuade_init(uint max_tesselation_level, void *(*gl_GetProcAddress)(const char* proc))
