@@ -256,10 +256,10 @@ static void save_material(FILE *f, ENode *m_node)
 			case VN_M_FT_TEXTURE :
 				fprintf(f,
 					"\t\t\t<bitmap>%u</bitmap>\n"
-					"\t\t\tlayer_r>%s</layer_r>\n"
-					"\t\t\tlayer_g>%s</layer_g>\n"
-					"\t\t\tlayer_b>%s</layer_b>\n"
-					"mapping>%u</mapping>\n",
+					"\t\t\t<layer_r>%s</layer_r>\n"
+					"\t\t\t<layer_g>%s</layer_g>\n"
+					"\t\t\t<layer_b>%s</layer_b>\n"
+					"\t\t\t<mapping>%u</mapping>\n",
 					frag->texture.bitmap,
 					frag->texture.layer_r,
 					frag->texture.layer_g,
