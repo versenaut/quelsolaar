@@ -296,7 +296,7 @@ static void save_material(FILE *f, ENode *m_node)
 			break;
 			case VN_M_FT_RAMP :
 				fprintf(f,
-					"\t\t\t<type>%s</ramp>\n"
+					"\t\t\t<type>%s</type>\n"
 					"\t\t\t<channel>%s</channel>\n"
 					"\t\t\t<mapping>%u</mapping>\n",
 					ramp_type[frag->ramp.type],
@@ -587,8 +587,10 @@ static void download_data(void)
 		for(layer = e_nsg_get_layer_next(node, 0); layer != NULL; layer = e_nsg_get_layer_next(node, e_nsg_get_layer_id(layer) + 1))
 			e_nsg_get_layer_data(node, layer);
 	for(node = e_ns_get_node_next(0, 0, V_NT_BITMAP); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_BITMAP))
+	{
 		for(layer = e_nsb_get_layer_next(node, 0); layer != NULL; layer = e_nsb_get_layer_next(node, e_nsb_get_layer_id(layer) + 1))
 			e_nsb_get_layer_data(node, layer);
+	}
 	for(node = e_ns_get_node_next(0, 0, V_NT_TEXT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_TEXT))
 		for(buffer = e_nst_get_buffer_next(node, 0); buffer != NULL; buffer = e_nst_get_buffer_next(node, e_nst_get_buffer_id(buffer) + 1))
 			e_nst_get_buffer_data(node, buffer);
@@ -619,7 +621,10 @@ int main(int argc, char **argv)
 	repeat = find_param(argc, argv, "-r", NULL) != NULL;
 	tmp = find_param(argc, argv, "-i", "10");
 	if(tmp != NULL)
+	{
 		interval = strtoul(tmp, NULL, 10);
+		printf("Waiting %u seconds until save\n", interval);
+	}
 
 	for(i = 1; i < argc; i++)
 	{
@@ -654,6 +659,7 @@ int main(int argc, char **argv)
 			verse_session_get_time(&seconds, NULL);
 		//	printf(".");
 		}
+		printf("done waiting, beginning save\n");
 		if((f = fopen(file, "w")) != NULL)
 			save_data(f);
 		printf("Save complete\n");
