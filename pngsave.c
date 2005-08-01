@@ -14,7 +14,7 @@
  *  * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
  *  * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer
  *    in the documentation and/or other materials provided with the distribution.
- *  * Neither the name of the <ORGANIZATION> nor the names of its contributors may be used to endorse or promote products derived
+ *  * Neither the name of PDC, KTH nor the names of its contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
@@ -177,13 +177,10 @@ int main(int argc, char **argv)
 	name    = find_param(argc, argv, "-n", "pngsave");
 	pass    = find_param(argc, argv, "-p", "pass");
 	address = find_param(argc, argv, "-a", "localhost");
-	repeat  = find_param(argc, argv, "-r", NULL) != NULL;
+	repeat  = find_param(argc, argv, "-1", NULL) != NULL;
 	tmp     = find_param(argc, argv, "-i", "10");
 	if(tmp != NULL)
-	{
 		interval = strtoul(tmp, NULL, 10);
-		printf("Waiting %u seconds until save\n", interval);
-	}
 
 	for(i = 1; i < argc; i++)
 	{
@@ -200,16 +197,17 @@ int main(int argc, char **argv)
 			return EXIT_SUCCESS;
 		}
 	}
+	printf("Connecting to %s\n", address);
 	if(e_vc_connect(address, name, pass, NULL) == -1)
 	{
 		printf("Error: Invalid server address '%s'\n", address);
 		return TRUE;
 	}
-	printf("Connecting to %s\n", address);
 	while(interval != 0)
 	{
 		verse_session_get_time(&seconds, NULL);
 		s = seconds;
+		printf("Waiting %u seconds until next save\n", interval);
 		while(seconds < s + interval)
 		{
 			verse_callback_update(10000);
