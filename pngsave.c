@@ -162,9 +162,9 @@ static const char * find_param(int argc, char **argv, const char *option, const 
 {
 	int i;
 
-	for(i = 1; i < argc - 1; i++)
+	for(i = 1; i < argc; i++)
 		if(strcmp(argv[i], option) == 0)
-			return argv[i + 1];
+			return default_text != NULL ? argv[i + 1] : "something";
 	return default_text;
 }
 
@@ -177,7 +177,7 @@ int main(int argc, char **argv)
 	name    = find_param(argc, argv, "-n", "pngsave");
 	pass    = find_param(argc, argv, "-p", "pass");
 	address = find_param(argc, argv, "-a", "localhost");
-	repeat  = find_param(argc, argv, "-1", NULL) != NULL;
+	repeat  = find_param(argc, argv, "-1", NULL) == NULL;
 	tmp     = find_param(argc, argv, "-i", "10");
 	if(tmp != NULL)
 		interval = strtoul(tmp, NULL, 10);
