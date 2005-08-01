@@ -43,6 +43,9 @@ quelsolaar:	qs_camera.o qs_intro.o qs_main.o \
 
 vml-saver:	vml-saver.c libenough.a
 
+pngsave:	pngsave.c libenough.a
+		gcc -o $@ $(CFLAGS) $^ $(LDFLAGS) $(LDLIBS) -lpng
+
 # -----------------------------------------------
 
 libseduce.a:	s_background.o s_draw.o s_editor.o s_line_font.o s_main.o s_popup.o s_settings.o s_text.o
