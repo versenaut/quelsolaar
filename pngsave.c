@@ -116,7 +116,6 @@ static void save_data(void)
 	{
 		for(node = e_ns_get_node_next(0, 0, i); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, i))
 		{
-			printf("here's a node\n");
 			if(e_ns_get_node_type(node) == V_NT_BITMAP)
 				save_bitmap(node);
 		}
