@@ -186,9 +186,8 @@ int main(int argc, char **argv)
 	{
 		if(strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "help") == 0)
 		{
-			printf("usage: verse_saver <pamams>\n");
-			printf("params:\n");
-			printf("-h This text.\n");
+			printf("Usage: pngsave <params>\n");
+			printf("-h This text\n");
 			printf("-n <name>\n");
 			printf("-p <pass>\n");
 			printf("-a <address>\n");
