@@ -91,7 +91,7 @@ typedef struct{
 }PShaderGenTemp;
 
 PShader *p_standard_shader;
-boolean p_programmable_shaders_suported = FALSE;
+boolean p_programmable_shaders_supported = FALSE;
 
 char p_standard_fragment_shader_code[256] = "void main(void)"
 "{"
@@ -126,7 +126,7 @@ PShader *p_shader_allocate(void)
 
 extern void p_shader_func(ENode *node, ECustomDataCommand command);
 
-void p_shader_init()
+void p_shader_init(void)
 {
 //	uint length;
 	if(p_extension_test("GL_ARB_shading_language_100"))
@@ -150,20 +150,20 @@ void p_shader_init()
 		p_glActiveTextureARB = p_extension_get_address("glActiveTextureARB");
 
 		p_glGetInfoLogARB = p_extension_get_address("glGetInfoLogARB");
-		p_programmable_shaders_suported = TRUE;
+		p_programmable_shaders_supported = TRUE;
 
 		p_standard_shader = p_shader_allocate();
 		e_ns_set_custom_func(P_ENOUGH_SLOT, V_NT_MATERIAL, p_shader_func);
 	}else
 	{
-		p_programmable_shaders_suported = FALSE;
+		p_programmable_shaders_supported = FALSE;
 		e_ns_set_custom_func(P_ENOUGH_SLOT, V_NT_MATERIAL, p_shader_fallback_func);
 	}
 }
 
-boolean p_shaders_suported(void)
+boolean p_shaders_supported(void)
 {
-	return p_programmable_shaders_suported;
+	return p_programmable_shaders_supported;
 }
 
 void p_shader_destroy(PShader *shader)
@@ -281,7 +281,7 @@ void p_shader_param_load(ENode *parent, uint32 node_id, PRenderArray *array, uin
 	uint16 frag;
 	VMatFrag *f;
 	float m[16];
-	if(!p_programmable_shaders_suported)
+	if(!p_programmable_shaders_supported)
 		return;
 	if((node = e_ns_get_node(0, node_id)) == NULL || V_NT_MATERIAL != e_ns_get_node_type(node))
 		return;
@@ -328,7 +328,7 @@ void p_shader_param_load(ENode *parent, uint32 node_id, PRenderArray *array, uin
 
 uint p_shader_get_param_count(ENode *node)
 {
-	if(p_programmable_shaders_suported)
+	if(p_programmable_shaders_supported)
 	{
 		PShader *s;
 		s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
@@ -338,7 +338,7 @@ uint p_shader_get_param_count(ENode *node)
 }
 VMatFrag *p_shader_get_param(ENode *node, uint nr)
 {
-	if(p_programmable_shaders_suported)
+	if(p_programmable_shaders_supported)
 	{
 		PShader *s;
 		s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
@@ -350,7 +350,7 @@ VMatFrag *p_shader_get_param(ENode *node, uint nr)
 
 void p_shader_bind(uint32 node_id)
 {
-	if(p_programmable_shaders_suported)
+	if(p_programmable_shaders_supported)
 	{
 		PShader *s;
 		ENode *node;
@@ -364,7 +364,7 @@ void p_shader_bind(uint32 node_id)
 }
 void p_shader_unbind(uint32 node_id)
 {
-	if(p_programmable_shaders_suported)
+	if(p_programmable_shaders_supported)
 	{
 		PShader *s;
 		ENode *node;
@@ -546,7 +546,8 @@ void main()
 		gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }
 */
-void p_shader_init_shadow()
+
+void p_shader_init_shadow(void)
 {
 	uint vertex_obj, fragment_obj;
 	uint i;
@@ -598,11 +599,11 @@ void p_shader_init_shadow()
 	p_glLinkProgramARB(shadow_prog_obj);
 }
 
-boolean p_shader_shadow_bind()
+boolean p_shader_shadow_bind(void)
 {
 	if(shadow_prog_obj == -1)
 		p_shader_init_shadow();
-	if(p_programmable_shaders_suported)
+	if(p_programmable_shaders_supported)
 		p_glUseProgramObjectARB(shadow_prog_obj);
-	return p_programmable_shaders_suported;
+	return p_programmable_shaders_supported;
 }

@@ -183,7 +183,7 @@ void p_draw_scene(void)
 	glEnable(GL_NORMALIZE);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_VERTEX_ARRAY);
-	if(p_shaders_suported())
+	if(p_shaders_supported())
 	{
 		p_set_enable_shadow(1);
 		for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
@@ -225,13 +225,8 @@ void p_draw_scene(void)
 
 	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 		p_render_lit_and_transformed_object(node);
-	if(p_shaders_suported())
+	if(p_shaders_supported())
 		glDisable(GL_STENCIL_TEST);
-
-
-
-
-
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
