@@ -164,14 +164,14 @@ void callback_send_m_fragment_create(void *user_data, VNodeID node_id, VNMFragme
 		}
 		else if(strcmp(fragment->output.label, "particles") == 0)
 		{
-			if(fragment->output.front != -1)
+			if(fragment->output.front != (VNMFragmentID) ~0)
 				node->output_particles = fragment->output.front;
 			else
 				node->output_particles = fragment->output.back;
 		}
 		else if(strcmp(fragment->output.label, "displacement") == 0)
 		{
-			if(fragment->output.front != -1)
+			if(fragment->output.front != (VNMFragmentID) ~0)
 				node->output_displacement = fragment->output.front;
 			else
 				node->output_displacement = fragment->output.back;
