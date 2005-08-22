@@ -1,0 +1,33 @@
+Enough is a library to help you write Verse applications. It layers between
+the "RAW" Verse API and your application code, and acts as a data-storage
+system, storing all Verse data in custom data structures.
+
+Enough was written by Eskil Steenberg.
+
+The below sketch roughly illustrates the relationship between your appli-
+cation, the Enough library, and the Verse API. Note how reads are served
+from the Enough library, while writes (data transmission) must be done
+directly with the Verse API. This is a central fact about the Enough
+library: it acts as a data storage system only, and does not deal at all
+with sending data to the Verse host.
+
+
+				+-------------+
+				| Application |
+				+-------------+
+				 ||         /\
+				 ||         ||
+				 ||        read
+				write       ||
+				 ||  +--------+
+				 ||  | Enough |
+				 ||  +--------+
+				 \/         ||
+				+-------------+
+				|  Verse API  |
+				+-------------+
+
+For more information about how to work with the Enough library, please see the
+"enough.h" header file, or the "Quel Solaar", "Connector", "UV Editor" and
+"Loq Airou" applications. These serve as the primary "official" users of the
+library.
