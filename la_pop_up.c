@@ -22,11 +22,11 @@ struct{
 	float	popup_pos[3];
 }GlobalPopupData;*/
 
-void la_intro_draw(void);
+void la_intro_draw(void *user);
 void geometry_load_obj(void *user, char *file);
 void geometry_save_obj(void *user, char *file);
 extern void draw_settings_menu(BInputState *input, void *user);
-extern void draw_browser_menu(BInputState *input, void *user);
+
 
 void connect_type_in_func(void *user, char *text)
 {
@@ -62,7 +62,7 @@ void la_pu_connect(BInputState *input, void *user)
 		glPopMatrix();
 		glPushMatrix();
 		glTranslatef(0, 0, -1);
-		la_intro_draw();
+		la_intro_draw(NULL);
 		glDisable(GL_DEPTH_TEST);
 	}
 	
@@ -148,19 +148,18 @@ typedef struct{
 	}data;
 }SUIPUElement;
 */
-uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *element, uint element_count, uint button);
+
+
+#define MAX_NODE_DISPLAY_COUNT 16 
 
 boolean la_pu_empty(BInputState *input)
 {
-	SUIPUElement *element;
-	static float x, y;
+	SUIPUElement element[4 + MAX_NODE_DISPLAY_COUNT];
+	static float x, y, static_start = 0;
+	uint start = 0, ring, count = 4, i;
 	ENode *node;
-	uint ring, count = 4;
 
-
-	for(node = e_ns_get_node_next(0, 0, V_NT_GEOMETRY); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_GEOMETRY))
-		count++;
-	element = malloc((sizeof *element) * count);
+	start = static_start;
 	element[0].type = PU_T_ANGLE;
 	element[0].text = "Settings";
 	element[0].data.angle[0] = -45;
@@ -176,10 +175,34 @@ boolean la_pu_empty(BInputState *input)
 	element[3].type = PU_T_BOTTOM;
 	element[3].text = "NEW GEOMETRY";
 	count = 4;
-	for(node = e_ns_get_node_next(0, 0, V_NT_GEOMETRY); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_GEOMETRY))
+
+	
+	node = e_ns_get_node_next(0, 0, V_NT_GEOMETRY);
+	for(i = 1; node != NULL && i < start; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_GEOMETRY))
+		i++;
+
+	if(start != 0)
+	{
+		if(y - 0.175 < input->pointer_y)
+			static_start -= betray_get_delta_time() * 10 * (0.2 + input->pointer_y + (y - 0.175));
+		element[count].type = PU_T_BOTTOM;
+		element[count].text = "More...";
+		count++;
+	}
+
+
+	for(; node != NULL && count < MAX_NODE_DISPLAY_COUNT + 3; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_GEOMETRY))
 	{
 		element[count].type = PU_T_BOTTOM;
 		element[count].text = e_ns_get_node_name(node);
+		count++;
+	}
+	if(count == MAX_NODE_DISPLAY_COUNT + 3 && node != NULL)
+	{
+		if(y - 0.05 * MAX_NODE_DISPLAY_COUNT - 0.075 > input->pointer_y)
+			static_start += betray_get_delta_time() * 10 * (0.2 + (y - 0.05 * MAX_NODE_DISPLAY_COUNT - 0.075) - input->pointer_y);
+		element[count].type = PU_T_BOTTOM;
+		element[count].text = "More...";
 		count++;
 	}
 	if(input->mode == BAM_DRAW)
@@ -195,7 +218,7 @@ boolean la_pu_empty(BInputState *input)
 		x = input->pointer_x;
 		y = input->pointer_y;
 	}
-	ring = sui_draw_popup(input, x, y, element, count, 2);
+	ring = sui_draw_popup(input, x, y, element, count, 2, 0);
 	switch(ring)
 	{
 		case 0 :
@@ -211,9 +234,14 @@ boolean la_pu_empty(BInputState *input)
 			udg_create_new_modeling_node();
 		break;
 	}
+
+
+	node = e_ns_get_node_next(0, 0, V_NT_GEOMETRY);
+	for(i = 1; node != NULL && i < start; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_GEOMETRY))
+		i++;
 	count = 4;
 	if(ring > 3 && ring != -1)		
-		for(node = e_ns_get_node_next(0, 0, V_NT_GEOMETRY); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_GEOMETRY))
+		for(; node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_GEOMETRY))
 			if(ring == count++)
 				udg_set_modeling_node(e_ns_get_node_id(node));
 
@@ -225,7 +253,6 @@ boolean la_pu_empty(BInputState *input)
 		glPushMatrix();
 		glEnable(GL_DEPTH_TEST);
 	}
-	free(element);
 	if(ring == 3)
 		return TRUE;
 	else
@@ -321,7 +348,7 @@ void la_pu_manipulator(BInputState *input)
 		x = input->pointer_x;
 		y = input->pointer_y;
 	}
-	ring = sui_draw_popup(input, x, y, element, 15, 2);
+	ring = sui_draw_popup(input, x, y, element, 15, 2, 0);
 	switch(ring)
 	{
 		case 0 :
@@ -469,7 +496,7 @@ void la_pu_edge(BInputState *input, uint *edge)
 		x = input->pointer_x;
 		y = input->pointer_y;
 	}
-	ring = sui_draw_popup(input, x, y, element, 6, 2);
+	ring = sui_draw_popup(input, x, y, element, 6, 2, 0);
 	switch(ring)
 	{
 		case 0 :
@@ -557,7 +584,7 @@ void la_pu_polygon(BInputState *input, uint polygon)
 		x = input->pointer_x;
 		y = input->pointer_y;
 	}
-	ring = sui_draw_popup(input, x, y, element, 6, 2);
+	ring = sui_draw_popup(input, x, y, element, 6, 2, 0);
 	switch(ring)
 	{
 		case 0 :
@@ -644,7 +671,7 @@ uint la_pu_select(BInputState *input)
 		glPushMatrix();
 		glTranslatef(0, 0, -1);
 	}
-	ring = sui_draw_popup(input, input->click_pointer_x, input->click_pointer_y, element, 4, 0);
+	ring = sui_draw_popup(input, input->click_pointer_x, input->click_pointer_y, element, 4, 0, 0);
 	if(input->mode == BAM_DRAW)
 	{
 		glPopMatrix();

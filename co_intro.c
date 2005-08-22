@@ -127,16 +127,16 @@ sui_draw_gl(GL_QUADS, COIntroData.larger_ring, LOGO_SMALL_RING_SPLIT * 4, 2, col
 
 }
 
-void co_intro_draw(void)
+void co_intro_draw(void *user)
 {
 	static float timer = 2;
 	float color, cam = 1, x, y, z, aspect, border[16] = {-1, 1, 1, 1, 1, 0.45, -1, 0.45, -1, -1, 1, -1, 1, -0.45, -1, -0.45};
 	uint i;
-
+	co_vng_update_time();
 	aspect = betray_get_screen_mode(NULL, NULL, NULL);
-
+	
 	if(timer > 0)
-		timer -= 0.008;
+		timer -= 0.16 * betray_get_delta_time();
 	if(timer > 1)
 		cam = 1 - (timer - 1) * (timer - 1);
 	glPushMatrix();
@@ -157,9 +157,7 @@ void co_intro_draw(void)
 		COIntroData.dust[i++] = 0.7 * sin(y) * z;
 		COIntroData.dust[i++] = 0.15 * x / z;
 		COIntroData.dust[i++] = 0.7 * cos(y) * z;
-
 	}
-
 	if(timer > 0.5)
 	{
 		glPushMatrix();

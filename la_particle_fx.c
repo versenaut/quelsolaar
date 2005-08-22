@@ -614,10 +614,10 @@ void la_pfx_draw(boolean intro)
 				counter++;
 				temp = (counter<<13) ^ counter;
 				p->vector[2] += (1.0 - ((temp * (temp * temp * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0) * size;
-				p->pos[0] += p->vector[0];
-				p->pos[1] += p->vector[1];
-				p->pos[2] += p->vector[2];
-				p->age -= 0.01;
+				p->pos[0] += p->vector[0] * betray_get_delta_time() * 100;
+				p->pos[1] += p->vector[1] * betray_get_delta_time() * 100;
+				p->pos[2] += p->vector[2] * betray_get_delta_time() * 100;
+				p->age -= betray_get_delta_time();
 				sui_draw_set_vec3(GlobalParticleData.dust_pos, i * 2, p->pos[0], p->pos[1], p->pos[2]);
 				sui_draw_set_vec3(GlobalParticleData.dust_col, i * 2, p->age * 1.2, p->age * 1.1, p->age * 1);
 				if(p->age < 0)
@@ -703,7 +703,7 @@ void la_pfx_draw(boolean intro)
 			p = &GlobalParticleData.bright[i];
 			if(p->age > -1.0)
 			{
-				p->age -= 0.02;
+				p->age -= betray_get_delta_time() * 2;
 				if(p->age < 0)
 				{
 				//	glDisable(GL_LIGHT2 + i);
@@ -943,7 +943,7 @@ void la_pfx_draw_intro(void)
 
 void la_pfx_video_flare(void)
 {
-	float pos[8] ={0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5}, uv[8] = {0, 0, 1, 0, 1, 1, 0, 1};
+	float pos[8] = {0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5}, uv[8] = {0, 0, 1, 0, 1, 1, 0, 1};
 	glDepthMask(0);
 	glDisable(GL_DEPTH_TEST);
 	sui_set_blend_gl(GL_ZERO, GL_SRC_COLOR);

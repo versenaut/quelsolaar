@@ -55,4 +55,5 @@ uint	p_rm_get_geometry_node(PMesh *mesh);
 extern double	p_light_compute_brightnes(double *obj, uint32 node_id, uint32 time_s, uint32 time_f);
 extern void		p_light_update(PObjLight *light, uint32 node_id, uint light_count, uint32 time_s, uint32 time_f);
 extern void		p_set_light(PObjLight *light, uint light_count, uint32 time_s, uint32 time_f);
+extern void		p_set_shadow_light(uint32 time_s, uint32 time_f);
 

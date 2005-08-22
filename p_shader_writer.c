@@ -5,7 +5,11 @@
 	#include <windows.h>
 	#include <GL/gl.h>
 #else
+#if defined(__APPLE__) || defined(MACOSX)
+	#include <OpenGL/gl.h>
+#else
 	#include <GL/gl.h>
+#endif
 #endif
 #include "verse.h"
 #include "enough.h"
@@ -75,14 +79,14 @@ void p_shader_get_name(ENode *node, char *frag_name, uint fragment)
 		case VN_M_FT_TRANSPARENCY :
 			sprintf(frag_name, "transparency_%u", fragment);
 			return;
+		case VN_M_FT_VOLUME :
+			sprintf(frag_name, "geometry_%u", fragment);
+			return;
 		case VN_M_FT_GEOMETRY :
 			sprintf(frag_name, "geometry_%u", fragment);
 			return;
 		case VN_M_FT_TEXTURE :
 			sprintf(frag_name, "texture_%u", fragment);
-			return;
-		case VN_M_FT_ANIMATION :
-			sprintf(frag_name, "anim_%u", fragment);
 			return;
 		case VN_M_FT_NOISE :
 			sprintf(frag_name, "noise_%u", fragment);
@@ -96,11 +100,17 @@ void p_shader_get_name(ENode *node, char *frag_name, uint fragment)
 		case VN_M_FT_RAMP :
 			sprintf(frag_name, "ramp_%u", fragment);
 			return;
+		case VN_M_FT_ANIMATION :
+			sprintf(frag_name, "anim_%u", fragment);
+			return;
 		case VN_M_FT_ALTERNATIVE :
 			sprintf(frag_name, "alternative_%u", fragment);
 			return;
+		case VN_M_FT_OUTPUT :
+			sprintf(frag_name, "output_%u", fragment);
+			return;
 	}
-	sprintf(frag_name, "vec4(0.0, 0.0, 0.0, 0.0)");
+	sprintf(frag_name, "strange");
 	return;
 }
 
@@ -197,27 +207,26 @@ void p_shader_write_lights(ENode *node, PSExeCode *f_c)
 					"\tint i;\n"
 					"\tfor(i = 0; i < 3; i++)\n"
 					"\t{\n"
-					"\t\tv = gl_LightSource[i].position.xyz - pixel_pos;\n"
+					"\t\tv = gl_LightSource[0].position.xyz - pixel_pos.xyz;\n"
 					"\t\tdist = length(v);\n"
 //					"\t\tdist *= dist;\n"
 					"\t\tv = normalize(v);\n");
 	if(direct)
 		p_shader_extend_code(f_c, "\t\tf = max(0.0, dot(normal, v)) / dist;\n"
-					"\t\tlight += gl_LightSource[i].diffuse.rgb * vec3(f, f, f);\n");
+					"\t\tlight += gl_LightSource[0].diffuse.rgb * vec3(f, f, f);\n");
 
 	if(back_direct)
 		p_shader_extend_code(f_c, "\t\tf = max(0.0, dot(normal, vec3(0.0, 0.0, 0.0) - v)) / dist;\n"
-					"\t\tlight += gl_LightSource[i].diffuse.rgb * vec3(f, f, f);\n");
+					"\t\tlight += gl_LightSource[0].diffuse.rgb * vec3(f, f, f);\n");
 	if(direct || back_direct)				
 		p_shader_extend_code(f_c, "\t}\n");
 
 
 	if(ambient)
-		p_shader_extend_code(f_c, "\tambient = textureCube(diffuse_environment, normal).xyz;\n");
+		p_shader_extend_code(f_c, "\tambient = textureCube(diffuse_environment, reflect(pixel_pos.xyz, normal.xyz)).xyz;\n");
 	if(back_ambient)
 		p_shader_extend_code(f_c, "\tb_ambient = textureCube(diffuse_environment, vec3(0.0, 0.0, 0.0) - normal).xyz;\n");
 }
-
 
 void p_shader_write_types(ENode *node, uint16 fragment, uint row_length, PSExeCode *c, uint *passed, uint *count)
 {
@@ -243,6 +252,9 @@ void p_shader_write_types(ENode *node, uint16 fragment, uint row_length, PSExeCo
 		passed[i * 2 + 1] = 1;
 		return;
 	}
+
+	if(!e_nsm_enter_fragment(node, fragment))
+		return;
 
 	if(type == VN_M_FT_MATRIX || type == VN_M_FT_BLENDER || type == VN_M_FT_NOISE || type == VN_M_FT_TEXTURE || type == VN_M_FT_RAMP || type == VN_M_FT_ALTERNATIVE)
 	{
@@ -277,6 +289,7 @@ void p_shader_write_types(ENode *node, uint16 fragment, uint row_length, PSExeCo
 		if(type == VN_M_FT_ALTERNATIVE)
 			p_shader_write_types(node, frag->noise.mapping, row_length, c, passed, count);
 	}
+	e_nsm_leave_fragment(node, fragment);
 }
 
 
@@ -287,7 +300,8 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 	VMatFrag *frag;
 	frag = e_nsm_get_fragment(node, fragment);
 	code[0] = 0;
-	if(frag == NULL)
+	
+	if(frag == NULL || !e_nsm_enter_fragment(node, fragment))
 	{
 		sprintf(code, "vec4(0.0, 0.0, 0.0, 0.0)");
 		return;
@@ -333,11 +347,11 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 				{
 					char input[2560];
 			//		p_shader_write_math(node, fragment, input, c, passed, count);
-					sprintf(code, "textureCube(environment, normal).xyz");
+					sprintf(code, "vec4(textureCube(environment, normal).xyz, 1)");
 					break;
 				}
 			case VN_M_FT_TRANSPARENCY :
-				sprintf(code, "textureCube(environment, normal).xyz)");
+				sprintf(code, "vec4(textureCube(environment, normal).xyz), 1)");
 				break;;
 			case VN_M_FT_GEOMETRY :
 				sprintf(code, "geometry_%u", fragment);
@@ -445,14 +459,14 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 				{
 					char input[2560];
 					p_shader_write_math(node, frag->alternative.alt_a, input, c, passed, count);
-					sprintf(code, "%s", fragment, input);
+					sprintf(code, "%s", /*fragment,*/ input);
 				}
 				break;
 			case VN_M_FT_OUTPUT :
 				{
 					char input[2560];
 					p_shader_write_math(node, frag->output.front, input, c, passed, count);
-					sprintf(code, "%s", fragment, input);
+					sprintf(code, "%s", /*fragment,*/ input);
 				}
 				break;
 		}
@@ -472,6 +486,7 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 		sprintf(code, "t_%s", name);
 
 	}
+	e_nsm_leave_fragment(node, fragment);
 }
 
 typedef struct{
@@ -496,8 +511,9 @@ void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, 
 			t->stage = 0;
 			p_shader_extend_code_create(&t->f_c);
 			p_shader_extend_code_create(&t->v_c);
-			p_shader_extend_code(&t->v_c, "varying vec3 pixel_pos;\nvarying vec3 normal;\n");
-			p_shader_extend_code(&t->f_c, "varying vec3 pixel_pos;\nvarying vec3 normal;\n");
+//			p_shader_extend_code(&t->f_c, "uniform gl_LightSourceParameters gl_LightSource[3];\n");
+			p_shader_extend_code(&t->v_c, "varying vec4 pixel_pos;\nvarying vec3 normal;\n");
+			p_shader_extend_code(&t->f_c, "varying vec4 pixel_pos;\nvarying vec3 normal;\n");
 			p_shader_extend_code(&t->f_c, "uniform samplerCube environment;\n");
 			p_shader_extend_code(&t->f_c, "uniform samplerCube diffuse_environment;\n");
 		}else
@@ -534,7 +550,7 @@ void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, 
 						}
 					}
 
-					p_shader_extend_code(&t->v_c, "\tpixel_pos = gl_Vertex.xyz;\n\n");
+					p_shader_extend_code(&t->v_c, "\tpixel_pos = gl_ModelViewMatrix * gl_Vertex;\n\n");
 					p_shader_extend_code(&t->v_c, "\tgl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n}\n");
 
 					p_shader_extend_code(&t->f_c, "}\n");

@@ -15,8 +15,16 @@
 
 void b_glut_idle_func(void)
 {
-	betray_action(BAM_MAIN);
-	glutPostRedisplay();
+	static uint32 seconds = 0, fractions = 0;
+	uint32 s, f;
+	betray_get_current_time(&s, &f);
+	if((double)s - (double)seconds + ((double)f - (double)fractions) / (double)(0xffffffff) > 0.03)
+	{
+		seconds = s;
+		fractions = f;
+		betray_action(BAM_MAIN);
+	    glutPostRedisplay();
+	}
 }
 
 void b_glut_reshape_func(int width, int height)
@@ -52,7 +60,6 @@ void b_glut_mouse_func(int button, int state, int x, int y)
 		input->mouse_button[button] = !state;
 
 }
-
 //glutSpecialFunc(void (GLUTCALLBACK *func)(int key, int x, int y));
 
 void betray_insert_character_b(char character);
@@ -77,6 +84,11 @@ void b_glut_special_keyboard_func(int key, int x, int y)
 	}
 }
 
+void *betray_get_gl_proc_address()
+{
+	return glutGetProcAddress;
+}
+
 void b_glut_keyboard_func(unsigned char key, int x, int y)
 {
 	BInputState *input;
@@ -96,7 +108,7 @@ void b_glut_keyboard_func(unsigned char key, int x, int y)
 			betray_move_cursor(1);
 			betray_delete_character();
 		}
-		else if(key == 8) /* MACKSPACE */
+		else if(key == 8) /* BACKSPACE */
 		{
 			betray_delete_character();
 		}
@@ -135,12 +147,7 @@ GLUTAPI void APIENTRY glutSpecialUpFunc(void (GLUTCALLBACK *func)(int key, int x
 GLUTAPI void APIENTRY glutJoystickFunc(void (GLUTCALLBACK *func)(unsigned int buttonMask, int x, int y, int z), int pollInterval);
 */
 
-void * betray_get_gl_proc_address(void)
-{
-	return (void *) &glutGetProcAddress;
-}
-
-extern void betray_ime_update(void);
+extern void betray_time_update();
 
 void b_glut_display_func(void)
 {
@@ -180,6 +187,7 @@ boolean b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boo
 //	glutInitDisplayString("stencil>=1 rgb depth double");
 	glutInitWindowPosition(10, 10);
 	glutInitWindowSize(size_x, size_y);
+//	glutInitWindowSize(100, 100);
 	glutCreateWindow(caption);
 	glutDisplayFunc(b_glut_display_func);
 	glutReshapeFunc(b_glut_reshape_func);
@@ -193,7 +201,7 @@ boolean b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boo
 	return TRUE;
 }
 
-void betray_launch_main_loop(void)
+void betray_launch_main_loop()
 {
 	glutMainLoop();
 }

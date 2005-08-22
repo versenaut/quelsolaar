@@ -21,14 +21,6 @@ void co_draw_bitmap(ENode *node)
 	sui_set_texture2D_array_gl(uv, 4, 2, p_th_get_texture_id(h));
 	sui_draw_gl(GL_QUADS, vertex, 4, 2, 1, 1, 1);
 	p_th_destroy_texture_handle(h);
-
-	{
-		EBMHandle	*h;
-		ebreal output[3];
-		h = e_nsb_get_image_handle(e_ns_get_node_id(node), "col_r", "col_g", "col_b");
-		e_nsb_evaluate_image_handle_clamp(h, output, 0.5, 0.5, 0.5);
-		e_nsb_destroy_image_handle(h);
-	}
 #endif
 }
 uint change_b_node_id = 0;
@@ -167,7 +159,7 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 					e[i].data.angle[0] = 180 + 45 + (float)(i - 3) * 45;
 					e[i].data.angle[1] = 180 + 45 + (float)(i - 2) * 45;
 				}
-				output = sui_draw_popup(input, 0.15, y, e, 5, 0);
+				output = sui_draw_popup(input, 0.15, y, e, 5, 0, 0.9);
 				if(output != -1 && output != type)
 				{
 					verse_send_b_layer_create(e_ns_get_node_id(node), popup, e_nsb_get_layer_name(layer), output);

@@ -45,7 +45,10 @@ PMesh *p_rm_create(ENode *node)
 	mesh->depend.ref_count = NULL;
 	mesh->normal.normal_ref = NULL;	
 	mesh->normal.normals = NULL;
-	mesh->normal.displacement = NULL;
+	mesh->displacement.displacement = NULL;
+	mesh->displacement.live = TRUE;
+	mesh->displacement.node_version = 0;
+	mesh->displacement.tree_version = 0;
 	mesh->normal.draw_normals = NULL;
 	mesh->param.array = NULL;
 	mesh->param.version = NULL;
@@ -98,8 +101,8 @@ void p_rm_destroy(PMesh *mesh)
 		free(mesh->normal.normal_ref);	
 	if(mesh->normal.normals != NULL)
 		free(mesh->normal.normals);
-	if(mesh->normal.displacement != NULL)
-		free(mesh->normal.displacement);
+	if(mesh->displacement.displacement != NULL)
+		free(mesh->displacement.displacement);
 	if(mesh->normal.draw_normals != NULL)
 		free(mesh->normal.draw_normals);
 	if(mesh->param.array != NULL)
@@ -197,7 +200,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 		return mesh;
 
 	verse_session_get_time(&seconds, &fractions);
-	if(mesh->stage == POS_DONE && mesh->next == NULL && p_lod_compute_lod_update(o_node, g_node, seconds, fractions, mesh->tess.factor))
+	if(mesh->stage == POS_DONE && mesh->next == NULL && (p_lod_compute_lod_update(o_node, g_node, seconds, fractions, mesh->tess.factor) || p_lod_material_test(mesh, o_node)))
 		mesh->geometry_version--;
 
 
@@ -269,7 +272,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 			mesh->normal.normal_ref = malloc((sizeof *mesh->normal.normal_ref) * mesh->render.vertex_count * 4);
 			mesh->render.reference = malloc((sizeof *mesh->render.reference) * mesh->render.element_count * 3);
 
-			mesh->normal.displacement = malloc((sizeof *mesh->normal.displacement) * mesh->render.vertex_count);
+			mesh->displacement.displacement = NULL;
 
 			mesh->depend.reference = malloc((sizeof *mesh->depend.reference) * mesh->depend.length);
 			mesh->depend.weight = malloc((sizeof *mesh->depend.weight) * mesh->depend.length);
@@ -357,39 +360,58 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 			p_lod_create_layer_param(g_node, mesh);
 			break;
 		case POS_CREATE_DISPLACEMENT :
-			p_lod_create_displacement_array(g_node, o_node, mesh, smesh->level);
+			if(o_node != NULL)	
+			{
+				if(p_lod_displacement_update_test(mesh))
+				{
+					uint ii;
+					mesh->displacement.displacement = malloc((sizeof *mesh->displacement.displacement) * mesh->render.vertex_count);
+					p_lod_create_displacement_array(g_node, o_node, mesh, smesh->level);
+				//	for(ii = 0; ii < mesh->render.vertex_count; ii++)
+				//		mesh->displacement.displacement[ii] = 0;
+				}
+			}
+			else
+				mesh->stage++;
 			break;
 		case POS_CREATE_ANIM :
-			p_lod_anim_bones_update_test(mesh, o_node, g_node);
-			p_lod_anim_scale_update_test(mesh, o_node);
-			p_lod_anim_layer_update_test(mesh, o_node, g_node);
+			if(o_node != NULL)	
+			{
+				p_lod_anim_bones_update_test(mesh, o_node, g_node);
+				p_lod_anim_scale_update_test(mesh, o_node);
+				p_lod_anim_layer_update_test(mesh, o_node, g_node);
+			}
 			mesh->stage++;
 			break;
 		case POS_ANIMATE :
-
-			p_lod_anim_vertex_array(mesh->anim.cvs, mesh->anim.cv_count, mesh, g_node);
+			if(o_node != NULL)	
+				p_lod_anim_vertex_array(mesh->anim.cvs, mesh->anim.cv_count, mesh, g_node);
 			mesh->stage++;
 			break;
 		case POS_CREATE_VERTICES :
-			p_lod_compute_vertex_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->depend.ref_count, mesh->depend.reference, mesh->depend.weight, mesh->anim.cvs);
+			if(o_node != NULL)	
+				p_lod_compute_vertex_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->depend.ref_count, mesh->depend.reference, mesh->depend.weight, mesh->anim.cvs);
+			else
+				p_lod_compute_vertex_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->depend.ref_count, mesh->depend.reference, mesh->depend.weight, vertex);
 			p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
-		/*	if(mesh->normal.displacement != NULL)
+		//	if(o_node != NULL)	
+		//		p_lod_create_displacement_array(g_node, o_node, mesh, smesh->level);
+			if(mesh->displacement.displacement != NULL)
 			{
-				p_sds_compute_displacement_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->render.normal_array, mesh->normal.displacement);
-				p_sds_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
-			}*/
+				p_lod_compute_displacement_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->render.normal_array, mesh->displacement.displacement);
+				p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
+			}
 			mesh->stage++;
 			if(store != NULL)
 				p_rm_destroy(store);
 			store = NULL;
 			break;
 		case POS_DONE :
+			if(o_node != NULL)
 			{
 				boolean update = FALSE;
 				static double timer = 0;
 				timer += 0.1;
-
-
 				p_lod_update_layer_param(g_node, mesh);
 				if(p_lod_anim_bones_update_test(mesh, o_node, g_node))
 					update = TRUE;
@@ -397,11 +419,22 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 					update = TRUE;
 				if(p_lod_anim_layer_update_test(mesh, o_node, g_node))
 					update = TRUE;
+				if(p_lod_displacement_update_test(mesh))
+				{
+					uint ii;
+					p_lod_update_displacement_array(g_node, o_node, mesh, smesh->level);
+					update = TRUE;
+				}
 				if(update)
 				{
 					p_lod_anim_vertex_array(mesh->anim.cvs, mesh->anim.cv_count, mesh, g_node);
 					p_lod_compute_vertex_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->depend.ref_count, mesh->depend.reference, mesh->depend.weight, mesh->anim.cvs);
 					p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
+					if(mesh->displacement.displacement != NULL)
+					{
+						p_lod_compute_displacement_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->render.normal_array, mesh->displacement.displacement);
+						p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
+					}
 				}
 
 			}
@@ -412,6 +445,11 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 	return mesh;
 }
 
+void p_rm_update_shape(PMesh *mesh, egreal *vertex)
+{
+	p_lod_compute_vertex_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->depend.ref_count, mesh->depend.reference, mesh->depend.weight, vertex);
+	p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
+}
 
 
 /*
@@ -465,7 +503,7 @@ void p_lod_compute_vertex_array(egreal *vertex, uint vertex_count, const uint *r
 			vertex[v + 1] += cvs[r++] * f;
 			vertex[v + 2] += cvs[r] * f;
 		}
-		printf("%f %f %f\n", vertex[v + 0], vertex[v + 1], vertex[v + 2]);
+//		printf("%f %f %f\n", vertex[v + 0], vertex[v + 1], vertex[v + 2]);
 		v += 3;
 	}
 

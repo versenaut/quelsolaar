@@ -2,7 +2,11 @@
 	#include <windows.h>
 	#include <GL/gl.h>
 #else
+#if defined(__APPLE__) || defined(MACOSX)
+	#include <OpenGL/gl.h>
+#else
 	#include <GL/gl.h>
+#endif
 #endif
 
 #include "enough.h"
@@ -111,6 +115,8 @@ uint p_th_compute_size_check_sum(uint *size)
 	return size[0] * 17 + size[1] * 23 + size[2];
 }
 
+
+
 void p_th_create_new_texture(ENode *node, PTextureHandle *handle)
 {
 	uint i;
@@ -153,7 +159,7 @@ void p_th_create_new_texture(ENode *node, PTextureHandle *handle)
 			glBindTexture(GL_TEXTURE_2D, handle->texture_id);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			buf = malloc((sizeof *buf) * handle->size[0] * handle->size[1] * 3);
@@ -165,11 +171,13 @@ void p_th_create_new_texture(ENode *node, PTextureHandle *handle)
 	}
 }
 
+extern void p_texture_func(ENode *node, ECustomDataCommand command);
 
 PTextureHandle *p_th_create_texture_handle(uint node_id, char *layer_r, char *layer_g, char *layer_b)
 {
 	uint i, j, empty = -1;
 	PTextureHandle *h; 
+
 	for(i = 0; i < PTextureStorage.handel_count; i++)
 	{
 		h = PTextureStorage.handels[i];
@@ -200,6 +208,7 @@ PTextureHandle *p_th_create_texture_handle(uint node_id, char *layer_r, char *la
 			}
 		}
 	}
+	p_texture_func(NULL, E_CDC_STRUCT);
 	if(empty == -1)
 	{
 		PTextureStorage.handels = realloc(PTextureStorage.handels, (sizeof *PTextureStorage.handels) * (PTextureStorage.handel_count + 16));
@@ -267,6 +276,7 @@ void p_th_update_texture(PTextureHandle *handle)
 	EBMHandle *h;
 	uint i, size;
 	size = PIXELS_PER_UPDATE / handle->size[0];
+	printf("p_th_update_texture\n");
 	if(size == 0)
 		size = 1;
 	if(size > handle->size[1] - handle->update_position)
@@ -382,6 +392,7 @@ boolean p_texture_compute(uint dummy)
 	uint empty;
 	for(empty = PTextureStorage.handel_count + 1; empty != 0; empty--)
 	{
+		printf("p_texture_compute\n");
 		PTextureStorage.update_pos = (PTextureStorage.update_pos + 1) % PTextureStorage.handel_count;
 		if(p_th_service_handle(&PTextureStorage.handels[PTextureStorage.update_pos]))
 			return FALSE;

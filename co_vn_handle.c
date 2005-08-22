@@ -17,6 +17,7 @@ typedef struct{
 	float		pos_x;
 	float		pos_y;
 	boolean		hidden;
+	void		*persuade;
 }COVerseNode;
 
 float view_cam_pos[3] = {0, 0, 4};
@@ -92,8 +93,10 @@ COVerseNode *create_verse_node(ENode *node)
 	co_node->node_id = e_ns_get_node_id(node);
 	co_node->pos_x = co_get_pos_x(((float)e_ns_get_node_type(node) - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8);
 	co_node->pos_y = co_get_pos_y(0);
-	co_node->hidden = e_ns_get_node_owner(node) != VN_OWNER_MINE;
+	co_node->hidden = TRUE /*e_ns_get_node_owner(node) == VN_OWNER_MINE*/;
+	co_node->persuade = NULL;
 	e_ns_set_custom_data(node, CONNECTOR_ENOUGH_SLOTT, co_node);
+	printf("creating node");
 	return co_node;
 }
 
@@ -111,8 +114,16 @@ void co_draw_bitmap(ENode *node);
 
 void p_render_object(ENode *node);
 
+
 void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 {
+	egreal size = 1, center[3] = {0, 0, 0}; 
+	double time;
+	uint32 seconds, fractions;
+	betray_get_current_time(&seconds, &fractions);
+
+	time = ((double)fractions / (double)0xffffffff + (double)(seconds % 4)) / 4.0;
+
 	glDisable(GL_DEPTH_TEST);
 	co_vng_ring();
 	if(!hidden)
@@ -126,7 +137,81 @@ void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 //				co_vng_color(245.0 / 255.0, 243.0 / 255.0, 170.0 / 255.0);
 #ifdef PERSUADE_H
 				if(node != NULL)	
+				{
+					ENode *g_node;
+					EObjLink *link;
+					double matrix[16];
+					float col_one[4] = {0.5, 0.4, 0.3, 1}, pos_one[4] = {0.4, 0.6, -0.6, 1};
+					float col_two[4] = {0.6, 0.8, 1, 1}, pos_two[4] = {-0.4, 0.6, -0.6, 1};
+					float col_three[4] = {0.7, 0.7, 0.7, 1}, pos_three[4] = {0.4, 0.6, 0.6, 1};						
+					egreal center[3], size;
+					float pos[4] = {0, 0, 0, 1};
+					glGetDoublev(GL_PROJECTION_MATRIX, matrix);
+					for(link = e_nso_get_next_link(node, 0); link != NULL; link = e_nso_get_next_link(node, e_nso_get_link_id(link) + 1))
+					{
+						if((g_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL && e_ns_get_node_type(g_node) == V_NT_GEOMETRY)
+						{
+							e_nsg_get_center(g_node, center);
+							size = 0.7 / e_nsg_get_size(g_node);
+
+						}
+					}
+				/*	pos[0] = matrix[0] * pos_one[0] + matrix[1] * pos_one[1] + matrix[2] * pos_one[2] + matrix[3];
+					pos[1] = matrix[4] * pos_one[0] + matrix[5] * pos_one[1] + matrix[6] * pos_one[2] + matrix[7];
+					pos[2] = matrix[8] * pos_one[0] + matrix[9] * pos_one[1] + matrix[10] * pos_one[2] + matrix[11];
+					glEnable(GL_LIGHT0);
+					glLightfv(GL_LIGHT0, GL_POSITION, pos);
+					glLightfv(GL_LIGHT0, GL_DIFFUSE, col_one);
+					glEnable(GL_LIGHT1);
+					pos[0] = matrix[0] * pos_two[0] + matrix[1] * pos_two[1] + matrix[2] * pos_two[2] + matrix[3];
+					pos[1] = matrix[4] * pos_two[0] + matrix[5] * pos_two[1] + matrix[6] * pos_two[2] + matrix[7];
+					pos[2] = matrix[8] * pos_two[0] + matrix[9] * pos_two[1] + matrix[10] * pos_two[2] + matrix[11];
+					glLightfv(GL_LIGHT1, GL_POSITION, pos);
+					glLightfv(GL_LIGHT1, GL_DIFFUSE, col_two);
+					glEnable(GL_LIGHT2);
+					pos[0] = matrix[0] * pos_three[0] + matrix[1] * pos_three[1] + matrix[2] * pos_three[2] + matrix[3];
+					pos[1] = matrix[4] * pos_three[0] + matrix[5] * pos_three[1] + matrix[6] * pos_three[2] + matrix[7];
+					pos[2] = matrix[8] * pos_three[0] + matrix[9] * pos_three[1] + matrix[10] * pos_three[2] + matrix[11];
+					glLightfv(GL_LIGHT2, GL_POSITION, pos);
+					glLightfv(GL_LIGHT2, GL_DIFFUSE, col_three);
+				*/
+
+					pos[0] = matrix[0] * pos_one[0] + matrix[4] * pos_one[1] + matrix[8] * pos_one[2] + matrix[12];
+					pos[1] = matrix[1] * pos_one[0] + matrix[5] * pos_one[1] + matrix[9] * pos_one[2] + matrix[13];
+					pos[2] = matrix[2] * pos_one[0] + matrix[6] * pos_one[1] + matrix[10] * pos_one[2] + matrix[14];
+					glEnable(GL_LIGHT0);
+					glLightfv(GL_LIGHT0, GL_POSITION, pos);
+					glLightfv(GL_LIGHT0, GL_DIFFUSE, col_one);
+					glEnable(GL_LIGHT1);
+					pos[0] = matrix[0] * pos_two[0] + matrix[4] * pos_two[1] + matrix[8] * pos_two[2] + matrix[12];
+					pos[1] = matrix[1] * pos_two[0] + matrix[5] * pos_two[1] + matrix[9] * pos_two[2] + matrix[13];
+					pos[2] = matrix[2] * pos_two[0] + matrix[6] * pos_two[1] + matrix[10] * pos_two[2] + matrix[14];
+					glLightfv(GL_LIGHT1, GL_POSITION, pos);
+					glLightfv(GL_LIGHT1, GL_DIFFUSE, col_two);
+					glEnable(GL_LIGHT2);
+					pos[0] = matrix[0] * pos_three[0] + matrix[4] * pos_three[1] + matrix[8] * pos_three[2] + matrix[12];
+					pos[1] = matrix[1] * pos_three[0] + matrix[5] * pos_three[1] + matrix[9] * pos_three[2] + matrix[13];
+					pos[2] = matrix[2] * pos_three[0] + matrix[6] * pos_three[1] + matrix[10] * pos_three[2] + matrix[14];
+					glLightfv(GL_LIGHT2, GL_POSITION, pos);
+					glLightfv(GL_LIGHT2, GL_DIFFUSE, col_three);
+					glEnableClientState(GL_NORMAL_ARRAY);
+					glEnable(GL_DEPTH_TEST);
+					glPushMatrix();
+					glEnable(GL_NORMALIZE);
+					glEnable(GL_LIGHTING);
+					glScalef(size, size, size);
+					glRotatef(time * 360, 0, 1, 0);
+					glTranslatef(-center[0], -center[1], -center[2]);
 					p_render_object(node);
+					glDisable(GL_LIGHTING);
+					glDisable(GL_NORMALIZE);
+					glPopMatrix();
+					glDisable(GL_DEPTH_TEST);
+					glDisableClientState(GL_NORMAL_ARRAY);
+					glDisable(GL_LIGHT0);
+					glDisable(GL_LIGHT1);
+					glDisable(GL_LIGHT2);
+				}
 #endif
 			break;
 			case V_NT_GEOMETRY :
@@ -135,47 +220,74 @@ void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 //				co_vng_color(254.0 / 255.0, 214.0 / 255.0, 161.0 / 255.0);
 #ifdef PERSUADE_H
 				{
+/*					static PMesh *mesh = NULL, *next = NULL;
+					static uint version;
+					COVerseNode *co_node;
+					if(node == NULL)
+						return;
 
-					static double t = 0;
-					PMesh	*mesh;
-					egreal center[3], scale;
-					mesh = p_rm_create(node);
-
-					if(mesh != 0)
+					co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOTT);
+					if(co_node == NULL)
+						return;
+					mesh = co_node->persuade;
+					if(mesh == NULL)
+						mesh = p_rm_create(node);
+					if(mesh != NULL)
+						mesh = p_rm_service(mesh, NULL, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
+					if(mesh != NULL && p_rm_drawable(mesh))
 					{
-						while(p_rm_validate(mesh) && p_rm_drawable(mesh) == FALSE)
-							p_rm_service(mesh, node, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
-					//	scale = p_rm_compute_bounding_box(node, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)), center, NULL);
-						scale = e_nsg_get_size(node);
-						e_nsg_get_center(node, center);
+						float col_one[4] = {0.5, 0.4, 0.3, 1}, pos_one[4] = {4, 6, -6, 1};
+						float col_two[4] = {0.6, 0.8, 1, 1}, pos_two[4] = {-4, 6, -6, 1};
+						float col_three[4] = {0.7, 0.7, 0.7, 1}, pos_three[4] = {4, 6, 6, 1};						egreal center[3], size;
+						mesh = p_rm_service(mesh, NULL, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
+
+						glEnable(GL_LIGHT0);
+						glLightfv(GL_LIGHT0, GL_POSITION, pos_one);
+						glLightfv(GL_LIGHT0, GL_DIFFUSE, col_one);
+						glEnable(GL_LIGHT1);
+						glLightfv(GL_LIGHT1, GL_POSITION, pos_two);
+						glLightfv(GL_LIGHT1, GL_DIFFUSE, col_two);
+						glEnable(GL_LIGHT2);
+						glLightfv(GL_LIGHT2, GL_POSITION, pos_three);
+						glLightfv(GL_LIGHT2, GL_DIFFUSE, col_three);
+						glEnable(GL_DEPTH_TEST);
 						glPushMatrix();
-				/*		glScaled(0.15 / scale, 0.15 / scale, 0.15 / scale);
-						glTranslated(-center[0], -center[1], -center[2]);
-						glRotated(t++, 1, 1, 1);
-				*/		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+						e_nsg_get_center(node, center);
+						size = 0.7 / e_nsg_get_size(node);
+						glRotatef(time * 360, 0, 1, 0);
+						glScalef(size, size, size);
+						glTranslatef(-center[0], -center[1], -center[2]);
+
+						if(e_nsg_get_layer_version(e_nsg_get_layer_by_id(node,  0)) != version)
+						{
+							p_rm_update_shape(mesh, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
+							version = e_nsg_get_layer_version(e_nsg_get_layer_by_id(node,  0));
+						}
 						glEnableClientState(GL_NORMAL_ARRAY);
 						glEnableClientState(GL_VERTEX_ARRAY);
-		#ifdef E_GEOMETRY_REAL_PRECISION_64_BIT
+						glDisableClientState(GL_COLOR_ARRAY);
+						glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+						glDisable(GL_BLEND);
+						glEnable(GL_NORMALIZE);
+				#ifdef E_GEOMETRY_REAL_PRECISION_64_BIT
 						glVertexPointer(3, GL_DOUBLE, 0, p_rm_get_vertex(mesh));
 						glNormalPointer(GL_DOUBLE, 0 , p_rm_get_normal(mesh));
-		#endif
-		#ifdef E_GEOMETRY_REAL_PRECISION_32_BIT
+				//		glNormalPointer(GL_DOUBLE, 0 , p_rm_get_vertex(mesh));
+				#endif
+				#ifdef E_GEOMETRY_REAL_PRECISION_32_BIT
 						glVertexPointer(3, GL_FLOAT, 0, p_rm_get_vertex(mesh));
 						glNormalPointer(GL_FLOAT, 0 , p_rm_get_normal(mesh));
-		#endif
+				#endif
 						glEnable(GL_LIGHTING);
-					//	glColor3f(red, green, blue);
-
+						glColor4f(1, 1, 1, 1);
 						glDrawElements(GL_TRIANGLES, p_rm_get_ref_length(mesh), GL_UNSIGNED_INT, p_rm_get_reference(mesh));
-						glDisableClientState(GL_COLOR_ARRAY);
 						glDisableClientState(GL_NORMAL_ARRAY);
-						glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 						glDisable(GL_LIGHTING);
-						glDisable(GL_BLEND);
-						glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+						glDisable(GL_NORMALIZE);
 						glPopMatrix();
-						p_rm_destroy(mesh);
+						glDisable(GL_DEPTH_TEST);
 					}
+					co_node->persuade = mesh;*/
 				}
 #endif
 			break;
@@ -299,7 +411,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		else
 			glTranslatef(pos[0], pos[1], -pos[2]);
 #ifdef PERSUADE_H
-		p_draw_scene();
+//		p_draw_scene();
 #endif
 	}
 
@@ -319,7 +431,6 @@ void co_input_handler(BInputState *input, void *user_pointer)
 					glTranslatef(co_get_pos_x(((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8) * create_move + co_node->pos_x * (1 - create_move),
 						co_get_pos_y((float)type_count * -0.2) * create_move + co_node->pos_y * (1 - create_move), 0);
 					glScalef(view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move));
-
 					if(mode == COIM_CREATE)
 					{
 						glPushMatrix();
@@ -328,13 +439,6 @@ void co_input_handler(BInputState *input, void *user_pointer)
 						glPopMatrix();
 					}
 					co_node_draw(node, type, FALSE);
-					if(mode == COIM_LINK && (co_get_pos_x(input->pointer_x) - co_node->pos_x) * (co_get_pos_x(input->pointer_x) - co_node->pos_x) + (co_get_pos_y(input->pointer_y) - co_node->pos_y) * (co_get_pos_y(input->pointer_y) - co_node->pos_y) < 0.4 * 0.4)
-					{
-						glPushMatrix();
-						glScalef(1.1, 1.1, 1.1);
-						co_vng_ring();
-						glPopMatrix();
-					}
 				}else
 				{
 					if(mode == COIM_NONE)
@@ -395,9 +499,8 @@ void co_input_handler(BInputState *input, void *user_pointer)
 							co_link->pos_x = co_node->pos_x + 2;
 							co_link->pos_y = co_node->pos_y + 2 - i;
 						}
-						if(mode == COIM_LINK && active == e_ns_get_node_id(node) && link_id == e_nso_get_link_id(link))
-							co_vng_render_link(input, i, TRUE, 0, 0, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), e_nso_get_link_name(link));
-						else if((co_link != NULL && co_vng_render_link(input, i, TRUE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), -co_node->pos_x + co_link->pos_x, -co_node->pos_y + co_link->pos_y, e_nso_get_link_name(link)))
+
+						if((co_link != NULL && co_vng_render_link(input, i, TRUE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), -co_node->pos_x + co_link->pos_x, -co_node->pos_y + co_link->pos_y, e_nso_get_link_name(link)))
 						||	(co_link == NULL && co_vng_render_link(input, i, FALSE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), 0, 0, e_nso_get_link_name(link))))
 						{
 							mode = COIM_LINK;
@@ -406,9 +509,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 						}
 						i++;
 					}
-					if(mode == COIM_LINK && active == e_ns_get_node_id(node) && link_id == -1)
-						co_vng_render_link(input, i, TRUE, 0, 0, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), e_nso_get_link_name(link));
-					else if(co_vng_render_link(input, i, FALSE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), 0, 0, "New"))
+					if(co_vng_render_link(input, i, FALSE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), 0, 0, "New"))
 					{
 						mode = COIM_LINK;
 						link_id = -1;
@@ -481,21 +582,14 @@ void co_input_handler(BInputState *input, void *user_pointer)
 					glPopMatrix();
 			}else if(input->mode == BAM_DRAW && mode == COIM_CREATE)
 			{
-				float x, y, aspect;
-				x = co_get_pos_x(((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8);
-				y = co_get_pos_y((float)type_count * -0.2);
-				aspect = (betray_get_screen_mode(NULL, NULL, NULL) + 0.3) * 4;
-				if(y > -aspect && y < aspect)
-				{
-					glPushMatrix();
-					glTranslatef(co_get_pos_x(((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8),
-						co_get_pos_y((float)type_count * -0.2), 0);
-					glScalef(view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move));
-					co_node_draw(node, type, FALSE);
-					glScalef(4, 4, 4);
-					sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), 0.5, 0.5, 0.5);
-					glPopMatrix();
-				}
+				glPushMatrix();
+				glTranslatef(co_get_pos_x(((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8),
+					co_get_pos_y((float)type_count * -0.2), 0);
+				glScalef(view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move));
+				co_node_draw(node, type, FALSE);
+				glScalef(4, 4, 4);
+				sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), 0.5, 0.5, 0.5);
+				glPopMatrix();
 			}
 		}
 	}
@@ -601,19 +695,10 @@ void co_input_handler(BInputState *input, void *user_pointer)
 			{
 				if(V_NT_OBJECT == e_ns_get_node_type(linker))
 				{
-					if((link = e_nso_get_link(linker, link_id)) != NULL && found == -1)
-							verse_send_o_link_destroy(active, link_id);
-					if((link = e_nso_get_link(linker, link_id)) != NULL && found != -1 && e_ns_get_node_type(e_ns_get_node(0, found)) == e_ns_get_node_type(e_ns_get_node(0, e_nso_get_link_id(link))))
+					if((link = e_nso_get_link(linker, link_id)) != NULL)
 						verse_send_o_link_set(active, link_id, found, e_nso_get_link_name(link), e_nso_get_link_target_id(link));
-					else if(found != -1)
-					{
-						if(e_ns_get_node_type(e_ns_get_node(0, found)) == V_NT_GEOMETRY)
-							verse_send_o_link_set(active, link_id, found, "geometry", 0);
-						else if(e_ns_get_node_type(e_ns_get_node(0, found)) == V_NT_MATERIAL)
-							verse_send_o_link_set(active, link_id, found, "material", 0);
-						else
-							verse_send_o_link_set(active, link_id, found, "my_link", 0);
-					}
+					else
+						verse_send_o_link_set(active, link_id, found, "my_link", 0);
 				}
 				if(V_NT_MATERIAL == e_ns_get_node_type(linker))
 				{
@@ -664,10 +749,6 @@ void co_input_handler(BInputState *input, void *user_pointer)
 					break;
 				case V_NT_CURVE :
 					if(!co_handle_curve(input, node))
-						mode = COIM_NONE;
-					break;
-				case V_NT_AUDIO :
-					if(!co_handle_audio(input, node))
 						mode = COIM_NONE;
 					break;
 			}

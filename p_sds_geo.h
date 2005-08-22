@@ -54,7 +54,7 @@ extern PPolyStore	*compute(PPolyStore *mesh, uint *ref, uint ref_count, egreal *
 extern void			sds_2_test(void);
 
 extern egreal		p_sds_get_crease(PPolyStore *mesh, uint edge);
-extern uint			p_sds_get_corner_next(PPolyStore *mesh, uint corner, uint move);
+extern uint			p_sds_get_corner_next(PPolyStore *mesh, uint corner, int move);
 extern uint			p_sds_get_middle(PPolyStore *old_mesh, uint poly);
 extern void			p_sds_add_polygon(PPolyStore *old_mesh, PDepend *dep, uint poly, egreal weight);
 extern uint			p_sds_get_edge(PPolyStore *old_mesh, uint edge);

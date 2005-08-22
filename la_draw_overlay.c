@@ -5,6 +5,8 @@
 #include "la_tool.h"
 #include "st_matrix_operations.h"
 
+#include "persuade.h"
+
 struct{
 	float		*active_vertex;
 	float		*active_vertex_shadow;
@@ -17,6 +19,8 @@ struct{
 	uint		tri_count;
 	float		*quad;
 	float		*quad_normal;
+	float		*wire;
+	uint		wire_count;
 	uint		quad_count;
 	uint		surface_version;
 }GlobalOverlay;
@@ -63,7 +67,6 @@ void la_do_init(void)
 		sui_draw_set_vec2(GlobalOverlay.move_vertex, i * 4 + 3, square[6], square[7]);
 		sui_create_shadow_edge(0.005, 4, &GlobalOverlay.move_vertex_shadow[i * 4 * 2], &GlobalOverlay.move_vertex_color[i * 4 * 4], square);
 	}
-	GlobalOverlay.tri = NULL;
 	GlobalOverlay.tri_normal = NULL;
 	GlobalOverlay.tri_count = 0;
 	GlobalOverlay.quad = NULL;
@@ -319,13 +322,78 @@ void draw_persuade_surface(ENode *node)
 {
 #ifdef PERSUADE_H
 	static PMesh	*mesh = NULL, *next = NULL;
+	static uint version;
+
+	if(node == NULL)
+		return;
+
+	if(mesh == NULL)
+		mesh = p_rm_create(node);
+	if(mesh != NULL)
+		mesh = p_rm_service(mesh, NULL, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
+	if(mesh != NULL && p_rm_drawable(mesh))
+	{
+		glPushMatrix();
+		glPolygonMode(GL_FRONT, GL_LINE);
+		if(e_nsg_get_layer_version(e_nsg_get_layer_by_id(node,  0)) != version)
+		{
+			p_rm_update_shape(mesh, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
+			version = e_nsg_get_layer_version(e_nsg_get_layer_by_id(node,  0));
+		}
+//		p_rm_service(mesh, NULL, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_COLOR_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glDisable(GL_LIGHTING);
+		glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+		glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+		glBindTexture(GL_TEXTURE_2D, la_pfx_surface_material());
+		glDisable(GL_BLEND);
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_TEXTURE_GEN_S);
+		glEnable(GL_TEXTURE_GEN_T);
+		glEnable(GL_NORMALIZE);
+//		glDisable(GL_LIGHTING);
+//		glDisable(GL_TEXTURE_2D);
+//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+
+#ifdef E_GEOMETRY_REAL_PRECISION_64_BIT
+		glVertexPointer(3, GL_DOUBLE, 0, p_rm_get_vertex(mesh));
+		glNormalPointer(GL_DOUBLE, 0 , p_rm_get_normal(mesh));
+//		glNormalPointer(GL_DOUBLE, 0 , p_rm_get_vertex(mesh));
+#endif
+#ifdef E_GEOMETRY_REAL_PRECISION_32_BIT
+		glVertexPointer(3, GL_FLOAT, 0, p_rm_get_vertex(mesh));
+		glNormalPointer(GL_FLOAT, 0 , p_rm_get_normal(mesh));
+#endif
+//		glEnable(GL_LIGHTING);
+		glColor4f(1, 1, 1, 1);
+
+		glDrawElements(GL_TRIANGLES, p_rm_get_ref_length(mesh), GL_UNSIGNED_INT, p_rm_get_reference(mesh));
+		glDisableClientState(GL_NORMAL_ARRAY);
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_TEXTURE_GEN_S);
+		glDisable(GL_TEXTURE_GEN_T);
+		glDisable(GL_NORMALIZE);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glPopMatrix();
+	}
+#endif
+}
+void draw_persuade_surface_old(ENode *node)
+{
+#ifdef PERSUADE_H
+	static PMesh	*mesh = NULL, *next = NULL;
+	static uint version;
 
 	if((mesh == NULL || !p_rm_validate(mesh)) && next == NULL)
 		next = p_rm_create(node);
 	if(next != NULL)
 	{
 		if(p_rm_validate(next))
-			p_rm_service(next, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
+			next = p_rm_service(next, NULL, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
 		else
 		{
 			p_rm_destroy(next);
@@ -343,7 +411,12 @@ void draw_persuade_surface(ENode *node)
 	{
 		glPushMatrix();
 		glPolygonMode(GL_FRONT, GL_LINE);
-		p_rm_compute(mesh, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
+		if(e_nsg_get_layer_version(e_nsg_get_layer_by_id(node,  0)) != version)
+		{
+			p_rm_update_shape(mesh, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
+			version = e_nsg_get_layer_version(e_nsg_get_layer_by_id(node,  0));
+		}
+//		p_rm_service(mesh, NULL, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_COLOR_ARRAY);
@@ -359,6 +432,7 @@ void draw_persuade_surface(ENode *node)
 		glEnable(GL_NORMALIZE);
 //		glDisable(GL_LIGHTING);
 //		glDisable(GL_TEXTURE_2D);
+//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
 #ifdef E_GEOMETRY_REAL_PRECISION_64_BIT
@@ -375,7 +449,6 @@ void draw_persuade_surface(ENode *node)
 
 		glDrawElements(GL_TRIANGLES, p_rm_get_ref_length(mesh), GL_UNSIGNED_INT, p_rm_get_reference(mesh));
 		glDisableClientState(GL_NORMAL_ARRAY);
-
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_TEXTURE_GEN_S);
 		glDisable(GL_TEXTURE_GEN_T);
@@ -389,13 +462,13 @@ void draw_owerlay_surface(void)
 {
 	static uint version, draw;
 	double *vertex;
-	uint *ref, ref_length, length, i, temp[4];
+	uint *ref, *crease, ref_length, length, i, j, temp[4];
 
 	float x, y, z, x2, y2, z2, x3, y3, z3, r;
 
 	if(GlobalOverlay.surface_version != udg_get_version(TRUE, TRUE, FALSE, FALSE))
 	{	
-		udg_get_geometry(&length, &ref_length, &vertex, &ref, NULL);
+		udg_get_geometry(&length, &ref_length, &vertex, &ref, &crease);
 		if(GlobalOverlay.tri_count != 0)
 		{
 			free(GlobalOverlay.tri);
@@ -410,17 +483,29 @@ void draw_owerlay_surface(void)
 			GlobalOverlay.quad = NULL;
 			GlobalOverlay.quad_normal = NULL;
 		}		
-
+		GlobalOverlay.wire_count = 0;
 		GlobalOverlay.tri_count = 0;
 		GlobalOverlay.quad_count = 0;
+		
 		for(i = 0; i < ref_length; i++)
 		{
 			if(ref[i * 4] < length && ref[i * 4 + 1] < length && ref[i * 4 + 2] < length && vertex[ref[i * 4] * 3] != V_REAL64_MAX && vertex[ref[i * 4 + 1] * 3] != V_REAL64_MAX && vertex[ref[i * 4 + 2] * 3] != V_REAL64_MAX)
 			{
 				if(ref[i * 4 + 3] < length && vertex[ref[i * 4 + 3] * 3] != V_REAL64_MAX)
+				{
 					GlobalOverlay.quad_count++;
-				else
+					if(crease != NULL)
+						for(j = 0; j < 4; j++)
+							if(crease[i * 4 + j] != 0)
+								GlobalOverlay.wire_count++;
+				}else
+				{
 					GlobalOverlay.tri_count++;
+					if(crease != NULL)
+						for(j = 0; j < 3; j++)
+							if(crease[i * 4 + j] != 0)
+								GlobalOverlay.wire_count++;
+				}
 			}
 		}
 
@@ -436,14 +521,16 @@ void draw_owerlay_surface(void)
 			GlobalOverlay.quad_normal = malloc((sizeof *GlobalOverlay.quad_normal) * GlobalOverlay.quad_count * 12);
 		}	
 
-
+		if(GlobalOverlay.wire_count != 0)
+			GlobalOverlay.wire = malloc((sizeof *GlobalOverlay.wire) * GlobalOverlay.wire_count * 2 * 3);
 	}
 
 	if((GlobalOverlay.tri_count != 0 || GlobalOverlay.quad_count != 0) && GlobalOverlay.surface_version != udg_get_version(TRUE, TRUE, TRUE, FALSE))
 	{
 		GlobalOverlay.tri_count = 0;
 		GlobalOverlay.quad_count = 0;
-		udg_get_geometry(&length, &ref_length, &vertex, &ref, NULL);
+		GlobalOverlay.wire_count = 0;
+		udg_get_geometry(&length, &ref_length, &vertex, &ref, &crease);
 	
 		#ifdef PERSUADE_H
 			draw = TRUE;
@@ -492,7 +579,8 @@ void draw_owerlay_surface(void)
 				
 				if(r < 0)
 					r = -r;
-				r += 0.01;
+			//	r += 0.01;
+				r *= 0.5;
 				x = r;
 				y = r;
 				z = r;
@@ -512,12 +600,32 @@ void draw_owerlay_surface(void)
 					}
 					sui_draw_set_vec3(GlobalOverlay.quad_normal, GlobalOverlay.quad_count, x, y, z);
 					sui_draw_set_vec3(GlobalOverlay.quad, GlobalOverlay.quad_count++, vertex[temp[0]], vertex[temp[0] + 1], vertex[temp[0] + 2]);
+					if(crease != NULL && crease[i * 4] != 0)
+					{
+						sui_draw_set_vec3(GlobalOverlay.wire, GlobalOverlay.wire_count++, vertex[temp[0]], vertex[temp[0] + 1], vertex[temp[0] + 2]);
+						sui_draw_set_vec3(GlobalOverlay.wire, GlobalOverlay.wire_count++, vertex[temp[1]], vertex[temp[1] + 1], vertex[temp[1] + 2]);
+					}
 					sui_draw_set_vec3(GlobalOverlay.quad_normal, GlobalOverlay.quad_count, x, y, z);
 					sui_draw_set_vec3(GlobalOverlay.quad, GlobalOverlay.quad_count++, vertex[temp[1]], vertex[temp[1] + 1], vertex[temp[1] + 2]);
+					if(crease != NULL && crease[i * 4 + 1] != 0)
+					{
+						sui_draw_set_vec3(GlobalOverlay.wire, GlobalOverlay.wire_count++, vertex[temp[1]], vertex[temp[1] + 1], vertex[temp[1] + 2]);
+						sui_draw_set_vec3(GlobalOverlay.wire, GlobalOverlay.wire_count++, vertex[temp[2]], vertex[temp[2] + 1], vertex[temp[2] + 2]);
+					}
 					sui_draw_set_vec3(GlobalOverlay.quad_normal, GlobalOverlay.quad_count, x, y, z);
 					sui_draw_set_vec3(GlobalOverlay.quad, GlobalOverlay.quad_count++, vertex[temp[2]], vertex[temp[2] + 1], vertex[temp[2] + 2]);	
+					if(crease != NULL && crease[i * 4 + 2] != 0)
+					{
+						sui_draw_set_vec3(GlobalOverlay.wire, GlobalOverlay.wire_count++, vertex[temp[2]], vertex[temp[2] + 1], vertex[temp[2] + 2]);
+						sui_draw_set_vec3(GlobalOverlay.wire, GlobalOverlay.wire_count++, vertex[temp[3]], vertex[temp[3] + 1], vertex[temp[3] + 2]);
+					}
 					sui_draw_set_vec3(GlobalOverlay.quad_normal, GlobalOverlay.quad_count, x, y, z);
 					sui_draw_set_vec3(GlobalOverlay.quad, GlobalOverlay.quad_count++, vertex[temp[3]], vertex[temp[3] + 1], vertex[temp[3] + 2]);	
+					if(crease != NULL && crease[i * 4 + 3] != 0)
+					{
+						sui_draw_set_vec3(GlobalOverlay.wire, GlobalOverlay.wire_count++, vertex[temp[3]], vertex[temp[3] + 1], vertex[temp[3] + 2]);
+						sui_draw_set_vec3(GlobalOverlay.wire, GlobalOverlay.wire_count++, vertex[temp[0]], vertex[temp[0] + 1], vertex[temp[0] + 2]);
+					}
 				}else
 				{
 					if(udg_get_select(temp[0] / 3) > 0.01 && udg_get_select(temp[1] / 3) > 0.01 && udg_get_select(temp[2] / 3) > 0.01)
@@ -528,10 +636,25 @@ void draw_owerlay_surface(void)
 					}
 					sui_draw_set_vec3(GlobalOverlay.tri_normal, GlobalOverlay.tri_count, x, y, z);
 					sui_draw_set_vec3(GlobalOverlay.tri, GlobalOverlay.tri_count++, vertex[temp[0]], vertex[temp[0] + 1], vertex[temp[0] + 2]);
+					if(crease != NULL && crease[i * 4] != 0)
+					{
+						sui_draw_set_vec3(GlobalOverlay.wire, GlobalOverlay.wire_count++, vertex[temp[0]], vertex[temp[0] + 1], vertex[temp[0] + 2]);
+						sui_draw_set_vec3(GlobalOverlay.wire, GlobalOverlay.wire_count++, vertex[temp[1]], vertex[temp[1] + 1], vertex[temp[1] + 2]);
+					}
 					sui_draw_set_vec3(GlobalOverlay.tri_normal, GlobalOverlay.tri_count, x, y, z);
 					sui_draw_set_vec3(GlobalOverlay.tri, GlobalOverlay.tri_count++, vertex[temp[1]], vertex[temp[1] + 1], vertex[temp[1] + 2]);
+					if(crease != NULL && crease[i * 4 + 1] != 0)
+					{
+						sui_draw_set_vec3(GlobalOverlay.wire, GlobalOverlay.wire_count++, vertex[temp[1]], vertex[temp[1] + 1], vertex[temp[1] + 2]);
+						sui_draw_set_vec3(GlobalOverlay.wire, GlobalOverlay.wire_count++, vertex[temp[2]], vertex[temp[2] + 1], vertex[temp[2] + 2]);
+					}
 					sui_draw_set_vec3(GlobalOverlay.tri_normal, GlobalOverlay.tri_count, x, y, z);
 					sui_draw_set_vec3(GlobalOverlay.tri, GlobalOverlay.tri_count++, vertex[temp[2]], vertex[temp[2] + 1], vertex[temp[2] + 2]);					
+					if(crease != NULL && crease[i * 4 + 2] != 0)
+					{
+						sui_draw_set_vec3(GlobalOverlay.wire, GlobalOverlay.wire_count++, vertex[temp[2]], vertex[temp[2] + 1], vertex[temp[2] + 2]);
+						sui_draw_set_vec3(GlobalOverlay.wire, GlobalOverlay.wire_count++, vertex[temp[0]], vertex[temp[0] + 1], vertex[temp[0] + 2]);
+					}
 				}
 			}
 		}
@@ -539,7 +662,7 @@ void draw_owerlay_surface(void)
 	GlobalOverlay.surface_version = udg_get_version(TRUE, TRUE, FALSE, FALSE);
 	draw_persuade_surface(e_ns_get_node(0, udg_get_modeling_node()));
 	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+/*	glEnable(GL_CULL_FACE);
 	if(GlobalOverlay.tri_count != 0)
 	{
 
@@ -574,6 +697,47 @@ void draw_owerlay_surface(void)
 		sui_draw_gl(GL_QUADS, GlobalOverlay.quad, GlobalOverlay.quad_count, 3, 0.05, 0.05, 0.05);
 	}
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+*/
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	if(GlobalOverlay.tri_count != 0)
+	{
+
+		glCullFace(GL_FRONT);
+		sui_set_blend_gl(GL_ONE, GL_ONE);
+		sui_set_color_array_gl(GlobalOverlay.tri_normal, GlobalOverlay.tri_count, 3);
+		sui_draw_gl(GL_TRIANGLES, GlobalOverlay.tri, GlobalOverlay.tri_count, 3, 1, 1, 1);
+	}
+
+	if(GlobalOverlay.quad_count != 0)
+	{
+		glCullFace(GL_FRONT);
+		sui_set_blend_gl(GL_ONE, GL_ONE);
+		sui_set_color_array_gl(GlobalOverlay.quad_normal, GlobalOverlay.quad_count, 3);
+		sui_draw_gl(GL_QUADS, GlobalOverlay.quad, GlobalOverlay.quad_count, 3, 1, 1, 1);
+	}
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	if(GlobalOverlay.tri_count != 0)
+	{
+		glCullFace(GL_FRONT);
+		sui_set_blend_gl(GL_ONE, GL_ONE);
+		sui_draw_gl(GL_TRIANGLES, GlobalOverlay.tri, GlobalOverlay.tri_count, 3, 0.05, 0.1, 0.15);
+		glCullFace(GL_BACK);
+		sui_draw_gl(GL_TRIANGLES, GlobalOverlay.tri, GlobalOverlay.tri_count, 3, 0.05, 0.05, 0.05);
+	}	
+	if(GlobalOverlay.quad_count != 0)
+	{
+		sui_set_blend_gl(GL_ONE, GL_ONE);
+		glCullFace(GL_FRONT);
+		sui_draw_gl(GL_QUADS, GlobalOverlay.quad, GlobalOverlay.quad_count, 3, 0.05, 0.1, 0.15);
+		glCullFace(GL_BACK);
+		sui_draw_gl(GL_QUADS, GlobalOverlay.quad, GlobalOverlay.quad_count, 3, 0.05, 0.05, 0.05);
+	}
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+
+	if(GlobalOverlay.wire_count != 0)
+		sui_draw_gl(GL_LINES, GlobalOverlay.wire, GlobalOverlay.wire_count, 3, 0.5, 0.4, 0.5);
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 }

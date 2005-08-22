@@ -7,8 +7,10 @@ void sui_draw_text(float pos_x, float pos_y, float size, float spacing, const ch
 	uint i;
 	if(text == NULL || *text == '\0')
 		return;
-//	glEnable(GL_LINE_SMOOTH);
-	glPushMatrix();
+	glEnable(GL_LINE_SMOOTH);
+/*	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+*/	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
 	size = size / sui_get_letter_size(97);
 	spacing = spacing * sui_get_letter_size(97);
@@ -19,7 +21,8 @@ void sui_draw_text(float pos_x, float pos_y, float size, float spacing, const ch
 		glTranslatef(sui_get_letter_size(text[i]) + spacing, 0, 0);
 	}
 	glPopMatrix();
-//	glDisable(GL_LINE_SMOOTH);
+/*	glDisable(GL_BLEND);*/
+	glDisable(GL_LINE_SMOOTH);
 }
 
 float sui_compute_text_length(float size, float spacing, const char *text)

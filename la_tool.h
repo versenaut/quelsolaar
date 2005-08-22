@@ -10,7 +10,7 @@ extern void		la_t_weld_selected_vertexes(void);
 extern void		la_t_init_draw_line(void);
 extern void		la_t_new_draw_line(void);
 extern void		la_t_draw_line_add(float x, float y, boolean add);
-extern boolean  la_t_draw_select_meny_test(void);
+extern boolean  la_t_draw_select_menu_test(void);
 
 typedef enum{
 	SM_SELECT,
@@ -37,7 +37,7 @@ extern void		la_t_tm_get_pos(double *pos);
 extern void		la_t_tm_get_vector(double *vector);
 extern void		la_t_tm_hide(boolean hide);
 extern void		la_t_tm_draw(BInputState *input, boolean active);
-extern boolean	la_t_tm_grabb(BInputState *input);
+extern boolean	la_t_tm_grab(BInputState *input);
 extern void		la_t_tm_view_center(void);
 extern boolean	la_t_tm_test_center(BInputState *input);
 extern void		la_t_tm_manipulate(BInputState *input, double *snap);

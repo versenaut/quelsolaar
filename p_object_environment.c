@@ -8,7 +8,11 @@
 	#include <windows.h>
 	#include <GL/gl.h>
 #else
+#if defined(__APPLE__) || defined(MACOSX)
+	#include <OpenGL/gl.h>
+#else
 	#include <GL/gl.h>
+#endif
 #endif
 
 #define TRUE 1
@@ -292,7 +296,7 @@ PObjEnv *p_env_compute(PObjEnv *env)
 		}
 
 		for(; i < p_std_env_size * p_std_env_size * 6 * 4; i++)
-			env->a_buffer[i] = 1E300f;
+			env->a_buffer[i] = 1300;
 		env->environment_id = p_std_environment_id;
 		env->diffuse_environment_id = p_std_diffuse_environment_id;
 		return env;
@@ -335,7 +339,6 @@ PObjEnv *p_env_compute(PObjEnv *env)
 			glDisable(GL_TEXTURE_CUBE_MAP_EXT);
 		break;
 		case 2 :
-		//	p_env_create_sky(p_vec_buffer, env->b_buffer, 1, env->size);
 			env->sub_stage = p_env_cube_threw_qube(p_vec_buffer, env->a_buffer, env->b_buffer, env->size, env->sub_stage);
 			if(env->sub_stage == env->size * env->size * 6)
 			{

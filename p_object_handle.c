@@ -8,7 +8,11 @@
 	#include <windows.h>
 	#include <GL/gl.h>
 #else
+#if defined(__APPLE__) || defined(MACOSX)
+	#include <OpenGL/gl.h>
+#else
 	#include <GL/gl.h>
+#endif
 #endif
 
 /*#include "enough.h"*/

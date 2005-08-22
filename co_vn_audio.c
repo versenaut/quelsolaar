@@ -110,7 +110,7 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 					e[i].data.angle[0] = 180 + 30 + (float)(i - 3) * 40;
 					e[i].data.angle[1] = 180 + 30 + (float)(i - 2) * 40;
 				}
-				output = sui_draw_popup(input, 0.15, y, e, 8, 0);
+				output = sui_draw_popup(input, 0.15, y, e, 8, 0, 0.9);
 				if(output != -1 && output != e_nsa_get_buffer_type(buffer))
 					verse_send_a_buffer_create(change_a_node_id, e_nsa_get_buffer_id(buffer), e_nsa_get_buffer_name(buffer), output, e_nsa_get_buffer_frequency(buffer));
 			}

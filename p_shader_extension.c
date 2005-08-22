@@ -4,23 +4,34 @@
 #ifdef WIN32
 	#include <windows.h>
 	#include <GL/gl.h>
+	typedef unsigned int GLhandleARB;
+#else
+#if defined(__APPLE__) || defined(MACOSX)
+	#include <OpenGL/gl.h>
 #else
 	#include <GL/gl.h>
+	typedef unsigned int GLhandleARB;
+#endif
 #define APIENTRY
 #endif
+
 #include "verse.h"
 #include "persuade.h"
 #include "p_task.h"
 #include "p_extension.h"
 #include "p_sds_array.h"
 
-/*typedef unsigned int GLhandleARB;*/
+
 
 #define GL_VERTEX_SHADER_ARB                        0x8B31
 #define GL_FRAGMENT_SHADER_ARB                      0x8B30
 #define GL_TEXTURE0_ARB								0x84C0
 
-GLhandleARB (APIENTRY *p_glCreateShaderObjectARB)(GLenum shaderType);
+GLhandleARB 
+(APIENTRY 
+		 *p_glCreateShaderObjectARB)
+(GLenum 
+ shaderType);
 GLvoid      (APIENTRY *p_glDeleteObjectARB)(GLhandleARB obj);
 GLhandleARB (APIENTRY *p_glCreateProgramObjectARB)(GLvoid);
 GLvoid      (APIENTRY *p_glAttachObjectARB)(GLhandleARB containerObj, GLhandleARB obj);
@@ -95,9 +106,9 @@ PShader *p_shader_allocate(void)
 {
 	PShader *s;
 	s = malloc(sizeof *s);
-    s->prog_obj = p_glCreateProgramObjectARB();
+	s->prog_obj = p_glCreateProgramObjectARB();
 	s->vertex_obj = p_glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-    s->fragment_obj = p_glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+	s->fragment_obj = p_glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
 	p_glAttachObjectARB(s->prog_obj, s->vertex_obj);
 	p_glAttachObjectARB(s->prog_obj, s->fragment_obj);
 	s->uniforms_fragments = NULL;
@@ -114,10 +125,10 @@ PShader *p_shader_allocate(void)
 
 extern void p_shader_func(ENode *node, ECustomDataCommand command);
 
-void p_shader_init(void)
+void p_shader_init()
 {
 //	uint length;
-	if(/*p_extention_test("GL_ARB_shading_language_100")*/FALSE)
+	if(p_extension_test("GL_ARB_shading_language_100"))
 	{
 		p_glCreateShaderObjectARB = p_extension_get_address("glCreateShaderObjectARB");
 		p_glDeleteObjectARB = p_extension_get_address("glDeleteObjectARB");
@@ -148,6 +159,12 @@ void p_shader_init(void)
 		e_ns_set_custom_func(P_ENOUGH_SLOT, V_NT_MATERIAL, p_shader_fallback_func);
 	}
 }
+
+boolean p_shaders_suported(void)
+{
+	return p_programmable_shaders_suported;
+}
+
 void p_shader_destroy(PShader *shader)
 {
 	if(shader->prog_obj != p_standard_shader->prog_obj)
@@ -509,3 +526,82 @@ void p_shader_func(ENode *node, ECustomDataCommand command)
 	}
 }
 
+uint shadow_prog_obj = -1;
+/*
+vec3 vector;
+vec3 normal;
+vec4 position;
+
+void main()
+{
+	poition = gl_ModelViewMatrix * gl_Vertex;
+	vector = gl_LightSource[0].position.xyz - position.xyz;
+	normal = normalize(gl_NormalMatrix * gl_Normal);
+	if(dot(vector, normal) < 0.0)
+	{
+		vector = normalize(vector);
+		gl_Position = gl_ProjectionMatrix * vec4((position - vector), 0.0);
+	}else
+		gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
+*/
+void p_shader_init_shadow()
+{
+	uint vertex_obj, fragment_obj;
+	uint i;
+	char buf[2000];
+	char *v_shader = "vec3 vector;\n"
+	"vec3 normal;\n"
+	"vec4 position;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"\tposition = gl_ModelViewMatrix * gl_Vertex;\n"
+	"\tvector = gl_LightSource[0].position.xyz - position.xyz;\n"
+	"\tnormal = normalize(gl_NormalMatrix * gl_Normal);\n"
+	"\tif(dot(vector, normal) < 0.0)\n"	
+	"\t{\n"
+	"\t\tvector = normalize(vector);\n"
+	"\t\tgl_Position = gl_ProjectionMatrix * vec4((position.xyz - vector), 1.0);\n"
+//	"\t\tgl_Position = gl_ProjectionMatrix * vec4(position.xyz, 0.0);\n"
+	"\t}else\n"
+	"\t\tgl_Position = gl_ProjectionMatrix * vec4((position.xyz - vector * vec3(0.01, 0.01, 0.01)), 1.0);\n"
+	
+//	"\t\tgl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+
+	"}\n";
+
+	char *f_shader = "void main()\n{\n\tgl_FragColor = vec4(1.0, 1.0, 1.0, 0.0);\n}\n";
+
+
+
+	shadow_prog_obj = p_glCreateProgramObjectARB();
+	vertex_obj = p_glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+    fragment_obj = p_glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+	p_glAttachObjectARB(shadow_prog_obj, vertex_obj);
+	p_glAttachObjectARB(shadow_prog_obj, fragment_obj);
+	for(i = 0; v_shader[i] != 0; i++);
+	p_glShaderSourceARB(vertex_obj, 1, &v_shader, &i);
+	p_glCompileShaderARB(vertex_obj);
+
+	p_glGetInfoLogARB(vertex_obj, 2000, &i, buf);
+	printf("%s\n", v_shader);
+	printf("Shadow Errors:\n%s\n", buf);
+	for(i = 0; f_shader[i] != 0; i++);
+	p_glShaderSourceARB(fragment_obj, 1, &f_shader, &i);
+	p_glCompileShaderARB(fragment_obj);
+	p_glGetInfoLogARB(fragment_obj, 2000, &i, buf);
+	printf("%s\n", f_shader);
+	printf("Shadow Errors:\n%s\n", buf);
+
+	p_glLinkProgramARB(shadow_prog_obj);
+}
+
+boolean p_shader_shadow_bind()
+{
+	if(shadow_prog_obj == -1)
+		p_shader_init_shadow();
+	if(p_programmable_shaders_suported)
+		p_glUseProgramObjectARB(shadow_prog_obj);
+	return p_programmable_shaders_suported;
+}

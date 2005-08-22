@@ -28,7 +28,7 @@ extern void		uvg_set_corner_select_all(egreal select);
 
 extern void		uv_find_closest_corner(egreal *output, float x, float y, boolean selected);
 
-extern void		uvg_get_un_collapse(uint id);
+extern void		uvg_get_un_colapse(uint id);
 
 extern void		uvg_set_all_corner_uv(uint id, egreal u0, egreal v0, egreal u1, egreal v1, egreal u2, egreal v2, egreal u3, egreal v3);
 extern void		uvg_set_one_corner_uv(uint id, uint corner, egreal u, egreal v);

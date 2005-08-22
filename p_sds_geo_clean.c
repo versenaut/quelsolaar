@@ -457,9 +457,9 @@ float p_sds_stage_clean_poly_cerease(PPolyStore *mesh, uint *ref, uint ref_count
 			{
 				mesh->crease[mesh->base_quad_count + mesh->tri_length] = 1 - ((egreal)crease[stage] / 4294967295.0);
 				mesh->ref[mesh->base_quad_count + mesh->tri_length++] = ref[stage];
-				mesh->crease[mesh->base_quad_count + mesh->tri_length] = 1 - ((egreal)crease[stage - 1] / 4294967295.0);
+				mesh->crease[mesh->base_quad_count + mesh->tri_length] = 1 - ((egreal)crease[stage + 1] / 4294967295.0);
 				mesh->ref[mesh->base_quad_count + mesh->tri_length++] = ref[stage + 1];
-				mesh->crease[mesh->base_quad_count + mesh->tri_length] = 1 - ((egreal)crease[stage - 2] / 4294967295.0);
+				mesh->crease[mesh->base_quad_count + mesh->tri_length] = 1 - ((egreal)crease[stage + 2] / 4294967295.0);
 				mesh->ref[mesh->base_quad_count + mesh->tri_length++] = ref[stage + 2];
 /*				printf("crease = %f %f %f\n",
 					1 - ((egreal)crease[stage + 0] / 4294967295.0),
@@ -510,14 +510,16 @@ egreal p_sds_get_crease(PPolyStore *mesh, uint edge)
 	{
 		if(id / (mesh->poly_per_base * 4) == edge / (mesh->poly_per_base * 4))
 			return 1;
+		return mesh->crease[(edge / (mesh->poly_per_base * 4)) * 4 + edge % 4];
 		return mesh->crease[(edge - edge % (mesh->poly_per_base * 4)) / mesh->poly_per_base + edge % 4];
 	}else
 	{
 		edge -= mesh->quad_length;
 		if((id - mesh->quad_length) / (mesh->poly_per_base * 3) == edge / (mesh->poly_per_base * 3))
 			return 1;
-		
-		return mesh->crease[mesh->base_quad_count * 4 + (edge - edge % (mesh->poly_per_base * 3)) / mesh->poly_per_base + edge % 3];
+
+		return mesh->crease[mesh->base_quad_count * 4 + (edge / (mesh->poly_per_base * 3)) * 3 + edge % 3];	
+	//	return mesh->crease[mesh->base_quad_count * 4 + (edge - edge % (mesh->poly_per_base * 3)) / mesh->poly_per_base + edge % 3];
 	}
 }
 //		return mesh->crease[edge / mesh->poly_per_base + (edge - mesh->quad_length * mesh->poly_per_base) % 3];

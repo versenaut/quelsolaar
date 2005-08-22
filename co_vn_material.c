@@ -795,7 +795,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 									e[j].data.square.square[2] = 0.2;
 									e[j].data.square.square[3] = -0.1;
 								}
-								output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 6, 0);
+								output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 6, 0, 0.9);
 								if(output < 6 && output != frag->light.type)
 								{
 									f.light.type = output;
@@ -1001,7 +1001,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 										e[j].data.square.square[2] = 0.2;
 										e[j].data.square.square[3] = -0.1;
 									}
-									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 2, 0);
+									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 2, 0, 0.9);
 									if(output < 2 && output != frag->noise.type)
 									{
 										frag->noise.type = output;
@@ -1049,7 +1049,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 										e[j].data.square.square[2] = 0.2;
 										e[j].data.square.square[3] = -0.1;
 									}
-									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 6, 0);
+									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 6, 0, 0.9);
 									if(output < 6 && output != frag->blender.type)
 									{
 										f.blender.type = output;
@@ -1103,7 +1103,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 										e[j].data.square.square[2] = 0.2;
 										e[j].data.square.square[3] = -0.1;
 									}
-									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 3, 0);
+									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 3, 0, 0.9);
 									if(output < 3)
 										mode = output;
 								}
@@ -1267,7 +1267,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 										e[j].data.square.square[2] = 0.2;
 										e[j].data.square.square[3] = -0.1;
 									}
-									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 3, 0);
+									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 3, 0, 0.9);
 									f.ramp.channel = output; 
 									if(output < 3 && output != frag->ramp.channel)
 										verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_RAMP, &f);
@@ -1291,7 +1291,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 										e[j].data.square.square[2] = 0.2;
 										e[j].data.square.square[3] = -0.1;
 									}
-									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.15, e, 3, 0);
+									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.15, e, 3, 0, 0.9);
 									f.ramp.type = output; 
 									if(output < 3 && output != frag->ramp.type)
 										verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_RAMP, &f);
@@ -1545,7 +1545,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 				e[i].type = PU_T_BOTTOM; 
 				e[i].text = material_type_names[i];
 			}
-			output = sui_draw_popup(input, -0.2, y - 0.05, e, VN_M_FT_OUTPUT + 1, 0);
+			output = sui_draw_popup(input, -0.2, y - 0.05, e, VN_M_FT_OUTPUT + 1, 0, 0.9);
 			if(output <= VN_M_FT_OUTPUT)
 			{
 				clear_new_frag(&f, output);

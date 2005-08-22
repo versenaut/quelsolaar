@@ -8,6 +8,8 @@
 typedef struct{ 
 	char	weight[16];
 	char	reference[16];
+	char	pos_label[16];
+	char	rot_label[16];
 	uint32	parent;
 	real64	pos_x;
 	real64	pos_y;
@@ -32,6 +34,7 @@ typedef struct{
 	uint32					vertex_length; 
 	uint32					polygon_length;
 	egreal					space[6];
+	boolean					space_recompute;
 	char					vertex_crease_layer[16];
 	uint32					vertex_crease;
 	char					edge_crease_layer[16];
@@ -475,29 +478,7 @@ void callback_send_g_vertex_set_real(void *user_data, VNodeID node_id, VLayerID 
 		e_ns_update_node_version_struct(node);
 }
 
-ESGeometryNode	*e_create_g_node(VNodeID node_id, VNodeOwner owner)
-{
-	ESGeometryNode	*node;
-	if((node = (ESGeometryNode *) e_ns_get_node_networking(node_id)) == NULL)
-	{
-		uint i;
-		node = malloc(sizeof *node);
-		node->layer_allocated = 0;
-		node->layers = NULL;
-		node->vertex_length = 16;
-		node->polygon_length = 16;
-		node->vertex_crease_layer[0] = 0;
-		node->vertex_crease = 0;
-		node->edge_crease_layer[0] = 0;
-		node->edge_crease = 0;
-		node->bones = NULL;
-		node->bones_allocated = 0;
-		for(i = 0; i < 6; i++)
-			node->space[i] = 0;
-		e_ns_init_head((ENodeHead *)node, V_NT_GEOMETRY, node_id, owner);
-	}
-	return node;
-}
+extern ESGeometryNode	*e_create_g_node(VNodeID node_id, VNodeOwner owner);
 
 void callback_send_g_layer_create(void *user_data, VNodeID node_id, VLayerID layer_id, char *name, VNGLayerType type, uint32 def_integer, real64 def_real)
 {
@@ -545,6 +526,33 @@ void callback_send_g_layer_create(void *user_data, VNodeID node_id, VLayerID lay
 		layer->name[i] = name[i];
 	layer->name[i] = 0;
 	e_ns_update_node_version_struct(node);
+}
+
+ESGeometryNode	*e_create_g_node(VNodeID node_id, VNodeOwner owner)
+{
+	ESGeometryNode	*node;
+	if((node = (ESGeometryNode *) e_ns_get_node_networking(node_id)) == NULL)
+	{
+		uint i;
+		node = malloc(sizeof *node);
+		node->layer_allocated = 0;
+		node->layers = NULL;
+		node->vertex_length = 16;
+		node->polygon_length = 16;
+		node->vertex_crease_layer[0] = 0;
+		node->vertex_crease = 0;
+		node->edge_crease_layer[0] = 0;
+		node->edge_crease = 0;
+		node->bones = NULL;
+		node->bones_allocated = 0;
+		node->space_recompute = TRUE;
+		for(i = 0; i < 6; i++)
+			node->space[i] = 0;
+		e_ns_init_head((ENodeHead *)node, V_NT_GEOMETRY, node_id, owner);
+		callback_send_g_layer_create(NULL, node_id, 0, "vertex", VN_G_LAYER_VERTEX_XYZ, 0, 0);
+		callback_send_g_layer_create(NULL, node_id, 1, "polygon", VN_G_LAYER_POLYGON_CORNER_UINT32, 0, 0);
+	}
+	return node;
 }
 
 void callback_send_g_layer_destroy(void *user_data, VNodeID node_id, VLayerID layer_id)
@@ -685,15 +693,72 @@ uint e_nsg_find_empty_polygon_slot(ESGeometryNode *node, uint start)
 		return start;
 }
 
+void e_nsg_re_compute_space(ESGeometryNode *node)
+{
+	uint		i;
+	EGeoLayer	*end, *layer;
+	if(node->space_recompute != TRUE)
+		return;
+	node->space_recompute = FALSE;
+
+	layer = node->layers;
+	for(i = 0; i < node->vertex_length * 3 && ((egreal *)layer->data)[i] == E_REAL_MAX; i += 3)
+	if(i == node->vertex_length * 3)
+		return;
+	node->space[0] = ((egreal *)layer->data)[i];
+	node->space[1] = ((egreal *)layer->data)[i];
+	i++;
+	node->space[2] = ((egreal *)layer->data)[i];
+	node->space[3] = ((egreal *)layer->data)[i];
+	i++;
+	node->space[4] = ((egreal *)layer->data)[i];
+	node->space[5] = ((egreal *)layer->data)[i];
+
+
+	for(end = layer + node->layer_allocated; layer != end; layer++)
+	{
+		if(layer->data != NULL)
+		{
+			if(layer->type == VN_G_LAYER_VERTEX_XYZ)
+			{
+				for(i = 0; i < node->vertex_length * 3;)
+				{
+					if(((egreal *)layer->data)[i] != E_REAL_MAX)
+					{
+						if(((egreal *)layer->data)[i] > node->space[0])
+							node->space[0] = ((egreal *)layer->data)[i];
+						if(((egreal *)layer->data)[i] < node->space[1])
+							node->space[1] = ((egreal *)layer->data)[i];
+						i++;
+						if(((egreal *)layer->data)[i] > node->space[2])
+							node->space[2] = ((egreal *)layer->data)[i];
+						if(((egreal *)layer->data)[i] < node->space[3])
+							node->space[3] = ((egreal *)layer->data)[i];
+						i++;
+						if(((egreal *)layer->data)[i] > node->space[4])
+							node->space[4] = ((egreal *)layer->data)[i];
+						if(((egreal *)layer->data)[i] < node->space[5])
+							node->space[5] = ((egreal *)layer->data)[i];
+						i++;
+					}else
+						i += 3;
+				}
+			}
+		}
+	}
+}
+
 void e_nsg_get_center(ESGeometryNode *node, egreal *center)
 {
-	center[0] = node->space[1] = (node->space[0] - node->space[1]) * 0.5;
-	center[1] = node->space[3] = (node->space[2] - node->space[3]) * 0.5;
-	center[2] = node->space[5] = (node->space[4] - node->space[5]) * 0.5;
+	e_nsg_re_compute_space(node);
+	center[0] = node->space[1] + (node->space[0] - node->space[1]) * 0.5;
+	center[1] = node->space[3] + (node->space[2] - node->space[3]) * 0.5;
+	center[2] = node->space[5] + (node->space[4] - node->space[5]) * 0.5;
 }
 
 void e_nsg_get_bounding_box(ESGeometryNode *node, egreal *high_x, egreal *low_x, egreal *high_y, egreal *low_y, egreal *high_z, egreal *low_z)
 {
+	e_nsg_re_compute_space(node);
 	if(high_x == NULL)
 		*high_x = node->space[0];
 	if(low_x == NULL)
@@ -710,6 +775,7 @@ void e_nsg_get_bounding_box(ESGeometryNode *node, egreal *high_x, egreal *low_x,
 
 egreal e_nsg_get_size(ESGeometryNode *node)
 {
+	e_nsg_re_compute_space(node);
 	return sqrt((node->space[0] - node->space[1]) * (node->space[0] - node->space[1]) +
 	(node->space[2] - node->space[3]) * (node->space[2] - node->space[3]) +
 	(node->space[4] - node->space[5]) * (node->space[4] - node->space[5]));
@@ -718,7 +784,7 @@ egreal e_nsg_get_size(ESGeometryNode *node)
 
 
 void callback_send_g_bone_create(void *user, VNodeID node_id, uint16 bone_id, const char *weight, const char *reference, uint16 parent,
-				 real64 pos_x, real64 pos_y, real64 pos_z, const VNQuat64 *rot)
+				 real64 pos_x, real64 pos_y, real64 pos_z, char *pos_label, const VNQuat64 *rot, char *rot_label)
 {
 	ESGeometryNode	*node;
 	uint			i;
@@ -746,7 +812,15 @@ void callback_send_g_bone_create(void *user, VNodeID node_id, uint16 bone_id, co
 	node->bones[bone_id].weight[i] = 0;	
 	for(i = 0; reference[i] != 0 && i < 15; i++)
 		node->bones[bone_id].reference[i] = reference[i];
-	node->bones[bone_id].reference[i] = 0;	
+	node->bones[bone_id].reference[i] = 0;
+
+	for(i = 0; pos_label[i] != 0 && i < 15; i++)
+		node->bones[bone_id].pos_label[i] = pos_label[i];
+	node->bones[bone_id].pos_label[i] = 0;	
+	for(i = 0; rot_label[i] != 0 && i < 15; i++)
+		node->bones[bone_id].rot_label[i] = rot_label[i];
+	node->bones[bone_id].rot_label[i] = 0;	
+
 	node->bones[bone_id].parent = parent,
 	node->bones[bone_id].pos_x = pos_x;
 	node->bones[bone_id].pos_y = pos_y;
@@ -801,6 +875,20 @@ char *e_nsg_get_bone_reference(ESGeometryNode *g_node, uint16 bone_id)
 {
 	if(bone_id < g_node->bones_allocated)
 		return g_node->bones[bone_id].reference;
+	return NULL;
+}
+
+char *e_nsg_get_bone_pos_label(ESGeometryNode *g_node, uint16 bone_id)
+{
+	if(bone_id < g_node->bones_allocated)
+		return g_node->bones[bone_id].pos_label;
+	return NULL;
+}
+
+char *e_nsg_get_bone_rot_label(ESGeometryNode *g_node, uint16 bone_id)
+{
+	if(bone_id < g_node->bones_allocated)
+		return g_node->bones[bone_id].rot_label;
 	return NULL;
 }
 

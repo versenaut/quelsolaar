@@ -17,7 +17,7 @@ typedef struct{
 	uint version;
 }PGeoParams;
 
-/*extern uint p_create_material_array(PMesh *mesh, egreal *output, uint32 *reference, uint32 ref_length, uint32 cv_count, uint slot, void *data, uint type, uint start);*/
+//extern uint p_create_material_array(PMesh *mesh, egreal *output, uint32 *reference, uint32 ref_length, uint32 cv_count, uint slot, void *data, uint type, uint start);
 
 extern uint p_shader_get_param_count(ENode *node);
 
@@ -146,7 +146,7 @@ boolean p_array_update(PGeoParams *p, PMesh *mesh, uint32 geometry, uint32 mater
 			{
 				if(p->data[i].version[j] != e_nsg_get_layer_version(layer))
 					p->data[i].compleat[j] = 0;
-/*				p->data[i].compleat[j] = p_create_material_array(mesh, p->arrays[i], e_nsg_get_layer_data(g_node, e_nsg_get_layer_by_id(g_node, 1)), e_nsg_get_polygon_length(g_node), e_nsg_get_vertex_length(g_node), j, e_nsg_get_layer_data(g_node, layer), e_nsg_get_layer_type(layer), p->data[i].compleat[j]);*/
+//				p->data[i].compleat[j] = p_create_material_array(mesh, p->arrays[i], e_nsg_get_layer_data(g_node, e_nsg_get_layer_by_id(g_node, 1)), e_nsg_get_polygon_length(g_node), e_nsg_get_vertex_length(g_node), j, e_nsg_get_layer_data(g_node, layer), e_nsg_get_layer_type(layer), p->data[i].compleat[j]);
 				p->data[i].version[j] = e_nsg_get_layer_version(layer);
 				return TRUE;
 			}

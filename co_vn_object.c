@@ -264,7 +264,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 							element[j].data.square.square[3] = -0.1;
 						}
 
-						output = sui_draw_popup(input, 0.15, y_meth, element, VN_O_METHOD_PTYPE_LAYER + 1, 0);
+						output = sui_draw_popup(input, 0.15, y_meth, element, VN_O_METHOD_PTYPE_LAYER + 1, 0, 0.9);
 						if(output <= VN_O_METHOD_PTYPE_REAL64_MAT16)
 						{
 							VNOParamType temp;

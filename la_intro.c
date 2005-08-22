@@ -135,7 +135,7 @@ void draw_la_star_drop(double x, double y, double z, double timer, boolean wire,
 }
 
 
-void la_intro_draw(void)
+void la_intro_draw(void *user)
 {
 	uint i;
 	static double t = -100, rot = 1;

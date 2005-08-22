@@ -344,6 +344,8 @@ boolean udg_check_g_node(uint32 node_id)
 
 		if(e_nsg_get_layer_by_id(g_node, 1) == NULL || e_nsg_get_layer_by_id(g_node, 0) == NULL)
 			return FALSE;
+		if(e_nsg_get_layer_data(g_node, e_nsg_get_layer_by_id(g_node, 1)) == NULL || e_nsg_get_layer_data(g_node, e_nsg_get_layer_by_id(g_node, 0) == NULL))
+			return FALSE;
 	//	if(UNDOGlobal.select_local != TRUE && e_nsg_get_layer_data(g_node, e_nsg_get_layer_by_type(g_node, VN_G_LAYER_VERTEX_REAL, "select")) == NULL)
 	//		return FALSE;
 		return TRUE;

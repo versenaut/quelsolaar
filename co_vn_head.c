@@ -348,7 +348,7 @@ float co_handle_node_head(BInputState *input, ENode *node)
 						e[l].data.angle[0] = 180 + 45 + (float)(l - 4) * 22.5;
 						e[l].data.angle[1] = 180 + 45 + (float)(l - 3) * 22.5;
 					}
-					output = sui_draw_popup(input, 0.15, y + size, e, 8, 0);
+					output = sui_draw_popup(input, 0.15, y + size, e, 8, 0, 0.9);
 					clear_tag(&t, output);
 					if(output != -1 && output != k)
 						verse_send_tag_create(e_ns_get_node_id(node), i, j, e_ns_get_tag_name(node, i, j), output, &t);

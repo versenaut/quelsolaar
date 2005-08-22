@@ -50,16 +50,23 @@ struct{
 
 void uvg_set_node(uint node_id)
 {
+	ENode *node;
 	UVGGlobal.create = FALSE;
 	UVGGlobal.node_id = node_id;
+	if((node = e_ns_get_node(0, node_id)) == NULL)
+	{
+		if(NULL == e_nsg_get_layer_by_name(node, "map_u"))
+			verse_send_g_layer_create(UVGGlobal.node_id, -1, "map_u", VN_G_LAYER_POLYGON_CORNER_REAL, 0, 0);
+		if(NULL == e_nsg_get_layer_by_name(node, "map_v"))
+			verse_send_g_layer_create(UVGGlobal.node_id, -1, "map_v", VN_G_LAYER_POLYGON_CORNER_REAL, 0, 0);
+	}	
 }
-
 uint uvg_get_node(void)
 {
 	return UVGGlobal.node_id;
 }
 
-void uvg_init(void)
+void uvg_init()
 {
 	uint i;
 	UVGGlobal.node_id = 0;
@@ -85,7 +92,7 @@ void uvg_init(void)
 		UVGGlobal.events[i].type = ET_END;
 }
 
-boolean uvg_update(void)
+boolean uvg_update()
 {
 	ENode *node;
 	EGeoLayer *layer;
@@ -132,7 +139,6 @@ boolean uvg_update(void)
 
 				}
 			}
-			printf("i = %u UVGGlobal.polygon_length = %u\n", i, UVGGlobal.polygon_length);
 			if(i == UVGGlobal.polygon_length)
 				UVGGlobal.vertex_select = NULL;
 			UVGGlobal.select_version = e_nsg_get_layer_version(layer);
@@ -168,17 +174,17 @@ boolean uvg_update(void)
 	return TRUE;
 }
 
-boolean uvg_node_has_uv(void)
+boolean uvg_node_has_uv()
 {
 	return UVGGlobal.u != NULL && UVGGlobal.v != NULL;
 }
 
-void uvg_node_create_uv(void)
+void uvg_node_create_uv()
 {
 	if(UVGGlobal.u == NULL)
 		verse_send_g_layer_create(UVGGlobal.node_id, -1, "map_u", VN_G_LAYER_POLYGON_CORNER_REAL, 0, 0);
 	if(UVGGlobal.v == NULL)
-		verse_send_g_layer_create(UVGGlobal.node_id, -2, "map_v", VN_G_LAYER_POLYGON_CORNER_REAL, 0, 0);
+		verse_send_g_layer_create(UVGGlobal.node_id, -1, "map_v", VN_G_LAYER_POLYGON_CORNER_REAL, 0, 0);
 	UVGGlobal.create = TRUE;
 }
 
@@ -292,22 +298,22 @@ uint uvg_get_uv_version(uint id)
 	return 1;
 }
 
-uint *uvg_get_ref(void)
+uint *uvg_get_ref()
 {
 	return UVGGlobal.polygon;
 }
 
-egreal *uvg_get_vertex(void)
+egreal *uvg_get_vertex()
 {
 	return UVGGlobal.vertex;
 }
 
-uint uvg_get_vertex_length(void)
+uint uvg_get_vertex_length()
 {
 	return UVGGlobal.vertex_length;
 }
 
-uint uvg_get_polygon_length(void)
+uint uvg_get_polygon_length()
 {
 	return UVGGlobal.polygon_length;
 }
@@ -355,7 +361,7 @@ uint find_same_event(uint id, uint type)
 	return UVGGlobal.event_pos;
 }
 
-void uvg_redo(void)
+void uvg_redo()
 {
 	if(UVGGlobal.event_pos == UVGGlobal.event_end)
 		return;
@@ -372,7 +378,7 @@ void uvg_redo(void)
 	}
 }
 
-void uvg_undo(void)
+void uvg_undo()
 {
 	if(UVGGlobal.event_pos == UVGGlobal.event_start)
 		return;
@@ -513,7 +519,7 @@ void uvg_set_one_corner_uv(uint id, uint corner, egreal u, egreal v)
 	execute_event(event, 1);
 }
 
-void uvg_action_end(void)
+void uvg_action_end()
 {
 	if(UVGGlobal.events[UVGGlobal.event_pos].type == ET_END)
 		return;

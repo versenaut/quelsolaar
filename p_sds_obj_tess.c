@@ -202,8 +202,9 @@ PTessTableElement	*p_select_quad_tesselation(const PPolyStore *mesh, const egrea
 */
 
 double view_cam_lod_eye_pos[3];
-double view_cam_lod_factor = 0.1;
+double view_cam_lod_factor = 0.01;
 double view_cam_lod_limit = 1.5;
+double view_cam_lod_geometry_only = 1000;
 
 void p_lod_set_wiev_pos(double *view_cam)
 {
@@ -215,6 +216,8 @@ void p_lod_set_wiev_pos(double *view_cam)
 egreal p_lod_compute_lod_level(ENode *o_node, ENode *g_node, uint32 time_s, uint32 time_f)
 {
 	double tmp[3], f;
+	if(o_node == NULL)
+		return view_cam_lod_geometry_only;
 	e_nso_get_scale(o_node, tmp);
 	f = (tmp[0] + tmp[1] + tmp[2]) / 3;
 
@@ -231,7 +234,7 @@ boolean p_lod_compute_lod_update(ENode *o_node, ENode *g_node, uint32 time_s, ui
 {
 	double f;
 	f = p_lod_compute_lod_level(o_node, g_node, time_s, time_f);
-	if(f * view_cam_lod_limit < factor || f / view_cam_lod_limit > factor)
+	if(f * (view_cam_lod_limit + view_cam_lod_limit - 1) < factor || f / view_cam_lod_limit > factor)
 		return TRUE;
 	else 
 		return FALSE;

@@ -62,7 +62,7 @@ void e_nsb_get_size(ESBitmapNode *node, uint *x, uint *y, uint *z)
 ESBitmapLayer *e_nsb_get_layer_by_name(ESBitmapNode *node, const char *name)
 {
 	ESBitmapLayer *layer;
-	for(layer = get_next_dlut(&node->layertables, 0); layer != NULL; layer = get_next_dlut(&node->layertables, layer->layer_id + 1))
+	for(layer =	get_next_dlut(&node->layertables, 0); layer != NULL; layer = get_next_dlut(&node->layertables, layer->layer_id + 1))
 		if(strcmp(name, layer->name) == 0)
 			return layer;
 	return NULL;
@@ -76,7 +76,7 @@ ESBitmapLayer *e_nsb_get_layer_by_id(ESBitmapNode *node, uint layer_id)
 ESBitmapLayer *e_nsb_get_layer_by_type(ESBitmapNode *node, VNBLayerType type, const char *name)
 {
 	ESBitmapLayer *layer;
-	for(layer = get_next_dlut(&node->layertables, 0); layer != NULL; layer = get_next_dlut(&node->layertables, layer->layer_id + 1))
+	for(layer =	get_next_dlut(&node->layertables, 0); layer != NULL; layer = get_next_dlut(&node->layertables, layer->layer_id + 1))
 		if(layer->type == type && strcmp(name, layer->name) == 0)
 			return layer;
 	return NULL;
@@ -133,7 +133,6 @@ char *e_nsb_get_layer_name(ESBitmapLayer *layer)
 {
 	return layer->name;
 }
-
 VNBLayerType e_nsb_get_layer_type(ESBitmapLayer *layer)
 {
 	return layer->type;
@@ -187,7 +186,7 @@ void callback_send_b_layer_create(void *user_data, VNodeID node_id, VLayerID lay
 	}
 	for(i = 0; i < 15 && name[i] != 0; i++)
 		layer->name[i] = name[i];
-	layer->name[i] = '\0';
+	layer->name[i] = name[i];
 	layer->layer_id = layer_id;
 	layer->type = type;
 	layer->version++;
@@ -218,104 +217,106 @@ void callback_send_b_dimensions_set(void *user_data, VNodeID node_id, uint16 wid
 	float			*data;
 	uint i, j, k;
 	node = e_create_b_node(node_id, 0);
+
 	for(layer = get_next_dlut(&node->layertables, 0); layer != NULL; layer = get_next_dlut(&node->layertables, layer->layer_id + 1))
 	{
-		if(layer->data == NULL)	/* If data has not yet been subscribed to, do not resize since doing so fools the test in get_layer_data(). */
-			continue;
-		switch(layer->type)
+		if(layer->data != NULL)
 		{
-			case VN_B_LAYER_UINT1 :
+			switch(layer->type)
 			{
-			}
-			break;
-			case VN_B_LAYER_UINT8 :
-			{
-				uint8 *buf;
-				buf = malloc((sizeof *buf) * width * height * depth);
-				for(i = 0 ; i < depth && i < node->size_z; i++)
+				case VN_B_LAYER_UINT1 :
 				{
-					for(j = 0 ; j < height && j < node->size_y; j++)
-					{
-						for(k = 0 ; k < height && k < node->size_x; k++)
-							buf[i * height * width + j * width + k] = ((uint8*)layer->data)[i * node->size_y * node->size_x + j * node->size_x + k];
-						for(; k < width; k++)
-							buf[i * height * width + j * width + k] = 0;
-					}
-					for(j *= width; j < height * width; j++)
-						buf[i * height * width + j] = 0;
 				}
-				for(i *= height * width; i < depth * height * width; i++)
-					buf[i] = 0;
-				free(layer->data);
-				layer->data = buf;
-			}
-			break;
-			case VN_B_LAYER_UINT16 :
-			{
-				uint16 *buf;
-				buf = malloc((sizeof *buf) * width * height * depth);
-				for(i = 0 ; i < depth && i < node->size_z; i++)
+				break;
+				case VN_B_LAYER_UINT8 :
 				{
-					for(j = 0 ; j < height && j < node->size_y; j++)
+					uint8 *buf;
+					buf = malloc((sizeof *buf) * width * height * depth);
+					for(i = 0 ; i < depth && i < node->size_z; i++)
 					{
-						for(k = 0 ; k < height && k < node->size_x; k++)
-							buf[i * height * width + j * width + k] = ((uint16*)layer->data)[i * node->size_y * node->size_x + j * node->size_x + k];
-						for(; k < width; k++)
-							buf[i * height * width + j * width + k] = 0;
+						for(j = 0 ; j < height && j < node->size_y; j++)
+						{
+							for(k = 0 ; k < height && k < node->size_x; k++)
+								buf[i * height * width + j * width + k] = ((uint8*)layer->data)[i * node->size_y * node->size_x + j * node->size_x + k];
+							for(; k < width; k++)
+								buf[i * height * width + j * width + k] = 0;
+						}
+						for(j *= width; j < height * width; j++)
+							buf[i * height * width + j] = 0;
 					}
-					for(j *= width; j < height * width; j++)
-						buf[i * height * width + j] = 0;
+					for(i *= height * width; i < depth * height * width; i++)
+						buf[i] = 0;
+					free(layer->data);
+					layer->data = buf;
 				}
-				for(i *= height * width; i < depth * height * width; i++)
-					buf[i] = 0;
-				free(layer->data);
-				layer->data = buf;
-			}
-			break;
-			case VN_B_LAYER_REAL32 :
-			{
-				real32 *buf;
-				buf = malloc((sizeof *buf) * width * height * depth);
-				for(i = 0 ; i < depth && i < node->size_z; i++)
+				break;
+				case VN_B_LAYER_UINT16 :
 				{
-					for(j = 0 ; j < height && j < node->size_y; j++)
+					uint16 *buf;
+					buf = malloc((sizeof *buf) * width * height * depth);
+					for(i = 0 ; i < depth && i < node->size_z; i++)
 					{
-						for(k = 0 ; k < height && k < node->size_x; k++)
-							buf[i * height * width + j * width + k] = ((float*)layer->data)[i * node->size_y * node->size_x + j * node->size_x + k];
-						for(; k < width; k++)
-							buf[i * height * width + j * width + k] = 0;
+						for(j = 0 ; j < height && j < node->size_y; j++)
+						{
+							for(k = 0 ; k < height && k < node->size_x; k++)
+								buf[i * height * width + j * width + k] = ((uint16*)layer->data)[i * node->size_y * node->size_x + j * node->size_x + k];
+							for(; k < width; k++)
+								buf[i * height * width + j * width + k] = 0;
+						}
+						for(j *= width; j < height * width; j++)
+							buf[i * height * width + j] = 0;
 					}
-					for(j *= width; j < height * width; j++)
-						buf[i * height * width + j] = 0;
+					for(i *= height * width; i < depth * height * width; i++)
+						buf[i] = 0;
+					free(layer->data);
+					layer->data = buf;
 				}
-				for(i *= height * width; i < depth * height * width; i++)
-					buf[i] = 0;
-				free(layer->data);
-				layer->data = buf;
-			}
-			break;
-			case VN_B_LAYER_REAL64 :
-			{
-				real64 *buf;
-				buf = malloc((sizeof *buf) * width * height * depth);
-				for(i = 0 ; i < depth && i < node->size_z; i++)
+				break;
+				case VN_B_LAYER_REAL32 :
 				{
-					for(j = 0 ; j < height && j < node->size_y; j++)
+					real32 *buf;
+					buf = malloc((sizeof *buf) * width * height * depth);
+					for(i = 0 ; i < depth && i < node->size_z; i++)
 					{
-						for(k = 0 ; k < height && k < node->size_x; k++)
-							buf[i * height * width + j * width + k] = ((double*)layer->data)[i * node->size_y * node->size_x + j * node->size_x + k];
-						for(; k < width; k++)
-							buf[i * height * width + j * width + k] = 0;
+						for(j = 0 ; j < height && j < node->size_y; j++)
+						{
+							for(k = 0 ; k < height && k < node->size_x; k++)
+								buf[i * height * width + j * width + k] = ((float*)layer->data)[i * node->size_y * node->size_x + j * node->size_x + k];
+							for(; k < width; k++)
+								buf[i * height * width + j * width + k] = 0;
+						}
+						for(j *= width; j < height * width; j++)
+							buf[i * height * width + j] = 0;
 					}
-					for(j *= width; j < height * width; j++)
-						buf[i * height * width + j] = 0;
+					for(i *= height * width; i < depth * height * width; i++)
+						buf[i] = 0;
+					free(layer->data);
+					layer->data = buf;
 				}
-				for(i *= height * width; i < depth * height * width; i++)
-					buf[i] = 0;
-				free(layer->data);
-				layer->data = buf;
+				break;
+				case VN_B_LAYER_REAL64 :
+				{
+					real64 *buf;
+					buf = malloc((sizeof *buf) * width * height * depth);
+					for(i = 0 ; i < depth && i < node->size_z; i++)
+					{
+						for(j = 0 ; j < height && j < node->size_y; j++)
+						{
+							for(k = 0 ; k < height && k < node->size_x; k++)
+								buf[i * height * width + j * width + k] = ((double*)layer->data)[i * node->size_y * node->size_x + j * node->size_x + k];
+							for(; k < width; k++)
+								buf[i * height * width + j * width + k] = 0;
+						}
+						for(j *= width; j < height * width; j++)
+							buf[i * height * width + j] = 0;
+					}
+					for(i *= height * width; i < depth * height * width; i++)
+						buf[i] = 0;
+					free(layer->data);
+					layer->data = buf;
+				}
+				break;
 			}
-			break;
 		}
 	}
 	node->size_x = width;
@@ -495,6 +496,9 @@ void e_nsb_evaluate_image_handle_tile(EBMHandle *handle, ebreal *output, ebreal 
 	uint i;
 	if(handle->global_version != global_version)
 		uppdate_bitmap_image_handle(handle);
+	x += 100;
+	y += 100;
+	z += 100;
 	x -= (int)x;
 	y -= (int)y;
 	z -= (int)z;
@@ -511,7 +515,6 @@ void callback_send_b_tile_set(void *user_data, VNodeID node_id, VLayerID layer_i
 	float				*buf;
 	uint32				i, x, y, x_ofset, y_ofset, z_ofset, pixel_id, x_tilesize, y_tilesize, tw, th;
 	node = e_create_b_node(node_id, 0);
-
 	layer = find_dlut(&node->layertables, layer_id);
 	if(layer == NULL)
 		return;

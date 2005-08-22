@@ -6,6 +6,19 @@
 
 extern uint p_shader_get_param_count(ENode *node);
 
+boolean p_lod_material_test(PMesh *mesh, ENode *o_node)
+{
+	EObjLink *link = NULL;
+	ENode *m_node;
+	uint material = -1;
+	if(o_node == NULL)
+		return FALSE;
+	for(link = e_nso_get_next_link(o_node, 0); link != 0; link = e_nso_get_next_link(o_node, e_nso_get_link_id(link) + 1))
+		if((m_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL && V_NT_MATERIAL == e_ns_get_node_type(m_node))
+			material = e_nso_get_link_node(link);
+	return mesh->render.mat[0].material != material;
+}
+
 void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_node)
 {
 
@@ -49,13 +62,19 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 			for(link = e_nso_get_next_link(o_node, 0); link != 0; link = e_nso_get_next_link(o_node, e_nso_get_link_id(link) + 1))
 				if((m_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL && V_NT_MATERIAL == e_ns_get_node_type(m_node))
 					break;
-		}	
-		if(def != NULL)	
-			mat[mesh->render.mat_count].material = e_nso_get_link_node(def);
-		else if(mesh->render.mat_count == 0 && link != 0)
-			mat[mesh->render.mat_count].material = e_nso_get_link_node(link);
-		else
+			if(def != NULL)	
+				mat[mesh->render.mat_count].material = e_nso_get_link_node(def);
+			else if(mesh->render.mat_count == 0 && link != 0)
+				mat[mesh->render.mat_count].material = e_nso_get_link_node(link);
+			else
+				mat[mesh->render.mat_count].material = -1;
+		}else
+		{
+			mesh->render.mat = mat = malloc(sizeof *mat);
+			mesh->render.mat_count = 0;
 			mat[mesh->render.mat_count].material = -1;
+		}
+
 		mat[mesh->render.mat_count].tri_end = 0;
 		mat[mesh->render.mat_count].quad_end = 0;
 		mat[mesh->render.mat_count].id = -1;

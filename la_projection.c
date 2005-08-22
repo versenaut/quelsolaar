@@ -93,9 +93,9 @@ void p_view_change(BInputState *input)
 				ProjectionData.target[2] = ProjectionData.position[2];
 			}else if(input->mouse_button[0] == TRUE)
 			{
-				a = ProjectionData.distance + ((input->pointer_x - ProjectionData.grab[0]) - (input->pointer_y - ProjectionData.grab[1])) * 2;
-				if(a > 90)
-					a = 90;
+				a = ProjectionData.distance * (1 + (input->delta_pointer_x - input->delta_pointer_y) * 4);
+				if(a > 90000)
+					a = 90000;
 				if(a < 0.01)
 					a = 0.01;
 				ProjectionData.distance_target = a;

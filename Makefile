@@ -19,12 +19,12 @@ ALL:		$(APPS)
 connector:	co_main.o co_game.o co_intro.o co_vn_audio.o co_vn_bitmap.o co_vn_curve.o co_vn_geometry.o co_vn_graphics.o \
 		co_vn_handle.o co_vn_head.o co_vn_mat_render.o co_vn_material.o co_vn_object.o co_vn_search.o \
 		co_vn_text.o co_widgets.o  \
-		libseduce.a libbetray.a libenough.a libpersuade.a
+		libseduce.a libbetray.a libenough.a libpersuade.a libdeceive.a
 		gcc -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
-uvedit:		uv_draw.o uv_edge_collapse.o uv_geometry.o uv_main.o uv_menu.o uv_overlay.o uv_popup.o uv_tool_corner.o\
+uvedit:		uv_draw.o uv_edge_collapse.o uv_geometry.o uv_main.o uv_menu.o uv_overlay.o uv_popup.o uv_texture.o uv_tool_corner.o\
 		uv_tool_edge.o uv_tool_polygon.o uv_transform.o uv_tool_select.o uv_tool_strip.o uv_unfold.o \
-		uv_view.o uv_input_parse.o libseduce.a libbetray.a libenough.a
+		uv_view.o uv_input_parse.o libbetray.a libenough.a libpersuade.a libdeceive.a libseduce.a
 		gcc -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 loqairou:	la_draw_overlay.o la_flare_fx.o la_geometry_undo.o la_input_parser.o la_intro.o la_key_input.o \
@@ -33,7 +33,7 @@ loqairou:	la_draw_overlay.o la_flare_fx.o la_geometry_undo.o la_input_parser.o l
 		la_tool_manipulator.o la_tool_poly_select.o la_tool_reshape.o la_tool_revolve.o la_tool_select.o \
 		la_tool_slice.o la_tool_splitter.o la_tool_subdivide.o \
 		st_math.o st_matrix_operations.o st_text.o \
-		libseduce.a libbetray.a libenough.a
+		libseduce.a libbetray.a libenough.a libdeceive.a libpersuade.a
 		gcc -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 quelsolaar:	qs_camera.o qs_intro.o qs_main.o \
@@ -64,6 +64,9 @@ libpersuade.a:	p_extension.o p_geometry.o p_object_environment.o p_object_handle
 		p_sds_table.o p_sds_table_debug.o p_sds_table_edge_sort.o p_sds_table_normals.o p_sds_table_split.o p_shader_bind.o \
 		p_shader_extension.o p_shader_gl_one_fall_back.o p_shader_writer.o p_status_print.o \
 		p_task.o p_texture.o
+		ar -cr $@ $^
+
+libdeceive.a:	d_main.o
 		ar -cr $@ $^
 
 # -----------------------------------------------

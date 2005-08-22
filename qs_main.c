@@ -1,7 +1,8 @@
 
 #include "st_matrix_operations.h"
-#include "persuade.h"
+#include "enough.h"
 #include "seduce.h"
+#include "persuade.h"
 
 //#include "co_func_repository.h"
 //#include "co_storage.h"
@@ -43,7 +44,7 @@ void qs_draw_handler(BInputState *input, void *user)
 */	if(input->mode == BAM_DRAW)
 	{
 		glClearColor(0.2, 0.2, 0.2, 0);
-		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glPushMatrix();
 
 	//	glTranslatef(0, 0, -1);
@@ -94,8 +95,8 @@ void qs_intro_handler(BInputState *input, void *user)
 
 	if(input->mode == BAM_DRAW)
 	{
-			glClearColor(1, 1, 1, 0);
-		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+		glClearColor(1, 1, 1, 0);
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glPopMatrix();
 		glPopMatrix();
 		glPushMatrix();
@@ -184,19 +185,16 @@ void qs_intro_handler(BInputState *input, void *user)
 
 extern void *se_symbol_editor_func(BInputState *input, void *user_pointer);
 extern void *se_font_editor_func(BInputState *input, void *user_pointer);
-extern void qs_intro_init(void);
-void g_dropp_ship_init(void);
+extern void qs_intro_init();
+void g_dropp_ship_init();
 
 int main(int argc, char **argv)
 {
 	betray_init(argc, argv, 1280, 1024, FALSE, "Quel Solaar");
-
+	sui_load_settings("qs_config.cfg");
 	sui_init();
-
-	sui_init_settings("qs_config.cfg");
-
 	glClearColor(1, 1, 1, 0);
-	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	enough_init();					/* initializing the Enough Lib, setting the max subdivision level to 3*/
 #ifdef PERSUADE_H
 	persuade_init(5, betray_get_gl_proc_address());

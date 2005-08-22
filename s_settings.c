@@ -11,16 +11,27 @@ typedef struct{
 	uint	integer;
 }Setting;
 
-static struct {
+struct{
 	Setting			*array;
 	uint			count;
 	uint			version;
-}SUIGlobalSettings = { 0 };
+	
+}SUIGlobalSettings;
 
-
+void init_setting()
+{
+	static boolean init = FALSE;
+	if(init)
+		return;
+	init = TRUE;
+	SUIGlobalSettings.array = malloc((sizeof *SUIGlobalSettings.array) * 32);
+	SUIGlobalSettings.count = 0;
+	SUIGlobalSettings.version = 345;
+}
 static Setting * get_setting(const char *name)
 {
 	uint i;
+	init_setting();
 	for(i = 0; i < SUIGlobalSettings.count; i++)
 		if(strcmp(SUIGlobalSettings.array[i].name, name) == 0)
 			return &SUIGlobalSettings.array[i];
@@ -30,11 +41,9 @@ static Setting * get_setting(const char *name)
 static Setting * add_setting(const char *name)
 {
 	uint i;
-
-	for(i = 0; i < 31 && name[i] != 0; i++)
+	init_setting();
+	for(i = 0; i < 32 && name[i] != 0; i++)
 		SUIGlobalSettings.array[SUIGlobalSettings.count].name[i] = name[i];
-	SUIGlobalSettings.array[SUIGlobalSettings.count].name[i] = '\0';
-
 	SUIGlobalSettings.array[SUIGlobalSettings.count].text = NULL;
 	SUIGlobalSettings.array[SUIGlobalSettings.count].real = 0;
 	SUIGlobalSettings.array[SUIGlobalSettings.count].integer = 0;
@@ -44,6 +53,7 @@ static Setting * add_setting(const char *name)
 double	sui_get_setting_double(char *setting, double default_value)
 {
 	Setting	 *s;
+	init_setting();
 	s = get_setting(setting);
 	if(s == NULL)
 	{
@@ -56,6 +66,7 @@ double	sui_get_setting_double(char *setting, double default_value)
 void sui_set_setting_double(char *setting, double value)
 {
 	Setting	 *s;
+	init_setting();
 	s = get_setting(setting);
 	if(s == NULL)
 		s = add_setting(setting);
@@ -67,6 +78,7 @@ void sui_set_setting_double(char *setting, double value)
 uint sui_get_setting_int(char *setting, uint default_value)
 {
 	Setting	 *s;
+	init_setting();
 	s = get_setting(setting);
 	if(s == NULL)
 	{
@@ -79,6 +91,7 @@ uint sui_get_setting_int(char *setting, uint default_value)
 void sui_set_setting_int(char *setting, uint value)
 {
 	Setting	 *s;
+	init_setting();
 	s = get_setting(setting);
 	if(s == NULL)
 		s = add_setting(setting);
@@ -89,6 +102,7 @@ void sui_set_setting_int(char *setting, uint value)
 char * sui_get_setting_text(const char *setting, const char *default_text)
 {
 	Setting	 *s;
+	init_setting();
 	s = get_setting(setting);
 	if(s == NULL)
 	{
@@ -106,6 +120,7 @@ void sui_set_setting_text(const char *setting, const char *text)
 {
 	Setting	 *s;
 	uint i;
+	init_setting();
 	s = get_setting(setting);
 	if(s == NULL)
 		s = add_setting(setting);
@@ -122,6 +137,7 @@ void sui_set_setting_text(const char *setting, const char *text)
 
 boolean sui_test_setting_version(uint *version)
 {
+	init_setting();
 	if(SUIGlobalSettings.version == *version)
 		return FALSE;
 	*version = SUIGlobalSettings.version;
@@ -132,7 +148,7 @@ void sui_save_settings(const char *file_name)
 {
 	uint i;
 	FILE *settings;
-
+	init_setting();
 	settings = fopen(file_name, "w");
 	for(i = 0; i < SUIGlobalSettings.count; i++)
 	{
@@ -152,7 +168,7 @@ void sui_load_settings(const char *file_name)
 	char	line[512], key[64], value[32];
 	float	r;
 	FILE	*settings;
-
+	init_setting();
 	if((settings = fopen(file_name, "r")) != NULL)
 	{
 /*		uint i;
@@ -180,10 +196,3 @@ void sui_load_settings(const char *file_name)
 	}
 }
 
-void sui_init_settings(char *settings)
-{
-	SUIGlobalSettings.array = malloc((sizeof *SUIGlobalSettings.array) * 32);
-	SUIGlobalSettings.count = 0;
-	SUIGlobalSettings.version = 345;
-	sui_load_settings(settings);
-}

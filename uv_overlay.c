@@ -5,9 +5,11 @@
 #include "verse.h"
 #include "enough.h"
 #include "seduce.h"
+#include "persuade.h"
 
 #include "uv.h"
 #include "uv_geometry.h"
+
 
 #define CORNER_SIZE 0.2
 #define INV_CORNER_SIZE (1.0 - CORNER_SIZE) 
@@ -32,9 +34,25 @@
 
 #define PUSC_GRAY 0.2
 
+uint texture_node_id = -1;
+
+void uvo_set_bitmap_node(uint node_id)
+{
+//	texture_node_id = node_id;
+}
+
 void uvo_draw_square()
 {
 	float vertex[] = {0, 0, 1, 0, 1, 1, 0, 1};
+	ENode *node;
+	if((node = e_ns_get_node(0, texture_node_id)) != NULL);
+	{
+		PTextureHandle *h = NULL;
+		h = p_th_create_texture_handle(texture_node_id, "col_r", "col_g", "col_b");
+		sui_set_texture2D_array_gl(vertex, 4, 2, p_th_get_texture_id(h));
+		sui_draw_gl(GL_QUADS, vertex, 4, 2, 1, 1, 1);
+		p_th_destroy_texture_handle(h);
+	}
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	sui_draw_gl(GL_QUADS, vertex, 4, 2, 0.1, 0.2, 0.4);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -257,14 +275,13 @@ void uvo_draw_overlay(BInputState *input)
 
 		}
 	}
-/*	sui_set_blend_gl(GL_ONE, GL_ONE);*/
+//	sui_set_blend_gl(GL_ONE, GL_ONE);
 
 	sui_set_color_array_gl(color, pos, 3);
 	sui_draw_gl(GL_QUADS, array, pos, 2, 0, 0, 0);
 
-/*	free(array);
-	free(color);
-*/
+//	free(array);
+//	free(color);
 /*	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
 	{
 		uvg_get_uve(uv, id);
@@ -293,8 +310,7 @@ void uvo_draw_overlay(BInputState *input)
 void draw_a_polygon(uint id, float x, float y)
 {
 	egreal uv[8];
-	float vertex[24];
-	uint i, part;
+	uint part;
 	if(id == -1 || id != uvg_get_next_polygon(id))
 		return;
 	uvg_get_uve(uv, id);

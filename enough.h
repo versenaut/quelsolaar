@@ -162,6 +162,10 @@ extern void			e_nsg_get_bone_pos32(ENode *g_node, uint16 bone_id, float *pos);
 extern void			e_nsg_get_bone_pos64(ENode *g_node, uint16 bone_id, double *pos);
 extern void			e_nsg_get_bone_rot32(ENode *g_node, uint16 bone_id, VNQuat32 *rot);
 extern void			e_nsg_get_bone_rot64(ENode *g_node, uint16 bone_id, VNQuat64 *rot);
+
+extern char *		e_nsg_get_bone_pos_label(ENode *g_node, uint16 bone_id);
+extern char *		e_nsg_get_bone_rot_label(ENode *g_node, uint16 bone_id);
+
 /*
 extern void			e_nsg_get_bone_matrix32(ENode *o_node, ENode *g_node, uint16 bone_id, float *matrix);
 extern void			e_nsg_get_bone_matrix64(ENode *o_node, ENode *g_node, uint16 bone_id, double *matrix);
@@ -244,7 +248,6 @@ extern void				e_nsc_get_segment(ECurve *curve, uint segment_nr, uint axis, real
 extern double				e_nsc_evaluate_curve(ECurve *curve, double *output, double pos);
 
 extern void				e_nsc_send_c_key_set(ENode *node, ECurve *curve, uint32 key_id, real64 *pre_value, real64 *pre_pos, real64 *value, real64 *pos, real64 *post_value, real64 *post_pos);
-#endif
 
 /* Text node storage ----------------------------------------------------------------------------------------------------------------*/
 
@@ -284,3 +287,5 @@ extern EAudioBuffer *		e_nsa_get_stream_next(ENode *node, uint stream_id);
 extern uint			e_nsa_get_stream_id(EAudioStream *stream);
 extern char *			e_nsa_get_stream_name(EAudioStream *stream);
 extern uint			e_nsa_get_stream_version(EAudioStream *stream);
+
+#endif

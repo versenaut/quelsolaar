@@ -1,11 +1,10 @@
 
 #include <stdlib.h>
+#include <sys/time.h>
 
 #include "betray.h"
 #ifdef WIN32
 	#include <windows.h>
-#else
-	#include <sys/time.h>
 #endif
 
 extern boolean b_sdl_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
@@ -91,7 +90,7 @@ void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, 
 	#ifdef BETRAY_GLUT_SYSTEM_WRAPPER
 	b_glut_init_display(argc, argv, window_size_x, window_size_y, window_fullscreen, name);
 	#endif
-
+	betray_get_current_time(&BGlobal.time[0], &BGlobal.time[1]);
 	BGlobal.screen_mode.x_size = window_size_x;
 	BGlobal.screen_mode.y_size = window_size_y;
 	BGlobal.screen_mode.fullscreen = window_fullscreen;

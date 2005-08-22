@@ -16,7 +16,7 @@ struct{
 }GDroppShip;
 
 
-void g_dropp_ship_init()
+void g_dropp_ship_init(void)
 {
 	uint i;
 	for(i = 0; i < 16; i++)
@@ -135,7 +135,7 @@ void ge_move_matrix_axis(float *pos, uint axis, float *matrix, float speed, floa
 	pos[2] += matrix[axis + 2] * speed;
 }
 
-void g_just_set_camera()
+void g_just_set_camera(void)
 {
 	glMultMatrixf(GDroppShip.matrix);
 	glTranslatef(-GDroppShip.pos[0], -GDroppShip.pos[1], -GDroppShip.pos[2]);

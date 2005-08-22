@@ -68,10 +68,16 @@ typedef struct{
 	struct{
 		uint32	*normal_ref;	
 		egreal	*normals;
-		egreal	*displacement;
-		PDispMode mode;
+	//	egreal	*displacement;
+	//	PDispMode mode;
 		egreal	*draw_normals;
 	}normal;
+	struct{
+		egreal	*displacement;
+		boolean	live;
+		uint32	node_version;
+		uint32	tree_version;
+	}displacement;
 	struct{
 		PRenderArray *array;
 		uint		array_count;
@@ -117,7 +123,7 @@ extern void		p_lod_create_normal_ref_and_shadow_skirts(PPolyStore *smesh, PMesh 
 /* p_sds_obj_displace.c */
 
 extern void		p_lod_create_displacement_array(ENode *g_node, ENode *o_node, PMesh *mesh, uint base_level);
-
+extern void		p_lod_update_displacement_array(ENode *g_node, ENode *o_node, PMesh *mesh, uint base_level);
 /* p_sds_obj_sort.c */
 
 extern void		p_lod_gap_count(ENode *node, PPolyStore *smesh, PMesh *mesh, ENode *o_node);

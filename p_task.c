@@ -5,7 +5,11 @@
 	#include <windows.h>
 	#include <GL/gl.h>
 #else
+#if defined(__APPLE__) || defined(MACOSX)
+	#include <OpenGL/gl.h>
+#else
 	#include <GL/gl.h>
+#endif
 #endif
 #include "verse.h"
 #include "enough.h"
@@ -66,12 +70,12 @@ void p_task_compute(uint count)
 {
 	PTask *t;
 	uint i;
-	if(PGlobalTaskMannager.init == FALSE)
+/*	if(PGlobalTaskMannager.init == FALSE)
 	{
 		for(i = 0; i < count && !PGlobalTaskMannager.init; i++)
 			PGlobalTaskMannager.init = p_init_table(0);
 		return;
-	}
+	}*/
 	for(i = 0; i < count; i++)
 	{
 		if(PGlobalTaskMannager.count == 0)

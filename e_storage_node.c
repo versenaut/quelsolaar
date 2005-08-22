@@ -204,7 +204,7 @@ void callback_send_connect_accept(void *user, uint32 avatar, void *address)
 			mask = mask | (1 << i);
 	ENSGlobal.context[ENSGlobal.curent_net_connection].avatar = avatar;
 	ENSGlobal.context[ENSGlobal.curent_net_connection].accepted = TRUE;
-	verse_send_node_list(mask);
+	verse_send_node_index_subscribe(mask);
 }
 
 uint e_vc_connect(const char *server_address, const char *name, const char *pass, const uint8 *server_id)
@@ -259,7 +259,6 @@ boolean e_vc_check_accepted_slot(uint connection)
 void e_ns_init_head(ENodeHead *head, VNodeType type, VNodeID node_id, VNodeOwner owner)
 {
 	uint i;
-
 	head->node_type = type;
 	head->node_id = node_id;
 	head->owner = owner;

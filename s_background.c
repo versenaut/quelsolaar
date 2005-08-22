@@ -1,9 +1,6 @@
-
-#include <math.h>
-#include <stdlib.h>
-
+#define WIDGET_DEFENITION
 #include "seduce.h"
-
+#include <math.h>
 #define CIRCLE_SEGMENTS 32
 #define IRIS_SEGMENTS 64
 #define BACK_SEGMENTS 16
@@ -163,13 +160,13 @@ void sui_init_background(void)
 	get_randomized_color(color_a, IRIS_SEGMENTS - 1);
 	for(i = 0; i < IRIS_SEGMENTS; i++)
 	{
-		sui_draw_set_vec3(SBackgroundData.transparancy_ring, i * 4 + 0, 0.5 * sin(2.0 * PI * (float)i / IRIS_SEGMENTS), 0.5 * cos(2.0 * PI * (float)i / IRIS_SEGMENTS), 0);
+		sui_draw_set_vec3(SBackgroundData.transparancy_ring, i * 4 + 0, 0.4 * sin(2.0 * PI * (float)i / IRIS_SEGMENTS), 0.4 * cos(2.0 * PI * (float)i / IRIS_SEGMENTS), 0);
 		sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 0, 1, 1, 1, 0);
 		sui_draw_set_vec3(SBackgroundData.transparancy_ring, i * 4 + 1, 0.07 * sin(2.0 * PI * (float)i / IRIS_SEGMENTS), 0.07 * cos(2.0 * PI * (float)i / IRIS_SEGMENTS), 0);
 		sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 1, 1, 1, 1, 0.6);
 		sui_draw_set_vec3(SBackgroundData.transparancy_ring, i * 4 + 2, 0.07 * sin(2.0 * PI * (float)(i + 1) / IRIS_SEGMENTS), 0.07 * cos(2.0 * PI * (float)(i + 1) / IRIS_SEGMENTS), 0);
 		sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 2, 1, 1, 1, 0.6);
-		sui_draw_set_vec3(SBackgroundData.transparancy_ring, i * 4 + 3, 0.5 * sin(2.0 * PI * (float)(i + 1) / IRIS_SEGMENTS), 0.5 * cos(2.0 * PI * (float)(i + 1) / IRIS_SEGMENTS), 0);
+		sui_draw_set_vec3(SBackgroundData.transparancy_ring, i * 4 + 3, 0.4 * sin(2.0 * PI * (float)(i + 1) / IRIS_SEGMENTS), 0.4 * cos(2.0 * PI * (float)(i + 1) / IRIS_SEGMENTS), 0);
 		sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 3, 1, 1, 1, 0);
 	}
 	SBackgroundData.window_color = malloc((sizeof *SBackgroundData.window_color) * 20 * 4);
@@ -236,14 +233,27 @@ void sw_draw_background_line(float length);
 void sw_draw_background_square(void)
 {
 	glPushMatrix();
-	glScaled(1, 1.0 / 2.34, 1);
+    glScaled(1, 1.0 / 2.34, 1);
 	sui_set_color_array_gl(SBackgroundData.square_color, BACK_SEGMENTS * 6, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.square, BACK_SEGMENTS * 6, 3, 1, 1, 1);
 	glPopMatrix();
 }
 
-void sw_draw_background_ring(float pos_x, float pos_y)
+void sw_draw_background_ring(float pos_x, float pos_y, float color)
 {
+	static last_color = 1;
+	if(last_color != color)
+	{
+		uint i;
+		for(i = 0; i < IRIS_SEGMENTS; i++)
+		{
+			sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 0, color, color, color, 0);
+			sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 1, color, color, color, 0.6);
+			sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 2, color, color, color, 0.6);
+			sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 3, color, color, color, 0);
+		}
+		last_color = color;
+	}
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
 	sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -259,7 +269,7 @@ void sw_draw_background_point(float *pos)
 //	glScaled(0.8, 0.8, 1);
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
-	glScaled(-1, 1, 1);
+    glScaled(-1, 1, 1);
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
 	glPopMatrix();
@@ -273,7 +283,7 @@ void sw_draw_background_dot(float *pos)
 	glScaled(0.6, 0.6, 1);
 	sui_set_color_array_gl(SBackgroundData.point_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
-	glScaled(-1, 1, 1);
+    glScaled(-1, 1, 1);
 	sui_set_color_array_gl(SBackgroundData.point_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
 	glPopMatrix();
@@ -285,8 +295,8 @@ void sw_draw_background_line(float length)
 	glPushMatrix();
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
-	glTranslatef(length, 0, 0);
-	glScalef(-1.0f, 1.0f, 1.0f);
+    glTranslatef(length, 0, 0);
+    glScalef(-1, 1, 1);
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
 	glScalef(length, 1, 1);

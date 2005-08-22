@@ -587,6 +587,7 @@ void co_play_game(BInputState *input)
 		betray_get_key_up_down(&quit, &quit_l, 'q');
 		if(quit)
 		{
+			quit = FALSE;
 			active_game = FALSE;
 			return;
 		}

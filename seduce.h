@@ -8,8 +8,8 @@ This is the new and improved .h file for the "ui tool kit" used in varius verse 
 #include "st_types.h"
 #include "betray.h"
 
-extern void		sui_init(void);
-extern void		sui_draw_pointer(float x, float y);
+extern void	sui_init(void);
+extern void	sui_draw_pointer(float x, float y);
 
 extern boolean	sui_box_click_test(float x_pos, float y_pos, float x_size, float y_size);
 extern boolean	sui_box_down_click_test(float x_pos, float y_pos, float x_size, float y_size);
@@ -21,16 +21,16 @@ void *sui_font_editor_func(BInputState *input, void *user_pointer);
 
 /* GL draw helpers */
 
-extern void sui_draw_gl(uint draw_type, float *array, uint length, uint dimensions, float red, float green, float blue);
+extern void sui_draw_gl(uint draw_type, float *array, uint length, uint dimentions, float red, float green, float blue);
 extern void sui_draw_2d_line_gl(float start_x, float start_y, float end_x, float end_y, float red, float green, float blue);
 extern void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end_x, float end_y, float end_z, float red, float green, float blue);
-extern void sui_draw_elements_gl(uint draw_type, float *array, uint *reference, uint length, uint dimensions, float red, float green, float blue);
+extern void sui_draw_elements_gl(uint draw_type, float *array, uint *reference, uint length, uint dimentions, float red, float green, float blue);
 
 extern void sui_set_blend_gl(uint source, uint destination);
 
 extern void sui_set_color_array_gl(float *array, uint length, uint channels);
 extern void sui_set_normal_array_gl(float *array, uint length);
-extern void sui_set_texture2D_array_gl(float *array, uint length, uint dimensions, uint texture);
+extern void sui_set_texture2D_array_gl(float *array, uint length, uint dimentions, uint texture);
 
 extern void sui_draw_set_vec2(float *array, uint pos, float a, float b);
 extern void sui_draw_set_vec3(float *array, uint pos, float a, float b, float c);
@@ -62,6 +62,7 @@ extern boolean	sui_type_in(BInputState *input, float pos_x, float pos_y, float l
 /* Setting are automaticaly created if you ask for them, just use a "sui_get_setting..." to name and set a default value, and the value will
  be returned if a different value isnt found in the settings file, use the "sui_set_setting..." to set/change a value*/
 
+
 extern double	sui_get_setting_double(char *setting, double default_value); /* get double setting */
 extern void		sui_set_setting_double(char *setting, double value); /* changed / set double setting */
 extern uint		sui_get_setting_int(char *setting, uint default_value); /* get uint setting */
@@ -72,6 +73,21 @@ extern boolean	sui_test_setting_version(uint *version); /* check if your version
 
 extern void		sui_save_settings(const char *file_name); /* saves all settings to a file */
 extern void		sui_load_settings(const char *file_name); /* loads all settings from a file */
+
+/* view handeling functionality */
+
+void s_view_2d_set(void);
+void s_view_2d_handle(BInputState *input, float *pos, boolean active);
+
+void s_view_2d_set_speed(float speed);
+void s_view_2d_set_pos(float x, float y, float z);
+void s_view_2d_get_pos(float *pos);
+
+float s_view_2d_get_pos_x(float x);
+float s_view_2d_get_pos_y(float y);
+
+float s_view_2d_get_view_x(float x);
+float s_view_2d_get_view_y(float y);
 
 /* Creates a shadow edge around a shape*/
 
@@ -89,7 +105,7 @@ typedef enum{
 
 typedef struct{
 	SUIPUType	type;
-	const char	*text;
+	char		*text;
 	union{
 		float angle[2];
 		struct{
@@ -99,20 +115,20 @@ typedef struct{
 		}slider;
 		struct{
 			float square[4];
-			void (*draw_func)(float pos_x, float pos_y, float size_x, float size_y, float red, float green, float blue);
+			void (*draw_func)(float pos_x, float pos_y, float size_x, float size_y, float color);
 		}square;
 		struct{
 			float pos[2];
 			float size;
-			void (*draw_func)(float pos_x, float pos_y, float red, float green, float blue);
+			void (*draw_func)(float pos_x, float pos_y, float color);
 		}icon;
 	}data;
 }SUIPUElement;
 
-uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *element, uint element_count, uint button);
+uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *element, uint element_count, uint button, float back_color);
 
 /**/
 
-extern void sw_draw_background_ring(float pos_x, float pos_y);
+extern void sw_draw_bakground_ring(float pos_x, float pos_y, float color);
 
 #endif
