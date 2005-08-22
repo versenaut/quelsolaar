@@ -77,7 +77,7 @@ void draw_table_normals(PTessTableElement *t, uint corners)
 	}
 }
 
-void draw_table_debuging()
+void draw_table_debuging(void)
 {
 	static uint splits[4] = {3, 2, 3, 4}, counter = 6400 * 2;
 	PTessTableElement *t;
