@@ -338,13 +338,16 @@ uint32 udg_get_modeling_node(void)
 boolean udg_check_g_node(uint32 node_id)
 {
 	ENode *g_node;
+
 	g_node = e_ns_get_node(0, node_id);
 	if(g_node != NULL && e_ns_get_node_type(g_node) == V_NT_GEOMETRY)
 	{
+		EGeoLayer	*vertex = e_nsg_get_layer_by_id(g_node, 0),
+				*polygon = e_nsg_get_layer_by_id(g_node, 1);
 
-		if(e_nsg_get_layer_by_id(g_node, 1) == NULL || e_nsg_get_layer_by_id(g_node, 0) == NULL)
+		if(polygon == NULL || vertex == NULL)
 			return FALSE;
-		if(e_nsg_get_layer_data(g_node, e_nsg_get_layer_by_id(g_node, 1)) == NULL || e_nsg_get_layer_data(g_node, e_nsg_get_layer_by_id(g_node, 0) == NULL))
+		if((e_nsg_get_layer_data(g_node, polygon) == NULL) || (e_nsg_get_layer_data(g_node, vertex) == NULL))
 			return FALSE;
 	//	if(UNDOGlobal.select_local != TRUE && e_nsg_get_layer_data(g_node, e_nsg_get_layer_by_type(g_node, VN_G_LAYER_VERTEX_REAL, "select")) == NULL)
 	//		return FALSE;
