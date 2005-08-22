@@ -8,6 +8,7 @@
 #else
 #if defined(__APPLE__) || defined(MACOSX)
 	#include <OpenGL/gl.h>
+	typedef unsigned int GLhandleARB;
 #else
 	#include <GL/gl.h>
 	typedef unsigned int GLhandleARB;
