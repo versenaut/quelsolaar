@@ -566,6 +566,7 @@ void la_pfx_create_dust_selected_vertexes(double *mid)
 	uint32 vertex_count, i, j;
 	egreal *vertex;
 	DustParticle *p;
+
 	udg_get_geometry(&vertex_count, NULL, &vertex, NULL, NULL);
 	p_get_view_camera(pos);
 	size = sqrt((mid[0] - pos[0]) * (mid[0] - pos[0]) + (mid[1] - pos[1]) * (mid[1] - pos[1]) + (mid[2] - pos[2]) * (mid[2] - pos[2]));
