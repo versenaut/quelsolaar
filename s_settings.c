@@ -18,7 +18,7 @@ struct{
 	
 }SUIGlobalSettings;
 
-void init_setting()
+static void init_setting(void)
 {
 	static boolean init = FALSE;
 	if(init)
