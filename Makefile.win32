@@ -17,7 +17,7 @@ connector.exe:	co_main.obj co_game.obj co_intro.obj co_vn_audio.obj co_vn_bitmap
 		co_vn_handle.obj co_vn_head.obj co_vn_mat_render.obj co_vn_material.obj co_vn_object.obj co_vn_search.obj \
 		co_vn_text.obj co_widgets.obj  \
 		seduce.lib betray.lib enough.lib persuade.lib deceive.lib
-		$(CC) $(CFLAGS) /Fe$@ $**  $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib
+		$(CC) $(CFLAGS) /Fe$@ $** $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib sdlmain.lib
 
 loqairou.exe:	la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.obj la_input_parser.obj la_intro.obj la_key_input.obj \
 		la_main.obj la_particle_fx.obj la_pop_up.obj la_projection.obj la_reference.obj la_save.obj \
@@ -26,18 +26,20 @@ loqairou.exe:	la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.obj la_input_
 		la_tool_slice.obj la_tool_splitter.obj la_tool_subdivide.obj \
 		st_math.obj st_matrix_operations.obj st_text.obj \
 		seduce.lib betray.lib enough.lib deceive.lib persuade.lib
-		$(CC) $(CFLAGS) /Fe$@ $**  $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib
+		$(CC) $(CFLAGS) /Fe$@ $** $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib sdlmain.lib
 
 quelsolaar:	qs_camera.obj qs_intro.obj qs_main.obj \
 		st_math.obj st_matrix_operations.obj st_text.c st_types.obj \
 		persuade.lib seduce.lib betray.lib enough.lib
-		gcc -o $@ $^ $(LDFLAGS) $(LDLIBS)
+		$(CC) $(CFLAGS) /Fe$@ $** $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib
 
-uvedit.exe:	uv_draw.obj uv_edge_collapse.obj uv_geometry.obj uv_main.obj uv_menu.obj uv_overlay.obj uv_popup.obj uv_texture.obj uv_tool_corner.obj\
+uvedit.exe:	uv_main.obj uv_draw.obj uv_edge_collapse.obj uv_geometry.obj uv_menu.obj uv_overlay.obj uv_popup.obj uv_texture.obj uv_tool_corner.obj \
 		uv_tool_edge.obj uv_tool_polygon.obj uv_transform.obj uv_tool_select.obj uv_tool_strip.obj uv_unfold.obj \
 		uv_view.obj uv_input_parse.obj \
 		betray.lib enough.lib persuade.lib deceive.lib seduce.lib
-		$(CC) $(CFLAGS) /Fe$@ $**  $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib
+		$(CC) $(CFLAGS) /Fe$@ $** $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib
+
+# -------------------------------------------------------------
 
 seduce.lib:	s_background.obj s_draw.obj s_editor.obj s_line_font.obj s_main.obj s_popup.obj s_settings.obj s_text.obj
 		$(LIBEXE) $(LIBFLAGS)$@ $**
@@ -59,3 +61,9 @@ persuade.lib:	p_extension.obj p_geometry.obj p_object_environment.obj p_object_h
 
 deceive.lib:	d_main.obj
 		$(LIBEXE) $(LIBFLAGS)$@ $**
+
+# -------------------------------------------------------------
+
+clean:
+	del *.exe *.obj *.lib
+
