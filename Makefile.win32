@@ -64,6 +64,65 @@ deceive.lib:	d_main.obj
 
 # -------------------------------------------------------------
 
+# Distribution archive creation rules. They don't rule at all,
+# though.
+#
+
+d=%date:~-10%%
+# I would dearly like to strip the hypens from this 'd' variable,
+# but I don't have nearly enough nmake-fu to pull that off. There
+# is the e=%d:-=% construct that seems to work in plain shells, but
+# it won't work here, oh no. :/ Suggestions welcome.
+
+dc=connector-$(d)-win32
+dl=loqairou-$(d)-win32
+du=uvedit-$(d)-win32
+dq=quelsolaar-$(d)-win32
+
+dist:	dist-connector dist-loqairou dist-quelsolaar #dist-uvedit
+
+dist-connector:	connector.exe
+	echo $(dc)
+	if exist $(dc). ( rmdir /s /q $(dc). )
+	mkdir $(dc)
+	copy /b connector.exe $(dc)
+	copy /a README.connector $(dc)
+	copy /b c:\winnt\system32\sdl.dll $(dc)
+	zip -r $(dc).zip $(dc)
+	rmdir /s /q $(dc)
+
+dist-loqairou:	loqairou.exe
+	echo $(dl)
+	if exist $(dl). ( rmdir /s /q $(dl). )
+	mkdir $(dl)
+	copy /b loqairou.exe $(dl)
+	copy /a README.loqairou $(dl)
+	copy /b c:\winnt\system32\sdl.dll $(dl)
+	zip -r $(dl).zip $(dl)
+	rmdir /s /q $(dl)
+
+dist-uvedit:	uvedit.exe
+	echo $(du)
+	if exist $(du). ( rmdir /s /q $(du). )
+	mkdir $(du)
+	copy /b uvedit.exe $(du)
+	copy /a README.uvedit $(du)
+	copy /b c:\winnt\system32\sdl.dll $(du)
+	zip -r $(du).zip $(du)
+	rmdir /s /q $(du)
+
+dist-quelsolaar:	quelsolaar.exe
+	echo $(dq)
+	if exist $(dq). ( rmdir /s /q $(dq). )
+	mkdir $(dq)
+	copy /b quelsolaar.exe $(dq)
+	copy /a README.quelsolaar $(dq)
+	copy /b c:\winnt\system32\sdl.dll $(dq)
+	zip -r $(dq).zip $(dq)
+	rmdir /s /q $(dq)
+
+# -------------------------------------------------------------
+
 clean:
 	del *.exe *.obj *.lib
 
