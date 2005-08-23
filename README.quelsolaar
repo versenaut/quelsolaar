@@ -1,0 +1,11 @@
+This is "Quel Solaar", a state of the art rendering client for the Verse
+network platform. It very much like to use OpenGL 2.0 features, so you
+might want to consider running it on the best graphics hardware you have
+access to. In particular, it programmatically generates lots of OpenGL
+shader code for your GPU to execute.
+
+Quel Solaar was written by Eskil Steenberg.
+
+The Verse homepage is at <http://www.blender.org/modules/verse/>, and the
+project page at Blender, where you can find out how to access the code in
+CVS, is at <http://projects.blender.org/projects/verse/>.
