@@ -7,6 +7,11 @@
 //#include "co_func_repository.h"
 //#include "co_storage.h"
 
+/* Disable hijacking of main() by SDL. */
+#if defined _WIN32 && defined BETRAY_SDL_SYSTEM_WRAPPER
+#undef main
+#endif
+
 void connect_type_in_func(void *user, char *text)
 {
 	e_vc_connect(text, "unknown", "none", NULL);

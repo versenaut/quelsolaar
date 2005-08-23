@@ -8,6 +8,11 @@
 #include "uv_geometry.h"
 #include "uv.h"
 
+/* Disable hijacking of main() by SDL. */
+#if defined _WIN32 && defined BETRAY_SDL_SYSTEM_WRAPPER
+#undef main
+#endif
+
 extern void uv_input_handler(BInputState *input, void *user);
 
 int main(int argc, char **argv)

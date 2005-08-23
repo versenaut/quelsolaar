@@ -7,6 +7,11 @@
 //#include "co_func_repository.h"
 //#include "co_storage.h"
 
+/* Disable hijacking of main() by SDL. */
+#if defined _WIN32 && defined BETRAY_SDL_SYSTEM_WRAPPER
+#undef main
+#endif
+
 #include "co_vn_handle.h"
 #include "co_vn_graphics.h"
 #include "co_widgets.h"
