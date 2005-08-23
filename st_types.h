@@ -11,7 +11,7 @@
 #if !defined(FALSE)
 #define FALSE 0
 #endif
-#if defined(WIN32)
+#if defined _WIN32
 typedef unsigned int uint;
 #else
 #include <sys/types.h>

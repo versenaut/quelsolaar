@@ -1,10 +1,12 @@
 
 #include <stdlib.h>
-#include <sys/time.h>
 
 #include "betray.h"
-#ifdef _WIN32
+
+#if defined _WIN32
 	#include <windows.h>
+#else
+	#include <sys/time.h>
 #endif
 
 extern boolean b_sdl_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
