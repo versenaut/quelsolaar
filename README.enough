@@ -17,8 +17,8 @@ with sending data to the Verse host.
 				+-------------+
 				 ||         /\
 				 ||         ||
-				 ||        read
-				write       ||
+				write      read
+				 ||         ||
 				 ||  +--------+
 				 ||  | Enough |
 				 ||  +--------+
@@ -31,3 +31,7 @@ For more information about how to work with the Enough library, please see the
 "enough.h" header file, or the "Quel Solaar", "Connector", "UV Editor" and
 "Loq Airou" applications. These serve as the primary "official" users of the
 library.
+
+The Verse homepage is at <http://www.blender.org/modules/verse/>, and the
+project page at Blender, where you can find out how to access the code in
+CVS, is at <http://projects.blender.org/projects/verse/>.
