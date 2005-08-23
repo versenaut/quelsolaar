@@ -10,6 +10,11 @@ CFLAGS=-I$(VERSE) -g -Wstrict-prototypes
 LDFLAGS=-L$(VERSE) -L/usr/X11R6/lib
 LDLIBS=-lverse -lGL -lm -lglut  -lGLU -lSDL
 
+DATE=`date --iso-8601 | tr -d -`
+SYS=`uname -s | tr -d ' ' | tr [A-Z] [a-z]`-`uname -m | tr -d ' '`
+§DIST=$(DATE)-$(SYS)
+
+
 APPS=connector uvedit loqairou quelsolaar
 
 ALL:		$(APPS)
@@ -71,5 +76,19 @@ libdeceive.a:	d_main.o
 
 # -----------------------------------------------
 
+dist:	$(APPS)
+	$(MAKE) dist-enough dist-connector dist-loqairou
+
+dist-enough:	libenough.a enough.h README.enough
+		tar czf enough-$(DIST).tar.gz $^
+
+dist-connector:	connector README.connector
+		tar czf connector-$(DIST).tar.gz $^
+
+dist-loqairou:	loqairou
+		tar czf loqairou-$(DIST).tar.gz loqairou
+
+# -----------------------------------------------
+
 clean:
-	rm -f $(APPS) *.o *.a
+	rm -f $(APPS) *.o *.a *.tar.gz
