@@ -58,9 +58,9 @@ void co_vng_init(void)
 		sui_draw_set_vec2(COVNGraphicsData.ring, 2 * i + 1, sin((double)(i + 1) * 2.0 * 3.14 / SUN_RING_SPLIT), cos((double)(i + 1) * 2.0 * 3.14 / SUN_RING_SPLIT));
 	}
 
-	COVNGraphicsData.color_vertex = malloc((sizeof *COVNGraphicsData.color_vertex) * COLOR_RING_SPLITS * 2 + 2);
+	COVNGraphicsData.color_vertex = malloc((sizeof *COVNGraphicsData.color_vertex) * (COLOR_RING_SPLITS + 1) * 2);
 	COVNGraphicsData.color_ref = malloc((sizeof *COVNGraphicsData.color_ref) * COLOR_RING_SPLITS * 3);
-	COVNGraphicsData.color_color = malloc((sizeof *COVNGraphicsData.color_color) * COLOR_RING_SPLITS * 3 + 3);
+	COVNGraphicsData.color_color = malloc((sizeof *COVNGraphicsData.color_color) * (COLOR_RING_SPLITS + 1) * 3);
 
 	for(i = 0; i < COLOR_RING_SPLITS; i++)
 	{
