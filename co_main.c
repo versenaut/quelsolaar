@@ -18,8 +18,8 @@ extern void *se_symbol_editor_func(BInputState *input, void *user_pointer);
 extern void *se_font_editor_func(BInputState *input, void *user_pointer);
 extern void co_intro_init(void);
 
-
-void place_and_fix(uint connection, uint id, VNodeType type, void *user)
+/*
+static void place_and_fix(uint connection, uint id, VNodeType type, void *user)
 {
 	uint32 seconds, fractions;
 	static uint i = 0; 
@@ -37,7 +37,7 @@ void place_and_fix(uint connection, uint id, VNodeType type, void *user)
 	if((i / 20) % 5 == 0 && i % 5 == 0)
 		verse_send_o_light_set(id, sin((real64)i) * 0.5 + 0.5, sin((real64)i + 1) * 0.5 + 0.5, sin((real64)i + 2) * 0.5 + 0.5);
 }
-
+*/
 
 int main(int argc, char **argv)
 {
@@ -55,7 +55,6 @@ int main(int argc, char **argv)
 	co_vng_init();
 	co_intro_init();
 	e_nsm_set_custom_func(CO_ENOUGH_NODE_SLOT, material_func);
-	e_ns_set_node_create_func(place_and_fix, NULL);
 
 	deceive_set_intro_draw_func(co_intro_draw, NULL);
 	betray_set_action_func(deceive_intro_handler, co_input_handler);
