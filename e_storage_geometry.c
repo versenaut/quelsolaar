@@ -340,7 +340,7 @@ void callback_send_g_polygon_set_corner_real(void *user_data, VNodeID node_id, V
 	if(layer_id >= node->layer_allocated || node->layers[layer_id].name[0] == 0 || node->layers[layer_id].type != VN_G_LAYER_POLYGON_CORNER_REAL)
 		return;
 	layer = &node->layers[layer_id];
-	printf("data %p\n", layer->data);
+/*	printf("data %p\n", layer->data);*/
 	layer->version++;
 	polygon_append_array(node, polygon_id);
 	write = e_nsg_get_layer_data(node, layer);
@@ -703,6 +703,7 @@ void e_nsg_re_compute_space(ESGeometryNode *node)
 
 	layer = node->layers;
 	for(i = 0; i < node->vertex_length * 3 && ((egreal *)layer->data)[i] == E_REAL_MAX; i += 3)
+		;
 	if(i == node->vertex_length * 3)
 		return;
 	node->space[0] = ((egreal *)layer->data)[i];
