@@ -324,22 +324,22 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 				switch(frag->light.type)
 				{
 					case VN_M_LIGHT_DIRECT :
-					sprintf(code, "vec4(light, 0)", fragment);
+					sprintf(code, "vec4(light, 0)");
 					break;
 					case VN_M_LIGHT_AMBIENT :
-					sprintf(code, "vec4(ambient, 0)", fragment);
+					sprintf(code, "vec4(ambient, 0)");
 					break;
 					case VN_M_LIGHT_DIRECT_AND_AMBIENT :
-					sprintf(code, "vec4(light + ambient, 0)", fragment);
+					sprintf(code, "vec4(light + ambient, 0)");
 					break;
 					case VN_M_LIGHT_BACK_DIRECT :
-					sprintf(code, "vec4(b_light, 0)", fragment);
+					sprintf(code, "vec4(b_light, 0)");
 					break;
 					case VN_M_LIGHT_BACK_AMBIENT :
-					sprintf(code, "vec4(b_ambient, 0)", fragment);
+					sprintf(code, "vec4(b_ambient, 0)");
 					break;
 					case VN_M_LIGHT_BACK_DIRECT_AND_AMBIENT :
-					sprintf(code, "vec4(b_light + b_ambient, 0)", fragment);
+					sprintf(code, "vec4(b_light + b_ambient, 0)");
 					break;
 				}
 				break;
