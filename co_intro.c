@@ -9,6 +9,8 @@
 #include "enough.h"
 #include "seduce.h"
 
+#include "co_vn_graphics.h"
+
 /* These can be reduced for low-performance machines. Restrictions
  * apply, lowest "safe" settings are probably 12/12/1 respectively.
 */
@@ -27,7 +29,7 @@ struct{
 
 void create_ring_section(uint start, uint sections, float start_angle, float angle)
 {
-	uint i, temp;
+	uint i;
 	double x, y;
 	for(i = 0; i < sections; i++)
 	{
@@ -46,7 +48,7 @@ void create_ring_section(uint start, uint sections, float start_angle, float ang
 void co_intro_init(void)
 {
 	uint i, temp;
-	double x, y, z, size;
+	double x, y, z;
 
 	COIntroData.ring = malloc((sizeof * COIntroData.ring) * LOGO_RING_SPLIT * 4 * 2);
 	COIntroData.small_rings = malloc((sizeof * COIntroData.small_rings) * LOGO_SMALL_RING_SPLIT * 4 * 2);
