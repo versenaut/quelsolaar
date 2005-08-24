@@ -1,4 +1,5 @@
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "betray.h"
@@ -155,19 +156,16 @@ void betray_get_key_up_down(boolean *press, boolean *last_press, uint key)
 
 extern void b_glut_main_loop(void);
 
-
-char *type_in_string = NULL;
-uint type_in_alocated = 0;
-int cursor_pos = 0;
-int *cursor_pos_pointer = 0;
-uint type_in_length = 0;
-void (*type_in_done_func)(void *user, boolean cansle) = NULL;
-void *func_param;
+static char *type_in_string = NULL;
+static uint type_in_alocated = 0;
+static int cursor_pos = 0;
+static int *cursor_pos_pointer = NULL;
+static uint type_in_length = 0;
+static void (*type_in_done_func)(void *user, boolean cansle) = NULL;
+static void *func_param;
 
 void betray_start_type_in(char *string, uint length, void (*done_func)(void *user, boolean cancel), uint *cursor, void *user_pointer)
 {
-	uint	i;
-
 	type_in_string = string;
 	type_in_alocated = length;
 	type_in_done_func = done_func;
@@ -177,10 +175,8 @@ void betray_start_type_in(char *string, uint length, void (*done_func)(void *use
 	else
 		cursor_pos_pointer = cursor;
 	cursor_pos = 0;
-	for(type_in_length = 0; string[type_in_length] != 0; type_in_length++);
-/*	for(i = AXIS_BUTTON_VECTOR_1_X; i <= AXIS_BUTTON_VECTOR_2_Z; i++)
-		out_going_data.axis_state[i] = 0;*/
-
+	for(type_in_length = 0; string[type_in_length] != 0; type_in_length++)
+		;
 }
 
 void betray_end_type_in_mode(boolean cancel)
@@ -234,16 +230,14 @@ void betray_delete_character(void)
 
 void betray_move_cursor(int move)
 {
-	int pos;
 	(*cursor_pos_pointer) += move;
 	if(*cursor_pos_pointer < 0)
 		*cursor_pos_pointer = 0;
-
 	if((*cursor_pos_pointer) > type_in_length)
 		(*cursor_pos_pointer) = type_in_length;
 }
 
-char betray_debug_text[256];
+static char betray_debug_text[256];
 
 char *betray_debug(void)
 {
