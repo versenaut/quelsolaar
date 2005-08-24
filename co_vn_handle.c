@@ -20,10 +20,10 @@ typedef struct{
 	void		*persuade;
 }COVerseNode;
 
-float view_cam_pos[3] = {0, 0, 4};
-float view_cam_pos_goal[3] = {0, 0, 4};
-float view_cam_move_start[2];
-float view_cam_speed = 0.1;
+static float view_cam_pos[3] = {0, 0, 4};
+static float view_cam_pos_goal[3] = {0, 0, 4};
+static float view_cam_move_start[2];
+static float view_cam_speed = 0.1;
 
 void co_handle_view(BInputState *input, float *pos, boolean active)
 {
