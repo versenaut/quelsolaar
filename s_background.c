@@ -3,6 +3,7 @@
 
 #include "seduce.h"
 #include <math.h>
+
 #define CIRCLE_SEGMENTS 32
 #define IRIS_SEGMENTS 64
 #define BACK_SEGMENTS 16
@@ -17,15 +18,15 @@
 
 struct{
 	float	*square;
-    float	*square_color;
-    float	*window_color;
+	float	*square_color;
+	float	*window_color;
 	float	*transparency_ring;
 	float	*transparency_ring_color;
 	float	*button;
-    float	*button_color;
-    float	*point_color;
+	float	*button_color;
+	float	*point_color;
 	float	*line;
-    float	*line_color;
+	float	*line_color;
 }SBackgroundData;
 
 void get_randomized_color(float *color, uint32 index)
@@ -194,9 +195,7 @@ void sui_init_background(void)
 	sui_draw_set_vec4(SBackgroundData.window_color, 19, 0, 0, 0, 0.1);
 }
 
-
 #define SUI_SHADOW 0.3
-
 
 void sui_create_shadow_edge(float size, uint count, float *shadow, float *color, float *square)
 {
@@ -235,7 +234,7 @@ void sw_draw_background_line(float length);
 void sw_draw_background_square(void)
 {
 	glPushMatrix();
-    glScaled(1, 1.0 / 2.34, 1);
+	glScaled(1, 1.0 / 2.34, 1);
 	sui_set_color_array_gl(SBackgroundData.square_color, BACK_SEGMENTS * 6, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.square, BACK_SEGMENTS * 6, 3, 1, 1, 1);
 	glPopMatrix();
@@ -272,7 +271,7 @@ void sw_draw_background_point(float *pos)
 //	glScaled(0.8, 0.8, 1);
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
-    glScaled(-1, 1, 1);
+	glScaled(-1, 1, 1);
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
 	glPopMatrix();
@@ -286,7 +285,7 @@ void sw_draw_background_dot(float *pos)
 	glScaled(0.6, 0.6, 1);
 	sui_set_color_array_gl(SBackgroundData.point_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
-    glScaled(-1, 1, 1);
+	glScaled(-1, 1, 1);
 	sui_set_color_array_gl(SBackgroundData.point_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
 	glPopMatrix();
@@ -298,8 +297,8 @@ void sw_draw_background_line(float length)
 	glPushMatrix();
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
-    glTranslatef(length, 0, 0);
-    glScalef(-1, 1, 1);
+	glTranslatef(length, 0, 0);
+	glScalef(-1, 1, 1);
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
 	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
 	glScalef(length, 1, 1);
