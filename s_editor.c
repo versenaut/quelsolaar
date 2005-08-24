@@ -49,8 +49,6 @@ float se_grid_compute(float pos)
 	return (float)((int)((pos - 2.0) * SE_GRID_POINTS * 0.5 - 0.5)) / (SE_GRID_POINTS * 0.5) + 2;
 }
 
-extern void sui_draw_gl(uint draw_type, float *array, uint length, uint dimensions, float red, float green, float blue);
-
 void sui_draw_symb_trach(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {0.025000, 0.030000, 0.030000, 0.030000, 0.030000, 0.030000, 0.030000, 0.025000, 0.030000, 0.025000, 0.025000, 0.025000, 0.025000, 0.025000, 0.020000, -0.030000, 0.020000, -0.030000, -0.020000, -0.030000, -0.020000, -0.030000, -0.025000, 0.025000, -0.025000, 0.025000, -0.030000, 0.025000, -0.030000, 0.025000, -0.030000, 0.030000, -0.030000, 0.030000, -0.025000, 0.030000, -0.025000, 0.030000, -0.000000, 0.040000, -0.000000, 0.040000, 0.025000, 0.030000};
