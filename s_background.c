@@ -1,7 +1,6 @@
 
 #include <stdlib.h>
 
-#define WIDGET_DEFENITION
 #include "seduce.h"
 #include <math.h>
 #define CIRCLE_SEGMENTS 32
