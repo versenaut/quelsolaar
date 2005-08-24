@@ -7,7 +7,7 @@ void sui_set_blend_gl(uint source, uint destination)
 	glEnable(GL_BLEND);
 }
 
-void sui_draw_gl(uint draw_type, float *array, uint length, uint dimensions, float red, float green, float blue)
+void sui_draw_gl(uint draw_type, const float *array, uint length, uint dimensions, float red, float green, float blue)
 {
 	glColor4f(red, green, blue, 0);	
 	glEnableClientState(GL_VERTEX_ARRAY);

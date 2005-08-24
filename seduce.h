@@ -21,7 +21,7 @@ void *sui_font_editor_func(BInputState *input, void *user_pointer);
 
 /* GL draw helpers */
 
-extern void sui_draw_gl(uint draw_type, float *array, uint length, uint dimentions, float red, float green, float blue);
+extern void sui_draw_gl(uint draw_type, const float *array, uint length, uint dimentions, float red, float green, float blue);
 extern void sui_draw_2d_line_gl(float start_x, float start_y, float end_x, float end_y, float red, float green, float blue);
 extern void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end_x, float end_y, float end_z, float red, float green, float blue);
 extern void sui_draw_elements_gl(uint draw_type, float *array, uint *reference, uint length, uint dimentions, float red, float green, float blue);
