@@ -108,7 +108,7 @@ typedef struct{
 }PMesh;
 
 extern egreal	p_sds_edge_tesselation_global_func(egreal *v_0, egreal *v_1, egreal *e_0, egreal *eay);
-extern egrealp_sds_edge_tesselation_local_func(egreal *v_0, egreal *v_1, egreal *e_0, egreal *eay);
+extern egreal	p_sds_edge_tesselation_local_func(egreal *v_0, egreal *v_1, egreal *e_0, egreal *eay);
 
 /* p_sds_obj.c */
 
