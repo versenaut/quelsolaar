@@ -92,7 +92,7 @@ void p_shader_bind_fallback(uint node_id)
 	}
 }
 
-void p_shader_fallback_parce(ENode *node, PMatFallBack *fallback, uint16 frag_id)
+void p_shader_fallback_parse(ENode *node, PMatFallBack *fallback, uint16 frag_id)
 {
 	VMatFrag *f;
 	VNMFragmentType type;
@@ -131,11 +131,11 @@ void p_shader_fallback_parce(ENode *node, PMatFallBack *fallback, uint16 frag_id
 			}
 		break;
 		case VN_M_FT_BLENDER :
-			p_shader_fallback_parce(node, fallback, f->blender.data_a);
-			p_shader_fallback_parce(node, fallback, f->blender.data_b);
+			p_shader_fallback_parse(node, fallback, f->blender.data_a);
+			p_shader_fallback_parse(node, fallback, f->blender.data_b);
 		break;
 		case VN_M_FT_MATRIX :
-			p_shader_fallback_parce(node, fallback, f->matrix.data);
+			p_shader_fallback_parse(node, fallback, f->matrix.data);
 		break;
 	}
 	e_nsm_leave_fragment(node, frag_id);
@@ -176,8 +176,8 @@ PMatFallBack *p_shader_compute_fallback(ENode *node, PMatFallBack *fallback)
 		f_c = e_nsm_get_fragment(node, f->blender.control);
 		if((type_a == VN_M_FT_TRANSPARENCY || type_b == VN_M_FT_TRANSPARENCY) && type_a != type_b)
 		{
-			p_shader_fallback_parce(node, fallback, e_nsm_get_fragment_type(node, f->blender.data_a));
-			p_shader_fallback_parce(node, fallback, e_nsm_get_fragment_type(node, f->blender.data_b));
+			p_shader_fallback_parse(node, fallback, e_nsm_get_fragment_type(node, f->blender.data_a));
+			p_shader_fallback_parse(node, fallback, e_nsm_get_fragment_type(node, f->blender.data_b));
 			switch(f->blender.type)
 			{
 				case VN_M_BLEND_FADE :
@@ -197,7 +197,7 @@ PMatFallBack *p_shader_compute_fallback(ENode *node, PMatFallBack *fallback)
 			return fallback;
 		}
 	}
-	p_shader_fallback_parce(node, fallback, e_nsm_get_fragment_color_front(node));
+	p_shader_fallback_parse(node, fallback, e_nsm_get_fragment_color_front(node));
 	return fallback;
 }
 
