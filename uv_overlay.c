@@ -180,7 +180,7 @@ void uvo_set_overlay_motion(float move)
 void uvo_draw_overlay(BInputState *input)
 {
 	static float *array = NULL, *color = NULL;
-	static array_length = 0;
+	static uint array_length = 0;
 	egreal uv[8], *select, vertex[8];
 	float c[3];
 	uint size, id, pos, i, j;
