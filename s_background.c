@@ -29,7 +29,7 @@ static struct{
 	float	*line_color;
 }SBackgroundData;
 
-void get_randomized_color(float *color, uint32 index)
+static void get_randomized_color(float *color, uint32 index)
 {
 	uint32 temp;
 	temp = index * 4 + 0;
