@@ -244,7 +244,8 @@ void sw_draw_background_square(void)
 
 void sw_draw_background_ring(float pos_x, float pos_y, float color)
 {
-	static last_color = 1;
+	static float last_color = 1;
+
 	if(last_color != color)
 	{
 		uint i;
