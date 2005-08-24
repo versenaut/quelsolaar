@@ -759,6 +759,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		glPopMatrix();
 	glEnable(GL_DEPTH_TEST);
 }
+
 void co_init_handle_verse_node(void)
 {
 	e_ns_set_custom_func(1, V_NT_OBJECT, verse_node_create_func);
