@@ -345,7 +345,7 @@ boolean get_stop_sign(void);
 
 extern void co_init_game(uint count);
 extern void co_end_game(void);
-extern void co_create_pebel(uint type, float pos_x, float pos_y, float scale);
+extern void co_create_pebble(uint type, float pos_x, float pos_y, float scale);
 extern boolean co_is_game_active(void);
 extern void co_play_game(BInputState *input);
 
@@ -395,7 +395,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		for(type = 0; type < V_NT_NUM_TYPES; type++)
 			for(node = e_ns_get_node_next(0, 0, type); node != 0; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, type))
 				if((co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOTT)) != NULL && co_node->hidden != TRUE)
-					co_create_pebel(type, co_get_view_x(co_node->pos_x), co_get_view_y(co_node->pos_y), 1 / view_cam_pos[2]);
+					co_create_pebble(type, co_get_view_x(co_node->pos_x), co_get_view_y(co_node->pos_y), 1 / view_cam_pos[2]);
 		view_cam_pos[2] = 0;
 		view_cam_speed = 0.01;
 	}
