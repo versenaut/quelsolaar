@@ -47,7 +47,7 @@ struct{
 	float		aspect;
 }COGame;
 
-boolean active_game = FALSE;
+static boolean active_game = FALSE;
 
 void co_init_game(uint count)
 {
