@@ -1,3 +1,8 @@
+/*
+ *
+*/
+
+#include <stdio.h>
 
 #include "verse.h"
 #include "enough.h"
@@ -114,7 +119,7 @@ typedef struct{
 
 float p_sds_compute_neighbor(PPolyStore *poly)
 {
-	uint i, j, temp, count, cor, other_count, clear = 0, *n, *v, a, b, *ref;
+	uint i, cor, clear = 0, *n, *v, a, b, *ref;
 	uint counter = 0, laps = 0;
 	ref = poly->ref;
 	n = malloc((sizeof *n) * (poly->quad_length + poly->tri_length));
@@ -584,10 +589,9 @@ void sds_test_draw(PPolyStore *s, egreal *vertex)
 
 void sds_test_draw_2(PPolyStore *s, egreal *vertex)
 {
-	static float t = 0;
-	float array[12], center[3];
+	float array[12];
 	PDepend *dep;
-	uint i = 0, j, k, color, pos;
+	uint i = 0, j, k;
 //	vertex[4] = sin(t++ * 0.1) * 0.001;
 //	vertex[4] -= 0.001;
 	for(i = 0; i < s->quad_length; i += 4)
@@ -694,7 +698,7 @@ void p_sds_final_clean(PPolyStore *mesh)
 PPolyStore *p_sds_allocate_next(PPolyStore *pre)
 {
 	PPolyStore *mesh;
-	uint i, count;
+
 	mesh = malloc(sizeof *mesh);
 	mesh->tri_length = pre->tri_length * 4;
 	mesh->quad_length = pre->quad_length * 4;
