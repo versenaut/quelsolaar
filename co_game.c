@@ -8,6 +8,8 @@
 #include "persuade.h"
 #include "seduce.h"
 
+#include "co_vn_graphics.h"
+
 #define GAME_BULLET_COUNT	32
 #define GAME_DUST_COUNT		3200
 #define GAME_REVIVE_TIME	2
@@ -191,15 +193,6 @@ static void co_draw_game_over(float pos_x, float pos_y, float red, float green, 
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
 	sui_draw_gl(GL_LINES, array, 64, 2, red, green, blue);
-	glPopMatrix();
-}
-
-static void co_game_draw_ship1(float pos_x, float pos_y, float red, float green, float blue)
-{
-	static float array[] = {-0.040000, -0.020000, 0.040000, -0.020000, 0.040000, -0.020000, 0.080000, 0.000000, 0.080000, 0.000000, 0.040000, 0.020000, -0.080000, 0.000000, -0.040000, -0.020000, -0.040000, 0.020000, -0.080000, 0.000000, 0.040000, 0.020000, -0.040000, 0.020000, -0.040000, 0.020000, -0.020000, 0.040000, -0.020000, 0.040000, 0.020000, 0.040000, 0.020000, 0.040000, 0.040000, 0.020000};
-	glPushMatrix();
-	glTranslatef(pos_x, pos_y, -1);
-	sui_draw_gl(GL_LINES, array, 18, 2, red, green, blue);
 	glPopMatrix();
 }
 
@@ -431,10 +424,10 @@ static void co_draw_dust(void)
 
 void co_play_game(BInputState *input)
 {
-	uint i, j, k;
+	uint i, j;
+
 	if(input->mode == BAM_DRAW)
 	{
-		COParticle *p;
 		COGame.aspect = betray_get_screen_mode(NULL, NULL, NULL);
 		COGame.time += betray_get_delta_time();
 		co_draw_dust();
