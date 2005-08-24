@@ -449,7 +449,7 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 
 					if(frag->ramp.channel == VN_M_RAMP_RED)
 						sprintf(code, "(texture1d(%d + (%s).r * %d))", frag->ramp.ramp[0].pos, input, frag->ramp.ramp[0].pos - frag->ramp.ramp[frag->ramp.point_count - 1].pos);
-					else if(frag->ramp.channel == VN_M_RAMP_RED)
+					else if(frag->ramp.channel == VN_M_RAMP_GREEN)
 						sprintf(code, "(texture1d(%d + (%s).g * %d))", frag->ramp.ramp[0].pos, input, frag->ramp.ramp[0].pos - frag->ramp.ramp[frag->ramp.point_count - 1].pos);
 					else
 						sprintf(code, "(texture1d(%d + (%s).b * %d))", frag->ramp.ramp[0].pos, input, frag->ramp.ramp[0].pos - frag->ramp.ramp[frag->ramp.point_count - 1].pos);
