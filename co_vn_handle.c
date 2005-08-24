@@ -10,7 +10,7 @@
 #include "co_vn_handle.h"
 #include "co_widgets.h"
 
-#define CONNECTOR_ENOUGH_SLOTT 1
+#define CONNECTOR_ENOUGH_SLOT 1
 
 typedef struct{
 	uint		node_id;
@@ -95,7 +95,7 @@ COVerseNode *create_verse_node(ENode *node)
 	co_node->pos_y = co_get_pos_y(0);
 	co_node->hidden = TRUE /*e_ns_get_node_owner(node) == VN_OWNER_MINE*/;
 	co_node->persuade = NULL;
-	e_ns_set_custom_data(node, CONNECTOR_ENOUGH_SLOTT, co_node);
+	e_ns_set_custom_data(node, CONNECTOR_ENOUGH_SLOT, co_node);
 	printf("creating node");
 	return co_node;
 }
@@ -106,7 +106,7 @@ void verse_node_create_func(ENode *node, ECustomDataCommand command)
 	if(command == E_CDC_CREATE)
 		create_verse_node(node);
 	if(command == E_CDC_DESTROY)
-		free(e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOTT));
+		free(e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT));
 }
 
 
@@ -226,7 +226,7 @@ void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 					if(node == NULL)
 						return;
 
-					co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOTT);
+					co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
 					if(co_node == NULL)
 						return;
 					mesh = co_node->persuade;
@@ -389,12 +389,12 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		uint i = 0;
 		for(type = 0; type < V_NT_NUM_TYPES; type++)
 			for(node = e_ns_get_node_next(0, 0, type); node != 0; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, type))
-				if((co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOTT)) != NULL && co_node->hidden != TRUE)
+				if((co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT)) != NULL && co_node->hidden != TRUE)
 					i++;
 		co_init_game(i);
 		for(type = 0; type < V_NT_NUM_TYPES; type++)
 			for(node = e_ns_get_node_next(0, 0, type); node != 0; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, type))
-				if((co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOTT)) != NULL && co_node->hidden != TRUE)
+				if((co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT)) != NULL && co_node->hidden != TRUE)
 					co_create_pebble(type, co_get_view_x(co_node->pos_x), co_get_view_y(co_node->pos_y), 1 / view_cam_pos[2]);
 		view_cam_pos[2] = 0;
 		view_cam_speed = 0.01;
@@ -406,7 +406,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 	{
 		glPushMatrix();
 
-		if((node = e_ns_get_node(0, active)) != NULL && (co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOTT)) != NULL)
+		if((node = e_ns_get_node(0, active)) != NULL && (co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT)) != NULL)
 			glTranslatef(pos[0] * (1 - popup_move) - popup_move * (co_node->pos_x + 1), pos[1] * (1 - popup_move) -  popup_move * co_node->pos_y, -pos[2] * (1 - popup_move) - popup_move);
 		else
 			glTranslatef(pos[0], pos[1], -pos[2]);
@@ -422,7 +422,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		for(node = e_ns_get_node_next(0, 0, type); node != 0; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, type))
 		{
 			type_count++;
-			co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOTT);
+			co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
 			if(co_node != NULL && co_node->hidden != TRUE)
 			{
 				if(input->mode == BAM_DRAW)
@@ -491,7 +491,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 						COVerseNode *co_link = NULL;
 						ENode *link_node;
 						if((link_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL)
-							co_link = e_ns_get_custom_data(link_node, CONNECTOR_ENOUGH_SLOTT);
+							co_link = e_ns_get_custom_data(link_node, CONNECTOR_ENOUGH_SLOT);
 
 						if(co_link != NULL && co_link->hidden == TRUE)
 						{
@@ -530,7 +530,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 							ENode *link_node;
 							frag = e_nsm_get_fragment(node, i);
 							if((link_node = e_ns_get_node(0, frag->texture.bitmap)) != NULL)
-								co_link = e_ns_get_custom_data(link_node, CONNECTOR_ENOUGH_SLOTT);
+								co_link = e_ns_get_custom_data(link_node, CONNECTOR_ENOUGH_SLOT);
 
 							if(co_link != NULL && co_link->hidden == TRUE)
 							{
@@ -568,7 +568,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 							{
 								e_nso_get_link(node, i);
 								link = e_ns_get_node(0, e_nso_get_link(node, i));
-								if(link != NULL && (co_node = e_ns_get_custom_data(link, CONNECTOR_ENOUGH_SLOTT)) != NULL)
+								if(link != NULL && (co_node = e_ns_get_custom_data(link, CONNECTOR_ENOUGH_SLOT)) != NULL)
 									co_node->hidden = TRUE;
 							}*/
 						}
@@ -644,7 +644,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 					type_count = create_scroll;
 					for(node = e_ns_get_node_next(0, 0, type); node != 0; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, type))
 					{
-						co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOTT);
+						co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
 						if(co_node != NULL /*&& co_search_node(node, search)*/)
 						{
 							x = ((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8;
@@ -684,7 +684,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 			{
 				for(node = e_ns_get_node_next(0, 0, i); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, i))
 				{
-					co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOTT);
+					co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
 					if(co_node != NULL && co_node->hidden != TRUE && ((co_get_pos_x(input->pointer_x) - co_node->pos_x) * (co_get_pos_x(input->pointer_x) - co_node->pos_x) + (co_get_pos_y(input->pointer_y) - co_node->pos_y) * (co_get_pos_y(input->pointer_y) - co_node->pos_y) < 0.4 * 0.4))					
 						found = co_node->node_id;
 				}	
@@ -720,7 +720,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 	{
 		clear_color = clear_color - 0.001;
 		popup_move = popup_move * 0.95 + 0.05;
-		if(input->mode == BAM_DRAW && (node = e_ns_get_node(0, active)) != NULL && (co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOTT)) != NULL)
+		if(input->mode == BAM_DRAW && (node = e_ns_get_node(0, active)) != NULL && (co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT)) != NULL)
 			glTranslatef(co_node->pos_x + 1, co_node->pos_y, 0);
 
 		if((node = e_ns_get_node(0, active)) != NULL)
