@@ -235,6 +235,7 @@ void p_sds_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh)
 #endif
 
 
+#if 0
 
 void p_sort_materials(ENode *g_node, ENode *o_node, PMesh *mesh)
 {
@@ -381,3 +382,5 @@ void p_sort_materials(ENode *g_node, ENode *o_node, PMesh *mesh)
 	}
 //	mesh->tess.order = sort;
 }
+
+#endif
