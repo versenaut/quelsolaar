@@ -1,5 +1,8 @@
-#include <math.h>
+/*
+ * Asteroids! Triggered by clicking on one of the ships/space stations that swirl around the screen.
+*/
 
+#include <math.h>
 
 #include "st_matrix_operations.h"
 #include "persuade.h"
@@ -520,7 +523,6 @@ void co_play_game(BInputState *input)
 			}
 			glPopMatrix();
 		}
-
 		for(i = 0; i < GAME_BULLET_COUNT; i++)
 		{
 			if(COGame.fire[i].time < 1)
@@ -529,16 +531,6 @@ void co_play_game(BInputState *input)
 					COGame.fire[i].pos[0] + COGame.fire[i].vec[0] * 0.05,
 					COGame.fire[i].pos[1] + COGame.fire[i].vec[1] * 0.05, 0, 0, 0);
 		}
-	/*	for(i = 0; i < GAME_DUST_COUNT; i++)
-		{
-			float color = 0;
-			p = &COGame.dust[i];
-			if(p->time < 1)
-			{
-				color = 1 - COGame.dust[i].time;
-				sui_draw_3d_line_gl(p->pos[0], p->pos[1], p->pos[2], p->pos[0] + p->vec[0] * 0.2 * color, p->pos[1] + p->vec[1] * 0.2 * color, p->pos[2] + p->vec[2] * 0.2 * color, p->time, p->time, p->time);
-			}
-		}*/
 		glPopMatrix();
 
 	}else
@@ -582,16 +574,6 @@ void co_play_game(BInputState *input)
 			COGame.fire_time += betray_get_delta_time();
 			if(space && (COGame.fire_time > 0.23 /*|| space_l == FALSE*/))
 				co_fire(COGame.player_rot);
-/*			{
-
-				COGame.fire[COGame.fire_next].vec[0] = -sin(COGame.player_rot * PI / 180);
-				COGame.fire[COGame.fire_next].vec[1] = cos(COGame.player_rot * PI / 180);
-				COGame.fire[COGame.fire_next].pos[0] = COGame.player_pos[0] + COGame.fire[COGame.fire_next].vec[0] * 0.04;
-				COGame.fire[COGame.fire_next].pos[1] = COGame.player_pos[1] + COGame.fire[COGame.fire_next].vec[1] * 0.04;
-				COGame.fire[COGame.fire_next].time = 0;
-				COGame.fire_next = (COGame.fire_next + 1) % GAME_BULLET_COUNT;
-				COGame.fire_time = 0;
-			}*/
 		}
 
 		co_pos_wrap(COGame.player_pos);
