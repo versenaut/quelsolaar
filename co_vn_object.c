@@ -11,10 +11,7 @@
 
 extern boolean co_handle_head(BInputState *input, ENode *node, float *length);
 
-uint32 rename_o_node_id = 0;
-
-double new_transform[10];
-double new_light[3];
+static uint32 rename_o_node_id = 0;
 
 void rename_method_group_func(void *user, char *text)
 {
