@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "seduce.h"
@@ -86,11 +87,11 @@ boolean sw_text_button(BInputState *input, float pos_x, float pos_y, float cente
 	return FALSE;
 }
 
-uint sui_type_in_cursor = 0;
-char *sui_type_in_text = 0;
-char *sui_type_in_copy = 0;
-char *sui_return_text = 0;
-void (* sui_type_in_done_func)(void *user, char *text); 
+static uint sui_type_in_cursor = 0;
+static char *sui_type_in_text = 0;
+static char *sui_type_in_copy = 0;
+static char *sui_return_text = 0;
+static void (* sui_type_in_done_func)(void *user, char *text); 
 
 void sui_end_type_func(void *user, boolean cancel)
 {
@@ -108,7 +109,8 @@ void sui_end_type_func(void *user, boolean cancel)
 }
 
 
-boolean sui_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size, void (*done_func)(void *user, char *text), void* user, float red, float green, float blue)
+boolean sui_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size,
+		    void (*done_func)(void *user, char *text), void* user, float red, float green, float blue)
 {
 	int i;
 	float pos;

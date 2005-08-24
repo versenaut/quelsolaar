@@ -82,9 +82,7 @@ void rename_param_func(void *user, char *text)
 
 void rename_link_func(void *user, char *text)
 {
-
 	ENode *node;
-	EObjLink *link;
 	if((node = e_ns_get_node(0, rename_o_node_id)) != NULL)
 	{
 		EObjLink *link;
@@ -101,7 +99,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 	float y, color, color_light, y_meth, y_group, pre_expander;
 	static float rot_meth = 0, rot_light = 0, rot_trans = 0, rot_link = 0;
 	static boolean show_meth = TRUE, show_light = TRUE, show_trans = TRUE, show_link = TRUE;
-	static double light[3], transform[6], data = 0;
+	static double light[3], transform[6];
 	VNQuat64	rot;
 	uint16 m_group, method;
 	char nr[64];
@@ -400,7 +398,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 			
 			if(input->mode == BAM_DRAW && (l_node = e_ns_get_node(0, link_id)) != NULL)
 			{
-				nr[256];
+				char nr[256];
 				glPushMatrix();
 				glTranslatef(-0.15 + (-1 + rot_link * rot_link) * 3, y, 0);
 				glScalef(0.1, 0.1, 0.1);

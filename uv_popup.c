@@ -199,7 +199,7 @@ void uv_pu_empty_old(BInputState *input)
 	SUIPUElement element[MAX_NODE_DISPLAY_COUNT + 4];
 	static float x = 0, y = 0;
 	float *cam;
-	uint ring, top_count = 0, bottom_count = 0;
+	uint ring;
 /*
 	for(node = e_ns_get_node_next(0, 0, V_NT_GEOMETRY); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_GEOMETRY))
 		top_count++;
