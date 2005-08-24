@@ -19,8 +19,8 @@ struct{
 	float	*square;
     float	*square_color;
     float	*window_color;
-	float	*transparancy_ring;
-	float	*transparancy_ring_color;
+	float	*transparency_ring;
+	float	*transparency_ring_color;
 	float	*button;
     float	*button_color;
     float	*point_color;
@@ -157,19 +157,19 @@ void sui_init_background(void)
 		sui_draw_set_vec4(SBackgroundData.square_color, i * 6 + 4, 1, 1, 1, b);
 		sui_draw_set_vec4(SBackgroundData.square_color, i * 6 + 5, 1, 1, 1, 1);
 	}
-	SBackgroundData.transparancy_ring = malloc((sizeof *SBackgroundData.transparancy_ring) * IRIS_SEGMENTS * 4 * 3);
-	SBackgroundData.transparancy_ring_color = malloc((sizeof *SBackgroundData.transparancy_ring_color) * IRIS_SEGMENTS * 4 * 4);
+	SBackgroundData.transparency_ring = malloc((sizeof *SBackgroundData.transparency_ring) * IRIS_SEGMENTS * 4 * 3);
+	SBackgroundData.transparency_ring_color = malloc((sizeof *SBackgroundData.transparency_ring_color) * IRIS_SEGMENTS * 4 * 4);
 	get_randomized_color(color_a, IRIS_SEGMENTS - 1);
 	for(i = 0; i < IRIS_SEGMENTS; i++)
 	{
-		sui_draw_set_vec3(SBackgroundData.transparancy_ring, i * 4 + 0, 0.4 * sin(2.0 * PI * (float)i / IRIS_SEGMENTS), 0.4 * cos(2.0 * PI * (float)i / IRIS_SEGMENTS), 0);
-		sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 0, 1, 1, 1, 0);
-		sui_draw_set_vec3(SBackgroundData.transparancy_ring, i * 4 + 1, 0.07 * sin(2.0 * PI * (float)i / IRIS_SEGMENTS), 0.07 * cos(2.0 * PI * (float)i / IRIS_SEGMENTS), 0);
-		sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 1, 1, 1, 1, 0.6);
-		sui_draw_set_vec3(SBackgroundData.transparancy_ring, i * 4 + 2, 0.07 * sin(2.0 * PI * (float)(i + 1) / IRIS_SEGMENTS), 0.07 * cos(2.0 * PI * (float)(i + 1) / IRIS_SEGMENTS), 0);
-		sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 2, 1, 1, 1, 0.6);
-		sui_draw_set_vec3(SBackgroundData.transparancy_ring, i * 4 + 3, 0.4 * sin(2.0 * PI * (float)(i + 1) / IRIS_SEGMENTS), 0.4 * cos(2.0 * PI * (float)(i + 1) / IRIS_SEGMENTS), 0);
-		sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 3, 1, 1, 1, 0);
+		sui_draw_set_vec3(SBackgroundData.transparency_ring, i * 4 + 0, 0.4 * sin(2.0 * PI * (float)i / IRIS_SEGMENTS), 0.4 * cos(2.0 * PI * (float)i / IRIS_SEGMENTS), 0);
+		sui_draw_set_vec4(SBackgroundData.transparency_ring_color, i * 4 + 0, 1, 1, 1, 0);
+		sui_draw_set_vec3(SBackgroundData.transparency_ring, i * 4 + 1, 0.07 * sin(2.0 * PI * (float)i / IRIS_SEGMENTS), 0.07 * cos(2.0 * PI * (float)i / IRIS_SEGMENTS), 0);
+		sui_draw_set_vec4(SBackgroundData.transparency_ring_color, i * 4 + 1, 1, 1, 1, 0.6);
+		sui_draw_set_vec3(SBackgroundData.transparency_ring, i * 4 + 2, 0.07 * sin(2.0 * PI * (float)(i + 1) / IRIS_SEGMENTS), 0.07 * cos(2.0 * PI * (float)(i + 1) / IRIS_SEGMENTS), 0);
+		sui_draw_set_vec4(SBackgroundData.transparency_ring_color, i * 4 + 2, 1, 1, 1, 0.6);
+		sui_draw_set_vec3(SBackgroundData.transparency_ring, i * 4 + 3, 0.4 * sin(2.0 * PI * (float)(i + 1) / IRIS_SEGMENTS), 0.4 * cos(2.0 * PI * (float)(i + 1) / IRIS_SEGMENTS), 0);
+		sui_draw_set_vec4(SBackgroundData.transparency_ring_color, i * 4 + 3, 1, 1, 1, 0);
 	}
 	SBackgroundData.window_color = malloc((sizeof *SBackgroundData.window_color) * 20 * 4);
 	sui_draw_set_vec4(SBackgroundData.window_color, 0, 1, 1, 1, 0.7);
@@ -250,18 +250,18 @@ void sw_draw_background_ring(float pos_x, float pos_y, float color)
 		uint i;
 		for(i = 0; i < IRIS_SEGMENTS; i++)
 		{
-			sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 0, color, color, color, 0);
-			sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 1, color, color, color, 0.6);
-			sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 2, color, color, color, 0.6);
-			sui_draw_set_vec4(SBackgroundData.transparancy_ring_color, i * 4 + 3, color, color, color, 0);
+			sui_draw_set_vec4(SBackgroundData.transparency_ring_color, i * 4 + 0, color, color, color, 0);
+			sui_draw_set_vec4(SBackgroundData.transparency_ring_color, i * 4 + 1, color, color, color, 0.6);
+			sui_draw_set_vec4(SBackgroundData.transparency_ring_color, i * 4 + 2, color, color, color, 0.6);
+			sui_draw_set_vec4(SBackgroundData.transparency_ring_color, i * 4 + 3, color, color, color, 0);
 		}
 		last_color = color;
 	}
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
 	sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	sui_set_color_array_gl(SBackgroundData.transparancy_ring_color, IRIS_SEGMENTS * 4, 4);
-	sui_draw_gl(GL_QUADS, SBackgroundData.transparancy_ring, IRIS_SEGMENTS * 4, 3, 1, 1, 1);
+	sui_set_color_array_gl(SBackgroundData.transparency_ring_color, IRIS_SEGMENTS * 4, 4);
+	sui_draw_gl(GL_QUADS, SBackgroundData.transparency_ring, IRIS_SEGMENTS * 4, 3, 1, 1, 1);
 	glPopMatrix();
 }
 
