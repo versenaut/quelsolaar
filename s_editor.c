@@ -424,7 +424,7 @@ void se_save(char *file_name)
 
 void se_save_symbols(char *file_name)
 {
-	uint i, j, k, line_count;
+	uint i, j, line_count;
 	float *buf;
 	SEFuncType type;
 	FILE *file;
@@ -503,10 +503,10 @@ void se_save_symbols(char *file_name)
 }
 void se_save_font(char *file_name)
 {
-	uint i, j, k, line_count, size[256];
+	uint i, j, line_count, size[256];
 	float *buf, width[256];
-	SEFuncType type;
 	FILE *file;
+
 	file = fopen(file_name, "w");
 	fprintf(file, "#include \"seduce.h\"\n\n");
 	fprintf(file, "void sui_draw_letter(uint8 letter, float red, float green, float blue)\n{\n");
@@ -523,12 +523,12 @@ void se_save_font(char *file_name)
 			buf = se_create_array(&SEditor.drawings[i], &line_count);
 
 
-			fprintf(file, "\tstatic float font_%u[] = {(float)%f, (float)%f", i, buf[0] * SE_OUTPUT_SCALE, buf[1] * SE_OUTPUT_SCALE);
+			fprintf(file, "\tstatic const float font_%u[] = {%ff, %ff", i, buf[0] * SE_OUTPUT_SCALE, buf[1] * SE_OUTPUT_SCALE);
 			for(j = 2; j < line_count; j += 2)
 			{
 				if(j % 16 == 0)
 					fprintf(file, "\n\t\t\t");
-				fprintf(file, ", (float)%f, (float)%f", buf[j] * SE_OUTPUT_SCALE, buf[j + 1] * SE_OUTPUT_SCALE);
+				fprintf(file, ", %ff, %ff", buf[j] * SE_OUTPUT_SCALE, buf[j + 1] * SE_OUTPUT_SCALE);
 				if(buf[j] > width[i])
 					width[i] = buf[j];
 			}
@@ -538,7 +538,7 @@ void se_save_font(char *file_name)
 		if(width[i] < 0.000001)
 			width[i] = 0.1 * SE_OUTPUT_SCALE;
 	}
-	fprintf(file, "\tstatic uint font_size[] = {%u", size[0]);
+	fprintf(file, "\tstatic const uint font_size[] = {%u", size[0]);
 	for(i = 1; i < 256; i++)
 	{
 		if(i % 16 == 0)
@@ -547,7 +547,7 @@ void se_save_font(char *file_name)
 	}
 	fprintf(file, "};\n");
 
-	fprintf(file, "\tstatic float *font_array[256];\n");
+	fprintf(file, "\tstatic const float *font_array[256];\n");
 	fprintf(file, "\tstatic boolean init = FALSE;\n");
 	fprintf(file, "\tif(init == FALSE)\n\t{\n\t\tinit = TRUE;\n");
 	for(i = 0; i < SEditor.drawing_count && i < 256; i++)
@@ -573,15 +573,16 @@ void se_save_font(char *file_name)
 void se_load(char *file_name, SEEdtorMode ed_mode)
 {
 	char	line[512];
-	uint	i, j;
+	uint	i;
 	FILE	*drawing;
+
 	if((drawing = fopen(file_name, "r")) != NULL)
 	{
 		for(i = 0; i < 512; i++)
 			line[i] = 0;
 		while((fgets(line, sizeof line, drawing)) != NULL)
 		{
-			if(sscanf(line, "%u %f %f %f %f", &SEditor.drawings[SEditor.current_drawing].lines[SEditor.drawings[SEditor.current_drawing].line_count].type,
+			if(sscanf(line, "%u %f %f %f %f", (unsigned int *) &SEditor.drawings[SEditor.current_drawing].lines[SEditor.drawings[SEditor.current_drawing].line_count].type,
 				&SEditor.drawings[SEditor.current_drawing].lines[SEditor.drawings[SEditor.current_drawing].line_count].pos_one[0],
 				&SEditor.drawings[SEditor.current_drawing].lines[SEditor.drawings[SEditor.current_drawing].line_count].pos_one[1],
 				&SEditor.drawings[SEditor.current_drawing].lines[SEditor.drawings[SEditor.current_drawing].line_count].pos_two[0],
@@ -677,9 +678,8 @@ void se_draw_button(BInputState *input, SELineMode *mode, SEEdtorMode ed_mode)
 void se_editor(BInputState *input, SEEdtorMode ed_mode)
 {
 	static uint mode = SE_LT_LINE;
-	static boolean init = FALSE, active = FALSE;
+	static boolean init = FALSE;
 	SDrawing *d;
-	char *text[] = {"LINE", "ARC"};
 
 	if(init == FALSE)
 	{
