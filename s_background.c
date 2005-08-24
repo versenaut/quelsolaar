@@ -16,7 +16,7 @@
 #define IN_SIZE 0.015
 #define OUT_SIZE 0.023
 
-struct{
+static struct{
 	float	*square;
 	float	*square_color;
 	float	*window_color;
