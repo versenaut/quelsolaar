@@ -75,11 +75,8 @@ boolean co_search_node(ENode *node, char *search)
 		break;
 		case V_NT_TEXT :
 		break;
-/*		case V_NT_PARTICLE :
-		break;
-*/		case V_NT_CURVE :
+		case V_NT_CURVE :
 		break;
 	}
-
 	return FALSE;
 }
