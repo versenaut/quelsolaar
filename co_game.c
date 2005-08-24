@@ -32,7 +32,7 @@ typedef struct{
 	uint generation;
 }COpebble;
 
-struct{
+static struct{
 	float		player_pos[2];
 	float		player_vec[2];
 	float		player_rot;
