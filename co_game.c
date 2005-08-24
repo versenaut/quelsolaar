@@ -8,9 +8,9 @@
 #include "persuade.h"
 #include "seduce.h"
 
-#define GAME_BULLET_COUNT 32
-#define GAME_DUST_COUNT 3200
-#define GAME_REVIVE_TIME 2
+#define GAME_BULLET_COUNT	32
+#define GAME_DUST_COUNT		3200
+#define GAME_REVIVE_TIME	2
 
 typedef struct{
 	float pos[3];
@@ -30,13 +30,13 @@ typedef struct{
 	float size;
 	uint type;
 	uint generation;
-}COpebble;
+}COPebble;
 
 static struct{
 	float		player_pos[2];
 	float		player_vec[2];
 	float		player_rot;
-	COpebble	*pebbles;
+	COPebble	*pebbles;
 	uint		pebble_count;
 	COFire		fire[GAME_BULLET_COUNT];
 	float		fire_time;
