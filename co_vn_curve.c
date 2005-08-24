@@ -131,7 +131,7 @@ void	sui_draw_symb_empty(float point_x, float point_y, float pos_x, float pos_y,
 
 void co_c_draw_point(BInputState *input, ENode *node, ECurve *curve, float *scroll, float *stretch, float y_pos, float scale, float pan, float color, float color_light)
 {
-	uint i, j, dimensions, point;
+	uint i, dimensions, point;
 	static uint grab_dim, grab_control, grab_point = -1;
 	double pre_x[4], pre_y[4], pos_x, pos_y[4], post_x[4], post_y[4], x, y, aspect;
 	aspect = betray_get_screen_mode(NULL, NULL, NULL);
