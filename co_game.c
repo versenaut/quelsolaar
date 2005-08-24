@@ -43,7 +43,7 @@ struct{
 	boolean		engine;
 	float		time;
 	float		revive_time;
-	uint		lifes;
+	uint		lives;
 	float		aspect;
 }COGame;
 
@@ -66,7 +66,7 @@ void co_init_game(uint count)
 	COGame.engine = FALSE;
 	COGame.time = 0;
 	COGame.revive_time = GAME_REVIVE_TIME + 0.1;
-	COGame.lifes = 3;
+	COGame.lives = 3;
 	for(i = 0; i < GAME_BULLET_COUNT; i++)
 		COGame.fire[i].time = 2;
 	for(i = 0; i < GAME_DUST_COUNT; i++)
@@ -457,7 +457,7 @@ void co_draw_dust(void)
 			alive = TRUE;
 		}
 	}
-	if(!alive && (COGame.lifes == 0 || COGame.pebble_count == 0))
+	if(!alive && (COGame.lives == 0 || COGame.pebble_count == 0))
 		active_game = FALSE;
 	glPopMatrix();
 }
@@ -470,7 +470,7 @@ void co_play_game(BInputState *input)
 		COGame.aspect = betray_get_screen_mode(NULL, NULL, NULL);
 		COGame.time += betray_get_delta_time();
 		co_draw_dust();
-		if(COGame.lifes == 0)
+		if(COGame.lives == 0)
 		{
 			glPushMatrix();
 			glTranslatef(0, 0, -1);
@@ -501,7 +501,7 @@ void co_play_game(BInputState *input)
 				co_draw_ship(0, 0, 0, 0, 0);
 			glPopMatrix();
 		}
-		for(i = 0; i < COGame.lifes; i++)
+		for(i = 0; i < COGame.lives; i++)
 			co_draw_ship(0.95 - 0.04 * (float)i, COGame.aspect - 0.05, 0, 0, 0);
 		for(i = 0; i < COGame.pebble_count; i++)
 		{
@@ -671,8 +671,8 @@ void co_play_game(BInputState *input)
 					co_fire(COGame.player_rot + 180);
 					co_fire(COGame.player_rot + 240);
 					co_fire(COGame.player_rot + 300);
-					COGame.lifes--;
-					if(COGame.lifes == 0)
+					COGame.lives--;
+					if(COGame.lives == 0)
 						co_end_game();
 					COGame.player_pos[0] = 0;
 					COGame.player_pos[1] = 0;
