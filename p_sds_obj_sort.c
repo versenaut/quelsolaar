@@ -149,7 +149,7 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 	}
 }
 
-/*
+#if 0
 
 void p_sds_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh)
 {
@@ -207,7 +207,7 @@ void p_sds_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh)
 		}
 	}
 	
-/*	if(mesh->sub_stages[0] == 1)
+	if(mesh->sub_stages[0] == 1)
 	{
 		for(stage = mesh->sub_stages[1]; stage < ref_count && stage < MAX_COUNT_STAGE_LOOPS ; stage += 4)
 		{
@@ -231,7 +231,8 @@ void p_sds_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh)
 		mesh->stage++;
 		mesh->sub_stages[0] = 0;
 	}
-}*/
+}
+#endif
 
 
 
