@@ -56,7 +56,7 @@ void qs_draw_handler(BInputState *input, void *user)
 	//	p_status_print();
 	//	draw_table_debuging();
 		g_set_ship_camera(input, betray_get_delta_time());
-	//	p_lod_set_wiev_pos(double view_cam);
+	//	p_lod_set_view_pos(double view_cam);
 	//	p_draw_scene();
 
 	//	glScalef(12, 12, 12);

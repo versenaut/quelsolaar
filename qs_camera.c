@@ -211,6 +211,6 @@ void g_set_ship_camera(BInputState *input, float delta_time)
 		view_cam[0] = GDroppShip.pos[0]; 
 		view_cam[1] = GDroppShip.pos[1]; 
 		view_cam[2] = GDroppShip.pos[2]; 
-		p_lod_set_wiev_pos(view_cam);
+		p_lod_set_view_pos(view_cam);
 	}
 }

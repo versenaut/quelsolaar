@@ -131,7 +131,7 @@ extern void		p_lod_gap_count(ENode *node, PPolyStore *smesh, PMesh *mesh, ENode 
 /* p_sds_obj_tess.c */
 
 
-extern void		p_lod_set_wiev_pos(double *view_cam);
+extern void		p_lod_set_view_pos(double *view_cam);
 extern egreal	p_lod_compute_lod_level(ENode *o_node, ENode *g_node, uint32 time_s, uint32 time_f);
 extern boolean	p_lod_compute_lod_update(ENode *o_node, ENode *g_node, uint32 time_s, uint32 time_f, egreal factor);
 

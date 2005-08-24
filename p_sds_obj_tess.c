@@ -206,7 +206,7 @@ double view_cam_lod_factor = 0.01;
 double view_cam_lod_limit = 1.5;
 double view_cam_lod_geometry_only = 1000;
 
-void p_lod_set_wiev_pos(double *view_cam)
+void p_lod_set_view_pos(double *view_cam)
 {
 	view_cam_lod_eye_pos[0] = view_cam[0];
 	view_cam_lod_eye_pos[1] = view_cam[1];
