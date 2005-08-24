@@ -73,7 +73,7 @@ void co_init_game(uint count)
 		COGame.dust[i].time = 2;	
 }
 
-void co_spread_dust(float *pos, float *vec, float blast_size, float object_size, uint count)
+static void co_spread_dust(float *pos, float *vec, float blast_size, float object_size, uint count)
 {
 	uint i;
 	for(i = 0; i < count; i++)
@@ -91,7 +91,7 @@ void co_spread_dust(float *pos, float *vec, float blast_size, float object_size,
 	}
 }
 
-void co_fire(float rotation)
+static void co_fire(float rotation)
 {
 	COGame.fire[COGame.fire_next].vec[0] = -sin(rotation * PI / 180);
 	COGame.fire[COGame.fire_next].vec[1] = cos(rotation * PI / 180);
@@ -102,7 +102,7 @@ void co_fire(float rotation)
 	COGame.fire_time = 0;
 }
 
-void co_end_game(void)
+static void co_end_game(void)
 {
 	uint i;
 	for(i = 0; i < COGame.pebble_count; i++)
@@ -111,8 +111,7 @@ void co_end_game(void)
 	COGame.pebble_count = 0;
 }
 
-
-void co_create_pebel(uint type, float pos_x, float pos_y, float scale)
+void co_create_pebble(uint type, float pos_x, float pos_y, float scale)
 {
 	COGame.pebbles[COGame.pebble_count].pos[0] = pos_x;
 	COGame.pebbles[COGame.pebble_count].pos[1] = pos_y;
@@ -129,20 +128,7 @@ boolean co_is_game_active(void)
 	return active_game;
 }
 
-
-
-
-/*
-void	co_draw_pebble_1(float pos_x, float pos_y, float red, float green, float blue)
-{
-	static float array[] = {-0.040000, 0.280000, 0.240000, 0.180000, 0.240000, 0.180000, 0.280000, -0.060000, 0.280000, -0.060000, 0.220000, -0.220000, 0.220000, -0.220000, -0.000000, -0.340000, -0.000000, -0.340000, -0.140000, -0.240000, -0.280000, -0.180000, -0.140000, -0.240000, -0.300000, 0.060000, -0.280000, -0.180000, -0.300000, 0.060000, -0.140000, 0.100000, -0.140000, 0.100000, -0.040000, 0.280000};
-	glPushMatrix();
-	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 18, 2, red, green, blue);
-	glPopMatrix();
-}*/
-
-void co_draw_pebble1(float pos_x, float pos_y, float red, float green, float blue)
+static void co_draw_pebble1(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {-0.380000, -0.120000, -0.240000, -0.420000, -0.240000, -0.420000, 0.060000, -0.480000, 0.060000, -0.480000, 0.140000, -0.400000, 0.140000, -0.400000, 0.300000, -0.460000, 0.300000, -0.440000, 0.480000, -0.100000, 0.480000, -0.100000, 0.380000, 0.120000, 0.380000, 0.120000, 0.400000, 0.300000, 0.400000, 0.300000, 0.040000, 0.440000, 0.040000, 0.440000, -0.240000, 0.400000, -0.240000, 0.400000, -0.220000, 0.300000, -0.220000, 0.300000, -0.380000, 0.220000, -0.380000, 0.220000, -0.380000, -0.120000};
 	glPushMatrix();
@@ -151,7 +137,7 @@ void co_draw_pebble1(float pos_x, float pos_y, float red, float green, float blu
 	glPopMatrix();
 }
 
-void co_draw_pebble2(float pos_x, float pos_y, float red, float green, float blue)
+static void co_draw_pebble2(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {-0.100000, 0.420000, -0.380000, 0.220000, -0.380000, 0.220000, -0.240000, 0.060000, -0.260000, 0.060000, -0.440000, -0.020000, -0.440000, -0.020000, -0.300000, -0.360000, -0.300000, -0.360000, 0.100000, -0.500000, 0.100000, -0.500000, 0.320000, -0.360000, 0.320000, -0.360000, 0.340000, -0.040000, 0.340000, -0.040000, 0.460000, 0.040000, 0.460000, 0.040000, 0.380000, 0.240000, 0.380000, 0.240000, 0.140000, 0.420000, 0.040000, 0.340000, -0.100000, 0.420000, 0.140000, 0.420000, 0.040000, 0.340000};
 	glPushMatrix();
@@ -160,7 +146,7 @@ void co_draw_pebble2(float pos_x, float pos_y, float red, float green, float blu
 	glPopMatrix();
 }
 
-void co_draw_pebble3(float pos_x, float pos_y, float red, float green, float blue)
+static void co_draw_pebble3(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {-0.100000, 0.420000, -0.460000, 0.160000, -0.460000, 0.160000, -0.500000, -0.140000, -0.500000, -0.140000, -0.320000, -0.280000, -0.320000, -0.280000, -0.160000, -0.480000, -0.160000, -0.480000, 0.120000, -0.340000, 0.120000, -0.340000, 0.260000, -0.400000, 0.260000, -0.400000, 0.480000, -0.100000, 0.480000, -0.100000, 0.360000, 0.240000, -0.100000, 0.420000, 0.360000, 0.240000};
 	glPushMatrix();
@@ -169,7 +155,7 @@ void co_draw_pebble3(float pos_x, float pos_y, float red, float green, float blu
 	glPopMatrix();
 }
 
-void co_draw_pebble4(float pos_x, float pos_y, float red, float green, float blue)
+static void co_draw_pebble4(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {-0.400000, -0.320000, -0.460000, 0.040000, -0.460000, 0.040000, -0.180000, 0.120000, -0.180000, 0.120000, -0.020000, 0.400000, -0.020000, 0.400000, 0.360000, 0.280000, 0.480000, -0.080000, 0.400000, -0.340000, 0.360000, 0.280000, 0.480000, -0.080000, 0.400000, -0.340000, 0.060000, -0.500000, 0.060000, -0.500000, -0.080000, -0.340000, -0.080000, -0.340000, -0.400000, -0.320000};
 	glPushMatrix();
@@ -178,9 +164,7 @@ void co_draw_pebble4(float pos_x, float pos_y, float red, float green, float blu
 	glPopMatrix();
 }
 
-
-
-void	co_draw_ship_engine(float pos_x, float pos_y, float red, float green, float blue)
+static void co_draw_ship_engine(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {-0.000000, 0.024000, -0.018000, -0.020000, -0.000000, 0.024000, 0.018000, -0.020000, -0.004000, -0.012000, -0.018000, -0.020000, -0.004000, -0.012000, 0.004000, -0.012000, 0.004000, -0.012000, 0.018000, -0.020000, -0.018000, -0.038000, -0.012000, -0.020000, -0.006000, -0.024000, -0.018000, -0.038000, -0.006000, -0.024000, -0.000000, -0.050000, -0.000000, -0.050000, 0.006000, -0.024000, 0.012000, -0.020000, 0.018000, -0.038000, 0.018000, -0.038000, 0.006000, -0.024000};
 	glPushMatrix();
@@ -189,7 +173,7 @@ void	co_draw_ship_engine(float pos_x, float pos_y, float red, float green, float
 	glPopMatrix();
 }
 
-void	co_draw_ship(float pos_x, float pos_y, float red, float green, float blue)
+static void co_draw_ship(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {0.018000, -0.020000, -0.000000, 0.024000, -0.000000, 0.024000, -0.018000, -0.020000, -0.004000, -0.012000, -0.018000, -0.020000, 0.004000, -0.012000, -0.004000, -0.012000, 0.004000, -0.012000, 0.018000, -0.020000};
 	glPushMatrix();
@@ -198,8 +182,7 @@ void	co_draw_ship(float pos_x, float pos_y, float red, float green, float blue)
 	glPopMatrix();
 }
 
-
-void co_draw_game_over(float pos_x, float pos_y, float red, float green, float blue)
+static void co_draw_game_over(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {-0.500000, -0.080000, -0.580000, -0.080000, 0.080000, 0.080000, 0.080000, -0.080000, -0.580000, -0.080000, -0.580000, 0.080000, -0.580000, 0.080000, -0.500000, 0.080000, 0.220000, 0.080000, 0.260000, -0.080000, 0.260000, -0.080000, 0.300000, 0.080000, 0.360000, 0.080000, 0.360000, -0.080000, 0.360000, -0.080000, 0.440000, -0.080000, 0.440000, 0.080000, 0.360000, 0.080000, 0.160000, 0.080000, 0.080000, 0.080000, -0.160000, 0.080000, -0.160000, -0.080000, 0.160000, -0.080000, 0.160000, 0.080000, 0.080000, -0.080000, 0.160000, -0.080000, 0.420000, 0.000000, 0.360000, 0.000000, 0.500000, 0.080000, 0.500000, -0.080000, -0.080000, -0.080000, -0.160000, -0.080000, -0.160000, 0.080000, -0.080000, 0.080000, -0.160000, 0.000000, -0.100000, 0.000000, 0.520000, 0.000000, 0.580000, -0.080000, -0.260000, 0.040000, -0.220000, 0.080000, -0.300000, 0.080000, -0.300000, -0.080000, -0.220000, 0.080000, -0.220000, -0.080000, -0.260000, 0.040000, -0.300000, 0.080000, -0.360000, 0.080000, -0.440000, 0.080000, -0.360000, -0.080000, -0.360000, 0.080000, -0.440000, 0.080000, -0.440000, -0.080000, -0.440000, 0.000000, -0.360000, 0.000000, -0.500000, 0.000000, -0.500000, -0.080000, 0.500000, 0.080000, 0.580000, 0.080000, 0.580000, 0.080000, 0.580000, 0.000000, 0.580000, 0.000000, 0.500000, 0.000000, -0.540000, 0.000000, -0.500000, 0.000000};
 	glPushMatrix();
@@ -208,8 +191,7 @@ void co_draw_game_over(float pos_x, float pos_y, float red, float green, float b
 	glPopMatrix();
 }
 
-
-void co_game_draw_ship1(float pos_x, float pos_y, float red, float green, float blue)
+static void co_game_draw_ship1(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {-0.040000, -0.020000, 0.040000, -0.020000, 0.040000, -0.020000, 0.080000, 0.000000, 0.080000, 0.000000, 0.040000, 0.020000, -0.080000, 0.000000, -0.040000, -0.020000, -0.040000, 0.020000, -0.080000, 0.000000, 0.040000, 0.020000, -0.040000, 0.020000, -0.040000, 0.020000, -0.020000, 0.040000, -0.020000, 0.040000, 0.020000, 0.040000, 0.020000, 0.040000, 0.040000, 0.020000};
 	glPushMatrix();
@@ -217,26 +199,8 @@ void co_game_draw_ship1(float pos_x, float pos_y, float red, float green, float 
 	sui_draw_gl(GL_LINES, array, 18, 2, red, green, blue);
 	glPopMatrix();
 }
-/*
-void co_game_draw_ship2(float pos_x, float pos_y, float rot, float red, float green, float blue)
-{
-	static float array[] = {-0.000000, 0.060000, 0.030000, 0.051962, 0.030000, 0.051962, 0.051962, 0.030000, 0.051962, 0.030000, 0.060000, 0.000000, -0.000000, -0.540000, -0.010000, -0.537321, -0.010000, -0.537321, -0.017321, -0.530000, -0.017321, -0.530000, -0.020000, -0.520000, -0.000000, 0.060000, -0.030000, 0.051962, -0.030000, 0.051962, -0.051962, 0.030000, -0.051962, 0.030000, -0.060000, 0.000000, 0.040000, -0.200000, 0.050000, -0.197321, 0.050000, -0.197321, 0.057321, -0.190000, 0.057321,
- -0.190000, 0.060000, -0.180000, -0.040000, -0.200000, -0.050000, -0.197321, -0.050000, -0.197321, -0.057320, -0.190000, -0.057320, -0.190000, -0.060000, -0.180000, -0.040000, -0.200000, -0.040000, -0.240000, -0.040000, -0.240000, -0.020000, -0.260000, -0.020000, -0.260000, 0.020000, -0.260000, 0.020000, -0.260000, 0.040000, -0.240000, 0.040000, -0.240000, 0.040000, -0.200000, 0.060000, -0.180000, 0.060000, 0.000000, -0.060000, 0.000000, -0.060000, -0.180000, -0.000000, -0.260000, -0.000000, 
- -0.480000, -0.000000, -0.500000, -0.010000, -0.502680, -0.010000, -0.502680, -0.017321, -0.510000, -0.017321, -0.510000, -0.020000, -0.520000, -0.000000, -0.500000, 0.010000, -0.502680, 0.010000, -0.502680, 0.017320, -0.510000, 0.017320, -0.510000, 0.020000, -0.520000, -0.000000, -0.540000, 0.010000, -0.537321, 0.010000, -0.537321, 0.017320, -0.530000, 0.017320, -0.530000, 0.020000, -0.520000, 0.080000, 0.000000, 0.400000, 0.000000, -0.080000, 0.000000, -0.400000, 0.000000, -0.100000, 0.020000,
- -0.100000, 0.060000, -0.100000, -0.020000, -0.100000, -0.060000, 0.100000, -0.020000, 0.100000, -0.060000, 0.100000, 0.020000, 0.100000, 0.060000, 0.100000, 0.060000, 0.380000, 0.060000, 0.380000, 0.060000, 0.380000, 0.020000, 0.380000, -0.020000, 0.380000, -0.060000, 0.100000, -0.060000, 0.380000, -0.060000, 0.340000, -0.020000, 0.340000, -0.040000, 0.300000, -0.020000, 0.300000, -0.040000, 0.260000, -0.020000, 0.260000, -0.040000, 0.220000, -0.020000, 0.220000, -0.040000, 0.180000, -0.020000,
- 0.180000, -0.040000, 0.140000, -0.020000, 0.140000, -0.040000, 0.140000, 0.040000, 0.140000, 0.020000, 0.180000, 0.040000, 0.180000, 0.020000, 0.220000, 0.040000, 0.220000, 0.020000, 0.260000, 0.040000, 0.260000, 0.020000, 0.300000, 0.040000, 0.300000, 0.020000, 0.340000, 0.040000, 0.340000, 0.020000, -0.100000, 0.060000, -0.380000, 0.060000, -0.380000, 0.060000, -0.380000, 0.020000, -0.380000, -0.020000, -0.380000, -0.060000, -0.380000, -0.060000, -0.100000, -0.060000, -0.220000, -0.020000, 
-	-0.220000, -0.040000, -0.180000, -0.020000, -0.180000, -0.040000, -0.140000, -0.020000, -0.140000, -0.040000, -0.140000, 0.040000, -0.140000, 0.020000, -0.180000, 0.040000, -0.180000, 0.020000, -0.220000, 0.040000, -0.220000, 0.020000, -0.260000, 0.040000, -0.260000, 0.020000, -0.260000, -0.020000, -0.260000, -0.040000, -0.340000, -0.020000, -0.340000, -0.040000, -0.300000, -0.020000, -0.300000, -0.040000, -0.300000, 0.040000, -0.300000, 0.020000, -0.340000, 0.040000, -0.340000, 0.020000, 
- 0.040000, 0.060000, 0.140000, 0.260000, -0.040000, 0.060000, -0.140000, 0.260000};
-	glPushMatrix();
-	glTranslatef(pos_x, pos_y, -1);
-	glScalef(0.2, 0.2, 0.2);
-	glRotatef(rot, 0, 0, 1);
-	sui_draw_gl(GL_LINES, array, 144, 2, red, green, blue);
-	glPopMatrix();
-}*/
 
-
-void co_game_draw_lander(float pos_x, float pos_y, float rot, float red, float green, float blue)
+static void co_game_draw_lander(float pos_x, float pos_y, float rot, float red, float green, float blue)
 {
 	static float array[] = {0.020000, 0.020000, 0.020000, 0.040000, 0.020000, 0.040000, -0.020000, 0.040000, -0.020000, 0.040000, -0.020000, 0.020000, -0.020000, 
 0.020000, -0.060000, -0.040000, -0.060000, -0.040000, -0.040000, -0.060000, -0.040000, -0.060000, -0.060000, -0.080000, -0.060000, -0.080000, -0.060000, -0.200000,
@@ -261,7 +225,7 @@ void co_game_draw_lander(float pos_x, float pos_y, float rot, float red, float g
 	glPopMatrix();
 }
 
-void co_game_draw_station(float pos_x, float pos_y, float rot, float red, float green, float blue)
+static void co_game_draw_station(float pos_x, float pos_y, float rot, float red, float green, float blue)
 {
 	static float array[] = {-0.020000, 0.180000, -0.040000, 0.174641, -0.040000, 0.174641, -0.054641, 0.160000, -0.054641, 0.160000, -0.060000, 0.140000, 0.020000, 
 0.180000, 0.040000, 0.174641, 0.040000, 0.174641, 0.054641, 0.160000, 0.054641, 0.160000, 0.060000, 0.140000, 0.020000, 0.060000, 0.040000, 0.065359, 0.040000, 
@@ -316,7 +280,7 @@ void co_game_draw_station(float pos_x, float pos_y, float rot, float red, float 
 	glPopMatrix();
 }
 
-void co_game_draw_sputnik(float pos_x, float pos_y, float rot, float red, float green, float blue)
+static void co_game_draw_sputnik(float pos_x, float pos_y, float rot, float red, float green, float blue)
 {
 	static float array[] = {-0.000000, -0.100000, 0.050000, -0.086603, 0.050000, -0.086603, 0.086603, -0.050000, 0.086603, -0.050000, 0.100000, 0.000000, -0.000000, 
 0.100000, 0.050000, 0.086603, 0.050000, 0.086603, 0.086603, 0.050000, 0.086603, 0.050000, 0.100000, 0.000000, -0.000000, 0.100000, -0.050000, 0.086603, -0.050000, 
@@ -333,7 +297,7 @@ void co_game_draw_sputnik(float pos_x, float pos_y, float rot, float red, float 
 	glPopMatrix();
 }
 
-void co_game_draw_rocket(float pos_x, float pos_y, float rot, float red, float green, float blue)
+static void co_game_draw_rocket(float pos_x, float pos_y, float rot, float red, float green, float blue)
 {
 	static float array[] = {-0.040000, 0.000000, 0.040000, 0.000000, 0.040000, 0.000000, 0.080000, -0.040000, 0.080000, -0.040000, 0.080000, -0.100000, 0.080000, -0.100000, 0.040000, -0.140000, -0.000000, 
 -0.180000, 0.020000, -0.185359, 0.020000, -0.185359, 0.034641, -0.200000, 0.034641, -0.200000, 0.040000, -0.220000, 0.060000, -0.140000, 0.100000, -0.180000, 0.100000, -0.180000, -0.100000, -0.180000, 
@@ -427,19 +391,19 @@ boolean co_draw_ships(BInputState *input)
 	return FALSE;
 }
 
-void co_pos_wrap(float *pos)
+static void co_pos_wrap(float *pos)
 {
-	if(pos[0] > 1)
-		pos[0] -= 2; 
-	if(pos[0] < -1)
-		pos[0] += 2; 
+	if(pos[0] > 1.0f)
+		pos[0] -= 2.0f;
+	if(pos[0] < -1.0f)
+		pos[0] += 2.0f;
 	if(pos[1] > COGame.aspect)
-		pos[1] -= 2 * COGame.aspect; 
+		pos[1] -= 2.0f * COGame.aspect; 
 	if(pos[1] < -COGame.aspect)
-		pos[1] += 2 * COGame.aspect; 
+		pos[1] += 2.0f * COGame.aspect; 
 }
 
-void co_draw_dust(void)
+static void co_draw_dust(void)
 {
 	boolean alive = FALSE;
 	COParticle *p;
@@ -461,6 +425,7 @@ void co_draw_dust(void)
 		active_game = FALSE;
 	glPopMatrix();
 }
+
 void co_play_game(BInputState *input)
 {
 	uint i, j, k;
