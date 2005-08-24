@@ -27,14 +27,14 @@ typedef struct{
 	float size;
 	uint type;
 	uint generation;
-}COPebbel;
+}COpebble;
 
 struct{
 	float		player_pos[2];
 	float		player_vec[2];
 	float		player_rot;
-	COPebbel	*pebbels;
-	uint		pebbel_count;
+	COpebble	*pebbles;
+	uint		pebble_count;
 	COFire		fire[GAME_BULLET_COUNT];
 	float		fire_time;
 	uint		fire_next;
@@ -57,8 +57,8 @@ void co_init_game(uint count)
 	COGame.player_vec[0] = 0;
 	COGame.player_vec[1] = 0;
 	COGame.player_rot = 0;
-	COGame.pebbels = malloc((sizeof *COGame.pebbels) * count * 8);
-	COGame.pebbel_count = 0;
+	COGame.pebbles = malloc((sizeof *COGame.pebbles) * count * 8);
+	COGame.pebble_count = 0;
 	active_game = TRUE;
 	COGame.fire_time = 0;
 	COGame.fire_next = 0;
@@ -105,23 +105,23 @@ void co_fire(float rotation)
 void co_end_game(void)
 {
 	uint i;
-	for(i = 0; i < COGame.pebbel_count; i++)
-		co_spread_dust(COGame.pebbels[i].pos, COGame.pebbels[i].vec, 1 + 1 / (COGame.pebbels[i].generation + 1), COGame.pebbels[i].size, GAME_DUST_COUNT / COGame.pebbel_count);
-	free(COGame.pebbels);
-	COGame.pebbel_count = 0;
+	for(i = 0; i < COGame.pebble_count; i++)
+		co_spread_dust(COGame.pebbles[i].pos, COGame.pebbles[i].vec, 1 + 1 / (COGame.pebbles[i].generation + 1), COGame.pebbles[i].size, GAME_DUST_COUNT / COGame.pebble_count);
+	free(COGame.pebbles);
+	COGame.pebble_count = 0;
 }
 
 
 void co_create_pebel(uint type, float pos_x, float pos_y, float scale)
 {
-	COGame.pebbels[COGame.pebbel_count].pos[0] = pos_x;
-	COGame.pebbels[COGame.pebbel_count].pos[1] = pos_y;
-	COGame.pebbels[COGame.pebbel_count].vec[0] = get_rand(COGame.pebbel_count * 2) * 0.2 - 0.1/* scale*/;
-	COGame.pebbels[COGame.pebbel_count].vec[1] = get_rand(COGame.pebbel_count * 2 + 1) * 0.2 - 0.1 /* scale*/;
-	COGame.pebbels[COGame.pebbel_count].size = scale;
-	COGame.pebbels[COGame.pebbel_count].type = type;
-	COGame.pebbels[COGame.pebbel_count].generation = 0;
-	COGame.pebbel_count++;
+	COGame.pebbles[COGame.pebble_count].pos[0] = pos_x;
+	COGame.pebbles[COGame.pebble_count].pos[1] = pos_y;
+	COGame.pebbles[COGame.pebble_count].vec[0] = get_rand(COGame.pebble_count * 2) * 0.2 - 0.1/* scale*/;
+	COGame.pebbles[COGame.pebble_count].vec[1] = get_rand(COGame.pebble_count * 2 + 1) * 0.2 - 0.1 /* scale*/;
+	COGame.pebbles[COGame.pebble_count].size = scale;
+	COGame.pebbles[COGame.pebble_count].type = type;
+	COGame.pebbles[COGame.pebble_count].generation = 0;
+	COGame.pebble_count++;
 }
 
 boolean co_is_game_active(void)
@@ -133,7 +133,7 @@ boolean co_is_game_active(void)
 
 
 /*
-void	co_draw_pebbel_1(float pos_x, float pos_y, float red, float green, float blue)
+void	co_draw_pebble_1(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {-0.040000, 0.280000, 0.240000, 0.180000, 0.240000, 0.180000, 0.280000, -0.060000, 0.280000, -0.060000, 0.220000, -0.220000, 0.220000, -0.220000, -0.000000, -0.340000, -0.000000, -0.340000, -0.140000, -0.240000, -0.280000, -0.180000, -0.140000, -0.240000, -0.300000, 0.060000, -0.280000, -0.180000, -0.300000, 0.060000, -0.140000, 0.100000, -0.140000, 0.100000, -0.040000, 0.280000};
 	glPushMatrix();
@@ -142,7 +142,7 @@ void	co_draw_pebbel_1(float pos_x, float pos_y, float red, float green, float bl
 	glPopMatrix();
 }*/
 
-void co_draw_pebbel1(float pos_x, float pos_y, float red, float green, float blue)
+void co_draw_pebble1(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {-0.380000, -0.120000, -0.240000, -0.420000, -0.240000, -0.420000, 0.060000, -0.480000, 0.060000, -0.480000, 0.140000, -0.400000, 0.140000, -0.400000, 0.300000, -0.460000, 0.300000, -0.440000, 0.480000, -0.100000, 0.480000, -0.100000, 0.380000, 0.120000, 0.380000, 0.120000, 0.400000, 0.300000, 0.400000, 0.300000, 0.040000, 0.440000, 0.040000, 0.440000, -0.240000, 0.400000, -0.240000, 0.400000, -0.220000, 0.300000, -0.220000, 0.300000, -0.380000, 0.220000, -0.380000, 0.220000, -0.380000, -0.120000};
 	glPushMatrix();
@@ -151,7 +151,7 @@ void co_draw_pebbel1(float pos_x, float pos_y, float red, float green, float blu
 	glPopMatrix();
 }
 
-void co_draw_pebbel2(float pos_x, float pos_y, float red, float green, float blue)
+void co_draw_pebble2(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {-0.100000, 0.420000, -0.380000, 0.220000, -0.380000, 0.220000, -0.240000, 0.060000, -0.260000, 0.060000, -0.440000, -0.020000, -0.440000, -0.020000, -0.300000, -0.360000, -0.300000, -0.360000, 0.100000, -0.500000, 0.100000, -0.500000, 0.320000, -0.360000, 0.320000, -0.360000, 0.340000, -0.040000, 0.340000, -0.040000, 0.460000, 0.040000, 0.460000, 0.040000, 0.380000, 0.240000, 0.380000, 0.240000, 0.140000, 0.420000, 0.040000, 0.340000, -0.100000, 0.420000, 0.140000, 0.420000, 0.040000, 0.340000};
 	glPushMatrix();
@@ -160,7 +160,7 @@ void co_draw_pebbel2(float pos_x, float pos_y, float red, float green, float blu
 	glPopMatrix();
 }
 
-void co_draw_pebbel3(float pos_x, float pos_y, float red, float green, float blue)
+void co_draw_pebble3(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {-0.100000, 0.420000, -0.460000, 0.160000, -0.460000, 0.160000, -0.500000, -0.140000, -0.500000, -0.140000, -0.320000, -0.280000, -0.320000, -0.280000, -0.160000, -0.480000, -0.160000, -0.480000, 0.120000, -0.340000, 0.120000, -0.340000, 0.260000, -0.400000, 0.260000, -0.400000, 0.480000, -0.100000, 0.480000, -0.100000, 0.360000, 0.240000, -0.100000, 0.420000, 0.360000, 0.240000};
 	glPushMatrix();
@@ -169,7 +169,7 @@ void co_draw_pebbel3(float pos_x, float pos_y, float red, float green, float blu
 	glPopMatrix();
 }
 
-void co_draw_pebbel4(float pos_x, float pos_y, float red, float green, float blue)
+void co_draw_pebble4(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {-0.400000, -0.320000, -0.460000, 0.040000, -0.460000, 0.040000, -0.180000, 0.120000, -0.180000, 0.120000, -0.020000, 0.400000, -0.020000, 0.400000, 0.360000, 0.280000, 0.480000, -0.080000, 0.400000, -0.340000, 0.360000, 0.280000, 0.480000, -0.080000, 0.400000, -0.340000, 0.060000, -0.500000, 0.060000, -0.500000, -0.080000, -0.340000, -0.080000, -0.340000, -0.400000, -0.320000};
 	glPushMatrix();
@@ -457,7 +457,7 @@ void co_draw_dust(void)
 			alive = TRUE;
 		}
 	}
-	if(!alive && (COGame.lifes == 0 || COGame.pebbel_count == 0))
+	if(!alive && (COGame.lifes == 0 || COGame.pebble_count == 0))
 		active_game = FALSE;
 	glPopMatrix();
 }
@@ -503,34 +503,34 @@ void co_play_game(BInputState *input)
 		}
 		for(i = 0; i < COGame.lifes; i++)
 			co_draw_ship(0.95 - 0.04 * (float)i, COGame.aspect - 0.05, 0, 0, 0);
-		for(i = 0; i < COGame.pebbel_count; i++)
+		for(i = 0; i < COGame.pebble_count; i++)
 		{
 			glPushMatrix();
-			glTranslatef(COGame.pebbels[i].pos[0], COGame.pebbels[i].pos[1], 0);
-			glScalef(COGame.pebbels[i].size, COGame.pebbels[i].size, COGame.pebbels[i].size);
-			if(COGame.pebbels[i].generation > 0)
+			glTranslatef(COGame.pebbles[i].pos[0], COGame.pebbles[i].pos[1], 0);
+			glScalef(COGame.pebbles[i].size, COGame.pebbles[i].size, COGame.pebbles[i].size);
+			if(COGame.pebbles[i].generation > 0)
 			{
 				glRotatef(COGame.time * 20 * ((float)(i % 5) - 2.32), 0, 0, 1);
 				switch(i % 4)
 				{
 					case 0 :
-					co_draw_pebbel1(0, 0, 0, 0, 0);
+					co_draw_pebble1(0, 0, 0, 0, 0);
 					break;
 					case 1 :
-					co_draw_pebbel2(0, 0, 0, 0, 0);
+					co_draw_pebble2(0, 0, 0, 0, 0);
 					break;
 					case 2 :
-					co_draw_pebbel3(0, 0, 0, 0, 0);
+					co_draw_pebble3(0, 0, 0, 0, 0);
 					break;
 					case 3 :
-					co_draw_pebbel4(0, 0, 0, 0, 0);
+					co_draw_pebble4(0, 0, 0, 0, 0);
 					break;
 				}
 
 			}else
 			{
 				co_vng_ring();
-				switch(COGame.pebbels[i].type)
+				switch(COGame.pebbles[i].type)
 				{
 					case V_NT_OBJECT :
 						co_vng_sun();
@@ -653,16 +653,16 @@ void co_play_game(BInputState *input)
 			}
 		}
 
-		for(i = 0; i < COGame.pebbel_count; i++)
+		for(i = 0; i < COGame.pebble_count; i++)
 		{
 			float x, y, size;
-			COGame.pebbels[i].pos[0] += COGame.pebbels[i].vec[0] * betray_get_delta_time();
-			COGame.pebbels[i].pos[1] += COGame.pebbels[i].vec[1] * betray_get_delta_time();
-			co_pos_wrap(COGame.pebbels[i].pos);
+			COGame.pebbles[i].pos[0] += COGame.pebbles[i].vec[0] * betray_get_delta_time();
+			COGame.pebbles[i].pos[1] += COGame.pebbles[i].vec[1] * betray_get_delta_time();
+			co_pos_wrap(COGame.pebbles[i].pos);
 			if(COGame.revive_time > GAME_REVIVE_TIME)
 			{
-				size = COGame.pebbels[i].size * COGame.pebbels[i].size * 0.4 * 0.4;
-				if(size > (COGame.pebbels[i].pos[0] - COGame.player_pos[0]) * (COGame.pebbels[i].pos[0] - COGame.player_pos[0]) + (COGame.pebbels[i].pos[1] - COGame.player_pos[1]) * (COGame.pebbels[i].pos[1] - COGame.player_pos[1]))
+				size = COGame.pebbles[i].size * COGame.pebbles[i].size * 0.4 * 0.4;
+				if(size > (COGame.pebbles[i].pos[0] - COGame.player_pos[0]) * (COGame.pebbles[i].pos[0] - COGame.player_pos[0]) + (COGame.pebbles[i].pos[1] - COGame.player_pos[1]) * (COGame.pebbles[i].pos[1] - COGame.player_pos[1]))
 				{
 					co_spread_dust(COGame.player_pos, COGame.player_vec, 2, 0.2, 192);
 					co_fire(COGame.player_rot + 0);
@@ -686,31 +686,31 @@ void co_play_game(BInputState *input)
 			{
 				if(COGame.fire[j].time < 1)
 				{
-					x = COGame.pebbels[i].pos[0] - COGame.fire[j].pos[0];
-					y = COGame.pebbels[i].pos[1] - COGame.fire[j].pos[1];
+					x = COGame.pebbles[i].pos[0] - COGame.fire[j].pos[0];
+					y = COGame.pebbles[i].pos[1] - COGame.fire[j].pos[1];
 					if(size > x * x + y * y)
 					{
 						COGame.fire[j].time = 10;
-						COGame.pebbels[i].generation++;
-						co_spread_dust(COGame.pebbels[i].pos, COGame.fire[j].vec, 1 + 1 / COGame.pebbels[i].generation, COGame.pebbels[i].size, GAME_DUST_COUNT / COGame.pebbels[i].generation / 4);
-						if(COGame.pebbels[i].generation < 4)
+						COGame.pebbles[i].generation++;
+						co_spread_dust(COGame.pebbles[i].pos, COGame.fire[j].vec, 1 + 1 / COGame.pebbles[i].generation, COGame.pebbles[i].size, GAME_DUST_COUNT / COGame.pebbles[i].generation / 4);
+						if(COGame.pebbles[i].generation < 4)
 						{
 	
-							COGame.pebbels[i].size *= 0.6;
-							COGame.pebbels[COGame.pebbel_count] = COGame.pebbels[i];
-							COGame.pebbels[i].vec[0] = COGame.pebbels[i].vec[0] * 0.2 + COGame.fire[j].vec[1] * (0.1 + 0.08 * (float)COGame.pebbels[i].generation);
-							COGame.pebbels[i].vec[1] = COGame.pebbels[i].vec[1] * 0.2 - COGame.fire[j].vec[0] * (0.1 + 0.08 * (float)COGame.pebbels[i].generation);
-							COGame.pebbels[i].pos[0] += COGame.pebbels[i].vec[0] * 0.2 * COGame.pebbels[i].size;
-							COGame.pebbels[i].pos[1] += COGame.pebbels[i].vec[1] * 0.2 * COGame.pebbels[i].size;
-							COGame.pebbels[COGame.pebbel_count].vec[0] = COGame.pebbels[COGame.pebbel_count].vec[0] * 0.2 - COGame.fire[j].vec[1] * (0.1 + 0.08 * (float)COGame.pebbels[i].generation);
-							COGame.pebbels[COGame.pebbel_count].vec[1] = COGame.pebbels[COGame.pebbel_count].vec[0] * 0.2 + COGame.fire[j].vec[0] * (0.1 + 0.08 * (float)COGame.pebbels[i].generation);
-							COGame.pebbels[COGame.pebbel_count].pos[0] += COGame.pebbels[COGame.pebbel_count].vec[0] * 0.2 * COGame.pebbels[i].size;
-							COGame.pebbels[COGame.pebbel_count].pos[1] += COGame.pebbels[COGame.pebbel_count].vec[1] * 0.2 * COGame.pebbels[i].size;
-							COGame.pebbel_count++;
+							COGame.pebbles[i].size *= 0.6;
+							COGame.pebbles[COGame.pebble_count] = COGame.pebbles[i];
+							COGame.pebbles[i].vec[0] = COGame.pebbles[i].vec[0] * 0.2 + COGame.fire[j].vec[1] * (0.1 + 0.08 * (float)COGame.pebbles[i].generation);
+							COGame.pebbles[i].vec[1] = COGame.pebbles[i].vec[1] * 0.2 - COGame.fire[j].vec[0] * (0.1 + 0.08 * (float)COGame.pebbles[i].generation);
+							COGame.pebbles[i].pos[0] += COGame.pebbles[i].vec[0] * 0.2 * COGame.pebbles[i].size;
+							COGame.pebbles[i].pos[1] += COGame.pebbles[i].vec[1] * 0.2 * COGame.pebbles[i].size;
+							COGame.pebbles[COGame.pebble_count].vec[0] = COGame.pebbles[COGame.pebble_count].vec[0] * 0.2 - COGame.fire[j].vec[1] * (0.1 + 0.08 * (float)COGame.pebbles[i].generation);
+							COGame.pebbles[COGame.pebble_count].vec[1] = COGame.pebbles[COGame.pebble_count].vec[0] * 0.2 + COGame.fire[j].vec[0] * (0.1 + 0.08 * (float)COGame.pebbles[i].generation);
+							COGame.pebbles[COGame.pebble_count].pos[0] += COGame.pebbles[COGame.pebble_count].vec[0] * 0.2 * COGame.pebbles[i].size;
+							COGame.pebbles[COGame.pebble_count].pos[1] += COGame.pebbles[COGame.pebble_count].vec[1] * 0.2 * COGame.pebbles[i].size;
+							COGame.pebble_count++;
 						}else
 						{
-							COGame.pebbels[i] = COGame.pebbels[--COGame.pebbel_count];
-							if(COGame.pebbel_count == 0)
+							COGame.pebbles[i] = COGame.pebbles[--COGame.pebble_count];
+							if(COGame.pebble_count == 0)
 								co_end_game();
 						}
 						break;
