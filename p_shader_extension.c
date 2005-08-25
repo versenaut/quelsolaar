@@ -5,16 +5,12 @@
 	#include <windows.h>
 	#include <GL/gl.h>
 	typedef unsigned int GLhandleARB;
-#else
-#if defined(__APPLE__) || defined(MACOSX)
+#elif defined(__APPLE__) || defined(MACOSX)
 	#include <OpenGL/gl.h>
-	typedef unsigned int GLhandleARB;
 #else
 	#include <GL/gl.h>
-	typedef unsigned int GLhandleARB;
 #endif
 #define APIENTRY
-#endif
 
 #include "verse.h"
 #include "persuade.h"
@@ -23,16 +19,11 @@
 #include "p_sds_array.h"
 
 
-
 #define GL_VERTEX_SHADER_ARB                        0x8B31
 #define GL_FRAGMENT_SHADER_ARB                      0x8B30
 #define GL_TEXTURE0_ARB								0x84C0
 
-GLhandleARB 
-(APIENTRY 
-		 *p_glCreateShaderObjectARB)
-(GLenum 
- shaderType);
+GLhandleARB (APIENTRY *p_glCreateShaderObjectARB)(GLenum shaderType);
 GLvoid      (APIENTRY *p_glDeleteObjectARB)(GLhandleARB obj);
 GLhandleARB (APIENTRY *p_glCreateProgramObjectARB)(GLvoid);
 GLvoid      (APIENTRY *p_glAttachObjectARB)(GLhandleARB containerObj, GLhandleARB obj);
@@ -43,10 +34,10 @@ GLvoid      (APIENTRY *p_glUseProgramObjectARB)(GLhandleARB programObj);
 GLint       (APIENTRY *p_glGetUniformLocationARB)(GLhandleARB programObj, const char *name);
 GLvoid      (APIENTRY *p_glUniform4fARB)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 GLvoid      (APIENTRY *p_glUniform1iARB)(GLint location, GLint i);
-GLvoid		(APIENTRY *p_glUniformMatrix4fvARB)(GLint location, GLsizei count, GLboolean transpose, GLfloat *value);
+GLvoid	    (APIENTRY *p_glUniformMatrix4fvARB)(GLint location, GLsizei count, GLboolean transpose, GLfloat *value);
 GLint       (APIENTRY *p_glGetAttribLocationARB)(GLhandleARB programObj, const char *name);
-GLvoid		(APIENTRY *p_glVertexAttrib4fARB)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
-GLvoid		(APIENTRY *p_glActiveTextureARB)(GLenum texture);
+GLvoid	    (APIENTRY *p_glVertexAttrib4fARB)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+GLvoid	    (APIENTRY *p_glActiveTextureARB)(GLenum texture);
 
 GLvoid		(APIENTRY *p_glBindAttribLocationARB)(GLhandleARB programObj, GLuint index, const char *name);
 GLvoid		(APIENTRY *p_glVertexAttribPointerARB)(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
