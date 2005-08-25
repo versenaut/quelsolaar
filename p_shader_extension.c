@@ -7,6 +7,7 @@
 	typedef unsigned int GLhandleARB;
 #elif defined(__APPLE__) || defined(MACOSX)
 	#include <OpenGL/gl.h>
+	typedef unsigned int GLhandleARB;
 #else
 	#include <GL/gl.h>
 #endif
