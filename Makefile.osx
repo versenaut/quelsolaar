@@ -11,9 +11,20 @@ LDLIBS=-lverse -framework GLUT -framework OpenGL -framework Cocoa
 
 APPS=connector uvedit loqairou #quelsolaar
 
-ALL:		$(APPS)
+ALL:		Connector.app/Contents/MacOS/connector \
+                UV\ Edit.app/Contents/MacOS/uvedit \
+                Loq\ Airou.app/Contents/MacOS/loqairou
 
 # -----------------------------------------------
+
+Connector.app/Contents/MacOS/connector: connector
+		./bundle.sh Connector connector
+
+UV\ Edit.app/Contents/MacOS/uvedit: uvedit
+		./bundle.sh "UV Edit" uvedit
+
+Loq\ Airou.app/Contents/MacOS/loqairou: loqairou
+		./bundle.sh "Loq Airou" loqairou
 
 connector:	co_main.o co_game.o co_intro.o co_vn_audio.o co_vn_bitmap.o co_vn_curve.o co_vn_geometry.o co_vn_graphics.o \
 		co_vn_handle.o co_vn_head.o co_vn_mat_render.o co_vn_material.o co_vn_object.o co_vn_search.o \
@@ -78,3 +89,5 @@ SDLMain.o: SDLMain.m
 
 clean:
 	rm -f $(APPS) *.o *.a
+	rm -rf *.app
+
