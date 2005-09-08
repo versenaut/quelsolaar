@@ -398,7 +398,7 @@ boolean p_texture_compute(uint dummy)
 	uint empty;
 	for(empty = PTextureStorage.handel_count + 1; empty != 0; empty--)
 	{
-		printf("p_texture_compute\n");
+/*		printf("p_texture_compute\n");*/
 		PTextureStorage.update_pos = (PTextureStorage.update_pos + 1) % PTextureStorage.handel_count;
 		if(p_th_service_handle(&PTextureStorage.handels[PTextureStorage.update_pos]))
 			return FALSE;
