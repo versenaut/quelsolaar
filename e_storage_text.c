@@ -1,3 +1,7 @@
+/*
+ * 
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -9,32 +13,29 @@
 #include "e_types.h"
 #include "e_storage_node.h"
 
+typedef struct {
+	VBufferID	buffer_id;
+	char		name[16];
+	char		*data;
+	uint		length;
+	uint		allocated;
+	uint		version;
+} ESTextBuffer;
 
-
-typedef struct{
-	VBufferID		buffer_id;
-	char			name[16];
-	char			*data;
-	uint			length;
-	uint			allocated;
-	uint			version;
-}ESTextBuffer;
-
-typedef struct{
-	ENodeHead		head;
+typedef struct {
+	ENodeHead	head;
 	DynLookUpTable	buffertables;
-	char			language[512];
-}ESTextNode;
+	char		language[512];
+} ESTextNode;
 
 extern void	e_ns_update_node_version_struct(ESTextNode *node);
 
-char* e_nst_get_language(ESTextNode *t_node)
+const char * e_nst_get_language(const ESTextNode *t_node)
 {
 	return t_node->language;
 }
 
-
-ESTextBuffer *e_nst_get_buffer_by_name(ESTextNode *node, char *name)
+ESTextBuffer * e_nst_get_buffer_by_name(ESTextNode *node, char *name)
 {
 	ESTextBuffer *buffer;
 	for(buffer = get_next_dlut(&node->buffertables, 0); buffer != NULL; buffer = get_next_dlut(&node->buffertables, buffer->buffer_id + 1))
@@ -53,7 +54,7 @@ ESTextBuffer *e_nst_get_buffer_next(ESTextNode *node, uint buffer_id)
 	return get_next_dlut(&node->buffertables, buffer_id);
 }
 
-char *e_nst_get_buffer_data(ESTextNode *node, ESTextBuffer *buffer)
+const char * e_nst_get_buffer_data(ESTextNode *node, ESTextBuffer *buffer)
 {
 	if(node != NULL && buffer != NULL)
 	{
@@ -74,18 +75,17 @@ uint e_nst_get_buffer_id(ESTextBuffer *buffer)
 	return buffer->buffer_id;
 }
 
-char *e_nst_get_buffer_name(ESTextBuffer *buffer)
+const char * e_nst_get_buffer_name(ESTextBuffer *buffer)
 {
 	return buffer->name;
 }
-
 
 uint e_nst_get_buffer_version(ESTextBuffer *buffer)
 {
 	return buffer->version;
 }
 
-ESTextNode *e_create_t_node(VNodeID node_id, VNodeOwner owner)
+ESTextNode * e_create_t_node(VNodeID node_id, VNodeOwner owner)
 {
 	ESTextNode	*node;
 	if((node = (ESTextNode *) e_ns_get_node_networking(node_id)) == NULL)
@@ -98,7 +98,6 @@ ESTextNode *e_create_t_node(VNodeID node_id, VNodeOwner owner)
 	return node;
 }
 
-
 static void delete_text_buffer_func(uint id, void *buffer, void *user_data)
 {
 	ESTextBuffer	*real_buffer = buffer;
@@ -108,14 +107,13 @@ static void delete_text_buffer_func(uint id, void *buffer, void *user_data)
 	free(real_buffer);
 }
 
-void delete_text(ESTextNode	*node)
+void delete_text(ESTextNode *node)
 {
 	foreach_remove_dlut(&node->buffertables, delete_text_buffer_func, NULL);
 	free(node);
 }
 
-
-void callback_send_t_set_language(void *user, VNodeID node_id, const char *language)
+static void callback_send_t_set_language(void *user, VNodeID node_id, const char *language)
 {
 	ESTextNode	*node;
 	uint i;
@@ -126,7 +124,7 @@ void callback_send_t_set_language(void *user, VNodeID node_id, const char *langu
 	e_ns_update_node_version_struct(node);
 }
 
-void callback_send_t_buffer_create(void *user, VNodeID node_id, VBufferID buffer_id, const char *name)
+static void callback_send_t_buffer_create(void *user, VNodeID node_id, VBufferID buffer_id, const char *name)
 {
 	ESTextNode	*node;
 	ESTextBuffer *buffer;
@@ -149,7 +147,7 @@ void callback_send_t_buffer_create(void *user, VNodeID node_id, VBufferID buffer
 	e_ns_update_node_version_struct(node);
 }
 
-void callback_send_t_buffer_destroy(void *user, VNodeID node_id, VBufferID buffer_id)
+static void callback_send_t_buffer_destroy(void *user, VNodeID node_id, VBufferID buffer_id)
 {
 	ESTextNode	*node;
 	ESTextBuffer *buffer;
@@ -164,7 +162,7 @@ void callback_send_t_buffer_destroy(void *user, VNodeID node_id, VBufferID buffe
 	}
 }
 
-void callback_send_t_text_set(void *user, VNodeID node_id, VBufferID buffer_id, uint32 pos, uint32 length, const char *text)
+static void callback_send_t_text_set(void *user, VNodeID node_id, VBufferID buffer_id, uint32 pos, uint32 length, const char *text)
 {
 	ESTextNode	*node;
 	ESTextBuffer	*buffer;
@@ -172,7 +170,7 @@ void callback_send_t_text_set(void *user, VNodeID node_id, VBufferID buffer_id, 
 	node = e_create_t_node(node_id, 0);
 	if((buffer = find_dlut(&node->buffertables, buffer_id)) != NULL)
 	{
-		uint32	ins = text != NULL ? strlen(text) : 0u;
+		uint32	ins = (text != NULL) ? strlen(text) : 0u;
 
 		if(pos > buffer->allocated - 1)
 			pos = buffer->allocated - 1;
