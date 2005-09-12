@@ -338,8 +338,8 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 					verse_send_c_curve_create(change_c_node_id, e_nsc_get_curve_id(curve), e_nsc_get_curve_name(curve), dim);
 			y -= 0.05;
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Edit:", color_light, color_light, color_light);  
-			e = curve_edit_id != e_nsc_get_curve_id(curve);
-			if(co_w_checkbox(input, 0.17, y, &e, color, color, color) && !e)
+			e = curve_edit_id == e_nsc_get_curve_id(curve);
+			if(co_w_checkbox(input, 0.17, y, &e, color, color, color) && e)
 				curve_edit_id = e_nsc_get_curve_id(curve);
 			y -= 0.05;
 			sui_draw_rounded_square(-0.3, y + 0.175, 1, -0.14, color_light, color_light, color_light);
