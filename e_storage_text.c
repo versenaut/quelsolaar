@@ -17,8 +17,8 @@ typedef struct {
 	VBufferID	buffer_id;
 	char		name[16];
 	char		*data;
-	uint		length;
-	uint		allocated;
+	size_t		length;		/* Exact length of string. */
+	size_t		allocated;	/* Allocated space, typically larger than the string held. */
 	uint		version;
 } ESTextBuffer;
 
@@ -27,6 +27,8 @@ typedef struct {
 	DynLookUpTable	buffertables;
 	char		language[512];
 } ESTextNode;
+
+#define	ALLOC_EXTRA	1024
 
 extern void	e_ns_update_node_version_struct(ESTextNode *node);
 
@@ -162,6 +164,51 @@ static void callback_send_t_buffer_destroy(void *user, VNodeID node_id, VBufferI
 	}
 }
 
+static void text_delete(ESTextBuffer *buf, size_t offset, size_t length)
+{
+	if(offset > buf->length)
+		return;
+	if(offset + length > buf->length)
+		length = buf->length - offset;
+	if(length == 0)
+		return;
+	memmove(buf->data + offset, buf->data + offset + length, buf->length - (offset + length));
+	buf->length -= length;
+	buf->data[buf->length] = '\0';
+	/* FIXME: There (sh|c)ould be code here to realloc() the buffer *down*, if it shrunk a lot. */
+}
+
+static void text_insert(ESTextBuffer *buf, size_t offset, const char *text)
+{
+	size_t	len;
+
+	if(text == NULL)
+		return;
+	if(offset > buf->length)
+		offset = buf->length;
+	len = strlen(text);
+	if(len == 0)
+		return;
+
+	if(buf->length + len + 1 > buf->allocated)
+	{
+		char	*nb;
+
+		nb = realloc(buf->data, buf->length + len + ALLOC_EXTRA);
+		if(nb == NULL)
+		{
+			fprintf(stderr, "Enough: Running out of memory in text storage\n");
+			return;
+		}
+		buf->data = nb;
+		buf->allocated = buf->length + len + ALLOC_EXTRA;
+	}
+	memmove(buf->data + offset + len, buf->data + offset, buf->length - offset);
+	memcpy(buf->data + offset, text, len);
+	buf->length += len;
+	buf->data[buf->length] = '\0';
+}
+
 static void callback_send_t_text_set(void *user, VNodeID node_id, VBufferID buffer_id, uint32 pos, uint32 length, const char *text)
 {
 	ESTextNode	*node;
@@ -170,13 +217,11 @@ static void callback_send_t_text_set(void *user, VNodeID node_id, VBufferID buff
 	node = e_create_t_node(node_id, 0);
 	if((buffer = find_dlut(&node->buffertables, buffer_id)) != NULL)
 	{
-		uint32	ins = (text != NULL) ? strlen(text) : 0u;
-
-		if(pos > buffer->allocated - 1)
-			pos = buffer->allocated - 1;
-		printf("setting %u bytes of text at %u.%u [%u,%u]\n", ins, node_id, buffer_id, pos, pos + length);
-		if(strlen(text) < 20)
-			printf(" [%s]\n", text);
+		/* This is not optimally efficient for replacement, and also does the delete()
+		 * without regard for the subsequent insert(). It is simple, though.
+		*/
+		text_delete(buffer, pos, length);
+		text_insert(buffer, pos, text);
 	}
 }
 
