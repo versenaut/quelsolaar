@@ -11,6 +11,117 @@
 
 extern boolean co_handle_head(BInputState *input, ENode *node, float *length);
 
+typedef struct{
+	float *tri;
+	float *quad;
+	uint tri_count;
+	uint quad_count;
+	uint version;
+}PeGeometry;
+
+void co_geometry_destroy(PeGeometry *g)
+{
+	if(g != NULL)
+	{
+		if(g->tri != NULL)
+			free(g->tri);
+		if(g->quad != NULL)
+			free(g->quad);
+		free(g);
+	}
+}
+
+
+PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g)
+{
+	egreal *vertex;
+	uint i, *ref, ref_length, length;
+	if(g == NULL)
+	{
+		g = malloc(sizeof *g);
+		g->tri = NULL;
+		g->quad = NULL;
+		g->version = 0;
+		g->tri_count = 0;
+		g->quad_count = 0;
+	}
+	if(g->version != e_ns_get_node_version_struct(node))
+	{
+		g->version = e_ns_get_node_version_struct(node);
+		vertex = e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node, 0));
+		ref = e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node, 1));
+		length = e_nsg_get_vertex_length(node);
+		ref_length = e_nsg_get_polygon_length(node);
+		g->quad_count = 0;
+		g->tri_count = 0;
+		for(i = 0; i < ref_length; i++)
+		{
+			if(ref[i * 4] < length && ref[i * 4 + 1] < length && ref[i * 4 + 2] < length && vertex[ref[i * 4] * 3] != V_REAL64_MAX && vertex[ref[i * 4 + 1] * 3] != V_REAL64_MAX && vertex[ref[i * 4 + 2] * 3] != V_REAL64_MAX)
+			{
+				if(ref[i * 4 + 3] < length && vertex[ref[i * 4 + 3] * 3] != V_REAL64_MAX)
+				{
+					g->quad_count++;
+				}else
+				{
+					g->tri_count++;
+				}
+			}
+		}
+		if(g->tri_count != 0)
+			g->tri = malloc((sizeof *g->tri) * 3 * 3 * g->tri_count);
+		else
+			g->tri = NULL;
+		if(g->quad_count != 0)
+			g->quad = malloc((sizeof *g->quad) * 4 * 3 * g->quad_count);
+		else
+			g->quad = NULL;
+		g->quad_count = 0;
+		g->tri_count = 0;
+		for(i = 0; i < ref_length; i++)
+		{
+			if(ref[i * 4] < length && ref[i * 4 + 1] < length && ref[i * 4 + 2] < length && vertex[ref[i * 4] * 3] != V_REAL64_MAX && vertex[ref[i * 4 + 1] * 3] != V_REAL64_MAX && vertex[ref[i * 4 + 2] * 3] != V_REAL64_MAX)
+			{
+				if(ref[i * 4 + 3] < length && vertex[ref[i * 4 + 3] * 3] != V_REAL64_MAX)
+				{
+					g->quad[g->quad_count * 12 + 0] = vertex[ref[i * 4 + 0] * 3 + 0];
+					g->quad[g->quad_count * 12 + 1] = vertex[ref[i * 4 + 0] * 3 + 1];
+					g->quad[g->quad_count * 12 + 2] = vertex[ref[i * 4 + 0] * 3 + 2];
+					g->quad[g->quad_count * 12 + 3] = vertex[ref[i * 4 + 1] * 3 + 0];
+					g->quad[g->quad_count * 12 + 4] = vertex[ref[i * 4 + 1] * 3 + 1];
+					g->quad[g->quad_count * 12 + 5] = vertex[ref[i * 4 + 1] * 3 + 2];
+					g->quad[g->quad_count * 12 + 6] = vertex[ref[i * 4 + 2] * 3 + 0];
+					g->quad[g->quad_count * 12 + 7] = vertex[ref[i * 4 + 2] * 3 + 1];
+					g->quad[g->quad_count * 12 + 8] = vertex[ref[i * 4 + 2] * 3 + 2];
+					g->quad[g->quad_count * 12 + 9] = vertex[ref[i * 4 + 3] * 3 + 0];
+					g->quad[g->quad_count * 12 + 10] = vertex[ref[i * 4 + 3] * 3 + 1];
+					g->quad[g->quad_count * 12 + 11] = vertex[ref[i * 4 + 3] * 3 + 2];
+					g->quad_count++;
+				}else
+				{
+					g->tri[g->tri_count * 9 + 0] = vertex[ref[i * 4 + 0] * 3 + 0];
+					g->tri[g->tri_count * 9 + 1] = vertex[ref[i * 4 + 0] * 3 + 1];
+					g->tri[g->tri_count * 9 + 2] = vertex[ref[i * 4 + 0] * 3 + 2];
+					g->tri[g->tri_count * 9 + 3] = vertex[ref[i * 4 + 1] * 3 + 0];
+					g->tri[g->tri_count * 9 + 4] = vertex[ref[i * 4 + 1] * 3 + 1];
+					g->tri[g->tri_count * 9 + 5] = vertex[ref[i * 4 + 1] * 3 + 2];
+					g->tri[g->tri_count * 9 + 6] = vertex[ref[i * 4 + 2] * 3 + 0];
+					g->tri[g->tri_count * 9 + 7] = vertex[ref[i * 4 + 2] * 3 + 1];
+					g->tri[g->tri_count * 9 + 8] = vertex[ref[i * 4 + 2] * 3 + 2];
+					g->tri_count++;
+				}
+			}
+		}
+	}
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	if(g->tri_count != 0)
+		sui_draw_gl(GL_TRIANGLES, g->tri, g->tri_count * 3, 3, 0.5, 0.5, 0.5);
+	if(g->quad_count != 0)
+		sui_draw_gl(GL_QUADS, g->quad, g->quad_count * 4,  3, 0.5, 0.5, 0.5);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	return g;
+}
+
+
 static uint change_g_node_id = 0;
 
 void rename_g_layer_func(void *user, char *text)
@@ -44,7 +155,7 @@ void rename_g_layer_func(void *user, char *text)
 	}
 }
 
-extern float co_handle_node_head(BInputState *input, ENode *node);
+extern float co_handle_node_head(BInputState *input, ENode *node, boolean reset);
 
 boolean co_handle_geometry(BInputState *input, ENode *node)
 {
@@ -52,9 +163,8 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 	static float rot_layer = 0, rot_crease = 0, rot_bone = 0;
 	static boolean show_layer = TRUE, show_crease = TRUE, show_bone = TRUE;
 
+	y = co_handle_node_head(input, node, change_g_node_id != e_ns_get_node_id(node));
 	change_g_node_id = e_ns_get_node_id(node);
-
-	y = co_handle_node_head(input, node);
 
 	co_vng_divider(input, 0.2, y, &rot_layer, &color, &color_light, &show_layer, "Layers");
 
@@ -247,9 +357,9 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 					}
 				}
 				sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, text[i], color_light, color_light, color_light);  
-				if(sui_type_number_double(input, 0.15, y, 0.15, SUI_T_SIZE, edit, edit, color, color, color))
-					verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], e_nsg_get_bone_pos_label(node, bone), &rot, e_nsg_get_bone_rot_label(node, bone));
-				if(co_w_slider(input, 0.3, y, 0.35, edit, color, color, color))
+/*				if(sui_type_number_double(input, 0.15, y, 0.15, SUI_T_SIZE, edit, edit, color, color, color))
+					verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], e_nsg_get_bone_pos_label(node, bone), &rot, e_nsg_get_bone_weight(node, bone), e_nsg_get_bone_rot_label(node, bone));
+*/				if(co_w_slider(input, 0.3, y, 0.35, edit, color, color, color))
 					/*verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], &rot)*/;
 				y -= 0.05;
 			}

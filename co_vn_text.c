@@ -10,7 +10,7 @@
 #include "co_widgets.h"
 
 extern boolean co_handle_head(BInputState *input, ENode *node, float *length);
-extern float co_handle_node_head(BInputState *input, ENode *node);
+extern float co_handle_node_head(BInputState *input, ENode *node, boolean reset);
 /*
 ETextBuffer *		e_nst_get_buffer_next(ENode *node, uint buffer_id);
 char *				e_nst_get_buffer_data(ENode *node, ESTextBuffer *buffer);
@@ -50,9 +50,9 @@ boolean co_handle_text(BInputState *input, ENode *node)
 	ETextBuffer *buffer;
 	float pos = 1, y, pre_expander, color, color_light;
 	uint i;
+
+	y = co_handle_node_head(input, node, change_t_node_id != e_ns_get_node_id(node));
 	change_t_node_id = e_ns_get_node_id(node);
-	
-	y = co_handle_node_head(input, node);
 
 	co_vng_divider(input, 0.2, y, &rot_language, &color, &color_light, &show_language, "Language");
 	pre_expander = y;

@@ -11,7 +11,10 @@
 
 extern boolean co_handle_head(BInputState *input, ENode *node, float *length);
 
-static uint32 rename_o_node_id = 0;
+uint32 rename_o_node_id = 0;
+
+double new_transform[10];
+double new_light[3];
 
 void rename_method_group_func(void *user, char *text)
 {
@@ -79,7 +82,9 @@ void rename_param_func(void *user, char *text)
 
 void rename_link_func(void *user, char *text)
 {
+
 	ENode *node;
+	EObjLink *link;
 	if((node = e_ns_get_node(0, rename_o_node_id)) != NULL)
 	{
 		EObjLink *link;
@@ -89,19 +94,20 @@ void rename_link_func(void *user, char *text)
 	}
 }
 
-extern float co_handle_node_head(BInputState *input, ENode *node);
+extern float co_handle_node_head(BInputState *input, ENode *node, boolean reset);
 
 boolean co_handle_object(BInputState *input, ENode *node)
 {
 	float y, color, color_light, y_meth, y_group, pre_expander;
 	static float rot_meth = 0, rot_light = 0, rot_trans = 0, rot_link = 0;
 	static boolean show_meth = TRUE, show_light = TRUE, show_trans = TRUE, show_link = TRUE;
-	static double light[3], transform[6];
+	static double light[3], transform[6], data = 0;
 	VNQuat64	rot;
 	uint16 m_group, method;
 	char nr[64];
 	uint i, count;
-	y = co_handle_node_head(input, node);
+
+	y = co_handle_node_head(input, node, rename_o_node_id != e_ns_get_node_id(node));
 	rename_o_node_id = e_ns_get_node_id(node);
 
 	co_vng_divider(input, 0.2, y, &rot_light, &color, &color_light, &show_light, "Light");

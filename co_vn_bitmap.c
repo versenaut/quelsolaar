@@ -3,6 +3,7 @@
 #include <math.h>
 
 #include "verse.h"
+#include "enough.h"
 #include "seduce.h"
 #include "persuade.h"
 #include "co_vn_graphics.h"
@@ -37,7 +38,7 @@ void rename_b_layer_func(void *user, char *text)
 	}
 }
 
-extern float co_handle_node_head(BInputState *input, ENode *node);
+extern float co_handle_node_head(BInputState *input, ENode *node, boolean reset);
 
 boolean co_handle_bitmap(BInputState *input, ENode *node)
 {
@@ -54,8 +55,9 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 	e_nsb_get_size(node, &s[0], &s[1], &s[2]);
 	if(s[0] * s[1] * s[2] != 0)
 		e_nsb_get_size(node, &create_size[0], &create_size[1], &create_size[2]);
+
+	y = co_handle_node_head(input, node, change_b_node_id != e_ns_get_node_id(node));
 	change_b_node_id = e_ns_get_node_id(node);
-	y = co_handle_node_head(input, node);
 
 	co_vng_divider(input, 0.2, y, &rot_size, &color, &color_light, &show_size, "Size");
 	pre_expander = y;
@@ -125,7 +127,7 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 		for(layer = e_nsb_get_layer_next(node, 0); layer != NULL ; layer = e_nsb_get_layer_next(node, e_nsb_get_layer_id(layer) + 1))
 		{
 			char *names[] = {"UINT1", "UINT8", "UINT16", "REAL32", "REAL64"};
-			static uint popup = -1;
+			static uint32 popup = -1;
 			VNBLayerType type;
 
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer name:", color_light, color_light, color_light);  

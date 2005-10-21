@@ -9,7 +9,7 @@
 #include "co_vn_handle.h"
 #include "co_widgets.h"
 
-extern float co_handle_node_head(BInputState *input, ENode *node);
+extern float co_handle_node_head(BInputState *input, ENode *node, boolean reset);
 extern boolean co_handle_head(BInputState *input, ENode *node, float *length);
 
 uint change_a_node_id;
@@ -50,9 +50,11 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 	double frequency;
 	float pos = 1, y, pre_expander, color, color_light;
 	uint i;
-	change_a_node_id = e_ns_get_node_id(node);
+
 	
-	y = co_handle_node_head(input, node);
+	y = co_handle_node_head(input, node, change_a_node_id != e_ns_get_node_id(node));
+
+	change_a_node_id = e_ns_get_node_id(node);
 
 	co_vng_divider(input, 0.2, y, &rot_buffer, &color, &color_light, &show_buffer, "Buffers");
 	pre_expander = y;

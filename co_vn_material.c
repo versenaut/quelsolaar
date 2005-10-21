@@ -679,7 +679,7 @@ void co_draw_lable(COVNMaterial *mat, float y, float color, char *lable)
 	glPopMatrix();
 }
 
-extern float co_handle_node_head(BInputState *input, ENode *node);
+extern float co_handle_node_head(BInputState *input, ENode *node, boolean reset);
 
 boolean co_handle_material(BInputState *input, ENode *node)
 {
@@ -695,10 +695,10 @@ boolean co_handle_material(BInputState *input, ENode *node)
 	VMatFrag *frag, f;
 	float y, pre_expander, color, color_light;
 
-	y = co_handle_node_head(input, node);
+	y = co_handle_node_head(input, node, change_m_node_id != e_ns_get_node_id(node));
 	change_m_node_id = e_ns_get_node_id(node);
 
-	co_vng_divider(input, 0.2, y, &rot_tree, &color, &color_light, &show_tree, "Fragments");
+	co_vng_divider(input, 0.2, y, &rot_tree, &color, &color_light, &show_tree, "LIGHT");
 	pre_expander = y;
 
 	if(rot_tree > 0.001)

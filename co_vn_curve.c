@@ -94,9 +94,8 @@ void co_c_space(ECurve *curve, float *scale, float *pan)
 		}
 	}
 	*scale -= *pan;
-/*	*pan;*/
+	*pan;
 }
-
 void sui_draw_symb_curve_point(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {0.008000, -0.004000, 0.006000, -0.004536, 0.006000, -0.004536, 0.004536, -0.006000, 0.004536, -0.006000, 0.004000, -0.008000, 0.008000, -0.004000, 0.010000, -0.003464, 0.010000, -0.003464, 0.011464, -0.002000, 0.011464, -0.002000, 0.012000, 0.000000, 0.008000, 0.004000, 0.010000, 0.003464, 0.010000, 0.003464,
@@ -131,7 +130,7 @@ void	sui_draw_symb_empty(float point_x, float point_y, float pos_x, float pos_y,
 
 void co_c_draw_point(BInputState *input, ENode *node, ECurve *curve, float *scroll, float *stretch, float y_pos, float scale, float pan, float color, float color_light)
 {
-	uint i, dimensions, point;
+	uint i, j, dimensions, point;
 	static uint grab_dim, grab_control, grab_point = -1;
 	double pre_x[4], pre_y[4], pos_x, pos_y[4], post_x[4], post_y[4], x, y, aspect;
 	aspect = betray_get_screen_mode(NULL, NULL, NULL);
@@ -279,7 +278,7 @@ void rename_c_layer_func(void *user, char *text)
 	}
 }
 
-extern float co_handle_node_head(BInputState *input, ENode *node);
+extern float co_handle_node_head(BInputState *input, ENode *node, boolean reset);
 
 boolean co_handle_curve(BInputState *input, ENode *node)
 {
@@ -296,9 +295,9 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 		scroll = 0;
 		stretch = 1;
 	}
-	change_c_node_id = e_ns_get_node_id(node);
 
-	y = co_handle_node_head(input, node);
+	y = co_handle_node_head(input, node, TRUE);
+	change_c_node_id = e_ns_get_node_id(node);
 
 	co_vng_divider(input, 0.2, y, &rot_curve, &color, &color_light, &show_curve, "Curves");
 
@@ -338,8 +337,8 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 					verse_send_c_curve_create(change_c_node_id, e_nsc_get_curve_id(curve), e_nsc_get_curve_name(curve), dim);
 			y -= 0.05;
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Edit:", color_light, color_light, color_light);  
-			e = curve_edit_id == e_nsc_get_curve_id(curve);
-			if(co_w_checkbox(input, 0.17, y, &e, color, color, color) && e)
+			e = curve_edit_id != e_nsc_get_curve_id(curve);
+			if(co_w_checkbox(input, 0.17, y, &e, color, color, color) && !e)
 				curve_edit_id = e_nsc_get_curve_id(curve);
 			y -= 0.05;
 			sui_draw_rounded_square(-0.3, y + 0.175, 1, -0.14, color_light, color_light, color_light);
