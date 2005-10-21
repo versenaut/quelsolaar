@@ -3,6 +3,7 @@
 #include <math.h>
 
 #include "verse.h"
+#include "enough.h"
 #include "seduce.h"
 #include "persuade.h"
 
@@ -110,8 +111,12 @@ void verse_node_create_func(ENode *node, ECustomDataCommand command)
 
 
 void co_draw_bitmap(ENode *node);
+void co_geometry_destroy(void *g);
+void *co_geometry_draw(ENode *node, void *g);
+
 
 void p_render_object(ENode *node);
+
 
 
 void co_node_draw(ENode *node, VNodeType type, boolean hidden)
@@ -216,79 +221,13 @@ void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 			case V_NT_GEOMETRY :
 				co_vng_saturn_ring();
 				co_vng_gas_planet();
-//				co_vng_color(254.0 / 255.0, 214.0 / 255.0, 161.0 / 255.0);
-#ifdef PERSUADE_H
+				if(node != NULL)
 				{
-/*					static PMesh *mesh = NULL, *next = NULL;
-					static uint version;
-					COVerseNode *co_node;
-					if(node == NULL)
-						return;
-
-					co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
-					if(co_node == NULL)
-						return;
-					mesh = co_node->persuade;
-					if(mesh == NULL)
-						mesh = p_rm_create(node);
-					if(mesh != NULL)
-						mesh = p_rm_service(mesh, NULL, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
-					if(mesh != NULL && p_rm_drawable(mesh))
-					{
-						float col_one[4] = {0.5, 0.4, 0.3, 1}, pos_one[4] = {4, 6, -6, 1};
-						float col_two[4] = {0.6, 0.8, 1, 1}, pos_two[4] = {-4, 6, -6, 1};
-						float col_three[4] = {0.7, 0.7, 0.7, 1}, pos_three[4] = {4, 6, 6, 1};						egreal center[3], size;
-						mesh = p_rm_service(mesh, NULL, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
-
-						glEnable(GL_LIGHT0);
-						glLightfv(GL_LIGHT0, GL_POSITION, pos_one);
-						glLightfv(GL_LIGHT0, GL_DIFFUSE, col_one);
-						glEnable(GL_LIGHT1);
-						glLightfv(GL_LIGHT1, GL_POSITION, pos_two);
-						glLightfv(GL_LIGHT1, GL_DIFFUSE, col_two);
-						glEnable(GL_LIGHT2);
-						glLightfv(GL_LIGHT2, GL_POSITION, pos_three);
-						glLightfv(GL_LIGHT2, GL_DIFFUSE, col_three);
-						glEnable(GL_DEPTH_TEST);
-						glPushMatrix();
-						e_nsg_get_center(node, center);
-						size = 0.7 / e_nsg_get_size(node);
-						glRotatef(time * 360, 0, 1, 0);
-						glScalef(size, size, size);
-						glTranslatef(-center[0], -center[1], -center[2]);
-
-						if(e_nsg_get_layer_version(e_nsg_get_layer_by_id(node,  0)) != version)
-						{
-							p_rm_update_shape(mesh, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
-							version = e_nsg_get_layer_version(e_nsg_get_layer_by_id(node,  0));
-						}
-						glEnableClientState(GL_NORMAL_ARRAY);
-						glEnableClientState(GL_VERTEX_ARRAY);
-						glDisableClientState(GL_COLOR_ARRAY);
-						glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-						glDisable(GL_BLEND);
-						glEnable(GL_NORMALIZE);
-				#ifdef E_GEOMETRY_REAL_PRECISION_64_BIT
-						glVertexPointer(3, GL_DOUBLE, 0, p_rm_get_vertex(mesh));
-						glNormalPointer(GL_DOUBLE, 0 , p_rm_get_normal(mesh));
-				//		glNormalPointer(GL_DOUBLE, 0 , p_rm_get_vertex(mesh));
-				#endif
-				#ifdef E_GEOMETRY_REAL_PRECISION_32_BIT
-						glVertexPointer(3, GL_FLOAT, 0, p_rm_get_vertex(mesh));
-						glNormalPointer(GL_FLOAT, 0 , p_rm_get_normal(mesh));
-				#endif
-						glEnable(GL_LIGHTING);
-						glColor4f(1, 1, 1, 1);
-						glDrawElements(GL_TRIANGLES, p_rm_get_ref_length(mesh), GL_UNSIGNED_INT, p_rm_get_reference(mesh));
-						glDisableClientState(GL_NORMAL_ARRAY);
-						glDisable(GL_LIGHTING);
-						glDisable(GL_NORMALIZE);
-						glPopMatrix();
-						glDisable(GL_DEPTH_TEST);
-					}
-					co_node->persuade = mesh;*/
+					glPushMatrix();
+					glRotatef(time * 360, 0, 1, 0);
+					co_geometry_destroy(co_geometry_draw(node, NULL));
+					glPopMatrix();
 				}
-#endif
 			break;
 			case V_NT_MATERIAL :
 				if(node != NULL)
@@ -344,9 +283,10 @@ boolean get_stop_sign(void);
 
 extern void co_init_game(uint count);
 extern void co_end_game(void);
-extern void co_create_pebble(uint type, float pos_x, float pos_y, float scale);
+extern void co_create_pebel(uint type, float pos_x, float pos_y, float scale);
 extern boolean co_is_game_active(void);
 extern void co_play_game(BInputState *input);
+extern boolean co_search_node(ENode *node, char *search);
 
 extern boolean co_draw_ships(BInputState *input);
 
@@ -356,6 +296,8 @@ void co_input_handler(BInputState *input, void *user_pointer)
 	static VNodeID active = -1;
 	static VNodeType link_id;
 	static float clear_color = 1, create_move = 0, popup_move = 0, type_count, create_scroll = 0;
+	static char search[64];
+	static uint search_cursor = 0;
 //	char *names[7] = {"OBJECT", "GEOMETRY", "MATERIAL", "BITMAP", "TEXT", "PARTICLE", "CURVE"};
 	ENode *node;
 	COVerseNode *co_node;
@@ -368,7 +310,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		co_material_compute(1);
 		co_vng_update_time();
 #ifdef PERSUADE_H
-		p_task_compute(2);
+		p_task_compute(1);
 #endif
 		return;
 	}
@@ -381,6 +323,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 
 	if(co_is_game_active())
 	{
+		betray_end_type_in_mode(TRUE);
 		co_play_game(input);
 		return;
 	}else if(co_draw_ships(input))
@@ -394,7 +337,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		for(type = 0; type < V_NT_NUM_TYPES; type++)
 			for(node = e_ns_get_node_next(0, 0, type); node != 0; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, type))
 				if((co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT)) != NULL && co_node->hidden != TRUE)
-					co_create_pebble(type, co_get_view_x(co_node->pos_x), co_get_view_y(co_node->pos_y), 1 / view_cam_pos[2]);
+					co_create_pebel(type, co_get_view_x(co_node->pos_x), co_get_view_y(co_node->pos_y), 1 / view_cam_pos[2]);
 		view_cam_pos[2] = 0;
 		view_cam_speed = 0.01;
 	}
@@ -420,115 +363,78 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		type_count = create_scroll - 1;
 		for(node = e_ns_get_node_next(0, 0, type); node != 0; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, type))
 		{
-			type_count++;
-			co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
-			if(co_node != NULL && co_node->hidden != TRUE)
+			if(mode != COIM_CREATE || co_search_node(node, search))
 			{
-				if(input->mode == BAM_DRAW)
+				type_count++;
+				co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
+				if(co_node != NULL && co_node->hidden != TRUE)
 				{
-					glPushMatrix();
-					glTranslatef(co_get_pos_x(((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8) * create_move + co_node->pos_x * (1 - create_move),
-						co_get_pos_y((float)type_count * -0.2) * create_move + co_node->pos_y * (1 - create_move), 0);
-					glScalef(view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move));
-					if(mode == COIM_CREATE)
+					if(input->mode == BAM_DRAW)
 					{
 						glPushMatrix();
-						glScalef(4, 4, 4);
-						sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), 0, 0, 0);
-						glPopMatrix();
-					}
-					co_node_draw(node, type, FALSE);
-				}else
-				{
-					if(mode == COIM_NONE)
-					{
-						if(input->last_mouse_button[0] == FALSE && input->mouse_button[0] == TRUE)
+						glTranslatef(co_get_pos_x(((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8) * create_move + co_node->pos_x * (1 - create_move),
+						co_get_pos_y((float)type_count * -0.2) * create_move + co_node->pos_y * (1 - create_move), 0);
+						glScalef(view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move));
+						if(mode == COIM_CREATE)
 						{
-							if((co_get_pos_x(input->pointer_x) - co_node->pos_x) * (co_get_pos_x(input->pointer_x) - co_node->pos_x) + (co_get_pos_y(input->pointer_y) - co_node->pos_y) * (co_get_pos_y(input->pointer_y) - co_node->pos_y) < 0.4 * 0.4)
+							glPushMatrix();
+							glScalef(4, 4, 4);
+							sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), 0, 0, 0);
+							glPopMatrix();
+						}
+						co_node_draw(node, type, FALSE);
+					}else
+					{
+						if(mode == COIM_NONE)
+						{
+							if(input->last_mouse_button[0] == FALSE && input->mouse_button[0] == TRUE)
 							{
-								active = e_ns_get_node_id(node);
-								mode = COIM_MOVE;
+								if((co_get_pos_x(input->pointer_x) - co_node->pos_x) * (co_get_pos_x(input->pointer_x) - co_node->pos_x) + (co_get_pos_y(input->pointer_y) - co_node->pos_y) * (co_get_pos_y(input->pointer_y) - co_node->pos_y) < 0.4 * 0.4)
+								{
+									active = e_ns_get_node_id(node);
+									mode = COIM_MOVE;
+								}
+							}
+							if(input->last_mouse_button[2] == FALSE && input->mouse_button[2] == TRUE)
+							{
+								if((co_get_pos_x(input->pointer_x) - co_node->pos_x) * (co_get_pos_x(input->pointer_x) - co_node->pos_x) + (co_get_pos_y(input->pointer_y) - co_node->pos_y) * (co_get_pos_y(input->pointer_y) - co_node->pos_y) < 0.4 * 0.4)
+								{
+									active = e_ns_get_node_id(node);
+									mode = COIM_POPUP;
+								}
+							}
+							if(input->last_mouse_button[1] == FALSE && input->mouse_button[1] == TRUE)
+							{
+								if((co_get_pos_x(input->pointer_x) - co_node->pos_x) * (co_get_pos_x(input->pointer_x) - co_node->pos_x) + (co_get_pos_y(input->pointer_y) - co_node->pos_y) * (co_get_pos_y(input->pointer_y) - co_node->pos_y) < 0.4 * 0.4)
+								{
+									co_center(co_node->pos_x, co_node->pos_y);
+								}
 							}
 						}
-						if(input->last_mouse_button[2] == FALSE && input->mouse_button[2] == TRUE)
+						if(mode == COIM_MOVE && active == e_ns_get_node_id(node))
 						{
-							if((co_get_pos_x(input->pointer_x) - co_node->pos_x) * (co_get_pos_x(input->pointer_x) - co_node->pos_x) + (co_get_pos_y(input->pointer_y) - co_node->pos_y) * (co_get_pos_y(input->pointer_y) - co_node->pos_y) < 0.4 * 0.4)
+							if(0.025 * 0.025 < (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
 							{
-								active = e_ns_get_node_id(node);
-								mode = COIM_POPUP;
+								co_node->pos_x = co_get_pos_x(input->pointer_x);
+								co_node->pos_y = co_get_pos_y(input->pointer_y);
+							}
+							if(input->last_mouse_button[0] == TRUE && input->mouse_button[0] == FALSE)
+							{
+								mode = COIM_NONE;
+								if(0.025 * 0.025 > (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
+									mode = COIM_POPUP;
 							}
 						}
-						if(input->last_mouse_button[1] == FALSE && input->mouse_button[1] == TRUE)
-						{
-							if((co_get_pos_x(input->pointer_x) - co_node->pos_x) * (co_get_pos_x(input->pointer_x) - co_node->pos_x) + (co_get_pos_y(input->pointer_y) - co_node->pos_y) * (co_get_pos_y(input->pointer_y) - co_node->pos_y) < 0.4 * 0.4)
-							{
-								co_center(co_node->pos_x, co_node->pos_y);
-							}
-						}
 					}
-					if(mode == COIM_MOVE && active == e_ns_get_node_id(node))
+					if(type == V_NT_OBJECT && mode != COIM_CREATE && mode != COIM_POPUP)
 					{
-						if(0.025 * 0.025 < (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
-						{
-							co_node->pos_x = co_get_pos_x(input->pointer_x);
-							co_node->pos_y = co_get_pos_y(input->pointer_y);
-						}
-						if(input->last_mouse_button[0] == TRUE && input->mouse_button[0] == FALSE)
-						{
-							mode = COIM_NONE;
-							if(0.025 * 0.025 > (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
-								mode = COIM_POPUP;
-						}
-					}
-				}
-				if(type == V_NT_OBJECT && mode != COIM_CREATE && mode != COIM_POPUP)
-				{
-					uint i = 0;
-					EObjLink *link;
-					for(link = e_nso_get_next_link(node, 0); link != NULL; link = e_nso_get_next_link(node, e_nso_get_link_id(link) + 1))
-					{
-						COVerseNode *co_link = NULL;
-						ENode *link_node;
-						if((link_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL)
-							co_link = e_ns_get_custom_data(link_node, CONNECTOR_ENOUGH_SLOT);
-
-						if(co_link != NULL && co_link->hidden == TRUE)
-						{
-							co_link->hidden = FALSE;
-							co_link->pos_x = co_node->pos_x + 2;
-							co_link->pos_y = co_node->pos_y + 2 - i;
-						}
-
-						if((co_link != NULL && co_vng_render_link(input, i, TRUE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), -co_node->pos_x + co_link->pos_x, -co_node->pos_y + co_link->pos_y, e_nso_get_link_name(link)))
-						||	(co_link == NULL && co_vng_render_link(input, i, FALSE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), 0, 0, e_nso_get_link_name(link))))
-						{
-							mode = COIM_LINK;
-							link_id = e_nso_get_link_id(link);
-							active = e_ns_get_node_id(node);
-						}
-						i++;
-					}
-					if(co_vng_render_link(input, i, FALSE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), 0, 0, "New"))
-					{
-						mode = COIM_LINK;
-						link_id = -1;
-						active = e_ns_get_node_id(node);
-					}
-				}
-				if(type == V_NT_MATERIAL && mode != COIM_CREATE && mode != COIM_POPUP)
-				{
-					VNMFragmentID i;
-					uint j = 0;
-					VMatFrag *frag, f;
-	
-					for(i = e_nsm_get_fragment_next(node, 0); i != (VNMFragmentID)-1; i = e_nsm_get_fragment_next(node, i + 1))
-					{
-						if(VN_M_FT_TEXTURE == e_nsm_get_fragment_type(node, i))
+						uint i = 0;
+						EObjLink *link;
+						for(link = e_nso_get_next_link(node, 0); link != NULL; link = e_nso_get_next_link(node, e_nso_get_link_id(link) + 1))
 						{
 							COVerseNode *co_link = NULL;
 							ENode *link_node;
-							frag = e_nsm_get_fragment(node, i);
-							if((link_node = e_ns_get_node(0, frag->texture.bitmap)) != NULL)
+							if((link_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL)
 								co_link = e_ns_get_custom_data(link_node, CONNECTOR_ENOUGH_SLOT);
 
 							if(co_link != NULL && co_link->hidden == TRUE)
@@ -538,57 +444,102 @@ void co_input_handler(BInputState *input, void *user_pointer)
 								co_link->pos_y = co_node->pos_y + 2 - i;
 							}
 
-							if((co_link != NULL && co_vng_render_link(input, j, TRUE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), -co_node->pos_x + co_link->pos_x, -co_node->pos_y + co_link->pos_y, "Texture"))
-							||	(co_link == NULL && co_vng_render_link(input, j, FALSE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), 0, 0, "Texture")))
+							if((co_link != NULL && co_vng_render_link(input, i, TRUE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), -co_node->pos_x + co_link->pos_x, -co_node->pos_y + co_link->pos_y, e_nso_get_link_name(link)))
+							||	(co_link == NULL && co_vng_render_link(input, i, FALSE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), 0, 0, e_nso_get_link_name(link))))
 							{
 								mode = COIM_LINK;
-								link_id = i;
+								link_id = e_nso_get_link_id(link);
 								active = e_ns_get_node_id(node);
 							}
-							j++;
+							i++;
 						}
-					}
-				}
-				if(mode != COIM_POPUP)
-				{
-					switch(co_vng_render_name(input, e_ns_get_node_name(node), co_node->pos_x, co_node->pos_y, co_get_pos_x(input->pointer_x), co_get_pos_y(input->pointer_y)))
-					{
-						case 1:
-							verse_send_node_destroy(e_ns_get_node_id(node));
-						break;
-						case 2:
-							co_node->hidden = TRUE;
-						break;
-						case 3:
+						if(co_vng_render_link(input, i, FALSE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), 0, 0, "New"))
 						{
-						/*	uint i;
-							ENode *link;
-							for(i = 0; i < V_NT_NUM_TYPES; i++)
-							{
-								e_nso_get_link(node, i);
-								link = e_ns_get_node(0, e_nso_get_link(node, i));
-								if(link != NULL && (co_node = e_ns_get_custom_data(link, CONNECTOR_ENOUGH_SLOT)) != NULL)
-									co_node->hidden = TRUE;
-							}*/
+							mode = COIM_LINK;
+							link_id = -1;
+							active = e_ns_get_node_id(node);
 						}
-						break;
-						case 4:
-							co_node->hidden = TRUE;
-						break;
+					}
+					if(type == V_NT_MATERIAL && mode != COIM_CREATE && mode != COIM_POPUP)
+					{
+						VNMFragmentID i;
+						uint j = 0;
+						VMatFrag *frag, f;
+		
+						for(i = e_nsm_get_fragment_next(node, 0); i != (VNMFragmentID)-1; i = e_nsm_get_fragment_next(node, i + 1))
+						{
+							if(VN_M_FT_TEXTURE == e_nsm_get_fragment_type(node, i))
+							{
+								COVerseNode *co_link = NULL;
+								ENode *link_node;
+								frag = e_nsm_get_fragment(node, i);
+								if((link_node = e_ns_get_node(0, frag->texture.bitmap)) != NULL)
+									co_link = e_ns_get_custom_data(link_node, CONNECTOR_ENOUGH_SLOT);
+
+								if(co_link != NULL && co_link->hidden == TRUE)
+								{
+									co_link->hidden = FALSE;
+									co_link->pos_x = co_node->pos_x + 2;
+									co_link->pos_y = co_node->pos_y + 2 - i;
+								}
+
+								if((co_link != NULL && co_vng_render_link(input, j, TRUE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), -co_node->pos_x + co_link->pos_x, -co_node->pos_y + co_link->pos_y, "Texture"))
+								||	(co_link == NULL && co_vng_render_link(input, j, FALSE, -co_node->pos_x + co_get_pos_x(input->pointer_x), -co_node->pos_y + co_get_pos_y(input->pointer_y), 0, 0, "Texture")))
+								{
+									mode = COIM_LINK;
+									link_id = i;
+									active = e_ns_get_node_id(node);
+								}
+								j++;
+							}
+						}
+					}
+					if(mode != COIM_POPUP)
+					{
+						switch(co_vng_render_name(input, e_ns_get_node_name(node), co_node->pos_x, co_node->pos_y, co_get_pos_x(input->pointer_x), co_get_pos_y(input->pointer_y)))
+						{
+							case 1:
+								verse_send_node_destroy(e_ns_get_node_id(node));
+							break;
+							case 2:
+								co_node->hidden = TRUE;
+							break;
+							case 3:
+							{
+							/*	uint i;
+								ENode *link;
+								for(i = 0; i < V_NT_NUM_TYPES; i++)
+								{
+									e_nso_get_link(node, i);
+									link = e_ns_get_node(0, e_nso_get_link(node, i));
+									if(link != NULL && (co_node = e_ns_get_custom_data(link, CONNECTOR_ENOUGH_SLOT)) != NULL)
+										co_node->hidden = TRUE;
+								}*/
+							}
+							break;
+							case 4:
+								co_node->hidden = TRUE;
+							break;
+						}
+					}
+					if(input->mode == BAM_DRAW)
+						glPopMatrix();
+				}else if(input->mode == BAM_DRAW && mode == COIM_CREATE)
+				{
+					float y;
+					y = /*co_get_pos_y*/((float)type_count * -0.2);
+					if(y < 1 && y > -1)
+					{
+						glPushMatrix();
+						glTranslatef(co_get_pos_x(((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8),
+							co_get_pos_y((float)type_count * -0.2), 0);
+						glScalef(view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move));
+						co_node_draw(node, type, FALSE);
+						glScalef(4, 4, 4);
+						sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), 0.5, 0.5, 0.5);
+						glPopMatrix();
 					}
 				}
-				if(input->mode == BAM_DRAW)
-					glPopMatrix();
-			}else if(input->mode == BAM_DRAW && mode == COIM_CREATE)
-			{
-				glPushMatrix();
-				glTranslatef(co_get_pos_x(((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8),
-					co_get_pos_y((float)type_count * -0.2), 0);
-				glScalef(view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move));
-				co_node_draw(node, type, FALSE);
-				glScalef(4, 4, 4);
-				sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), 0.5, 0.5, 0.5);
-				glPopMatrix();
 			}
 		}
 	}
@@ -630,13 +581,13 @@ void co_input_handler(BInputState *input, void *user_pointer)
 				}
 			}
 		}
-
-		if(input->mode != BAM_DRAW) /*&& co_node_create_draw(input)*/
+			
+		if(input->mode != BAM_DRAW)
 		{
 			if(input->last_mouse_button[0] == TRUE)
 				if(0.05 * 0.05 < (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
 					create_scroll -= input->delta_pointer_y * 5;
-			if(0.05 * 0.05 > (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y) && input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE)
+			if(0.05 * 0.05 > (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y) && ((input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE) || (input->mouse_button[2] == FALSE && input->last_mouse_button[2] == TRUE)))
 			{
 				for(type = 0; type < V_NT_NUM_TYPES; type++)
 				{
@@ -644,7 +595,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 					for(node = e_ns_get_node_next(0, 0, type); node != 0; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, type))
 					{
 						co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
-						if(co_node != NULL /*&& co_search_node(node, search)*/)
+						if(co_node != NULL && co_search_node(node, search))
 						{
 							x = ((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8;
 							if((input->pointer_x - x) * (input->pointer_x - x) + (input->pointer_y - (type_count * -0.2)) * (input->pointer_y - (type_count * -0.2)) < 0.2 * 0.2 * 0.4 * 0.4)
@@ -653,11 +604,15 @@ void co_input_handler(BInputState *input, void *user_pointer)
 								co_node->pos_x = co_get_pos_x(x);
 								co_node->pos_y = co_get_pos_y(type_count * -0.2);				
 							}
+							type_count++;
 						}
-						type_count++;
 					}
 				}
-				mode = COIM_NONE;
+				if(input->last_mouse_button[0] == TRUE)
+				{
+					betray_end_type_in_mode(TRUE);
+					mode = COIM_NONE;
+				}
 			}
 		}
 	}
@@ -752,10 +707,33 @@ void co_input_handler(BInputState *input, void *user_pointer)
 					break;
 			}
 		}
+		if(mode == COIM_NONE && betray_is_type_in())
+			betray_end_type_in_mode(TRUE);
 	}else
 		popup_move = popup_move * 0.95;
 	if(input->mode == BAM_DRAW)
 		glPopMatrix();
+
+	if(mode == COIM_CREATE)
+	{
+		if(!betray_is_type_in())
+		{
+			search_cursor = 0;
+		//	betray_start_type_in(search, 64, NULL, search_cursor, NULL);
+		}
+		if(search[0] != 0)
+		{
+			float length;
+			static boolean state = TRUE;
+			static uint cursor;
+			glPushMatrix();
+			glTranslatef(0, 0, -1);
+			length = sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, search);
+			sui_draw_text(length * -0.5, 0.0, SUI_T_SIZE, SUI_T_SPACE, search, 0, 0, 0);
+		//	co_w_checkbox(input, length * -0.5, 0, &state, 0, 0, 0);
+			glPopMatrix();
+		}
+	}
 	glEnable(GL_DEPTH_TEST);
 }
 
