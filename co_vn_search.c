@@ -16,7 +16,9 @@ boolean co_text_search(const char *text, const char *search)
 	{
 		if(text[i] == search[0] || search[0] + 32 == text[i] || search[0] - 32 == text[i])
 		{
-			for(j = 0; text[i + j] != 0 && search[j] != 0 && (text[i + j] == search[j] || (text[i + j] > 64 && text[i + j] < 91 && text[i + j] + 32 == search[j]) || (search[j] > 64 && search[j] < 91 && search[j] + 32 == text[i + j])); j++);
+			for(j = 0; text[i + j] != 0 && search[j] != 0 && (text[i + j] == search[j] ||
+				  (text[i + j] > 64 && text[i + j] < 91 && text[i + j] + 32 == search[j]) ||
+				  (search[j] > 64 && search[j] < 91 && search[j] + 32 == text[i + j])); j++);
 			if(search[j] == 0)
 				return TRUE;
 		}
