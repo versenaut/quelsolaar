@@ -46,6 +46,8 @@ struct{
 	double		*data;
 	double		*normal;
 	uint		data_length;
+	double		*tags;
+	uint		tag_length;
 	boolean		hide;
 	double		min_scale[3];
 	double		max_scale[3];
@@ -208,6 +210,8 @@ void la_t_tm_init(void)
 	GlobalTransformManipulator.mode = TMM_IDLE;
 	GlobalTransformManipulator.data = NULL;
 	GlobalTransformManipulator.hide = TRUE;
+	GlobalTransformManipulator.tags = NULL;
+	GlobalTransformManipulator.tag_length = 0;
 }
 
 void la_t_tm_place(double x, double y, double z)
@@ -362,7 +366,8 @@ void compute_tangent(double *vertex, uint edge_a, uint edge_b, uint other)
 void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent, boolean smooth)
 {
 	ENode *node;
-	uint i, j, *ref, ref_count, vertex_count;
+	UNDOTag *tag;
+	uint i, j, *ref, ref_count, vertex_count, count;
 	double select, *vertex;
 	boolean computed;
 	udg_get_geometry(&vertex_count, &ref_count, &vertex, &ref, NULL);
@@ -613,6 +618,19 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 					j++;
 				}
 			}
+		}
+	}else
+	{
+		tag = udg_get_tags(&GlobalTransformManipulator.tag_length);
+		for(i = 0; i < GlobalTransformManipulator.tag_length && tag[i].select < 0.01; i++);
+		if(i == GlobalTransformManipulator.tag_length)
+			return;
+		GlobalTransformManipulator.tags = malloc((sizeof *GlobalTransformManipulator.tags) * GlobalTransformManipulator.tag_length * 3);
+		for(i = 0; i < GlobalTransformManipulator.tag_length; i++)
+		{
+			GlobalTransformManipulator.tags[i * 3] = tag[i].vec[0];
+			GlobalTransformManipulator.tags[i * 3 + 1] = tag[i].vec[1];
+			GlobalTransformManipulator.tags[i * 3 + 2] = tag[i].vec[2];
 		}
 	}
 }
@@ -900,6 +918,28 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 		data = matrix;
 	}
 
+	if(func == matrix_func && GlobalTransformManipulator.tags != NULL)
+	{	
+		UNDOTag *tag;
+		tag = udg_get_tags(&i);
+		if(i == GlobalTransformManipulator.tag_length)
+		{
+			for(i = 0; i < GlobalTransformManipulator.tag_length; i++)
+			{
+				vertex[0] = GlobalTransformManipulator.tags[i * 3];
+				vertex[1] = GlobalTransformManipulator.tags[i * 3 + 1];
+				vertex[2] = GlobalTransformManipulator.tags[i * 3 + 2];
+	
+
+				point_threw_matrix3(matrix, &vertex[0], &vertex[1], &vertex[2]);
+				vertex[0] = vertex[0] * tag[i].select + GlobalTransformManipulator.tags[i * 3] * (1 - tag[i].select);
+				vertex[1] = vertex[1] * tag[i].select + GlobalTransformManipulator.tags[i * 3 + 1] * (1 - tag[i].select);
+				vertex[2] = vertex[2] * tag[i].select + GlobalTransformManipulator.tags[i * 3 + 2] * (1 - tag[i].select);
+				udg_move_tag(i, vertex);
+			}
+		}
+	}
+
 
 	if(data != NULL)
 	{
@@ -932,6 +972,8 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 			}
 		}
 	}
+
+
 	if(input->mouse_button[0] != TRUE && input->last_mouse_button[0] != TRUE)
 	{
 		if(GlobalTransformManipulator.data != NULL);
@@ -940,6 +982,11 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 		{
 			free(GlobalTransformManipulator.manipulator_normal_array);
 			free(GlobalTransformManipulator.normal);
+		}
+		if(GlobalTransformManipulator.tags != NULL)
+		{
+			free(GlobalTransformManipulator.tags);
+			GlobalTransformManipulator.tags = NULL;
 		}
 		GlobalTransformManipulator.mode = TMM_IDLE;
 	}

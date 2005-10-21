@@ -544,14 +544,17 @@ void la_pfx_create_bright(double *pos)
 
 void la_pfx_create_dust_line(double *pos_a, double *pos_b)
 {
-	double pos[3], size, count, i;
+	double pos[3], size, step, count, i;
 	count = sqrt((pos_a[0] - pos_b[0]) * (pos_a[0] - pos_b[0]) + (pos_a[1] - pos_b[1]) * (pos_a[1] - pos_b[1]) + (pos_a[2] - pos_b[2]) * (pos_a[2] - pos_b[2]));
 	p_get_view_camera(pos);
 	pos[0] -= (pos_a[0] + pos_b[0]) * 0.5;
 	pos[1] -= (pos_a[1] + pos_b[1]) * 0.5;
 	pos[2] -= (pos_a[2] + pos_b[2]) * 0.5;
 	size = sqrt(pos[0] * pos[0] + pos[1] * pos[1] + pos[2] * pos[2]);
-	for(i = 0.1; i < 0.9; i += size / (count * GlobalParticleData.dust_length * 0.2))
+	step = size / (count * GlobalParticleData.dust_length * 0.2);
+	if(step  < 0.01)
+			step  = 0.01;
+	for(i = 0.1; i < 0.9; i += step)
 	{
 		pos[0] = pos_a[0] * i + pos_b[0] * (1.0 - i);
 		pos[1] = pos_a[1] * i + pos_b[1] * (1.0 - i);
@@ -564,7 +567,7 @@ void la_pfx_create_dust_selected_vertexes(double *mid)
 {
 	double pos[3], size;
 	uint32 vertex_count, i, j;
-	egreal *vertex;
+	double *vertex;
 	DustParticle *p;
 
 	udg_get_geometry(&vertex_count, NULL, &vertex, NULL, NULL);

@@ -223,6 +223,7 @@ boolean la_pu_empty(BInputState *input)
 	{
 		case 0 :
 	//		betray_set_action_func(draw_settings_menu, NULL);
+			geometry_load_obj(NULL, "./girl_hi.obj");
 		break;
 		case 1 :
 			udg_undo_geometry();
@@ -289,7 +290,7 @@ void la_pu_vertex(BInputState *input, uint vertex)
 
 void la_pu_manipulator(BInputState *input)
 {
-	SUIPUElement element[165];
+	SUIPUElement element[17];
 	static float x, y;
 	uint ring;
 	element[0].type = PU_T_ANGLE;
@@ -325,7 +326,7 @@ void la_pu_manipulator(BInputState *input)
 	element[8].text = "Delete";
 	element[9].type = PU_T_TOP;
 	element[9].text = "Mirror";
-	element[10].type = PU_T_BOTTOM;
+	element[10].type = PU_T_TOP;
 	element[10].text = "Flatten";
 	element[11].type = PU_T_BOTTOM;
 	element[11].text = "Slice";
@@ -334,7 +335,11 @@ void la_pu_manipulator(BInputState *input)
 	element[13].type = PU_T_BOTTOM;
 	element[13].text = "Weld";
 	element[14].type = PU_T_BOTTOM;
-	element[14].text = "Center";
+	element[14].text = "Center Geometry";
+	element[15].type = PU_T_BOTTOM;
+	element[15].text = "Center Manipulator";
+	element[16].type = PU_T_BOTTOM;
+	element[16].text = "Create Tag";
 	if(input->mode == BAM_DRAW)
 	{
 		glDisable(GL_DEPTH_TEST);
@@ -348,7 +353,7 @@ void la_pu_manipulator(BInputState *input)
 		x = input->pointer_x;
 		y = input->pointer_y;
 	}
-	ring = sui_draw_popup(input, x, y, element, 15, 2, 0);
+	ring = sui_draw_popup(input, x, y, element, 16, 2, 0);
 	switch(ring)
 	{
 		case 0 :
@@ -391,6 +396,7 @@ void la_pu_manipulator(BInputState *input)
 			la_t_tm_get_pos(pos);
 			la_t_tm_get_vector(vector);
 			la_t_mirror(pos, vector);
+			la_t_flip_selected_polygons();
 		}
 		break;
 		case 10 :
@@ -424,23 +430,19 @@ void la_pu_manipulator(BInputState *input)
 		break;
 		case 14 :
 		{
-			uint i, vertex_id[7];
-			for(i = 0; i < 7; i++)
-				vertex_id[i] = udg_find_empty_slot_vertex();
-			udg_vertex_set(vertex_id[0], NULL, 0, 0, 0);
-			udg_vertex_set(vertex_id[1], NULL, 0.1, 0, 0);
-			udg_vertex_set(vertex_id[2], NULL, -0.1, 0, 0);
-			udg_vertex_set(vertex_id[3], NULL, 0, 0.1, 0);
-			udg_vertex_set(vertex_id[4], NULL, 0, -0.1, 0);
-			udg_vertex_set(vertex_id[5], NULL, 0, 0, 0.1);
-			udg_vertex_set(vertex_id[6], NULL, 0, 0, -0.1);
-			udg_create_edge(vertex_id[0], vertex_id[1]);
-			udg_create_edge(vertex_id[0], vertex_id[2]);
-			udg_create_edge(vertex_id[0], vertex_id[3]);
-			udg_create_edge(vertex_id[0], vertex_id[4]);
-			udg_create_edge(vertex_id[0], vertex_id[5]);
-			udg_create_edge(vertex_id[0], vertex_id[6]);
-			undo_event_done();
+			la_t_center_geometry();
+		}
+		break;
+		case 15 :
+		{
+			la_t_center_manipulator();
+		}
+		break;
+		case 16 :
+		{
+			double pos[3];
+			la_t_tm_get_pos(pos);
+			udg_create_tag(pos);
 		}
 		break;
 	}
@@ -503,7 +505,7 @@ void la_pu_edge(BInputState *input, uint *edge)
 			la_t_select_open_edge();
 		break;
 		case 1 :
-			la_t_revolve(edge, 16);
+			la_t_revolve(edge, 18);
 		break;
 		case 2 :
 			la_t_tube(edge, 8);
@@ -543,33 +545,45 @@ void la_pu_edge(BInputState *input, uint *edge)
 
 void la_pu_polygon(BInputState *input, uint polygon)
 {
-	SUIPUElement element[6];
+	SUIPUElement element[8];
 	static float x, y;
 	uint ring;
 	element[0].type = PU_T_ANGLE;
 	element[0].text = "Mirror";
 	element[0].data.angle[0] = 0;
-	element[0].data.angle[1] = 60;
+	element[0].data.angle[1] = 360.0 / 7.0;
 	element[1].type = PU_T_ANGLE;
 	element[1].text = "Flatten";
-	element[1].data.angle[0] = 60;
-	element[1].data.angle[1] = 120;
+	element[1].data.angle[0] = 360.0 / 7.0;
+	element[1].data.angle[1] = 360.0 / 7.0 * 2.0;
 	element[2].type = PU_T_ANGLE;
 	element[2].text = "Fill Selection";
-	element[2].data.angle[0] = 120;
-	element[2].data.angle[1] = 180;
+	element[2].data.angle[0] = 360.0 / 7.0 * 2.0;
+	element[2].data.angle[1] = 360.0 / 7.0 * 3.0;
 	element[3].type = PU_T_ANGLE;
 	element[3].text = "Deploy";
-	element[3].data.angle[0] = 180;
-	element[3].data.angle[1] = 240;
+	element[3].data.angle[0] = 360.0 / 7.0 * 3.0;
+	element[3].data.angle[1] = 360.0 / 7.0 * 4.0;
 	element[4].type = PU_T_ANGLE;
 	element[4].text = "Slice";
-	element[4].data.angle[0] = 240;
-	element[4].data.angle[1] = 300;
+	element[4].data.angle[0] = 360.0 / 7.0 * 4.0;
+	element[4].data.angle[1] = 360.0 / 7.0 * 5.0;
 	element[5].type = PU_T_ANGLE;
 	element[5].text = "Slice Off";
-	element[5].data.angle[0] = 300;
-	element[5].data.angle[1] = 360;
+	element[5].data.angle[0] = 360.0 / 7.0 * 5.0;
+	element[5].data.angle[1] = 360.0 / 7.0 * 6.0;
+	element[6].type = PU_T_ANGLE;
+	element[6].text = "Split";
+	element[6].data.angle[0] = 360.0 / 7.0 * 6.0;
+	element[6].data.angle[1] = 360;
+
+	element[7].type = PU_T_ANGLE;
+	element[7].text = "Splt";
+	element[7].data.angle[0] = 360.0 - 1;
+	element[7].data.angle[1] = 360;
+
+
+
 
 	if(input->mode == BAM_DRAW)
 	{
@@ -584,7 +598,7 @@ void la_pu_polygon(BInputState *input, uint polygon)
 		x = input->pointer_x;
 		y = input->pointer_y;
 	}
-	ring = sui_draw_popup(input, x, y, element, 6, 2, 0);
+	ring = sui_draw_popup(input, x, y, element, 7, 2, 0);
 	switch(ring)
 	{
 		case 0 :
@@ -594,6 +608,7 @@ void la_pu_polygon(BInputState *input, uint polygon)
 			udg_get_geometry(NULL, NULL, NULL, &ref, NULL);
 			la_t_face_vector(origo, vector, ref[polygon * 4], ref[polygon * 4 + 1], ref[polygon * 4 + 2]);
 			la_t_mirror(origo, vector);
+			la_t_flip_selected_polygons();
 		}
 		break;
 		case 1 :
@@ -629,7 +644,12 @@ void la_pu_polygon(BInputState *input, uint polygon)
 			la_t_slice(origo, vector, TRUE);
 		}
 		break;
+		case 6 :
+			la_t_poly_spliter(polygon);
+		break;
 
+
+		
 	}
 //	sw_drawbackground();
 	if(input->mode == BAM_DRAW)

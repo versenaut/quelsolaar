@@ -393,6 +393,8 @@ void la_t_flip_selected_polygons(void)
 
 	udg_get_geometry(&vertex_length, &ref_length, NULL, &ref, &crease);
 	select = convert_to_poly_selection(ref, ref_length, vertex_length, NULL);
+	if(select == NULL)
+		return;
 	ref_length *= 4;
 	for(i = 0; i < ref_length; i += 4)
 	{

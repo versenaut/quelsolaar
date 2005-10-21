@@ -444,6 +444,94 @@ void p_find_closest_vertex(uint *closest, uint *selected, double *distance, doub
 	}
 }
 
+boolean p_find_closest_tag(double *pos, double distance, double x, double y)
+{
+	boolean output = FALSE;
+	uint32 count, i;
+	double r;
+	UNDOTag	*tag;
+	tag = udg_get_tags(&count);
+	for(i = 0; i < count; i++)
+	{
+		p_get_projection_screen(pos, tag[i].vec[0], tag[i].vec[1], tag[i].vec[2]);
+		if(pos[2] < 0)
+		{
+			pos[0] += x;
+			pos[1] += y;
+			r = pos[0] * pos[0] + pos[1] * pos[1];
+			if(r < distance && tag[i].select < 0.001)
+			{
+				distance = r;
+				pos[0] = tag[i].vec[0];
+				pos[1] = tag[i].vec[1];
+				pos[2] = tag[i].vec[2];
+				output = TRUE;
+			}
+		}
+	}
+	return output;
+}
+
+uint p_find_click_tag(double x, double y)
+{
+	uint32 count, i, output = -1;
+	double r, pos[3];
+	UNDOTag	*tag;
+	tag = udg_get_tags(&count);
+	for(i = 0; i < count; i++)
+	{
+		p_get_projection_screen(pos, tag[i].vec[0], tag[i].vec[1], tag[i].vec[2]);
+		if(pos[2] < 0)
+		{
+			pos[0] += x;
+			pos[1] += y;
+			r = pos[0] * pos[0] + pos[1] * pos[1];
+			if(r < 0.001)
+			{
+				output = i;
+			}
+		}
+	}
+	return output;
+}
+
+boolean p_find_click_tag_lable(double x, double y)
+{
+	uint32 count, i;
+	double f, f2, pos[3];
+	UNDOTag	*tag;
+	tag = udg_get_tags(&count);
+	for(i = 0; i < count; i++)
+	{
+		p_get_projection_screen(pos, tag[i].vec[0], tag[i].vec[1], tag[i].vec[2]);
+		if(pos[2] < 0 && pos[1] - 0.02 < -y && pos[1] + 0.02 > -y)
+		{
+			f = sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, tag[i].group);
+			f2 = sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, tag[i].tag);
+			if(pos[0] > -x && pos[0] - (f + f2 + 0.06) < -x)
+
+			
+//			if(sui_box_click_test(pos[0] - f + 0.04, pos[1] + 0.03, -f - 0.04 , -0.06))
+		//	if(sui_box_click_test(pos[0] - f + 0.04, pos[1] + 0.03, -f - 0.04 , -0.06))
+			{
+				udg_rename_tag(i);
+				return TRUE;
+			}
+/*			if(sui_box_click_test(pos[0] + f + 0.04, pos[1] + 0.03, sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, tag[i].tag) + 0.02 , -0.06))
+			{
+				exit(0);
+				udg_rename_tag_group(i);
+				return TRUE;
+			}*/
+		}
+	}
+	return FALSE;
+}
+
+/*
+						udg_rename_tag(uint tag);
+extern void		udg_rename_group(uint tag);
+*/
 boolean p_find_closest_edge_test(double *a, double *b, double x, double y)
 {
 	double temp, r;

@@ -78,13 +78,18 @@ extern void		la_t_smooth_select(void);
 
 extern void 	la_t_edge_splitter_start(BInputState *input, uint *edge);
 extern void 	la_t_edge_splitter(BInputState *input);
+extern void		la_t_poly_spliter(uint id);
 
 /* la_tool_deply.c */
 
 extern void 	la_t_deploy(uint poly);
 extern void		la_t_polygon_select_fill(uint poly);
+
 /* la_tool_slice.c */
 
 extern void		la_t_slice(double *pos, double *vector, boolean del);
 
+/* la_tool_center.c */
 
+extern void		la_t_center_geometry();
+extern void		la_t_center_manipulator();

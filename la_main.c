@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 	p_op_lod_set_tess_levels(limit, 5);
 	p_op_service_set_auto(TRUE); /* choosing to run enough lib in auto service mode */
 #ifdef PERSUADE_H
-	persuade_init(5, betray_get_gl_proc_address());
+	persuade_init(3, betray_get_gl_proc_address());
 #endif
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);/*GL_AMBIENT_AND_DIFFUSE*/
 

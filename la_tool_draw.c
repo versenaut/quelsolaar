@@ -11,7 +11,7 @@
 #define DRAW_LINE_LENGTH 4096
 #define RING_SECTIONS 17
 #define DRAW_CLOSE_RANGE 0.05
-#define DRAW_SEGMENT_LENGTH 0.02
+#define DRAW_SEGMENT_LENGTH 0.01
 
 struct{
 	float		*array;
@@ -277,11 +277,16 @@ boolean la_t_draw_line_draw_delete_overlay(void)
 	return del;
 }
 
+
+/*
+
+*/
 boolean la_t_draw_line_test_select(SelectionMode mode)
 {
 	double *vertex, pos[3];
 	boolean output = FALSE;
 	uint length, i, k, front, *ref;
+	UNDOTag	*tag;
     udg_get_geometry(&length, NULL, &vertex, NULL, NULL);
     GlobalDrawLine.array[GlobalDrawLine.array_length * 2] = GlobalDrawLine.array[0];
     GlobalDrawLine.array[GlobalDrawLine.array_length * 2 + 1] = GlobalDrawLine.array[1];
@@ -325,6 +330,43 @@ boolean la_t_draw_line_test_select(SelectionMode mode)
 			}
 		}
 	}
-
+	tag = udg_get_tags(&length);
+    for(i = 0; i < length; i++)
+	{
+        front = 0;
+        p_get_projection_screen(pos, tag[i].vec[0], tag[i].vec[1], tag[i].vec[2]);
+        pos[0] = pos[0] / -1;
+        pos[1] = pos[1] / -1;
+        // if(pos[2] > 0)
+        for(k = 0; k < GlobalDrawLine.array_length * 2; k += 2)
+            if((GlobalDrawLine.array[k + 1] > pos[1] && GlobalDrawLine.array[k + 3] < pos[1]) || (GlobalDrawLine.array[k + 1] < pos[1] && GlobalDrawLine.array[k + 3] > pos[1]))
+                if((((pos[1] - GlobalDrawLine.array[k + 3]) / (GlobalDrawLine.array[k + 1] - GlobalDrawLine.array[k + 3])) * (GlobalDrawLine.array[k] - GlobalDrawLine.array[k + 2])) > pos[0] - GlobalDrawLine.array[k + 2])
+                    front++;
+        if(front % 2 == 1 /*&&front % 2 == 1*/)
+        {
+            output = TRUE;
+            switch(mode)
+            {
+            case SM_SELECT :
+                udg_select_tag(i, 1);
+            break;
+            case SM_DESELECT :
+                udg_select_tag(i, 0);
+            break;					
+            case SM_SUB :
+                if(tag[i].select - 0.25 > 0)
+                    udg_select_tag(i, tag[i].select - 0.25);
+                else
+                    udg_set_select(i, 0);
+            break;
+            case SM_ADD :
+                if(tag[i].select + 0.25 < 1)
+                    udg_select_tag(i, tag[i].select + 0.25);
+				else
+                    udg_select_tag(i, 1);
+			break;	
+			}
+		}
+	}
 	return output;
 }

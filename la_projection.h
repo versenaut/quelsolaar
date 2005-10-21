@@ -25,3 +25,6 @@ extern uint p_get_projection_axis(void);
 
 extern void p_find_closest_vertex(uint *closest, uint *selected, double *distance, double *selected_distance, double x, double y);
 extern void p_find_closest_edge(uint *edge, double x, double y);
+extern boolean p_find_closest_tag(double *pos, double distance, double x, double y);
+extern uint p_find_click_tag(double x, double y);
+extern boolean p_find_click_tag_lable(double x, double y);

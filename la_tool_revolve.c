@@ -67,10 +67,11 @@ void create_revolve_matrix(double *matrix, uint a, uint b)
 	start[0] = 0;
 	start[1] = 0;
 	start[2] = 0;
-	if(matrix[8] > matrix[9])
-		start[0] = value;
-	else
+	
+	if(matrix[8] * matrix[8] > matrix[9] * matrix[9])
 		start[1] = value;
+	else
+		start[0] = value;
 	matrix[4] = matrix[9] * start[2] - matrix[10] * start[1];
 	matrix[5] = matrix[10] * start[0] - matrix[8] * start[2];
 	matrix[6] = matrix[8] * start[1] - matrix[9] * start[0];
