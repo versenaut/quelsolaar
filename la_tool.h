@@ -91,5 +91,5 @@ extern void		la_t_slice(double *pos, double *vector, boolean del);
 
 /* la_tool_center.c */
 
-extern void		la_t_center_geometry();
-extern void		la_t_center_manipulator();
+extern void		la_t_center_geometry(void);
+extern void		la_t_center_manipulator(void);
