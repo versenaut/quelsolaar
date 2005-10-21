@@ -168,6 +168,7 @@ void b_glut_display_func(void)
 	input->last_mouse_button[0] = input->mouse_button[0];
 	input->last_mouse_button[1] = input->mouse_button[1];
 	input->last_mouse_button[2] = input->mouse_button[2];
+	input->time++;
 }
 
 /*
