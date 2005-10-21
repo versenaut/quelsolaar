@@ -1,6 +1,4 @@
 
-#include <stdio.h>
-
 #include "verse.h"
 #include "seduce.h"
 #include "enough.h"
@@ -8,8 +6,28 @@
 #include "p_sds_obj.h"
 #include "p_task.h"
 #include "p_object.h"
+/*
+typedef struct{
+	uint32	id;
+	uint32	material;
+	uint32	target;
+	uint	vertex_version;
+	PMesh	*draw;	
+	PMesh	*progress;
+	void	*param;
+}PRenderSets;
 
-void p_status_print(void)
+typedef struct{
+	uint32		node_id;
+	PRenderSets *sets;
+	uint		set_count;
+	PRenderSets temp;
+	uint32		lights[LIGHTS_PER_OBJECT];
+	void		*environment;
+	boolean		task;
+}PObject;
+*/
+void p_status_print()
 {
 	ENode *node;
 	PMesh *o_mesh;
