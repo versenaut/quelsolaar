@@ -18,6 +18,7 @@ typedef enum {
 	PIM_SPLIT,
 	PIM_DRAG_MANIPULATOR,
 	PIM_DRAG_ONE_VERTEX,
+	PIM_DRAG_ONE_TAG,
 	PIM_SHOW_EMPTY_MENU,
 	PIM_SHOW_VERTEX_MENU,
 	PIM_SHOW_EDGE_MENU,
@@ -42,16 +43,20 @@ boolean draw_view_cage(void)
 void la_parse_input(BInputState *input)
 {
 	double output[3]; 
-	static double snap[3], distance, selected_distance;
-	static int closest, select_closest, edge[2], polygon;
+	static double snap[3], unselect_snap[3], distance, selected_distance;
+	static int closest, select_closest, edge[2], polygon, tag;
 
 	if(input->mode == BAM_EVENT)
 	{
 		distance = 1E100;
 		selected_distance = 1E100;
 		p_find_closest_vertex(&closest, &select_closest, &distance, &selected_distance, input->pointer_x, input->pointer_y);
+		udg_get_vertex_pos(snap, select_closest);
 		if(selected_distance > VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE) && ParseInputData.mode != PIM_SHOW_EDGE_MENU)
+		{
 			p_find_closest_edge(edge, input->pointer_x, input->pointer_y);
+			
+		}
 	}else
 		la_pfx_select_vertex();
 	switch(ParseInputData.mode)
@@ -65,6 +70,16 @@ void la_parse_input(BInputState *input)
 					if(la_t_tm_grab(input))
 					{
 						ParseInputData.mode = PIM_DRAG_MANIPULATOR;
+						return;
+					}
+					if(p_find_click_tag_lable(input->pointer_x, input->pointer_y))
+						return;
+
+					tag = p_find_click_tag(input->pointer_x, input->pointer_y);
+					if(tag != -1)
+					{
+						udg_get_tag_pos(tag, ParseInputData.depth);
+						ParseInputData.mode = PIM_DRAG_ONE_TAG;
 						return;
 					}
 					if(selected_distance < VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE))
@@ -277,6 +292,32 @@ void la_parse_input(BInputState *input)
 						ParseInputData.mode = PIM_IDLE;
 					}else
 						udg_vertex_move(ParseInputData.start_vertex, vertex[0], vertex[1], vertex[2]);*/
+				}else
+				{
+					la_do_xyz_lines(ParseInputData.depth, input->mouse_button[1]);
+					if(select_closest != ParseInputData.start_vertex && selected_distance < VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE) && input->mouse_button[1] == TRUE)
+						la_do_active_vertex(snap, FALSE);
+				}
+			}
+		break;
+		case PIM_DRAG_ONE_TAG :
+			{
+				double vec[3];
+				static uint collapse = 0;
+				udg_get_vertex_pos(snap, select_closest);
+				if(input->mode == BAM_EVENT)
+				{
+					p_get_projection_vertex_with_axis(vec, ParseInputData.depth, input->pointer_x, input->pointer_y, input->mouse_button[1], snap);
+					udg_move_tag(tag, vec);
+					if(input->mouse_button[0] == FALSE)
+					{
+						if(VERTEX_SNAP_DISTANCE > (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
+						{
+							udg_move_tag(tag, ParseInputData.depth);
+							udg_select_tag(tag, 1);
+						}
+						ParseInputData.mode = PIM_IDLE;
+					}
 				}else
 				{
 					la_do_xyz_lines(ParseInputData.depth, input->mouse_button[1]);

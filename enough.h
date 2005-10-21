@@ -74,6 +74,17 @@ extern char *			e_ns_get_tag_name(const ENode *node, uint16 group_id, uint16 tag
 extern VNTagType	e_ns_get_tag_type(const ENode *node, uint16 group_id, uint16 tag_id);
 extern VNTag *		e_ns_get_tag(const ENode *node, uint16 group_id, uint16 tag_id);
 
+extern void			e_ns_get_tag_by_name(const ENode *node, char *name, uint16 *group_id, uint16 *tag_id);
+extern VNTag		*e_ns_get_tag_by_type(const ENode *node, char *name, VNTagType type, uint16 *group_id, uint16 *tag_id);
+extern uint16		e_ns_get_group_by_name(const ENode *node, char *group_name);
+extern void			e_ns_get_tag_by_name_and_group(const ENode *node, char *group_name, char *tag_name, uint16 *group_id, uint16 *tag_id);
+extern VNTag		*e_ns_get_tag_by_type_and_group(const ENode *node, char *group_name, char *tag_name, VNTagType type, uint16 *group_id, uint16 *tag_id);
+
+extern void e_matrix_to_quaternionsf(float *matrix, VNQuat32 *quaternion);
+extern void e_matrix_to_quaternionsd(double *matrix, VNQuat64 *quaternion);
+extern void e_quaternions_to_matrixf(float *matrix, VNQuat32 *quaternion);
+extern void e_quaternions_to_matrixd(double *matrix, VNQuat64 *quaternion);
+
 /* object node storage ----------------------------------------------------------------------------------------------------------------*/
 
 typedef void EObjLink;
@@ -254,11 +265,11 @@ extern void				e_nsc_send_c_key_set(ENode *node, ECurve *curve, uint32 key_id, r
 
 typedef void ETextBuffer;
 
-extern const char *			e_nst_get_language(const ENode *t_node);
-extern ETextBuffer *			e_nst_get_buffer_by_name(ENode *node, char *name);
-extern ETextBuffer *			e_nst_get_buffer_by_id(ENode *node,  uint buffer_id);
-extern ETextBuffer *			e_nst_get_buffer_next(ENode *node, uint buffer_id);
-extern const char *			e_nst_get_buffer_data(ENode *node, ETextBuffer *buffer);
+extern const char *		e_nst_get_language(ENode *t_node);
+extern ETextBuffer *	e_nst_get_buffer_by_name(ENode *node, char *name);
+extern ETextBuffer *	e_nst_get_buffer_by_id(ENode *node,  uint buffer_id);
+extern ETextBuffer *	e_nst_get_buffer_next(ENode *node, uint buffer_id);
+extern const char *		e_nst_get_buffer_data(ENode *node, ETextBuffer *buffer);
 extern uint				e_nst_get_buffer_data_length(ENode *node, ETextBuffer *buffer);
 extern uint				e_nst_get_buffer_id(ETextBuffer *buffer);
 extern const char *			e_nst_get_buffer_name(ETextBuffer *buffer);

@@ -41,11 +41,28 @@ extern uint		*udg_get_edge_data(uint *count);
 extern void		udg_destroy_edge(uint id);
 extern void		udg_destroy_all_edges(void);
 
-extern uint		udg_get_version(boolean	structure, boolean vertex, boolean select, boolean edge);
+extern uint		udg_get_version(boolean	structure, boolean vertex, boolean select, boolean edge, boolean tags);
 
 extern void		udg_set_distance(uint vertex_a, uint vertex_b);
 extern double	udg_get_distance(void);
 
 extern void		udg_undo_geometry(void);
 extern void		udg_redo_geometry(void);
+
+typedef struct{
+	char	group[16];
+	char	tag[16];	
+	double	vec[3];
+	double	select;
+}UNDOTag;
+
+extern UNDOTag	*udg_get_tags(uint *count);
+extern void		udg_get_tag_pos(uint tag, double *pos);
+
+extern void		udg_create_tag(double *vec);
+extern void		udg_destory_tag(uint tag);
+extern void		udg_rename_tag(uint tag);
+extern void		udg_rename_group(uint tag);
+extern void		udg_move_tag(uint tag, double *vec);
+extern void		udg_select_tag(uint tag, double	select);
 

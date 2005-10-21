@@ -14,6 +14,12 @@ struct{
 	float		*move_vertex;
 	float		*move_vertex_shadow;
 	float		*move_vertex_color;
+	float		*tag_select;
+	float		*tag_select_shadow;
+	float		*tag_select_color;
+	float		*tag_unselect;
+	float		*tag_unselect_shadow;
+	float		*tag_unselect_color;
 	float		*tri;
 	float		*tri_normal;
 	uint		tri_count;
@@ -67,11 +73,53 @@ void la_do_init(void)
 		sui_draw_set_vec2(GlobalOverlay.move_vertex, i * 4 + 3, square[6], square[7]);
 		sui_create_shadow_edge(0.005, 4, &GlobalOverlay.move_vertex_shadow[i * 4 * 2], &GlobalOverlay.move_vertex_color[i * 4 * 4], square);
 	}
+
+	GlobalOverlay.tag_select = malloc((sizeof * GlobalOverlay.tag_select) * 4 * 6 * 2);
+	GlobalOverlay.tag_select_shadow = malloc((sizeof * GlobalOverlay.tag_select_shadow) * 16 * 6 * 2);
+	GlobalOverlay.tag_select_color = malloc((sizeof * GlobalOverlay.tag_select_color) * 16 * 6 * 4);
+	for(i = 0; i < 6; i++)
+	{
+		square[0] = 0.01 * sin((float)i * 3.14 * 0.33333333);
+		square[1] = 0.01 * cos((float)i * 3.14 * 0.33333333);
+		square[2] = 0.02 * sin((float)i * 3.14 * 0.33333333 + 0.2);
+		square[3] = 0.02 * cos((float)i * 3.14 * 0.33333333 + 0.2);
+		square[4] = 0.02 * sin((float)i * 3.14 * 0.33333333 + 0.3);
+		square[5] = 0.02 * cos((float)i * 3.14 * 0.33333333 + 0.3);
+		square[6] = 0.01 * sin((float)i * 3.14 * 0.33333333 + 0.5);
+		square[7] = 0.01 * cos((float)i * 3.14 * 0.33333333 + 0.5);
+		sui_draw_set_vec2(GlobalOverlay.tag_select, i * 4 + 0, square[0], square[1]);
+		sui_draw_set_vec2(GlobalOverlay.tag_select, i * 4 + 1, square[2], square[3]);
+		sui_draw_set_vec2(GlobalOverlay.tag_select, i * 4 + 2, square[4], square[5]);
+		sui_draw_set_vec2(GlobalOverlay.tag_select, i * 4 + 3, square[6], square[7]);
+		sui_create_shadow_edge(0.005, 4, &GlobalOverlay.tag_select_shadow[i * 4 * 2], &GlobalOverlay.tag_select_color[i * 4 * 4], square);
+	}
+
+	GlobalOverlay.tag_unselect = malloc((sizeof * GlobalOverlay.tag_unselect) * 4 * 6 * 2);
+	GlobalOverlay.tag_unselect_shadow = malloc((sizeof * GlobalOverlay.tag_unselect_shadow) * 16 * 6 * 2);
+	GlobalOverlay.tag_unselect_color = malloc((sizeof * GlobalOverlay.tag_unselect_color) * 16 * 6 * 4);
+	for(i = 0; i < 6; i++)
+	{
+		square[0] = 0.01 * sin((float)i * 3.14 * 0.33333333);
+		square[1] = 0.01 * cos((float)i * 3.14 * 0.33333333);
+		square[2] = 0.013 * sin((float)i * 3.14 * 0.33333333);
+		square[3] = 0.013 * cos((float)i * 3.14 * 0.33333333);
+		square[4] = 0.013 * sin((float)i * 3.14 * 0.33333333 + 0.5);
+		square[5] = 0.013 * cos((float)i * 3.14 * 0.33333333 + 0.5);
+		square[6] = 0.01 * sin((float)i * 3.14 * 0.33333333 + 0.5);
+		square[7] = 0.01 * cos((float)i * 3.14 * 0.33333333 + 0.5);
+		sui_draw_set_vec2(GlobalOverlay.tag_unselect, i * 4 + 0, square[0], square[1]);
+		sui_draw_set_vec2(GlobalOverlay.tag_unselect, i * 4 + 1, square[2], square[3]);
+		sui_draw_set_vec2(GlobalOverlay.tag_unselect, i * 4 + 2, square[4], square[5]);
+		sui_draw_set_vec2(GlobalOverlay.tag_unselect, i * 4 + 3, square[6], square[7]);
+		sui_create_shadow_edge(0.005, 4, &GlobalOverlay.tag_unselect_shadow[i * 4 * 2], &GlobalOverlay.tag_unselect_color[i * 4 * 4], square);
+	}
+	
 	GlobalOverlay.tri_normal = NULL;
 	GlobalOverlay.tri_count = 0;
 	GlobalOverlay.quad = NULL;
 	GlobalOverlay.quad_normal = NULL;
 	GlobalOverlay.quad_count = 0;
+	GlobalOverlay.wire_count = 0;
 }
 
 void la_do_edge_select(double *vertex_a, double *vertex_b)
@@ -177,6 +225,7 @@ void la_do_active_vertex(double *vertex, boolean move)
 		sui_draw_gl(GL_QUADS, GlobalOverlay.move_vertex, 32, 2, 0.8, 0.8, 0.8);
 		sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		sui_set_color_array_gl(GlobalOverlay.move_vertex_color, 32 * 4, 4);
+		sui_draw_gl(GL_QUADS, GlobalOverlay.move_vertex_shadow, 32 * 4, 2, 0.8, 0.8, 0.8);
 	}
 	else
 	{
@@ -184,6 +233,7 @@ void la_do_active_vertex(double *vertex, boolean move)
 		sui_draw_gl(GL_QUADS, GlobalOverlay.active_vertex, 16, 2, 0.8, 0.8, 0.8);
 		sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		sui_set_color_array_gl(GlobalOverlay.active_vertex_color, 16 * 4, 4);
+		sui_draw_gl(GL_QUADS, GlobalOverlay.active_vertex_shadow, 16 * 4, 2, 0.8, 0.8, 0.8);
 	}
 	glEnable(GL_DEPTH_TEST);
 	glPopMatrix();
@@ -458,6 +508,48 @@ void draw_persuade_surface_old(ENode *node)
 	}
 #endif
 }
+void draw_owerlay_tags(void)
+{
+	double pos[3], f, color;
+	UNDOTag	*tag;
+	uint count, i;
+	tag = udg_get_tags(&count);
+	for(i = 0; i < count; i++)
+	{
+		glPopMatrix();
+		glPopMatrix();
+		glPushMatrix();
+		p_get_projection_screen(pos, tag[i].vec[0], tag[i].vec[1], tag[i].vec[2]);
+		glDisable(GL_DEPTH_TEST);
+		glTranslated(-pos[0], -pos[1], -1);
+	//	glRotated(t++, 0, 0, 1);
+		if(tag[i].select < 0.01)
+		{
+			sui_set_blend_gl(GL_ADD, GL_ADD);
+			sui_draw_gl(GL_QUADS, GlobalOverlay.tag_unselect, 24, 2, 0.8, 0.8, 0.8);
+		/*	sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			sui_set_color_array_gl(GlobalOverlay.tag_unselect_color, 24 * 4, 4);
+			sui_draw_gl(GL_QUADS, GlobalOverlay.tag_unselect_shadow, 24 * 4, 2, 0.8, 0.8, 0.8);*/
+		}else
+		{
+			sui_set_blend_gl(GL_ADD, GL_ADD);
+			sui_draw_gl(GL_QUADS, GlobalOverlay.tag_select, 24, 2, 0.8, 0.8, 0.8);
+		/*	sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			sui_set_color_array_gl(GlobalOverlay.tag_select_color, 24 * 4, 4);
+			sui_draw_gl(GL_QUADS, GlobalOverlay.tag_select_shadow, 24 * 4, 2, 0.8, 0.8, 0.8);*/
+		}
+		color = tag[i].select * 0.5 + 0.25;
+		sui_draw_text(0.03, SUI_T_SIZE * -0.5, SUI_T_SIZE, SUI_T_SPACE, tag[i].group, color, color, color);
+		f = sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, tag[i].group);
+		sui_draw_text(0.05 + f, SUI_T_SIZE * -0.5, SUI_T_SIZE, SUI_T_SPACE, tag[i].tag, color, color, color);
+		sui_draw_2d_line_gl(0.04 + f, 0.03, 0.04 + f, -0.03, color, color, color);
+		glEnable(GL_DEPTH_TEST);
+		glPopMatrix();
+		glPushMatrix();
+		p_view_set();
+		glPushMatrix();
+	}
+}
 void draw_owerlay_surface(void)
 {
 	static uint version, draw;
@@ -466,7 +558,7 @@ void draw_owerlay_surface(void)
 
 	float x, y, z, x2, y2, z2, x3, y3, z3, r;
 
-	if(GlobalOverlay.surface_version != udg_get_version(TRUE, TRUE, FALSE, FALSE))
+	if(GlobalOverlay.surface_version != udg_get_version(TRUE, TRUE, FALSE, FALSE, FALSE))
 	{	
 		udg_get_geometry(&length, &ref_length, &vertex, &ref, &crease);
 		if(GlobalOverlay.tri_count != 0)
@@ -482,6 +574,11 @@ void draw_owerlay_surface(void)
 			free(GlobalOverlay.quad_normal);
 			GlobalOverlay.quad = NULL;
 			GlobalOverlay.quad_normal = NULL;
+		}	
+		if(GlobalOverlay.wire_count != 0)
+		{
+			free(GlobalOverlay.wire);
+			GlobalOverlay.wire = NULL;
 		}		
 		GlobalOverlay.wire_count = 0;
 		GlobalOverlay.tri_count = 0;
@@ -525,7 +622,7 @@ void draw_owerlay_surface(void)
 			GlobalOverlay.wire = malloc((sizeof *GlobalOverlay.wire) * GlobalOverlay.wire_count * 2 * 3);
 	}
 
-	if((GlobalOverlay.tri_count != 0 || GlobalOverlay.quad_count != 0) && GlobalOverlay.surface_version != udg_get_version(TRUE, TRUE, TRUE, FALSE))
+	if((GlobalOverlay.tri_count != 0 || GlobalOverlay.quad_count != 0) && GlobalOverlay.surface_version != udg_get_version(TRUE, TRUE, TRUE, FALSE, FALSE))
 	{
 		GlobalOverlay.tri_count = 0;
 		GlobalOverlay.quad_count = 0;
@@ -659,7 +756,7 @@ void draw_owerlay_surface(void)
 			}
 		}
 	}
-	GlobalOverlay.surface_version = udg_get_version(TRUE, TRUE, FALSE, FALSE);
+	GlobalOverlay.surface_version = udg_get_version(TRUE, TRUE, FALSE, FALSE, FALSE);
 	draw_persuade_surface(e_ns_get_node(0, udg_get_modeling_node()));
 	glDisable(GL_DEPTH_TEST);
 /*	glEnable(GL_CULL_FACE);
@@ -738,7 +835,9 @@ void draw_owerlay_surface(void)
 
 	if(GlobalOverlay.wire_count != 0)
 		sui_draw_gl(GL_LINES, GlobalOverlay.wire, GlobalOverlay.wire_count, 3, 0.5, 0.4, 0.5);
+
 	glDisable(GL_CULL_FACE);
+	draw_owerlay_tags();
 	glEnable(GL_DEPTH_TEST);
 }
 
@@ -749,10 +848,12 @@ void draw_owerlay_vertex(void)
 	static boolean no_select = TRUE;
 	double *vertex, *base;
 	double select, manip_pos[3] ={0, 0, 0}, sum = 0;
-	uint length, i, j;
+	uint length, count, i, j;
 	boolean manip = TRUE;
+	UNDOTag	*tag;
+	tag = udg_get_tags(&count);
 	udg_get_geometry(&length, NULL, &vertex, NULL, NULL);
-	if(vertex_version != udg_get_version(TRUE, TRUE, TRUE, FALSE))
+	if(vertex_version != udg_get_version(TRUE, TRUE, TRUE, FALSE, TRUE))
 	{
 		j = 0;
 		for(i = 0; i < length; i++)
@@ -766,8 +867,10 @@ void draw_owerlay_vertex(void)
 		}
 		if(base_lines != NULL && (j != vertex_count || j == 0))
 			free(base_lines);
-			
-		if(j == 0)
+
+		for(i = 0; i < count && tag[i].select < 0.001; i++);	
+
+		if(j == 0 && i == count)
 		{
 			vertex_array = NULL;
 			vertex_color = NULL;
@@ -776,7 +879,7 @@ void draw_owerlay_vertex(void)
 			no_select = TRUE;
 		}else
 		{
-			if(j != vertex_count)
+			if(j != 0)
 			{
 				vertex_count = j;
 				vertex_array = malloc((sizeof *base_lines) * vertex_count * 3);
@@ -803,7 +906,18 @@ void draw_owerlay_vertex(void)
 					}
 				}
 			}
-			vertex_version = udg_get_version(TRUE, TRUE, TRUE, FALSE);
+			for(i = 0; i < count; i++)
+			{
+				if(tag[i].select > 0.0001)
+				{
+					manip = FALSE;
+					sum += tag[i].select;
+					manip_pos[0] += tag[i].vec[0] * tag[i].select;
+					manip_pos[1] += tag[i].vec[1] * tag[i].select;
+					manip_pos[2] += tag[i].vec[2] * tag[i].select;
+				}
+			}
+			vertex_version = udg_get_version(TRUE, TRUE, TRUE, FALSE, FALSE);
 			if(manip == FALSE && no_select == TRUE)
 				la_t_tm_place(manip_pos[0] / sum, manip_pos[1] / sum, manip_pos[2] / sum);
 			la_t_tm_hide(manip);
@@ -840,7 +954,7 @@ void draw_owerlay_edge(void)
 
 	udg_get_geometry(&length, NULL, &vertex, NULL, NULL);
 	edge = udg_get_edge_data(&edge_length);
-	if(el != edge_length || ev != udg_get_version(TRUE, TRUE, FALSE, TRUE))
+	if(el != edge_length || ev != udg_get_version(TRUE, TRUE, FALSE, TRUE, FALSE))
 	{
 		if(edge_array != 0)
 		{
@@ -884,7 +998,7 @@ void draw_owerlay_edge(void)
 			}
 		}
 		el = edge_length;
-		ev = udg_get_version(TRUE, TRUE, FALSE, TRUE);
+		ev = udg_get_version(TRUE, TRUE, FALSE, TRUE, FALSE);
 	}
 	if(el != 0)
 	{

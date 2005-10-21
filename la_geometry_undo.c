@@ -29,6 +29,13 @@ typedef struct{
 	uint32	b;
 }UNDOSetEdge;
 
+typedef struct{
+	char	group[16];
+	char	tag[16];	
+	double	vec[3];
+	double	select;
+}UNDOTag;
+
 typedef enum{
 	UNDOET_EMPTY,
 	UNDOET_STOPP,
@@ -36,7 +43,12 @@ typedef enum{
 	UNDOET_POLYGON,
 	UNDOET_CREASE,
 	UNDOET_SELECT,
-	UNDOET_EDGE
+	UNDOET_EDGE,
+	UNDOET_TAG_CREATE,
+	UNDOET_TAG_MOVE,
+	UNDOET_TAG_GROUP,
+	UNDOET_TAG_NAME,
+	UNDOET_TAG_SELECT,
 }UNDOEventType;
 
 typedef struct{
@@ -48,6 +60,7 @@ typedef struct{
 		UNDOSetCrease		crease;
 		UNDOSetEdge			edge;
 		double				select;
+		UNDOTag				tag;
 	} event[2];
 }UNDOEvent;
 
@@ -83,7 +96,33 @@ struct{
 	double		grid_center[3];
 	double		grid_size;
 	boolean		grid_active;
+	UNDOTag		*tags;
+	uint		tag_count;
+	UNDOTag		pending_tag;
+	uint		tags_version;
+	uint		tag_type_in_tag;
+	uint		tag_type_in_group;
+	char		tag_type_in_text[16];
+	uint		tag_type_in_cursor;
 }UNDOGlobal;
+
+/*
+typedef struct{
+	char	group[16];
+	char	tag[16];	
+	double	vec[3];
+	double	select;
+}UNDOTag;
+
+extern UNDOTag	*udg_get_tags(uint *count);
+extern void		udg_create_tag(double *vec);
+extern void		udg_destory_tag(double *vec);
+extern void		udg_rename_tag(uint tag, char name);
+extern void		udg_rename_group(uint tag, char name);
+extern void		udg_move_tag(uint tag, double *vec);
+extern void		udg_select_tag(uint tag, double	select);
+*/
+
 
 extern void udg_create_func(uint connection, uint id, VNodeType type, void *user);
 
@@ -111,8 +150,33 @@ void init_undo(void)
 	e_ns_set_node_create_func(udg_create_func, NULL);
 	UNDOGlobal.slot[0] = 0;
 	UNDOGlobal.slot[1] = 0;
+
+
+	UNDOGlobal.tags = NULL;
+	UNDOGlobal.tag_count = 0;
+	UNDOGlobal.pending_tag.group[0] = 0;
+	UNDOGlobal.tag_type_in_tag = -1;
+	UNDOGlobal.tag_type_in_group = -1;
+	UNDOGlobal.tag_type_in_text[0] = 0;
+	UNDOGlobal.tag_type_in_cursor = 0;
+
 }
 
+UNDOTag	*udg_get_tags(uint *count)
+{
+	*count = UNDOGlobal.tag_count;
+	return UNDOGlobal.tags;
+}
+
+void udg_get_tag_pos(uint tag, double *pos)
+{
+	if(tag < UNDOGlobal.tag_count)
+	{
+		pos[0] = UNDOGlobal.tags[tag].vec[0];
+		pos[1] = UNDOGlobal.tags[tag].vec[1];
+		pos[2] = UNDOGlobal.tags[tag].vec[2];
+	}
+}
 void udg_set_grid(boolean active)
 {
 	UNDOGlobal.grid_active = active;
@@ -282,7 +346,188 @@ void execute_event(UNDOEvent *event, uint direction)
 				/*	UNDOGlobal.vertex_delete = TRUE;*/
 				}
 			}
+		break;	
+
+		case UNDOET_TAG_CREATE :
+		{
+			uint16 group_id = (uint16)-1; 
+			uint16 tag_id = (uint16)-1, tag_2 = (uint16)-1;
+			VNTag tag;
+			ENode *node;
+			node = e_ns_get_node(0, UNDOGlobal.g_node);
+printf("A\n");
+			if(event->event[direction].tag.group[0] == 0)
+			{
+				printf("B\n");
+				e_ns_get_tag_by_type_and_group(node, event->event[direction].tag.group, event->event[direction].tag.tag, VN_TAG_REAL64_VEC3, &group_id, &tag_id);
+				group_id = e_ns_get_group_by_name(node, event->event[direction].tag.group);
+				if(group_id != -1 && tag_id != -1)
+				{
+					printf("C\n");
+					for(tag_2 = e_ns_get_next_tag(node, group_id, 0); tag_2 == tag_id; tag_2 = e_ns_get_next_tag(node, group_id, tag_2 + 1));
+					if(tag_2 == (uint)-1)
+						verse_send_tag_group_destroy(UNDOGlobal.g_node, group_id);
+					else
+						verse_send_tag_destroy(UNDOGlobal.g_node, group_id, tag_id);
+				}
+printf("D\n");
+			}else
+			{
+
+				printf("E %s\n", event->event[direction].tag.group);
+				e_ns_get_tag_by_type_and_group(node, event->event[direction].tag.group, event->event[direction].tag.tag, VN_TAG_REAL64_VEC3, &group_id, &tag_id);
+				group_id = e_ns_get_group_by_name(node, event->event[direction].tag.group);
+				printf("group_id, %u tag_id %u\n", (uint32)group_id, (uint32)tag_id);
+				if(group_id != (uint16)-1)
+				{
+					printf("F\n");
+					tag.vreal64_vec3[0] = event->event[direction].tag.vec[0];
+					tag.vreal64_vec3[1] = event->event[direction].tag.vec[1];
+					tag.vreal64_vec3[2] = event->event[direction].tag.vec[2];
+					verse_send_tag_create(UNDOGlobal.g_node, group_id, (uint16)-1, event->event[direction].tag.tag, VN_TAG_REAL64_VEC3, &tag);
+				}else
+				{
+					printf("G\n");
+					verse_send_tag_group_create(UNDOGlobal.g_node, (uint16)-1, event->event[direction].tag.group);
+					UNDOGlobal.pending_tag = event->event[direction].tag;
+				}
+			}
+printf("H\n");
+		}
 		break;
+		case UNDOET_TAG_MOVE :
+		{
+			uint16 group_id; 
+			uint16 tag_id;
+			VNTag tag;
+			ENode *node;
+			uint i;
+			printf("UNDOET_TAG_MOVE\n");
+			node = e_ns_get_node(0, UNDOGlobal.g_node);
+			group_id = e_ns_get_group_by_name(node, event->event[direction].tag.group);
+			if(group_id != -1)
+			{
+				char *name;
+				tag_id = event->id;
+				name = e_ns_get_tag_name(node, group_id, tag_id);
+				for(i = 0; name[i] != 0 && name[i] == event->event[direction].tag.tag[i]; i++);
+				if(name[i] != event->event[direction].tag.tag[i])
+					e_ns_get_tag_by_type_and_group(node, event->event[direction].tag.group, event->event[direction].tag.tag, VN_TAG_REAL64_VEC3, &group_id, &tag_id);
+				if(group_id != -1 && tag_id != -1)
+				{
+					tag.vreal64_vec3[0] = event->event[direction].tag.vec[0];
+					tag.vreal64_vec3[1] = event->event[direction].tag.vec[1];
+					tag.vreal64_vec3[2] = event->event[direction].tag.vec[2];
+					printf("verse_send_tag_create %f %f %f\n", tag.vreal64_vec3[0], tag.vreal64_vec3[1], tag.vreal64_vec3[2]);
+					verse_send_tag_create(UNDOGlobal.g_node, group_id, tag_id, event->event[direction].tag.tag, VN_TAG_REAL64_VEC3, &tag);
+				}
+			}
+		}
+		break;
+		case UNDOET_TAG_NAME :
+		{
+			uint16 group_id; 
+			uint16 tag_id;
+			VNTag tag;
+			ENode *node;
+			printf("UNDOET_TAG_NAME\n");
+			node = e_ns_get_node(0, UNDOGlobal.g_node);
+			e_ns_get_tag_by_type_and_group(node, event->event[1 - direction].tag.group, event->event[1 - direction].tag.tag, VN_TAG_REAL64_VEC3, &group_id, &tag_id);
+			if(group_id != -1 && tag_id != -1)
+			{
+				tag.vreal64_vec3[0] = event->event[direction].tag.vec[0];
+				tag.vreal64_vec3[1] = event->event[direction].tag.vec[1];
+				tag.vreal64_vec3[2] = event->event[direction].tag.vec[2];
+				verse_send_tag_create(UNDOGlobal.g_node, group_id, tag_id, event->event[direction].tag.tag, VN_TAG_REAL64_VEC3, &tag);
+			}
+		}
+		break;
+		case UNDOET_TAG_SELECT :
+		{
+			uint i, j;
+			for(i = 0;	UNDOGlobal.tag_count; i++)
+			{
+				for(j = 0; UNDOGlobal.tags[i].group[j] == event->event[direction].tag.group[j] && UNDOGlobal.tags[i].group[j] != 0; j++);
+				if(UNDOGlobal.tags[i].group[j] == event->event[direction].tag.group[j])
+				{
+					for(j = 0; UNDOGlobal.tags[i].tag[j] == event->event[direction].tag.tag[j] && UNDOGlobal.tags[i].tag[j] != 0; j++);
+					if(UNDOGlobal.tags[i].tag[j] == event->event[direction].tag.tag[j])
+						UNDOGlobal.tags[i].select = event->event[direction].tag.select;
+				}
+			}
+		}
+		break;
+/*	UNDOET_TAG_CREATE,
+	UNDOET_TAG_MOVE,
+	UNDOET_TAG_GROUP,
+	UNDOET_TAG_NAME,
+	UNDOET_TAG_SELECT,
+  
+	
+	  ENode *node;
+			uint i, other;
+			uint16 group_id; 
+			uint16 tag_id;
+			VNTag tag;
+			other = 1 - direction; 
+			node = e_ns_get_node(0, UNDOGlobal.g_node);
+			printf("A\n");
+			for(i = 0; event->event[other].tag.group[i] == event->event[direction].tag.group[i] && event->event[other].tag.group[i] != 0; i++);
+			if(event->event[other].tag.group[i] == event->event[direction].tag.group[i])
+			{
+				printf("B\n");
+				e_ns_get_tag_by_type_and_group(node, event->event[other].tag.group, event->event[other].tag.tag, VN_TAG_REAL64_VEC3, &group_id, &tag_id);
+				if(tag_id != -1 && (tag.vreal64_vec3[0] != event->event[direction].tag.vec[0] ||
+									tag.vreal64_vec3[1] != event->event[direction].tag.vec[1] ||
+									tag.vreal64_vec3[2] != event->event[direction].tag.vec[2]))
+				{
+					printf("C\n");
+					tag.vreal64_vec3[0] = event->event[direction].tag.vec[0];
+					tag.vreal64_vec3[1] = event->event[direction].tag.vec[1];
+					tag.vreal64_vec3[2] = event->event[direction].tag.vec[2];
+					verse_send_tag_create(UNDOGlobal.g_node, group_id, tag_id, event->event[direction].tag.tag, VN_TAG_REAL64_VEC3, &tag);
+				}
+			}else
+			{
+				printf("D\n");
+				group_id = e_ns_get_group_by_name(node, event->event[direction].tag.group);
+				if(group_id != -1)
+				{
+					printf("E %u %s\n", group_id, event->event[direction].tag.group);
+					for(tag_id = e_ns_get_next_tag(node, group_id, 0); tag_id != (uint16)-1; tag_id = e_ns_get_next_tag(node, group_id, tag_id + 1))
+					{
+						char *name;
+						printf("F\n");
+						name = e_ns_get_tag_name(node, group_id, tag_id);
+						for(i = 0; name[i] != 0  && name[i] == event->event[other].tag.tag[i]; i++);
+						if(name[i] == event->event[other].tag.tag[i])
+							break;
+					}
+				//	if(tag_id == (uint16)-1)
+				//	{
+						printf("G\n");
+					//	verse_send_tag_group_create(UNDOGlobal.g_node, group_id, event->event[direction].tag.group);
+						tag.vreal64_vec3[0] = event->event[direction].tag.vec[0];
+						tag.vreal64_vec3[1] = event->event[direction].tag.vec[1];
+						tag.vreal64_vec3[2] = event->event[direction].tag.vec[2];
+						verse_send_tag_create(UNDOGlobal.g_node, 0, tag_id, event->event[direction].tag.tag, VN_TAG_REAL64_VEC3, &tag);
+				/*	}else
+					{
+						printf("H\n");
+						verse_send_tag_group_create(UNDOGlobal.g_node, -1, event->event[direction].tag.group);
+						UNDOGlobal.pending_tag = event->event[direction].tag;
+						e_ns_get_tag_by_name_and_group(node, event->event[direction].tag.group, event->event[direction].tag.tag, &group_id, &tag_id);
+						verse_send_tag_destroy(UNDOGlobal.g_node, group_id, tag_id);
+					}
+				}else
+				{
+					printf("I\n");
+					verse_send_tag_group_create(UNDOGlobal.g_node, -1, event->event[direction].tag.group);
+					UNDOGlobal.pending_tag = event->event[direction].tag;
+				}
+				printf("J\n");
+			}*/
+
 	}
 }
 
@@ -292,7 +537,7 @@ void udg_undo_geometry(void)
 	{
 		uint i;
 		i = UNDOGlobal.pos;
-		while(UNDOGlobal.event[--UNDOGlobal.pos].type != UNDOET_STOPP)
+		while(UNDOGlobal.event[--UNDOGlobal.pos % UNDOGlobal.length].type != UNDOET_STOPP)
 		{
 			if(UNDOGlobal.pos == -1)
 				UNDOGlobal.pos = UNDOGlobal.length;
@@ -417,6 +662,72 @@ boolean udg_update_geometry(void)
 		UNDOGlobal.vertex_version = e_nsg_get_layer_version(layer);
 		UNDOGlobal.vertex = e_nsg_get_layer_data(g_node, layer);
 		UNDOGlobal.vertex_layer = e_nsg_get_layer_id(layer);
+		{
+			uint16 group_id, tag_id;
+			uint i;
+			char *name;
+			VNTag *tag;
+			UNDOGlobal.tags_version = e_ns_get_node_version_data(g_node);
+			i = 0;
+			for(group_id = e_ns_get_next_tag_group(g_node, 0); group_id != (uint16)-1; group_id = e_ns_get_next_tag_group(g_node, group_id + 1))
+			{
+				name = e_ns_get_tag_group(g_node, group_id);
+				for(i = 0; UNDOGlobal.pending_tag.group[i] != 0 && UNDOGlobal.pending_tag.group[i] == name[i]; i++);
+				if(UNDOGlobal.pending_tag.group[i] == name[i])
+				{
+					VNTag t;
+					t.vreal64_vec3[0] = UNDOGlobal.pending_tag.vec[0];
+					t.vreal64_vec3[1] = UNDOGlobal.pending_tag.vec[1];
+					t.vreal64_vec3[2] = UNDOGlobal.pending_tag.vec[2];
+					verse_send_tag_create(UNDOGlobal.g_node, group_id, -1, UNDOGlobal.pending_tag.tag, VN_TAG_REAL64_VEC3, &t);
+					UNDOGlobal.pending_tag.group[0] = 0;
+				}
+				for(tag_id = e_ns_get_next_tag(g_node, group_id, 0); tag_id != (uint16)-1; tag_id = e_ns_get_next_tag(g_node, group_id, tag_id + 1))
+					if(VN_TAG_REAL64_VEC3 == e_ns_get_tag_type(g_node, group_id, tag_id))
+						i++;
+			}
+
+			if(UNDOGlobal.tag_count != i)
+			{
+				if(UNDOGlobal.tags != NULL)
+					free(UNDOGlobal.tags);
+				UNDOGlobal.tags = NULL;
+				UNDOGlobal.tag_count = i;
+				if(UNDOGlobal.tag_count != 0)
+				{
+					UNDOGlobal.tags = malloc((sizeof *UNDOGlobal.tags) * UNDOGlobal.tag_count);
+					for(i = 0; i < UNDOGlobal.tag_count; i++)
+						UNDOGlobal.tags[i].select = 0;
+				}
+			}
+			if(UNDOGlobal.tag_count != 0)
+			{	
+				UNDOGlobal.tag_count = 0;
+				for(group_id = e_ns_get_next_tag_group(g_node, 0); group_id != (uint16)-1; group_id = e_ns_get_next_tag_group(g_node, group_id + 1))
+				{
+					for(tag_id = e_ns_get_next_tag(g_node, group_id, 0); tag_id != (uint16)-1; tag_id = e_ns_get_next_tag(g_node, group_id, tag_id + 1))
+					{
+						if(VN_TAG_REAL64_VEC3 == e_ns_get_tag_type(g_node, group_id, tag_id))
+						{	
+							name = e_ns_get_tag_group(g_node, group_id);
+							for(i = 0; name[i] != 0; i++)
+								UNDOGlobal.tags[UNDOGlobal.tag_count].group[i] = name[i];
+							UNDOGlobal.tags[UNDOGlobal.tag_count].group[i] = 0;
+							name = e_ns_get_tag_name(g_node, group_id, tag_id);
+							for(i = 0; name[i] != 0; i++)
+								UNDOGlobal.tags[UNDOGlobal.tag_count].tag[i] = name[i];
+							UNDOGlobal.tags[UNDOGlobal.tag_count].tag[i] = 0;
+							tag = e_ns_get_tag(g_node, group_id, tag_id);
+							UNDOGlobal.tags[UNDOGlobal.tag_count].vec[0] = tag->vreal64_vec3[0];
+							UNDOGlobal.tags[UNDOGlobal.tag_count].vec[1] = tag->vreal64_vec3[1];
+							UNDOGlobal.tags[UNDOGlobal.tag_count].vec[2] = tag->vreal64_vec3[2];
+							UNDOGlobal.tag_count++;
+						}
+					}
+				}
+				
+			}
+		}
 		return TRUE;
 	}
 	return FALSE;
@@ -428,6 +739,12 @@ void udg_set_modeling_node(uint32 node_id)
 	if((g_node = e_ns_get_node(0, node_id)) != NULL)
 	{
 		UNDOGlobal.g_node = node_id;
+		UNDOGlobal.structure_version = 0;
+		UNDOGlobal.vertex_version = 0;
+		UNDOGlobal.select_version = 0;
+		UNDOGlobal.edge_version = 0;
+		UNDOGlobal.tags_version = 0;
+
 /*		if(e_nsg_get_layer_by_type(g_node, VN_G_LAYER_POLYGON_CORNER_UINT32, "crease") == NULL)
 			verse_send_g_layer_create(node_id, -1, "crease", VN_G_LAYER_POLYGON_CORNER_UINT32, 0, 0);
 		if(e_nsg_get_layer_by_type(g_node, VN_G_LAYER_VERTEX_REAL, "select") == NULL)
@@ -436,7 +753,7 @@ void udg_set_modeling_node(uint32 node_id)
 */		udg_update_geometry();
 	}
 }
-uint udg_get_version(boolean	structure, boolean vertex, boolean select, boolean edge)
+uint udg_get_version(boolean	structure, boolean vertex, boolean select, boolean edge, boolean tags)
 {
 	uint output = 0;
 	if(structure)
@@ -447,6 +764,8 @@ uint udg_get_version(boolean	structure, boolean vertex, boolean select, boolean 
 		output += UNDOGlobal.select_version;
 	if(edge)
 		output += UNDOGlobal.edge_version;
+	if(tags)
+		output += UNDOGlobal.tags_version;
 	return output;
 }
 
@@ -594,14 +913,20 @@ void udg_polygon_delete(uint32 id)
 		double pos_a[3];
 		double pos_b[3];
 		double pos_c[3];
+		printf("polygon %u %u %u %u \n", event->event[0].polygon.a, event->event[0].polygon.b, event->event[0].polygon.c, event->event[0].polygon.d);
 		udg_get_vertex_pos(pos_a, event->event[0].polygon.a);
 		udg_get_vertex_pos(pos_b, event->event[0].polygon.b);
 		la_pfx_create_dust_line(pos_a, pos_b);
 		udg_get_vertex_pos(pos_c, event->event[0].polygon.c);
 		la_pfx_create_dust_line(pos_c, pos_b);
+		printf("vertex %f %f %f\n", pos_a[0], pos_a[1], pos_a[2]);
+		printf("vertex %f %f %f\n", pos_b[0], pos_b[1], pos_b[2]);
+		printf("vertex %f %f %f\n", pos_c[0], pos_c[1], pos_c[2]);
+
 		if(event->event[0].polygon.d < UNDOGlobal.vertex_length)
 		{
 			udg_get_vertex_pos(pos_b, event->event[0].polygon.d);
+			printf("vertex %f %f %f\n", pos_b[0], pos_b[1], pos_b[2]);
 			la_pfx_create_dust_line(pos_c, pos_b);
 			la_pfx_create_dust_line(pos_a, pos_b);
 		}else
@@ -639,6 +964,137 @@ void udg_crease_set(uint32 id, uint32 a, uint32 b, uint32 c, uint32 d)
 	execute_event(event, 1);
 }
 
+void udg_create_tag(double *vec)
+{
+	ENode *g_node;
+	UNDOEvent *event;
+	char *name = "group"; 
+	uint16 group_id;
+	uint i;
+	event = get_next_undo_event();
+	event->type = UNDOET_TAG_CREATE;
+	event->id = -1;
+
+	event->event[0].tag.group[0] = 0;
+	event->event[0].tag.tag[0] = 0;
+	
+	g_node = e_ns_get_node(0, UNDOGlobal.g_node);
+	if((group_id = e_ns_get_next_tag_group(g_node, 0)) != (uint16)-1)
+		name = e_ns_get_tag_group(g_node, group_id);
+
+	for(i = 0; name[i] != 0; i++)
+		event->event[1].tag.group[i] = name[i];
+	event->event[1].tag.group[i] = 0;
+	name = "tag";
+	for(i = 0; name[i] != 0; i++)
+		event->event[1].tag.tag[i] = name[i];
+	event->event[1].tag.tag[i] = 0;
+	event->event[1].tag.vec[0] = vec[0];
+	event->event[1].tag.vec[1] = vec[1];
+	event->event[1].tag.vec[2] = vec[2];
+	event->event[1].tag.select = 0;
+	execute_event(event, 1);
+}
+
+void udg_destroy_tag(uint tag)
+{
+	UNDOEvent *event;
+	event = get_next_undo_event();
+	event->type = UNDOET_TAG_CREATE;
+	event->id = -1;
+	event->event[1].tag.group[0] = 0;
+	event->event[1].tag.tag[0] = 0;
+	event->event[0].tag = UNDOGlobal.tags[tag];
+	execute_event(event, 1);
+}
+
+void udg_move_tag(uint tag, double *vec)
+{
+	UNDOEvent *event;
+	event = get_next_undo_event();
+	event->type = UNDOET_TAG_MOVE;
+	event->id = tag;
+	event->event[0].tag = UNDOGlobal.tags[tag];
+	event->event[1].tag = UNDOGlobal.tags[tag];
+	event->event[1].tag.vec[0] = vec[0];
+	event->event[1].tag.vec[1] = vec[1];
+	event->event[1].tag.vec[2] = vec[2];
+	execute_event(event, 1);
+}
+
+/*	UNDOGlobal.tag_type_in_tag = -1;
+	UNDOGlobal.tag_type_in_group = -1;
+	UNDOGlobal.tag_type_in_text[0] = 0;
+	UNDOGlobal.tag_type_in_cursor = 0;
+*/
+void udg_rename_tag_func(void *user, boolean cancel)
+{
+	UNDOEvent *event;
+	uint i;
+	if(cancel || UNDOGlobal.tag_type_in_text[0] == 0)
+		return;
+	event = get_next_undo_event();
+	event->type = UNDOET_TAG_NAME;
+	event->id = -1;
+	event->event[1].tag = UNDOGlobal.tags[UNDOGlobal.tag_type_in_tag];
+	event->event[0].tag = UNDOGlobal.tags[UNDOGlobal.tag_type_in_tag];
+	for(i = 0; UNDOGlobal.tag_type_in_text[i] != 0; i++)
+		event->event[1].tag.tag[i] = UNDOGlobal.tag_type_in_text[i];
+	event->event[1].tag.tag[i] = 0;
+	execute_event(event, 1);
+}
+
+void udg_rename_group_func(void *user, boolean cancel)
+{
+	UNDOEvent *event;
+	uint i;
+	if(cancel || UNDOGlobal.tag_type_in_text[0] == 0)
+		return;
+	event = get_next_undo_event();
+	event->type = UNDOET_TAG_GROUP;
+	event->id = -1;
+	event->event[1].tag = UNDOGlobal.tags[UNDOGlobal.tag_type_in_tag];
+	event->event[0].tag = UNDOGlobal.tags[UNDOGlobal.tag_type_in_tag];
+	for(i = 0; UNDOGlobal.tag_type_in_text[i] != 0; i++)
+		event->event[1].tag.group[i] = UNDOGlobal.tag_type_in_text[i];
+	event->event[1].tag.group[i] = 0;
+	execute_event(event, 1);
+}
+
+void udg_rename_tag(uint tag)
+{
+//	uint i;
+//	for(i = 0; event->event[tag].tag.tag[i] != 0; i++)
+//		type_in_text[i] = event->event[tag].tag.tag[i];
+	UNDOGlobal.tag_type_in_cursor = 0;
+	UNDOGlobal.tags[tag].tag[0] = 0;
+	betray_start_type_in(UNDOGlobal.tags[tag].tag, 16, udg_rename_tag_func, &UNDOGlobal.tag_type_in_cursor, NULL);
+}
+void udg_rename_group(uint tag)
+{
+//	uint i;
+//	for(i = 0; event->event[tag].tag.tag[i] != 0; i++)
+//		type_in_text[i] = event->event[tag].tag.tag[i];
+	UNDOGlobal.tag_type_in_cursor = 0;
+	UNDOGlobal.tags[tag].group[0] = 0;
+	betray_start_type_in(UNDOGlobal.tags[tag].group, 16, udg_rename_tag_func, &UNDOGlobal.tag_type_in_cursor, NULL);
+}
+extern void		betray_end_type_in_mode(boolean cancel);
+
+void udg_select_tag(uint tag, double select)
+{
+/*	UNDOEvent *event;
+	event = get_next_undo_event();
+	event->type = UNDOET_TAG_SELECT;
+	event->id = -1;
+	event->event[1].tag = UNDOGlobal.tags[tag];
+	event->event[0].tag = UNDOGlobal.tags[tag];
+	event->event[1].tag.select = select;
+	execute_event(event, 1);
+*/
+	UNDOGlobal.tags[tag].select = select;
+}
+
 void udg_end_event(void)
 {
 	if(UNDOGlobal.event[UNDOGlobal.pos].type == UNDOET_STOPP)
@@ -672,19 +1128,20 @@ void udg_clear_select(double value)
 	uint i;
 	for(i = 0; i < UNDOGlobal.vertex_length; i++)
 		udg_set_select(i, value);
+	for(i = 0; i < UNDOGlobal.tag_count; i++)
+		UNDOGlobal.tags[i].select = 0;
 }
 
 uint32 udg_find_empty_slot_vertex(void)
 {
 	UNDOGlobal.slot[0] = e_nsg_find_empty_vertex_slot(e_ns_get_node(0, UNDOGlobal.g_node), UNDOGlobal.slot[0] + 1);
-	fprintf(stderr, "UNDOGlobal.slot[0] %u\n", UNDOGlobal.slot[0]);
+
 	return UNDOGlobal.slot[0];	
 }
 
 uint32 udg_find_empty_slot_polygon(void)
 {
 	UNDOGlobal.slot[1] = e_nsg_find_empty_polygon_slot(e_ns_get_node(0, UNDOGlobal.g_node), UNDOGlobal.slot[1] + 1);
-	fprintf(stderr, "UNDOGlobal.slot[1] %u\n", UNDOGlobal.slot[1]);
 	return UNDOGlobal.slot[1];	
 }
 
