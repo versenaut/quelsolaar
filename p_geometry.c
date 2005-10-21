@@ -18,7 +18,7 @@ typedef enum{
 	PGS_READY
 }PGeoStage;
 
-uint p_sds_level = 5;
+uint p_sds_level = 1;
 uint p_sds_poly_cap = 100000;
 float p_sds_compute_timer = 1000;
 
