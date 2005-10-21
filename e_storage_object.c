@@ -265,7 +265,6 @@ void e_nso_get_pos(ESObjectNode *node, double *pos, double *speed, double *accel
 void e_nso_get_rot(ESObjectNode *node, VNQuat64 *rot, VNQuat64 *speed, VNQuat64 *accelerate, VNQuat64 *drag_normal, real64 *drag, uint32 *time)
 {
 	ESObjectTrans *t;
-	uint i;
 
 	t = &((ESObjectNode *)node)->trans;
 	if(rot != NULL)
@@ -795,4 +794,151 @@ void e_anim_handle_update(EOAnimhandle *handle)
 		free(handle->links);
 	free(handle);
 }*/
+/*
+typedef struct {
+	real32	x, y, z, w;
+} VNQuat32;
 
+typedef struct {
+	real64	x, y, z, w;
+} VNQuat64;
+
+*/
+
+void e_matrix_to_quaternionsf(float *matrix, VNQuat32 *quaternion)
+{
+	float t, s;
+	t = 1 + matrix[0] + matrix[5] + matrix[10];
+
+	if(t > 0.00000001)
+	{
+      s = 2 * sqrt(t);
+      quaternion->x = (matrix[9] - matrix[6]) / s;
+      quaternion->y = (matrix[2] - matrix[8]) / s;
+      quaternion->z = (matrix[4] - matrix[1]) / s;
+      quaternion->w = 0.25 * s;
+	}
+	else if(matrix[0] > matrix[5] && matrix[0] > matrix[10])
+	{
+        s = 2 * sqrt(1.0 + matrix[0] - matrix[5] - matrix[10]);
+        quaternion->x = 0.25 * s;
+        quaternion->y = (matrix[4] + matrix[1]) / s;
+        quaternion->z = (matrix[2] + matrix[8]) / s;
+        quaternion->w = (matrix[9] - matrix[6]) / s;
+    }
+	else if(matrix[5] > matrix[10])
+	{
+        s = 2 * sqrt(1.0 + matrix[5] - matrix[0] - matrix[10]);
+        quaternion->x = (matrix[4] + matrix[1]) / s;
+        quaternion->y = 0.25 * s;
+        quaternion->z = (matrix[9] + matrix[6]) / s;
+        quaternion->w = (matrix[2] - matrix[8]) / s;
+    }
+	else 
+	{
+        s = 2 * sqrt(1.0 + matrix[10] - matrix[0] - matrix[5]);
+        quaternion->x = (matrix[2] + matrix[8]) / s;
+        quaternion->y = (matrix[9] + matrix[6]) / s;
+        quaternion->z = 0.25 * s;
+        quaternion->w = (matrix[4] - matrix[1]) / s;
+    }
+}
+
+void e_matrix_to_quaternionsd(double *matrix, VNQuat64 *quaternion)
+{
+	double t, s;
+	t = 1 + matrix[0] + matrix[5] + matrix[10];
+
+	if(t > 0.00000001)
+	{
+      s = 2 * sqrt(t);
+      quaternion->x = (matrix[9] - matrix[6]) / s;
+      quaternion->y = (matrix[2] - matrix[8]) / s;
+      quaternion->z = (matrix[4] - matrix[1]) / s;
+      quaternion->w = 0.25 * s;
+	}
+	else if(matrix[0] > matrix[5] && matrix[0] > matrix[10])
+	{
+        s = 2 * sqrt(1.0 + matrix[0] - matrix[5] - matrix[10]);
+        quaternion->x = 0.25 * s;
+        quaternion->y = (matrix[4] + matrix[1]) / s;
+        quaternion->z = (matrix[2] + matrix[8]) / s;
+        quaternion->w = (matrix[9] - matrix[6]) / s;
+    }
+	else if(matrix[5] > matrix[10])
+	{
+        s = 2 * sqrt(1.0 + matrix[5] - matrix[0] - matrix[10]);
+        quaternion->x = (matrix[4] + matrix[1]) / s;
+        quaternion->y = 0.25 * s;
+        quaternion->z = (matrix[9] + matrix[6]) / s;
+        quaternion->w = (matrix[2] - matrix[8]) / s;
+    }
+	else 
+	{
+        s = 2 * sqrt(1.0 + matrix[10] - matrix[0] - matrix[5]);
+        quaternion->x = (matrix[2] + matrix[8]) / s;
+        quaternion->y = (matrix[9] + matrix[6]) / s;
+        quaternion->z = 0.25 * s;
+        quaternion->w = (matrix[4] - matrix[1]) / s;
+    }
+}
+
+void e_quaternions_to_matrixd(double *matrix, VNQuat64 *quaternion)
+{
+	double xx, xy, xz, xw, yy, yz, yw, zz, zw;
+	xx = quaternion->x * quaternion->x;
+	xy = quaternion->x * quaternion->y;
+	xz = quaternion->x * quaternion->z;
+	xw = quaternion->x * quaternion->w;
+	yy = quaternion->y * quaternion->y;
+	yz = quaternion->y * quaternion->z;
+	yw = quaternion->y * quaternion->w;
+	zz = quaternion->z * quaternion->z;
+	zw = quaternion->z * quaternion->w;
+	matrix[0] = 1 - 2 * (yy + zz);
+	matrix[1] = 2 * (xy - zw);
+	matrix[2] = 2 * (xz + yw);
+	matrix[3] = 0;
+	matrix[4] = 2 * (xy + zw);
+	matrix[5] = 1 - 2 * (xx + zz);
+	matrix[6] = 2 * (yz - xw);
+	matrix[7] = 0;
+	matrix[8] = 2 * (xz - yw);
+	matrix[9] = 2 * (yz + xw);
+	matrix[10] = 1 - 2 * (xx + yy);
+	matrix[11] = 0;
+	matrix[12] = 0;
+	matrix[13] = 0;
+	matrix[14] = 0;
+	matrix[15] = 1;
+}
+
+void e_quaternions_to_matrixf(float *matrix, VNQuat32 *quaternion)
+{
+	float xx, xy, xz, xw, yy, yz, yw, zz, zw;
+	xx = quaternion->x * quaternion->x;
+	xy = quaternion->x * quaternion->y;
+	xz = quaternion->x * quaternion->z;
+	xw = quaternion->x * quaternion->w;
+	yy = quaternion->y * quaternion->y;
+	yz = quaternion->y * quaternion->z;
+	yw = quaternion->y * quaternion->w;
+	zz = quaternion->z * quaternion->z;
+	zw = quaternion->z * quaternion->w;
+	matrix[0] = 1 - 2 * (yy + zz);
+	matrix[1] = 2 * (xy - zw);
+	matrix[2] = 2 * (xz + yw);
+	matrix[3] = 0;
+	matrix[4] = 2 * (xy + zw);
+	matrix[5] = 1 - 2 * (xx + zz);
+	matrix[6] = 2 * (yz - xw);
+	matrix[7] = 0;
+	matrix[8] = 2 * (xz - yw);
+	matrix[9] = 2 * (yz + xw);
+	matrix[10] = 1 - 2 * (xx + yy);
+	matrix[11] = 0;
+	matrix[12] = 0;
+	matrix[13] = 0;
+	matrix[14] = 0;
+	matrix[15] = 1;
+}

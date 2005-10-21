@@ -95,11 +95,10 @@ void vertex_append_array(ESGeometryNode	*node, uint32 id)
 	node->vertex_length = id + GEOMETRY_ARRAY_CHUNK_SIZE;
 }
 
-void polygon_append_array(ESGeometryNode *node, uint32 id)
+void polygon_append_array(ESGeometryNode	*node, uint32 id)
 {
 	uint			i;
 	EGeoLayer	*end, *layer;
-
 	if(id < node->polygon_length)
 		return;
 
@@ -194,7 +193,7 @@ void * e_nsg_get_layer_data(ESGeometryNode *g_node, EGeoLayer *layer)
 		case VN_G_LAYER_POLYGON_FACE_UINT32 :
 		{
 			layer->data = malloc(sizeof(uint32) * g_node->polygon_length);
-			for(i = 0 ; i < g_node->polygon_length; i++)
+			for(i = 0 ; i < g_node->polygon_length * 4; i++)
 				((uint32 *)layer->data)[i] = layer->def_integer;
 		}
 		break;

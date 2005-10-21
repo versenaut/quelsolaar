@@ -9,9 +9,8 @@ extern void co_vn_unhide_node(uint node_id, float pos_x, float pos_y);
 extern void co_vn_unhide_all(VNodeType type);
 extern void co_vn_hide_all(VNodeType type);
 extern void co_vn_hide_node(uint node_id);
+extern boolean co_vn_hidden_test(uint node_id);
 extern void *co_vn_node_get(uint node_id);
-
-extern void co_node_draw(ENode *node, VNodeType type, boolean hidden);
 
 extern void co_vn_handle(BInputState *input);
 

@@ -234,23 +234,23 @@ void clear_tag(VNTag *tag, VNTagType type)
 //float co_handle_head(BInputState *input, ENode *node)
 //boolean co_handle_popup_exit(BInputState *input, ENode *node)
 
-float co_handle_node_head(BInputState *input, ENode *node);
+float co_handle_node_head(BInputState *input, ENode *node, boolean reset);
 
 boolean co_handle_head(BInputState *input, ENode *node, float *length)
 {
-	co_handle_node_head(input, node);
+	co_handle_node_head(input, node, FALSE);
 	return TRUE;
 }
 
-float co_handle_node_head(BInputState *input, ENode *node)
+float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 {
-	static float pos = 0, grab = 0, tag_rot = 0;
-	static boolean show_tags = TRUE;
+	static float pos = 0, tag_rot = 0, temp = 0;
+	static boolean show_tags = TRUE, grab = FALSE;
 	static uint16 a_tag = -1, a_group = -1;
 	float size, color, color_light;
 	double value;
 	char *type_names[] = {"Object", "Geometry", "Material", "Bitmap", "Text", "Curve", "Audio"};
-	uint i, j, k, l, m;
+	uint16 i, j, k, l, m;
 	VNTag *tag, t;
 	float y;
 
@@ -260,6 +260,19 @@ float co_handle_node_head(BInputState *input, ENode *node)
 		glPushMatrix();
 
 	y = betray_get_screen_mode(NULL, NULL, NULL) - 0.1;
+
+	if(input->mode != BAM_DRAW)
+	{
+		if(input->pointer_x > 0.7 && input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
+			grab = TRUE;
+		if(input->mouse_button[0] == FALSE)
+			grab = FALSE;
+		if(grab == TRUE)
+			pos += input->delta_pointer_y * 2;
+		if(reset)
+			pos = 0;
+	}
+	y += pos;
 
 	if(input->mode == BAM_DRAW)
 		sui_draw_text(0.0, y - 0.075, SUI_T_SIZE, SUI_T_SPACE, "Name:", 1.0 - 1.0 / 4.0, 1.0 - 1.0 / 4.0, 1.0 - 1.0 / 4.0);  
