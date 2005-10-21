@@ -186,13 +186,13 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 						if(element[i].type == PU_T_ANGLE && ((element[i].data.angle[0] - 1 < element[j].data.angle[0] && element[i].data.angle[0] + 1 > element[j].data.angle[0]) || (element[i].data.angle[0] - 1 < element[j].data.angle[1] && element[i].data.angle[0] + 1 > element[j].data.angle[1])))
 							break;
 					if(j == i)
-						sui_draw_popup_angle_line(pos_x, pos_y, element[i].data.angle[0]);
+						sui_draw_popup_angle_line(pos_x, pos_y, element[i].data.angle[0] + 180);
 
 					for(j = 0; j < i; j++)
 						if(element[i].type == PU_T_ANGLE && ((element[i].data.angle[1] - 1 < element[j].data.angle[0] && element[i].data.angle[1] + 1 > element[j].data.angle[0]) || (element[i].data.angle[1] - 1 < element[j].data.angle[1] && element[i].data.angle[1] + 1 > element[j].data.angle[1])))
 							break;
 					if(j == i)
-						sui_draw_popup_angle_line(pos_x, pos_y, element[i].data.angle[1]);
+						sui_draw_popup_angle_line(pos_x, pos_y, element[i].data.angle[1] + 180);
 
 					if(element[i].data.angle[0] < 0)
 					{
