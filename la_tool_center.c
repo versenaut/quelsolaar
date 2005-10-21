@@ -31,8 +31,8 @@ void scale_test_vertex(double *vertex)
 	}
 }
 
-void la_t_center_geometry()
-{	
+void la_t_center_geometry(void)
+{
 	uint32 i, vertex_count, polygon_count, *ref;
 	double *vertex, size, center[3];
 	udg_get_geometry(&vertex_count, &polygon_count, &vertex, &ref, NULL);
@@ -72,8 +72,7 @@ void la_t_center_geometry()
 	undo_event_done();
 }
 
-
-void la_t_center_manipulator()
+void la_t_center_manipulator(void)
 {	
 	uint32 i, vertex_count, polygon_count, *ref;
 	double *vertex, size, center[3];
