@@ -21,7 +21,7 @@ connector.exe:	co_main.obj co_game.obj co_intro.obj co_vn_audio.obj co_vn_bitmap
 
 loqairou.exe:	la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.obj la_input_parser.obj la_intro.obj la_key_input.obj \
 		la_main.obj la_particle_fx.obj la_pop_up.obj la_projection.obj la_reference.obj la_save.obj \
-		la_settings.obj la_tool_collapse.obj la_tool_deploy.obj la_tool_draw.obj la_tool_edge_connector.obj \
+		la_settings.obj la_tool_center.obj la_tool_collapse.obj la_tool_deploy.obj la_tool_draw.obj la_tool_edge_connector.obj \
 		la_tool_manipulator.obj la_tool_poly_select.obj la_tool_reshape.obj la_tool_revolve.obj la_tool_select.obj \
 		la_tool_slice.obj la_tool_splitter.obj la_tool_subdivide.obj \
 		st_math.obj st_matrix_operations.obj st_text.obj \
