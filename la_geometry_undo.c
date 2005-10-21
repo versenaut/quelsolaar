@@ -361,11 +361,11 @@ printf("A\n");
 				printf("B\n");
 				e_ns_get_tag_by_type_and_group(node, event->event[direction].tag.group, event->event[direction].tag.tag, VN_TAG_REAL64_VEC3, &group_id, &tag_id);
 				group_id = e_ns_get_group_by_name(node, event->event[direction].tag.group);
-				if(group_id != -1 && tag_id != -1)
+				if(group_id != (uint16) -1 && tag_id != (uint16) -1)
 				{
 					printf("C\n");
 					for(tag_2 = e_ns_get_next_tag(node, group_id, 0); tag_2 == tag_id; tag_2 = e_ns_get_next_tag(node, group_id, tag_2 + 1));
-					if(tag_2 == (uint)-1)
+					if(tag_2 == (uint16)-1)
 						verse_send_tag_group_destroy(UNDOGlobal.g_node, group_id);
 					else
 						verse_send_tag_destroy(UNDOGlobal.g_node, group_id, tag_id);
@@ -405,7 +405,7 @@ printf("H\n");
 			printf("UNDOET_TAG_MOVE\n");
 			node = e_ns_get_node(0, UNDOGlobal.g_node);
 			group_id = e_ns_get_group_by_name(node, event->event[direction].tag.group);
-			if(group_id != -1)
+			if(group_id != (uint16) -1)
 			{
 				char *name;
 				tag_id = event->id;
@@ -413,7 +413,7 @@ printf("H\n");
 				for(i = 0; name[i] != 0 && name[i] == event->event[direction].tag.tag[i]; i++);
 				if(name[i] != event->event[direction].tag.tag[i])
 					e_ns_get_tag_by_type_and_group(node, event->event[direction].tag.group, event->event[direction].tag.tag, VN_TAG_REAL64_VEC3, &group_id, &tag_id);
-				if(group_id != -1 && tag_id != -1)
+				if(group_id != (uint16) -1 && tag_id != (uint16) -1)
 				{
 					tag.vreal64_vec3[0] = event->event[direction].tag.vec[0];
 					tag.vreal64_vec3[1] = event->event[direction].tag.vec[1];
@@ -433,7 +433,7 @@ printf("H\n");
 			printf("UNDOET_TAG_NAME\n");
 			node = e_ns_get_node(0, UNDOGlobal.g_node);
 			e_ns_get_tag_by_type_and_group(node, event->event[1 - direction].tag.group, event->event[1 - direction].tag.tag, VN_TAG_REAL64_VEC3, &group_id, &tag_id);
-			if(group_id != -1 && tag_id != -1)
+			if(group_id != (uint16) -1 && tag_id != (uint16) -1)
 			{
 				tag.vreal64_vec3[0] = event->event[direction].tag.vec[0];
 				tag.vreal64_vec3[1] = event->event[direction].tag.vec[1];
