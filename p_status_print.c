@@ -27,7 +27,8 @@ typedef struct{
 	boolean		task;
 }PObject;
 */
-void p_status_print()
+
+void p_status_print(void)
 {
 	ENode *node;
 	PMesh *o_mesh;
