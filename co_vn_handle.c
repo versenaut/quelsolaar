@@ -719,7 +719,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		if(!betray_is_type_in())
 		{
 			search_cursor = 0;
-			betray_start_type_in(search, 64, NULL, search_cursor, NULL);
+			betray_start_type_in(search, 64, NULL, &search_cursor, NULL);
 		}
 		if(search[0] != 0)
 		{
