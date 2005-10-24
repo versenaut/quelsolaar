@@ -28,7 +28,7 @@ loqairou.exe:	la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.obj la_input_
 		seduce.lib betray.lib enough.lib deceive.lib persuade.lib
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib sdlmain.lib
 
-quelsolaar:	qs_camera.obj qs_intro.obj qs_main.obj \
+quelsolaar.exe:	qs_camera.obj qs_intro.obj qs_main.obj \
 		st_math.obj st_matrix_operations.obj st_text.c st_types.obj \
 		persuade.lib seduce.lib betray.lib enough.lib
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib
@@ -74,12 +74,23 @@ d=%date:~-10%%
 # is the e=%d:-=% construct that seems to work in plain shells, but
 # it won't work here, oh no. :/ Suggestions welcome.
 
+de=enough-$(d)-win32
 dc=connector-$(d)-win32
 dl=loqairou-$(d)-win32
 du=uvedit-$(d)-win32
 dq=quelsolaar-$(d)-win32
 
-dist:	dist-connector dist-loqairou dist-quelsolaar #dist-uvedit
+dist:	dist-enough dist-connector dist-loqairou dist-quelsolaar #dist-uvedit
+
+dist-enough:	enough.lib enough.h README.enough
+	if exist $(de). ( rmdir /s /q $(de). )
+	mkdir $(de)
+	copy /b enough.lib $(de)
+	copy /a enough.h $(de)
+	copy /a README.enough $(de)
+	zip -r $(de).zip $(de)
+	rmdir /s /q $(de)
+
 
 dist-connector:	connector.exe
 	echo $(dc)
