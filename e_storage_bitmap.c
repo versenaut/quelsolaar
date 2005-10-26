@@ -94,7 +94,7 @@ void *e_nsb_get_layer_data(ESBitmapNode *node, ESBitmapLayer *layer)
 	{
 		if(layer->type == VN_B_LAYER_UINT1)
 		{
-			layer->data = malloc(sizeof(uint8) * node->size_x * node->size_y * node->size_z / 8);
+			layer->data = malloc(sizeof(uint8) * (node->size_x + 7) / 8 * node->size_y * node->size_z);
 		}else if(layer->type == VN_B_LAYER_UINT8)
 		{
 			layer->data = malloc(sizeof(uint8) * node->size_x * node->size_y * node->size_z);
@@ -512,8 +512,9 @@ void callback_send_b_tile_set(void *user_data, VNodeID node_id, VLayerID layer_i
 {
 	ESBitmapNode		*node;
 	ESBitmapLayer		*layer;
-	float				*buf;
-	uint32				i, x, y, x_ofset, y_ofset, z_ofset, pixel_id, x_tilesize, y_tilesize, tw, th;
+	float			*buf;
+	uint32			i, x, y, x_offset, y_offset, z_offset, pixel_id, x_tilesize, y_tilesize, tw, th;
+
 	node = e_create_b_node(node_id, 0);
 	layer = find_dlut(&node->layertables, layer_id);
 	if(layer == NULL)
@@ -521,9 +522,9 @@ void callback_send_b_tile_set(void *user_data, VNodeID node_id, VLayerID layer_i
 
 	if(layer->type != type)
 		return;
-	x_ofset = tile_x * VN_B_TILE_SIZE;
-	y_ofset = tile_y * VN_B_TILE_SIZE;
-	z_ofset = node->size_x * node->size_y * z;
+	x_offset = tile_x * VN_B_TILE_SIZE;
+	y_offset = tile_y * VN_B_TILE_SIZE;
+	z_offset = node->size_x * node->size_y * z;
 	x_tilesize = (node->size_x + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE;
 	y_tilesize = (node->size_y + VN_B_TILE_SIZE - 1) / VN_B_TILE_SIZE;
 	tw = (tile_x == x_tilesize - 1) && (node->size_x % VN_B_TILE_SIZE) != 0 ? node->size_x % VN_B_TILE_SIZE : VN_B_TILE_SIZE;
@@ -531,7 +532,13 @@ void callback_send_b_tile_set(void *user_data, VNodeID node_id, VLayerID layer_i
 	switch(type)
 	{
 		case VN_B_LAYER_UINT1 :
-		fprintf(stderr, "ONE-BIT BITMAP LAYERS NOT SUPPORTED");
+		{
+			uint8	*array = layer->data;
+			uint32	lw = (node->size_x + 7) / 8;
+
+			for(y = 0; y < th; y++)
+				array[z * lw * node->size_y + (y_offset + y) * lw + tile_x] = tile->vuint1[y];
+		}
 		break;
 		case VN_B_LAYER_UINT8 :
 		{
@@ -540,8 +547,8 @@ void callback_send_b_tile_set(void *user_data, VNodeID node_id, VLayerID layer_i
 			{
 				for(x = 0; x < tw; x++)
 				{
-					pixel_id = (y_ofset + y) * node->size_x + x_ofset + x;
-					array[pixel_id + z_ofset] = tile->vuint8[y * VN_B_TILE_SIZE + x];
+					pixel_id = (y_offset + y) * node->size_x + x_offset + x;
+					array[pixel_id + z_offset] = tile->vuint8[y * VN_B_TILE_SIZE + x];
 				}
 			}
 		}
@@ -553,8 +560,8 @@ void callback_send_b_tile_set(void *user_data, VNodeID node_id, VLayerID layer_i
 			{
 				for(x = 0; x < tw; x++)
 				{
-					pixel_id = (y_ofset + y) * node->size_x + x_ofset + x;
-					array[pixel_id + z_ofset] = tile->vuint16[y * VN_B_TILE_SIZE + x];
+					pixel_id = (y_offset + y) * node->size_x + x_offset + x;
+					array[pixel_id + z_offset] = tile->vuint16[y * VN_B_TILE_SIZE + x];
 				}
 			}
 		}
@@ -566,8 +573,8 @@ void callback_send_b_tile_set(void *user_data, VNodeID node_id, VLayerID layer_i
 			{
 				for(x = 0; x < tw; x++)
 				{
-					pixel_id = (y_ofset + y) * node->size_x + x_ofset + x;
-					array[pixel_id + z_ofset] = tile->vreal32[y * VN_B_TILE_SIZE + x];
+					pixel_id = (y_offset + y) * node->size_x + x_offset + x;
+					array[pixel_id + z_offset] = tile->vreal32[y * VN_B_TILE_SIZE + x];
 				}
 			}
 		}
@@ -578,8 +585,8 @@ void callback_send_b_tile_set(void *user_data, VNodeID node_id, VLayerID layer_i
 			{
 				for(x = 0; x < tw; x++)
 				{
-					pixel_id = (y_ofset + y) * node->size_x + x_ofset + x;
-					array[pixel_id + z_ofset] = tile->vreal64[y * VN_B_TILE_SIZE + x];
+					pixel_id = (y_offset + y) * node->size_x + x_offset + x;
+					array[pixel_id + z_offset] = tile->vreal64[y * VN_B_TILE_SIZE + x];
 				}
 			}
 		}
