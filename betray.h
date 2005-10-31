@@ -7,7 +7,8 @@
 /* ----------------------------------------------------------------------------------------- */
 
 /* Define BETRAY_SDL_SYSTEM_WRAPPER to use SDL for system access, or
- * define BETRAY_GLUT_SYSTEM_WRAPPER to use plain old GLUT.
+ * define BETRAY_GLUT_SYSTEM_WRAPPER to use plain old GLUT, or
+ * define BETRAY_GLFW_SYSTEM_WRAPPER to use GLFW.
 */
 
 #define BETRAY_GLUT_SYSTEM_WRAPPER
