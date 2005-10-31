@@ -12,6 +12,7 @@
 
 extern boolean b_sdl_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
 extern boolean b_glut_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
+extern boolean b_glfw_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
 
 typedef struct{
 	uint		x_size;
@@ -63,6 +64,11 @@ boolean betray_set_screen_mode(uint x_size, uint y_size, boolean fullscreen)
 		return FALSE;
 	#endif
 
+	#ifdef BETRAY_GLFW_SYSTEM_WRAPPER
+	if(b_glfw_system_wrapper_set_display(x_size, y_size, fullscreen) != TRUE)
+		return FALSE;
+	#endif
+
 	BGlobal.screen_mode.x_size = x_size;
 	BGlobal.screen_mode.y_size = y_size;
 	BGlobal.screen_mode.fullscreen = fullscreen;
@@ -83,6 +89,7 @@ double betray_get_screen_mode(uint *x_size, uint *y_size, boolean *fullscreen)
 
 extern void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, char *caption);
 extern void b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, char *caption);
+extern void b_glfw_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, char *caption);
 
 void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, boolean window_fullscreen, char *name)
 {
@@ -93,6 +100,11 @@ void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, 
 	#ifdef BETRAY_GLUT_SYSTEM_WRAPPER
 	b_glut_init_display(argc, argv, window_size_x, window_size_y, window_fullscreen, name);
 	#endif
+
+	#ifdef BETRAY_GLFW_SYSTEM_WRAPPER
+	b_glfw_init_display(argc, argv, window_size_x, window_size_y, window_fullscreen, name);
+	#endif
+
 	betray_get_current_time(&BGlobal.time[0], &BGlobal.time[1]);
 	BGlobal.screen_mode.x_size = window_size_x;
 	BGlobal.screen_mode.y_size = window_size_y;

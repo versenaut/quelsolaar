@@ -11,6 +11,7 @@
 */
 
 #define BETRAY_GLUT_SYSTEM_WRAPPER
+/*#define BETRAY_GLFW_SYSTEM_WRAPPER*/
 /*#define BETRAY_SDL_SYSTEM_WRAPPER*/
 
 #if defined BETRAY_SDL_SYSTEM_WRAPPER
@@ -37,6 +38,10 @@
 #else
 #include <GL/glut.h>
 #endif
+
+#elif defined BETRAY_GLFW_SYSTEM_WRAPPER
+
+#include <GL/glfw.h>
 
 #else
 #error "Please choose a system wrapper to use."
