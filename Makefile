@@ -12,7 +12,7 @@ LDLIBS=-lverse -lGL -lm -lglut  -lGLU -lSDL
 
 DATE=`date --iso-8601 | tr -d -`
 SYS=`uname -s | tr -d ' ' | tr [A-Z] [a-z]`-`uname -m | tr -d ' '`
-§DIST=$(DATE)-$(SYS)
+DIST=$(DATE)-$(SYS)
 
 
 APPS=connector uvedit loqairou quelsolaar
