@@ -45,8 +45,10 @@ void uv_input_handler(BInputState *input, void *user_pointer)
 
 	if(input->mode == BAM_MAIN)
 	{
+#if defined PERSUADE_H
+		p_task_compute(10);
+#endif
 		verse_callback_update(0);
-		p_task_compute(1); 
 		return;
 	}
 	uvg_update();

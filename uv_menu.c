@@ -195,7 +195,7 @@ void uv_draw_menu(BInputState *input)
 			if(sui_box_click_test(0.74, aspect - 0.05, 0.04, 0.05))
 				uv_tool_project(0, 2, TRUE);
 			if(sui_box_click_test(0.78, aspect - 0.05, 0.04, 0.05))
-				uv_tool_project(1, 2, TRUE);
+				uv_tool_project(2, 1, TRUE);
 		}
 	}
 }
