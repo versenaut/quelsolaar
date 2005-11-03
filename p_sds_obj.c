@@ -12,6 +12,8 @@
 
 extern void p_get_tri_tess_index(uint *index, uint base_tess);
 extern void p_get_quad_tess_index(uint *index, uint base_tess);
+extern boolean p_lod_displacement_update_test(PMesh *mesh);
+extern boolean p_lod_material_test(PMesh *mesh, ENode *o_node);
 
 PMesh *p_rm_create(ENode *node)
 {
@@ -26,7 +28,7 @@ PMesh *p_rm_create(ENode *node)
 	mesh->sub_stages[1] = 0;
 	mesh->sub_stages[2] = 0;
 	mesh->sub_stages[3] = 0;
-	mesh->tess.force = 0;
+	mesh->tess.force = 2;
 	mesh->tess.factor = 50;
 	mesh->tess.edge_tess_func = p_sds_edge_tesselation_global_func;
 	mesh->temp = NULL;
@@ -151,6 +153,7 @@ typedef enum{
 
 boolean p_rm_drawable(PMesh *mesh)
 {
+	printf("stage == %u\n", mesh->stage);
 	return mesh->stage == POS_DONE;
 }
 
@@ -196,6 +199,8 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 
 	if(vertex == NULL)
 		vertex = e_nsg_get_layer_data(g_node, e_nsg_get_layer_by_id(g_node, 0));
+
+
 	if(smesh == NULL || e_ns_get_node_version_struct(g_node) != smesh->geometry_version)
 		return mesh;
 
@@ -216,6 +221,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 			mesh->next = p_rm_create(g_node);
 		}
 	}
+
 	if(mesh->next != NULL)
 	{
 		if(smesh->geometry_version != ((PMesh *)mesh->next)->geometry_version)
