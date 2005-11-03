@@ -107,7 +107,7 @@ void callback_send_tag_create(void *user, VNodeID node_id, uint16 group_id, uint
 		break;
 		case VN_TAG_STRING :
 			for(i = 0; tag->vstring[i] != 0; i++);
-			t->tag.vstring = malloc((sizeof *tag->vstring) * i);
+			t->tag.vstring = malloc((sizeof *tag->vstring) * (i + 1));
 			for(i = 0; tag->vstring[i] != 0; i++)
 				t->tag.vstring[i] = tag->vstring[i];
 			t->tag.vstring[i] = 0;
