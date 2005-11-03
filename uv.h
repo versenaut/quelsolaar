@@ -97,6 +97,7 @@ extern void uv_tool_project(uint u, uint v, boolean unselected);
 extern void uv_tool_poly_normal_select(uint poly_id);
 extern void uv_tool_poly_project(uint poly);
 extern void uv_tool_poly_plane_select(uint poly);
+extern void uv_tool_poly_stack(uint poly);
 /* select tools */
 
 extern void uv_tool_flip_x(void);
