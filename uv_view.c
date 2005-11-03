@@ -93,7 +93,7 @@ void uv_center(float x, float y)
 	view_cam_speed = 0.9;
 }
 
-float * get_cam_pos(void)
+float *get_cam_pos(void)
 {
 	return view_cam_pos;
 }
@@ -224,17 +224,18 @@ boolean uv_test_polygon(uint id, float x, float y)
 {
 	egreal uv[8];
 	uvg_get_uve(uv, id);
+	
 	if(uvg_is_quad(id))
 	{
 		if(uv_test_quad(uv, x, y))
-			return id;
+			return TRUE;
 	}
 	else
 	{
 		if(uv_test_tri(uv, x, y))
-			return id;
+			return TRUE;
 	}
-	return -1;
+	return FALSE;
 }
 
 uint uv_test_all_polygons(float x, float y)

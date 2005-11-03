@@ -325,9 +325,12 @@ void uv_trans_unhide(void)
 				}
 			}	
 		}
-		UVTGlobal.manip_pos[0] = pos[0] / sum;
-		UVTGlobal.manip_pos[1] = pos[1] / sum;
-		UVTGlobal.display = TRUE;
+		if(sum > 0.1f)
+		{
+			UVTGlobal.manip_pos[0] = pos[0] / sum;
+			UVTGlobal.manip_pos[1] = pos[1] / sum;
+			UVTGlobal.display = TRUE;
+		}
 	}
 }
 

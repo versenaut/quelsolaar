@@ -34,25 +34,24 @@
 
 #define PUSC_GRAY 0.2
 
-uint texture_node_id = -1;
-
-void uvo_set_bitmap_node(uint node_id)
-{
-//	texture_node_id = node_id;
-}
+static uint texture_node_id = 0;
 
 void uvo_draw_square()
 {
 	float vertex[] = {0, 0, 1, 0, 1, 1, 0, 1};
+	float uv[] = {0, 1, 1, 1, 1, 0, 0, 0};
 	ENode *node;
-	if((node = e_ns_get_node(0, texture_node_id)) != NULL);
+#ifdef PERSUADE_H
+	if((node = e_ns_get_node_next(0, texture_node_id, V_NT_BITMAP)) != NULL);
 	{
-		PTextureHandle *h = NULL;
-		h = p_th_create_texture_handle(texture_node_id, "col_r", "col_g", "col_b");
-		sui_set_texture2D_array_gl(vertex, 4, 2, p_th_get_texture_id(h));
+		PTextureHandle *h;
+		h = p_th_create_texture_handle(e_ns_get_node_id(node), "col_r", "col_g", "col_b");
+		printf("node = %u tex id = %u handle %p\n\n", e_ns_get_node_id(node), p_th_get_texture_id(h), h);
+		sui_set_texture2D_array_gl(uv, 4, 2, p_th_get_texture_id(h));
 		sui_draw_gl(GL_QUADS, vertex, 4, 2, 1, 1, 1);
-		p_th_destroy_texture_handle(h);
+		p_th_destroy_texture_handle(h);	
 	}
+#endif
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	sui_draw_gl(GL_QUADS, vertex, 4, 2, 0.1, 0.2, 0.4);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -194,7 +193,7 @@ void uvo_draw_overlay(BInputState *input)
 		if(uvg_is_quad(id))
 			size += 8;
 	}
-	
+
 	if(size != array_length)
 	{
 		array = realloc(array, (sizeof *array) * size * 2);

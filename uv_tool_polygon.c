@@ -60,10 +60,10 @@ void uv_tool_poly_rectangle(uint poly_id)
 
 	length[1] = sqrt(axis[2] * axis[2] + axis[3] * axis[3]);
 
-	if(0 < vec[0] * vec[3] - vec[1] * vec[2])
+	if(0 < axis[0] * axis[3] - axis[1] * axis[2])
 		length[1] = -length[1];
 
-	if(0 < vec[1] * vec[2] - vec[0] * vec[3])
+	if(0 < axis[1] * axis[2] - axis[0] * axis[3])
 		length[0] = -length[0];
 
 
@@ -440,6 +440,130 @@ void uv_tool_project(uint u, uint v, boolean unselected)
 												(vertex[ref[id * 4 + 2] * 3 + v] / scale - center[2] - 0.5) * select[2] + uv[5] * (1 - select[2]),
 												(vertex[ref[id * 4 + 3] * 3 + u] / scale - center[0] - 0.5) * select[3] + uv[6] * (1 - select[3]), 
 												(vertex[ref[id * 4 + 3] * 3 + v] / scale - center[2] - 0.5) * select[3] + uv[7] * (1 - select[3]));
+				}
+			}
+		}
+	}
+}
+
+void uv_get_quad_vectors(egreal *vectors, uint id)
+{
+	egreal uv[8], r;
+	uvg_get_uve(uv, id);
+	vectors[0] = uv[0] - uv[2];
+	vectors[1] = uv[1] - uv[3];
+	r = sqrt(vectors[0] * vectors[0] + vectors[1] * vectors[1]);
+	vectors[0] /= r;
+	vectors[1] /= r;
+	vectors[2] = uv[2] - uv[4];
+	vectors[3] = uv[3] - uv[5];
+	r = sqrt(vectors[2] * vectors[2] + vectors[3] * vectors[3]);
+	vectors[2] /= r;
+	vectors[3] /= r;
+	vectors[4] = uv[4] - uv[6];
+	vectors[5] = uv[5] - uv[7];
+	r = sqrt(vectors[4] * vectors[4] + vectors[5] * vectors[5]);
+	vectors[4] /= r;
+	vectors[5] /= r;
+	vectors[6] = uv[6] - uv[0];
+	vectors[7] = uv[7] - uv[1];
+	r = sqrt(vectors[6] * vectors[6] + vectors[7] * vectors[7]);
+	vectors[6] /= r;
+	vectors[7] /= r;	
+}
+
+void uv_get_tri_vectors(egreal *vectors, uint id)
+{
+	egreal uv[8], r;
+	uvg_get_uve(uv, id);
+	vectors[0] = uv[0] - uv[2];
+	vectors[1] = uv[1] - uv[3];
+	r = sqrt(vectors[0] * vectors[0] + vectors[1] * vectors[1]);
+	vectors[0] /= r;
+	vectors[1] /= r;
+	vectors[2] = uv[2] - uv[4];
+	vectors[3] = uv[3] - uv[5];
+	r = sqrt(vectors[2] * vectors[2] + vectors[3] * vectors[3]);
+	vectors[2] /= r;
+	vectors[3] /= r;
+	vectors[4] = uv[4] - uv[0];
+	vectors[5] = uv[5] - uv[1];
+	r = sqrt(vectors[4] * vectors[4] + vectors[5] * vectors[5]);
+	vectors[4] /= r;
+	vectors[5] /= r;	
+}
+
+void uv_tool_poly_stack(uint poly)
+{
+	egreal v1[8],  v2[8], uv[8], *select, sums[4], r;
+	uint id, i, found = 0;
+	uvg_get_uve(uv, poly);
+	if(uvg_is_quad(poly))
+	{
+		uv_get_quad_vectors(v1, poly);
+		for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+		{
+			if(uvg_get_polygon_select(id) && id != poly)
+			{
+				select = uvg_get_corner_select(id);
+				if(select[0] > 0.01 && select[1] > 0.01 && select[2] > 0.01 && select[3] > 0.01)
+				{
+					uv_get_quad_vectors(v2, id);
+					sums[0] = v2[0] * v1[0] + v2[1] * v1[1]
+							+ v2[2] * v1[2] + v2[3] * v1[3]
+							+ v2[4] * v1[4] + v2[5] * v1[5]
+							+ v2[6] * v1[6] + v2[7] * v1[7];
+
+					sums[1] = v2[0] * v1[2] + v2[1] * v1[3]
+							+ v2[2] * v1[4] + v2[3] * v1[5]
+							+ v2[4] * v1[6] + v2[5] * v1[7]
+							+ v2[6] * v1[0] + v2[7] * v1[1];
+
+					sums[2] = v2[0] * v1[4] + v2[1] * v1[5]
+							+ v2[2] * v1[6] + v2[3] * v1[7]
+							+ v2[4] * v1[0] + v2[5] * v1[1]
+							+ v2[6] * v1[2] + v2[7] * v1[3];
+
+					sums[3] = v2[0] * v1[6] + v2[1] * v1[7]
+							+ v2[2] * v1[0] + v2[3] * v1[1]
+							+ v2[4] * v1[2] + v2[5] * v1[3]
+							+ v2[6] * v1[4] + v2[7] * v1[5];
+					r = 0;
+					for(i = 0; i < 4; i++)
+					{
+						if(sums[i] > r)
+						{
+							r = sums[i];
+							found = i;
+						}
+					}
+					for(i = 0; i < 4; i++)
+					{
+						if(-sums[i] > r)
+						{
+							r = -sums[i];
+							found = i + 4;
+						}
+					}
+					printf("found == %f\n", found);
+					if(found > 3)
+						uvg_set_all_corner_uv(id, uv[(found % 4) * 2 + 0],
+												uv[(found % 4) * 2 + 1],
+												uv[((found + 1) % 4) * 2 + 0],
+												uv[((found + 1) % 4) * 2 + 1],
+												uv[((found + 2) % 4) * 2 + 0],
+												uv[((found + 2) % 4) * 2 + 1],
+												uv[((found + 3) % 4) * 2 + 0],
+												uv[((found + 3) % 4) * 2 + 1]);
+					else 
+						uvg_set_all_corner_uv(id, uv[(found % 4) * 2 + 0],
+												uv[(found % 4) * 2 + 1],
+												uv[((found + 1) % 4) * 2 + 0],
+												uv[((found + 1) % 4) * 2 + 1],
+												uv[((found + 2) % 4) * 2 + 0],
+												uv[((found + 2) % 4) * 2 + 1],
+												uv[((found + 3) % 4) * 2 + 0],
+												uv[((found + 3) % 4) * 2 + 1]);
 				}
 			}
 		}
