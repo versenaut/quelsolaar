@@ -18,7 +18,7 @@ typedef enum{
 	PGS_READY
 }PGeoStage;
 
-uint p_sds_level = 1;
+uint p_sds_level = 2;
 uint p_sds_poly_cap = 100000;
 float p_sds_compute_timer = 1000;
 
@@ -144,9 +144,11 @@ boolean p_geo_sds_compute_func(uint id)
 void p_geometry_func(ENode *node, ECustomDataCommand command)
 {	
 	PPolyStore *geometry;
+
 	switch(command)
 	{
 		case E_CDC_STRUCT :
+		
 			geometry = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
 			if(geometry == NULL || geometry->stage[0] == PGS_READY)
 				p_task_add(e_ns_get_node_id(node), 1, p_geo_sds_compute_func);
