@@ -50,17 +50,10 @@ struct{
 
 void uvg_set_node(uint node_id)
 {
-	ENode *node;
 	UVGGlobal.create = FALSE;
 	UVGGlobal.node_id = node_id;
-	if((node = e_ns_get_node(0, node_id)) == NULL)
-	{
-		if(NULL == e_nsg_get_layer_by_name(node, "map_u"))
-			verse_send_g_layer_create(UVGGlobal.node_id, -1, "map_u", VN_G_LAYER_POLYGON_CORNER_REAL, 0, 0);
-		if(NULL == e_nsg_get_layer_by_name(node, "map_v"))
-			verse_send_g_layer_create(UVGGlobal.node_id, -1, "map_v", VN_G_LAYER_POLYGON_CORNER_REAL, 0, 0);
-	}	
 }
+
 uint uvg_get_node(void)
 {
 	return UVGGlobal.node_id;
@@ -122,6 +115,7 @@ boolean uvg_update()
 	{
 //		if(UVGGlobal.select_version != e_nsg_get_layer_version(layer))
 		{
+			
 			UVGGlobal.vertex_select = e_nsg_get_layer_data(node, layer);
 			for(i = 0; i < UVGGlobal.polygon_length; i++)
 			{
@@ -305,7 +299,13 @@ uint *uvg_get_ref()
 
 egreal *uvg_get_vertex()
 {
+	{
+		uint i;
+		for(i = 0; i < UVGGlobal.vertex_length; i++)
+			printf("v %f %f %f ", UVGGlobal.vertex[i * 3], UVGGlobal.vertex[i * 3 + 1], UVGGlobal.vertex[i * 3 + 2]);
+	}
 	return UVGGlobal.vertex;
+
 }
 
 uint uvg_get_vertex_length()
@@ -402,7 +402,6 @@ void uvg_set_all_corner_select(uint id, egreal c0, egreal c1, egreal c2, egreal 
 	event->type = ET_SELECT;
 	event->isolated = FALSE;
 	event->id = id;
-
 	id *= 4;
 	event->data[0].select[0] = UVGGlobal.corner_select[id++];
 	event->data[0].select[1] = UVGGlobal.corner_select[id++];
@@ -428,12 +427,12 @@ void uvg_set_one_corner_select(uint id, uint corner, egreal select)
 		event->id = id;
 		id *= 4;
 		event->data[0].select[0] = UVGGlobal.corner_select[id];
-		event->data[1].select[0] = UVGGlobal.corner_select[id];
-		event->data[0].select[1] = UVGGlobal.corner_select[++id];
-		event->data[1].select[1] = UVGGlobal.corner_select[id];
-		event->data[0].select[2] = UVGGlobal.corner_select[++id];
-		event->data[1].select[2] = UVGGlobal.corner_select[id];
-		event->data[0].select[3] = UVGGlobal.corner_select[++id];
+		event->data[1].select[0] = UVGGlobal.corner_select[id++];
+		event->data[0].select[1] = UVGGlobal.corner_select[id];
+		event->data[1].select[1] = UVGGlobal.corner_select[id++];
+		event->data[0].select[2] = UVGGlobal.corner_select[id];
+		event->data[1].select[2] = UVGGlobal.corner_select[id++];
+		event->data[0].select[3] = UVGGlobal.corner_select[id];
 		event->data[1].select[3] = UVGGlobal.corner_select[id];
 	}
 	event->data[1].select[corner] = select;
