@@ -357,9 +357,9 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 					}
 				}
 				sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, text[i], color_light, color_light, color_light);  
-/*				if(sui_type_number_double(input, 0.15, y, 0.15, SUI_T_SIZE, edit, edit, color, color, color))
+				if(sui_type_number_double(input, 0.15, y, 0.15, SUI_T_SIZE, edit, edit, color, color, color))
 					verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], e_nsg_get_bone_pos_label(node, bone), &rot, e_nsg_get_bone_weight(node, bone), e_nsg_get_bone_rot_label(node, bone));
-*/				if(co_w_slider(input, 0.3, y, 0.35, edit, color, color, color))
+				if(co_w_slider(input, 0.3, y, 0.35, edit, color, color, color))
 					/*verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], &rot)*/;
 				y -= 0.05;
 			}
