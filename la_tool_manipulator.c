@@ -51,13 +51,15 @@ struct{
 	boolean		hide;
 	double		min_scale[3];
 	double		max_scale[3];
+	uint		update_rotate;
 }GlobalTransformManipulator;
 
 void la_t_tm_init(void)
 {
 	uint i, j, k;
 	float square[8];
-	GlobalTransformManipulator.manipulator_normal_array = 0;
+	GlobalTransformManipulator.manipulator_normal_array = NULL;
+	GlobalTransformManipulator.manipulator_normal_array_length = 0;
 	GlobalTransformManipulator.manipulator_circle = malloc((sizeof *GlobalTransformManipulator.manipulator_circle) * (ROTATE_GRID_DEGREES * 6 + 24) * 3);
 	GlobalTransformManipulator.manipulator_grid = malloc((sizeof *GlobalTransformManipulator.manipulator_grid) * (ROTATE_GRID_DEGREES * 4 + ROTATE_GRID_SPLITS * 4) * 3);
 	k = 0;
@@ -336,7 +338,6 @@ void la_t_tm_draw(BInputState *input, boolean active)
 	glPopMatrix();
 	if(GlobalTransformManipulator.mode == TMM_NORMAL || GlobalTransformManipulator.mode == TMM_TANGENT || GlobalTransformManipulator.mode == TMM_SMOOTH)	
 	{
-
 		sui_draw_gl(GL_LINES, GlobalTransformManipulator.manipulator_normal_array, GlobalTransformManipulator.manipulator_normal_array_length * 2, 3, 1, 1, 1);
 	}
 	glEnable(GL_DEPTH_TEST);
@@ -496,7 +497,7 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 		double x, y, z, x2, y2, z2, r;
 		uint *pos, poly, j2;
 		boolean *edge;
-		GlobalTransformManipulator.normal = malloc((sizeof *GlobalTransformManipulator.normal) * vertex_count);
+		GlobalTransformManipulator.normal = malloc((sizeof *GlobalTransformManipulator.normal) * vertex_count * 3);
 		edge = malloc((sizeof *edge) * vertex_count);
 		for(i = 0; i < vertex_count; i++)
 		{
@@ -546,7 +547,7 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 	{
 		uint *count, poly;
 		double vertex[3], sum[3], *temp;
-		GlobalTransformManipulator.normal = malloc((sizeof *GlobalTransformManipulator.normal) * vertex_count);
+		GlobalTransformManipulator.normal = malloc((sizeof *GlobalTransformManipulator.normal) * vertex_count * 3);
 		temp = malloc((sizeof *temp) * vertex_count * 3);
 		count = malloc((sizeof *count) * vertex_count);
 		for(i = 0; i < vertex_count; i++)
@@ -785,10 +786,16 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 {
 	ENode *node;
 	double select, delta, vertex[3], state[3], matrix[16], normal_tangent;
-	uint i, id; 
+	uint i, j, id, update_length = -1; 
 	void  (*func)(double *output, uint vertex_id, void *data) = NULL;
 	void *data;
 	node = e_ns_get_node_selected(0, V_NT_GEOMETRY);
+
+	if(input->mouse_button[0] == TRUE)
+		update_length = 50;
+	else
+		GlobalTransformManipulator.update_rotate = 0;
+
 	if(GlobalTransformManipulator.mode == TMM_IDLE)
 		return;
 	if(GlobalTransformManipulator.mode == TMM_PLACE)
@@ -943,7 +950,10 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 
 	if(data != NULL)
 	{
-		for(i = 0; i < GlobalTransformManipulator.data_length; i++)
+		j = 0;
+		if(GlobalTransformManipulator.update_rotate >= GlobalTransformManipulator.data_length)
+			GlobalTransformManipulator.update_rotate = 0;
+		for(i = GlobalTransformManipulator.update_rotate; i < GlobalTransformManipulator.data_length; i++)
 		{
 			select = udg_get_select(i);
 			if(select > 0.0001)
@@ -953,8 +963,15 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 				state[2] = GlobalTransformManipulator.data[i * 3 + 2];
 				func(vertex, i, data);
 				udg_vertex_set(i, state, vertex[0], vertex[1], vertex[2]);
+				if(++j > update_length)
+				{
+					GlobalTransformManipulator.update_rotate = i;
+					break;
+				}
 			}
 		}
+		if(i == GlobalTransformManipulator.data_length)
+			GlobalTransformManipulator.update_rotate = 0;
 		if(input->mouse_button[2] != TRUE && input->last_mouse_button[2] == TRUE)
 		{
 			undo_event_done();
@@ -1023,6 +1040,7 @@ void grab_one_vertex(BInputState *input, uint id, double *pos)
                 udg_vertex_set(i, base, base[0] + delta[0] * select[i], base[1] + delta[1] * select[i], base[2] + delta[2] * select[i]);
             }
         }
+
         free(select);
         free(GlobalTransformManipulator.data);
         return;

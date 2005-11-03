@@ -72,7 +72,7 @@ void la_t_smooth_select(void)
 	value = malloc((sizeof *value) * vertex_count);
 	for(i = 0; i < vertex_count; i++)
 	{
-		count[i] = 0;
+		count[i] = 1;
 		value[i] = 0;
 	}
 	for(i = 0; i < ref_count; i += 4)
