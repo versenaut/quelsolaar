@@ -362,7 +362,7 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 				{
 					char input[2560];
 					p_shader_write_math(node, frag->texture.mapping, input, c, passed, count);
-					sprintf(code, "texture2D(texture_%u, %s.xy, 1.0)", fragment, input);
+					sprintf(code, "texture2D(texture_%u, %s.xy)", fragment, input);
 				}
 				break;
 			case VN_M_FT_ANIMATION :
