@@ -207,7 +207,7 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 						glRotatef(90 - (element[i].data.angle[0] + element[i].data.angle[1]) * 0.5, 0, 0, 1);
 						sui_draw_text(0.15, -SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color);
 						glPopMatrix();
-					}else if(element[i].data.angle[0] > 180)
+					}else /*if(element[i].data.angle[0] > 180)*/
 					{
 						glPushMatrix();
 						glTranslatef(pos_x, pos_y, 0);
