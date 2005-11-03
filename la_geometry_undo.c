@@ -129,7 +129,7 @@ extern void udg_create_func(uint connection, uint id, VNodeType type, void *user
 void init_undo(void)
 {
 	uint i;
-	UNDOGlobal.length = sui_get_setting_int("UNDO_MEMORY_FOOT_PRINT", 50000) / sizeof(UNDOEvent);
+	UNDOGlobal.length = sui_get_setting_int("UNDO_MEMORY_FOOT_PRINT", 5000000) / sizeof(UNDOEvent);
 	UNDOGlobal.event = malloc((sizeof *UNDOGlobal.event) * UNDOGlobal.length);
 	UNDOGlobal.undos = 0;
 	UNDOGlobal.redos = 0;

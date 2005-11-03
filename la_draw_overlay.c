@@ -371,9 +371,16 @@ void la_do_draw_closest_edge(uint *edge, double x, double y, boolean snap)
 void draw_persuade_surface(ENode *node)
 {
 #ifdef PERSUADE_H
-	static PMesh	*mesh = NULL, *next = NULL;
+	static ENode *old_node = NULL;
+	static PMesh *mesh = NULL, *next = NULL;
 	static uint version;
 
+	if(old_node != NULL && old_node != node)
+	{
+		p_rm_destroy(mesh);
+		mesh = NULL;
+	}
+	old_node = node;
 	if(node == NULL)
 		return;
 
@@ -381,8 +388,10 @@ void draw_persuade_surface(ENode *node)
 		mesh = p_rm_create(node);
 	if(mesh != NULL)
 		mesh = p_rm_service(mesh, NULL, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
+	printf("mesh %p \n", mesh);
 	if(mesh != NULL && p_rm_drawable(mesh))
 	{
+	
 		glPushMatrix();
 		glPolygonMode(GL_FRONT, GL_LINE);
 		if(e_nsg_get_layer_version(e_nsg_get_layer_by_id(node,  0)) != version)
@@ -860,17 +869,17 @@ void draw_owerlay_vertex(void)
 			if(vertex[i * 3] != V_REAL64_MAX)
 				j++;
 
-		if(vertex_array != NULL && (j != vertex_count || j == 0))
+		if(vertex_array != NULL)
 		{
 			free(vertex_array);
 			free(vertex_color);
 		}
-		if(base_lines != NULL && (j != vertex_count || j == 0))
+		if(base_lines != NULL)
 			free(base_lines);
 
 		for(i = 0; i < count && tag[i].select < 0.001; i++);	
 
-		if(j == 0 && i == count)
+		if(j == 0 /*|| i == count*/)
 		{
 			vertex_array = NULL;
 			vertex_color = NULL;
@@ -879,14 +888,11 @@ void draw_owerlay_vertex(void)
 			no_select = TRUE;
 		}else
 		{
-			if(j != 0)
-			{
-				vertex_count = j;
-				vertex_array = malloc((sizeof *base_lines) * vertex_count * 3);
-				vertex_color = malloc((sizeof *base_lines) * vertex_count * 3);
-				if((base = udg_get_base_layer()) != NULL)
-					base_lines = malloc((sizeof *base_lines) * vertex_count * 2 * 3);
-			}
+			vertex_count = j;
+			vertex_array = malloc((sizeof *base_lines) * vertex_count * 3);
+			vertex_color = malloc((sizeof *base_lines) * vertex_count * 3);
+			if((base = udg_get_base_layer()) != NULL)
+				base_lines = malloc((sizeof *base_lines) * vertex_count * 2 * 3);
 			j = 0;
 			for(i = 0; i < length; i++)
 			{
@@ -940,7 +946,8 @@ void draw_owerlay_vertex(void)
 	{
 		sui_set_color_array_gl(vertex_color, vertex_count, 3);
 		sui_draw_gl(GL_POINTS, vertex_array, vertex_count, 3, 1, 1, 1);
-	}if(base_lines != NULL)
+	}
+	if(base_lines != NULL)
 	{
 		sui_draw_gl(GL_POINTS, vertex_array, vertex_count, 3, 0.1, 0.1, 0.1 );
 	}
