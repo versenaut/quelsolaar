@@ -16,6 +16,7 @@ void geometry_load_obj(void *user, char *file)
 	obj = fopen(file, "r");
 	if(obj != NULL)
 	{
+		printf("exit(0)");
 		for(i = 0; i < 512; i++)
 			line[i] = 0;
 		while((fgets(line, sizeof line, obj)) != NULL)
@@ -33,8 +34,8 @@ void geometry_load_obj(void *user, char *file)
 			if(line[0] == 118) /* v */
 			{
 				count = sscanf(line, "v %f %f %f", &x, &y, &z);
-/*				printf("v count = %i ref = %f %f %f\n", count, x, y, z);
-*/				if(count == 3)
+				printf("v count = %i ref = %f %f %f\n", count, x, y, z);
+				if(count == 3)
 					udg_vertex_set(vertex_ids[++i], NULL, x, y, z);
 			}else
 			if(line[0] == 102) /* f */
