@@ -26,7 +26,7 @@ void p_sds_add_depend(PDepend *dep, PDepend *add, egreal mult)
 		for(j = 0; j < dep->length && dep->element[j].vertex != add->element[i].vertex && dep->element[j].vertex != -1; j++);
 		if(j == dep->length)
 		{
-			dep->length += 8;
+			dep->length += 32;		/* FIXME: Should be 8. */
 			dep->element = realloc(dep->element, (sizeof *dep->element) * dep->length);
 			for(k = j; k < dep->length; k++)
 			{
