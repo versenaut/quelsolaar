@@ -33,17 +33,17 @@ static Setting * get_setting(const char *name)
 	uint i;
 	init_setting();
 	for(i = 0; i < SUIGlobalSettings.count; i++)
+	{
 		if(strcmp(SUIGlobalSettings.array[i].name, name) == 0)
 			return &SUIGlobalSettings.array[i];
+	}
 	return NULL;
 }
 
 static Setting * add_setting(const char *name)
 {
-	uint i;
 	init_setting();
-	for(i = 0; i < 32 && name[i] != 0; i++)
-		SUIGlobalSettings.array[SUIGlobalSettings.count].name[i] = name[i];
+	strcpy(SUIGlobalSettings.array[SUIGlobalSettings.count].name, name);
 	SUIGlobalSettings.array[SUIGlobalSettings.count].text = NULL;
 	SUIGlobalSettings.array[SUIGlobalSettings.count].real = 0;
 	SUIGlobalSettings.array[SUIGlobalSettings.count].integer = 0;
