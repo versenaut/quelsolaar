@@ -73,6 +73,8 @@ void p_rm_set_eay(PMesh *mesh, egreal *eay)
 
 void p_rm_destroy(PMesh *mesh)
 {
+	if(mesh == NULL)
+		return;
 	if(mesh->temp != NULL)
 		free(mesh->temp);
 	if(mesh->tess.tess != NULL)
@@ -153,7 +155,6 @@ typedef enum{
 
 boolean p_rm_drawable(PMesh *mesh)
 {
-	printf("stage == %u\n", mesh->stage);
 	return mesh->stage == POS_DONE;
 }
 
