@@ -388,7 +388,6 @@ void draw_persuade_surface(ENode *node)
 		mesh = p_rm_create(node);
 	if(mesh != NULL)
 		mesh = p_rm_service(mesh, NULL, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
-	printf("mesh %p \n", mesh);
 	if(mesh != NULL && p_rm_drawable(mesh))
 	{
 	
