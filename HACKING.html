@@ -9,6 +9,16 @@
 <style type="text/css">
 <!--
 
+div.title
+{
+ text-align: center;
+}
+
+div.credits
+{
+ text-align: center;
+}
+
 pre.code
 {
  background-color: #ddddee;
@@ -41,12 +51,17 @@ table.table
 
 <body>
 
-<h1>"Quel Solaar" Source Guide</h1>
-<p>
-Written by Eskil Steenberg (eskil@obsession.se)<br>
-Converted to HTML by Emil Brink (emil@obsession.se)
-</p>
+<div class="title">
+ <h1>"Quel Solaar" Source Guide</h1>
+</div>
+<div class="credits">
+ <p>
+ Written by Eskil Steenberg (<a href="mailto:eskil@obsession.se">eskil@obsession.se</a>)<br>
+ Converted to HTML by Emil Brink (<a href="mailto:emil@obsession.se">emil@obsession.se</a>)
+ </p>
+</div>
 
+<hr>
 <h2>Table of Contents</h2>
 <ul class="toc">
  <li><a href="#intro">Introduction</a></li>
@@ -88,7 +103,7 @@ Converted to HTML by Emil Brink (emil@obsession.se)
  </li>
  <li><a href="#links">Links</a></li>
 </ul>
-
+<hr>
 
 <h2><a name="intro">Introduction</a></h2>
 <p>
@@ -891,9 +906,10 @@ Next is seduce's settings API. To initialize it, call the following function wit
 extern void sui_init_settings(char *settings);
 </pre>
 <p>
-To read out a setting or to set a setting you call the following functions with a key word and a value or a default value that will be
+To read out a setting or to set a setting you call the following functions with a keyword and a value or a default value that will be
 used if the setting doesn't not exist in the database. So you don't need to register the setting you just use it. Thees functions are not
-super fast so if you need the same setting many times, read it out to a temp value once rather then calling the functions in  an inner loop.
+super-fast, so if you need the same setting many times, read it out to a temporary value once rather then calling the functions in an inner
+loop.
 </p>
 <pre class="code">
 extern double  sui_get_setting_double(char *setting, double default_value);
@@ -920,7 +936,7 @@ extern void sui_create_shadow_edge(float size, uint count, float *shadow, float 
 
 <p>
 Perhaps to most advanced function in Seduce is the pop-up function. It draws and executes pop-up menus. The buttons or areas in side the menus
-can be quite complicated and are described in the SUIPUElement structure. Once it is passed in to the function it will return the number of
+can be quite complicated and are described in the <code>SUIPUElement</code> structure. Once it is passed in to the function it will return the number of
 the element that got changed by the user.
 </p>
 <pre class="code">
