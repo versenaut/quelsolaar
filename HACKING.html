@@ -157,11 +157,11 @@ Enough while <tt>s_main*</tt> is a file used by Seduce. The following table summ
 </tr>
 </table>
 <p>
-Outside a module only, the interface found in the main header files should be used. All application specific code is found in
+Outside a module, the interface found in the main header files should be used. All application specific code is found in
 files that begin with the applications initials followed by under score. So files from "Loq Airou" are named <code>la_*</code>.
 In some cases multiple files in a module or app are in a "sub module" then they can be named to formed groups. For instance in
-the Loq Airou source files there are a number of files named far form a group with all the tools found in the pop-up menus,
-they are named la_tool_... In general I write fairly short C files and the practice of having one header file for every C file
+the Loq Airou source files there are a number of files named far from a group with all the tools found in the pop-up menus,
+they are named <tt>la_tool_*</tt>. In general I write fairly short C files and the practice of having one header file for every C file
 would not be very practical, because it would turn out to bee too many header files contain only one or two externs. Therefore
 many C files share header files. Header files inside module are usually only used when many C files in one sub-module needs to
 access the same data.
@@ -228,8 +228,8 @@ if(my_nice_button(input, 0.2, 0.4, "cut"))
 	do_the_cutting();
 </pre>
 <p>
-Now the do_the_cutting() function will only be called in event mode and never in draw mode. As you can see it makes it fairly simple to to write
-interfaces since you don't have to have two different functions to describe the interface that has to be synchronized.
+Now the <code>do_the_cutting()</code> function will only be called in event mode and never in draw mode. As you can see it makes it fairly simple to to write
+interfaces since you don't have to have two different functions to describe the interface, that have to be kept synchronized.
 </p>
 <p>
 The compute mode is usually branched away quickly and is only used for things like keeping Verse alive, and doing computation that has nothing to do
@@ -469,7 +469,7 @@ On top of all this functionality there is actually an other callback that you ca
 extern void e_ns_set_node_create_func(void (* func)(uint connection, uint id, VNodeType type, void *user), void *user);
 </pre>
 <p>
-This callback is called when ever your connection receives a node create command form a node that you have asked to create. This is useful
+This callback is called when ever your connection receives a node create command from a node that you have asked to create. This is useful
 if you write a app that creates a node and then automatically want to add more data to it.
 </p>
 
@@ -652,7 +652,7 @@ to check for a button press.
 <p>
 The current position of the mouse is in <code>pointer_x</code> and <code>pointer_y</code>, while <code>click_pointer_x</code> and
 <code>click_pointer_y</code> are the position of the mouse the last time the left mouse button wasn't pressed. For movement,
-<code>delta_pointer_x</code> and <code>delta_pointer_y</code> are the delta movement of the pointer form the last frame.
+<code>delta_pointer_x</code> and <code>delta_pointer_y</code> are the delta movement of the pointer from the last frame.
 The <code>event</code> and <code>event_count</code> fields contain all key presses since the last frame.
 </p>
 
@@ -688,7 +688,7 @@ Turn on or of the wrapping of the mouse for is that don't use the pointer (FPS t
 extern void betray_execute(char *command);
 </pre>
 <p>
-used to execute a program outside the code.
+Used to execute a program outside the code.
 </p>
 
 <pre class="code">
@@ -735,7 +735,7 @@ To set the screen size / mode to a specific mode call:
 extern boolean betray_set_screen_mode(uint x_size, uint y_size, boolean fullscreen);
 </pre>
 <p>
-to read out the current screen size call the following function, it returns the aspect, and accepts NULL as any parameter.
+To read out the current screen size call the following function, it returns the aspect, and accepts NULL as any parameter.
 </p>
 <pre class="code">
 extern double betray_get_screen_mode(uint *x_size, uint *y_size, boolean *fullscreen);
