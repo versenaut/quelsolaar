@@ -124,10 +124,10 @@ first letter of the name of the module followed by under score. So a file named 
 while s_main is a file used by Seduce. Outside a module only, the interface found in the main header files should
 be used. All application specific code is found in files that begin with the applications initials followed by under
 score. So files from "Loq Airou" are named <code>la_...</code>. In some cases multiple files in a module or app are in a "sub
-module" then they can be named to formed groups. for instance in the Loq Airou source files there are a number of
+module" then they can be named to formed groups. For instance in the Loq Airou source files there are a number of
 files named far form a group with all the tools found in the pop-up menus, they are named la_tool_... In general I
 write fairly short .c files and the practice of having one .h files for every .c file would not be very practical,
-because it would turn out to bee too many .h files contain only one or two externs. therefor many c files share h
+because it would turn out to bee too many .h files contain only one or two externs. Therefore many c files share h
 files. H files inside nodule are usually only used when many c files in one sub module needs to access the same data.
 </p>
 
@@ -135,13 +135,14 @@ files. H files inside nodule are usually only used when many c files in one sub 
 <p>
 Verse is not really a module in this packet it is in its own CVS, but it is needed by all applications, and written
 by the same person who wrote the other modules (me). In fact the module and the applications where created to show case
-Verse. Verse it the real time network I/O that replaces all the file loading and saving in the apps. read more about
+Verse. Verse it the real time network I/O that replaces all the file loading and saving in the apps. Read more about
 Verse at www.blender.org/modules/verse.
 </p>
 
 <h3><a name="mod-st">St</a></h3>
 <p>
-St is a tiny module that include basic defines and some simple universally used functions. st does not require any other lib or module to compile.
+St is a tiny module that include basic definitions and some simple universally used functions. St does not require any
+other library or module to compile, it has no external dependencies.
 </p>
 
 <h3><a name="mod-enough">Enough</a></h3>
@@ -149,8 +150,8 @@ St is a tiny module that include basic defines and some simple universally used 
 Enough is the storage lib that stores incoming data from Verse. It downloads the basic structure of the content of the Verse host it is
 connected to. Enough can handle multiple connections at the same time (although none of the apps or Persuade supports this). Enough does
 not download data, like Geometry and Bitmap layers until the user actually asks for it. Enough does not support any quick searching or
-advanced data storage such as subdivision or BSP. In enough you can store user pointers and function pointers that can be very use full
-if you want to store your own representations of the nodes. this is used extensively in "Co On" and in Persuade.
+advanced data storage such as subdivision or BSP. In enough you can store user pointers and function pointers that can be very useful
+if you want to store your own representations of the nodes. This is used extensively in "Co On" and in Persuade.
 </p>
 
 <h3><a name="mod-betray">Betray</a></h3>
@@ -171,14 +172,14 @@ not work on all platforms but should at least compile.
 <p>
 Betray holds the main loop and calls a function pointer that the application gives it. The function call includes a pointer to the very important
 structure "BInputState". This structure includes the position of the mouse pointer, the state of the mouse buttons, key events and other. It also
-holds a "mode". This is perhaps the most important thing to know about the source code that is kind of non obvious. because the function is not
-called once every frame but THREE times! Once is for drawing, once is for input and the third time is for computational updates. This means that
-Betray can choose to update any of the events at it sees fit.
+holds a "mode". This is perhaps the most important thing to know about the source code that is kind of non-obvious. Because the function is not
+called once every frame but <strong>three</strong> times! Once is for drawing, once is for input and the third time is for computational updates.
+This means that Betray can choose to update any of the events at it sees fit.
 </p>
 <p>
 For instance Betray can run the compute command more gotten then the draw command and the draw command more often then the event command. This
-how ever means that all code has to check what mode it is currently running in. This may seam strange why not have there separate entry points,
-but there is actually a very good reason for this. imagine that you want to implement a button then you would create a function like this:
+how ever means that all code has to check what mode it is currently running in. This may seem strange why not have there separate entry points,
+but there is actually a very good reason for this. Imagine that you want to implement a button. Then you would create a function like this:
 </p>
 
 <pre class="code">boolean my_nice_button(BInputState *input, float pos_x, float pos_y, char *name);
@@ -191,8 +192,8 @@ if(my_nice_button(input, 0.2, 0.4, "cut"))
 	do_the_cutting();
 </pre>
 <p>
-now the do_the_cutting() function will only be called in event mode and never in draw mode. and as you can see it makes it fairly simple to to write
-interfaces whet you don't have to have two different functions to describe the interface that has to be synchronized.
+Now the do_the_cutting() function will only be called in event mode and never in draw mode. As you can see it makes it fairly simple to to write
+interfaces since you don't have to have two different functions to describe the interface that has to be synchronized.
 </p>
 <p>
 The compute mode is usually branched away quickly and is only used for things like keeping Verse alive, and doing computation that has nothing to do
@@ -205,21 +206,21 @@ seduce is the basic interface modules used by all apps. Seduce  used to include 
 more flexible to create UI tool kits ad hock for each application to make them fit better. So seduce mainly includes helper code that is used in all
 types of interfaces like checking if the mouse pointer is inside a rectangle, storing settings, typing in text and drawing text. In addition Seduce
 includes a editor for designing wire frame graphics used in all applications. Although this editor is some what limited it has made it easy to crate
-good looking icons and manipulators. seduce only requires st and Betray to compile, and can be used to non Verse related applications (in fact I have
-frequently used it for demos and rendering research projects)
+good looking icons and manipulators. Seduce only requires St and Betray to compile, and can be used for non-Verse related applications (in fact I have
+frequently used it for demos and rendering research projects).
 </p>
 
 <h3><a name="mod-persuade">Persuade</a></h3>
 <p>
 Persuade is a rendering library that is currently under construction, it uses <a href="http://www.opengl.org/">OpenGL</a> to draw Verse data. It includes
 Subdivision geometry code, shading code using the OpenGL shading language. Persuade can be used to draw entire Verse scenes but can also be used to to draw
-a specific geometry or get a GL handle to a texture provided by Verse. Persuade requires enough and Verse to compile. persuade has a built in "kernel" with
+a specific geometry or get a GL handle to a texture provided by Verse. Persuade requires enough and Verse to compile. Persuade has a built-in "kernel" with
 a task manager that does all the computations. All computations are chopped up in small blocks that are computed one by one. This means that if some thing
 needs to be computed that is quite demanding it will be spit up and wont lock down the computer, meaning continuous smooth frame-rates disregarding of how
 much has to be done in the background.
 </p>
 <p>
-Persuade is currently in development and is less then stable. Therefor you can compile applications that use it with out it simply by removing all the
+Persuade is currently in development and is less then stable. Therefore you can compile applications that use it with out it simply by removing all the
 persuade files and replace persuade.h with a empty persuade.h file. (the persuade.h file contains the define "PERSUADE_H" if it isn't found the code that
 uses it will be removed by ifdefs)
 </p>
@@ -244,10 +245,10 @@ All applications use the same set of external libs there are:
 <h3><a name="building-appspec">Application specific code</a></h3>
 <p>
 Most of the application code is very straight forward. Each application has a main c file where you will find the man function. Each application then gives a
-pointer to Betray that will be the main loop. In most applications this function if first a main loop for the connect/login/splash screen. later when the application
-is connected the application gives Betray the main loop function that will run the application. these main functions are found in the xx_input_handle.c files. These
+pointer to Betray that will be the main loop. In most applications this function if first a main loop for the connect/login/splash screen. Later when the application
+is connected the application gives Betray the main loop function that will run the application. These main functions are found in the xx_input_handle.c files. These
 are possibly the most important file of the application here you will find the main file that traverses the users actions and makes use of all the functionality of
-the application, Note that this function is called three times per frame, Once to draw, once to activate functionality and once for pure computational updates.
+the application. Note that this function is called three times per frame, Once to draw, once to activate functionality and once for pure computational updates.
 </p>
 
 <h3><a name="building-codestyle">Code style</a></h3>
@@ -256,10 +257,10 @@ My code style is best described by reading it, and if you are adding or modifyin
 naming descriptive and prefer "vertex_count" rather then "vc", this does result in kind of wide code but I think it is important to keep it readable.
 </p>
 <p>
-All functions, structures and type defs should start with the First letter of the module that they reside in, this makes it easy to always know from what module a
-function is taken. All functions, typedef members, and variables are written in lower case with underscores as dividers. all functions that are used as function
-pointers get the post fix "func", typedefed types are written in lower case with out any spaces. Macros, defines and enum members are all written in capital letters
-with under scores as spaces. Enum members should also have a sub category that defines in which enum they are defined. Structures and Enum types are written I lower
+All functions, structures and typedefs should start with the First letter of the module that they reside in, this makes it easy to always know from what module a
+function is taken. All functions, typedef members, and variables are written in lower case with underscores as dividers. All functions that are used as function
+pointers get the post fix "func", typedef:ed types are written in lower case without any spaces. Macros, defines and enum members are all written in capital letters
+with underscores as spaces. Enum members should also have a sub-category that defines in which enum they are defined. Structures and enum types are written in lower
 case with lower case letters, but instead of under scores the first letter in each word is capital.
 </p>
 <p>
@@ -292,12 +293,12 @@ I use the tab size of 4 in my editor.
 
 <h3><a name="api-enough">Enough</a></h3>
 <p>
-Enough Is a simple storage lib that stores all in coming callbacks form Verse. to send data changes back to Verse, the normal verse.h API is used. Enough stores
-the data in a fairly simplistic way, it does not sort the data or prepare the data for any specific use, therefor if you use Enough you are likely to need to write
-a data conversion code on top of enough.
+Enough is a simple storage library that stores all incoming data from Verse. To send data changes back to Verse, the normal verse.h API is used. Enough stores
+the data in a fairly simplistic way, it does not sort the data or prepare the data for any specific use, therefore if you use Enough you are likely to need to
+write a data conversion code on top of it.
 </p>
 <p>
-OK lets start looking at the API:
+OK, let's start looking at the API:
 </p>
 <h4><a name="api-enough-con">Managing Connections</a></h4>
 <p>
@@ -307,7 +308,8 @@ To initialize you first need to run:
 void enough_init(void);
 </pre>
 <p>
-Enough can store more then one connection that you can switch between. you need to use Enoughs connect command rather then the verse.h connection command. so use:
+Enough can store more than one connection, and lets you switch between all existing connections. You need to use Enoughs connect command rather then the
+verse.h connection command. So use:
 </p>
 <pre class="code">
 uint e_vc_connect(char *server_address, char *name, char *pass);
@@ -344,7 +346,7 @@ void e_vc_set_auto_subscribe(VNodeType type, boolean set);
 
 <h4><a name="api-enough-nodes">Node Handling</a></h4>
 <p>
-All nodes are handled using the type "ENode". the basic way of getting a node is by one of these functions:
+All nodes are handled using the type "ENode". The basic way of getting a node is by one of these functions:
 </p>
 <pre class="code">
 extern	ENode *e_ns_get_node(uint connection, uint node_id);
@@ -374,9 +376,9 @@ deleted or changed. So you have to store the node ids and the look up the node a
 </p>
 <p>
 Some data like geometry and bitmap layers will not be subscribed to until the user sends calls to get the data.  so if you want to use enough to write
-a saver you cant just connect, wait a while and then traverse the data. when you receive the data you need to traverse the layers and ask enough for
-pointers to the data. the first time they are requested they will return pointers pointing to blank data, but then they will start filling up as enough
-requests the data from the server. if you are writing a app that is connected to a host for a longer time this is very natural behavior.
+a saver you cant just connect, wait a while and then traverse the data. When you receive the data you need to traverse the layers and ask Enough for
+pointers to the data. The first time they are requested they will return pointers pointing to blank data, but then they will start filling up as Enough
+requests the data from the server. If you are writing an application that is connected to a host for a long time, this is very natural behavior.
 </p>
 
 <h4><a name="api-enough-cdata">Custom data</a></h4>
@@ -388,9 +390,10 @@ extern void   e_ns_set_custom_data(ENode *node, uint slot, void *data);
 extern void * e_ns_get_custom_data(ENode *node, uint slot);
 </pre>
 <p>
-Can be used to store pointers for each node. there are 16 differently slots for each node. It is recommended that you use a define for the slot ids you
-use to store your data. by doing this it easier to switch slot if you want to merge your code with other code bases that use enough as storage lib. How ever,
-this is not enough if the node gets deleted the slots will disappear and you will get a memory leak. therefor use this function:
+Can be used to store pointers for each node. There are 16 different slots for each node. It is recommended that you use a <code>define</code> for
+the slot IDs you use to store your data. By doing this it is easier to switch slots if you want to merge your code with other code bases that use
+Enough as storage lib. However, this is not enough if the node gets deleted, the slots will disappear and you will get a memory leak. Therefore
+use this function:
 </p>
 <pre class="code">
 typedef enum{
@@ -415,8 +418,8 @@ extern uint e_ns_get_node_version_data(ENode *node);
 </pre>
 <p>
 the data version is updated if there is any change to the node at all, and the structure version will only be updated if there is a structural change.
-For instance a new vertex, will result in a structural update , while moving a existing vertex will only be a data update. you can also poke at thees
-version numbers your self to force a update by calling:
+For instance a new vertex, will result in a structural update, while moving an existing vertex will only be a data update. You can also poke at these
+version numbers yourself to force an update by calling:
 </p>
 <pre class="code">
 extern void e_ns_update_node_version_struct(ENode *node);
@@ -476,7 +479,8 @@ for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT);
 </pre>
 
 <p>
-Some data types doesn't have their own types and only ids are used. they have similar _next functions. here is an example of going through all tag groups of a node:
+Some data types don't have their own C-level types and only IDs are used. They have similar _next functions. Here is an example of going through
+all tag groups of a node:
 </p>
 <pre class="code">
 for(id = e_ns_get_next_tag_group(node, 0);
@@ -493,14 +497,14 @@ These are functions that are node-specific, i.e. they work only on nodes of cert
 </p>
 <h5><a name="api-enough-nspec-g">Geometry Node</a></h5>
 <p>
-When modifying a geometry node one wants to add new vertexes and polygon one needs empty ids. to do this use the functions:
+When modifying a geometry node, by adding new vertices and polygons, one needs empty IDs. To find such IDs, use the functions:
 </p>
 <pre class="code">
 extern uint e_nsg_find_empty_vertex_slot(ENode *node, uint start);
 extern uint e_nsg_find_empty_polygon_slot(ENode *node, uint start);
 </pre>
 <p>
-Use the "start" param if you need to more then one id. a typical loop to obtain ten id can look like this:
+Use the "start" param if you need to more than one ID. A typical loop to obtain ten IDs can look like this:
 </p>
 <pre class="code">
 uint ids[10], i;
@@ -513,9 +517,9 @@ for(i = 1; i < 10; i++)
 
 <h5><a name="api-enough-nspec-b">Bitmap Node</a></h5>
 <p>
-The bitmap node has the same type of functions as the other nodes. but it also has some extra functionality for read out colors form layers.
-All you need to do is to get a handle and then use that to read out a color at any uv. the functionality will handle, layer searching, data
-conversion, and pixel filtering and pixel lookup. here is an example:
+The bitmap node has the same type of functions as the other nodes. But it also has some extra functionality for reading out colors from layers.
+All you need to do is to get a handle, and then use that to read out a color at any UV coordinate. The functionality will handle, layer searching,
+data conversion, and pixel filtering and pixel lookup. Here is an example:
 <pre class="code">
 EBMHandle *my_handle;
 EBMPrecision my_pixel[3];
@@ -702,7 +706,7 @@ extern double betray_get_screen_mode(uint *x_size, uint *y_size, boolean *fullsc
 </pre>
 
 <p>
-The Betray lib has some special input functionality to handle text editing. to start the type in mode. simply call:
+The Betray library has some special input functionality to handle text editing. To start the type-in mode, simply call:
 <pre class="code">
 extern void betray_start_type_in(char *text, uint size, void (*done_func)(void *user, boolean cancel), uint *cursor, void *user_pointer);
 </pre>
@@ -828,8 +832,9 @@ extern void sui_draw_set_ivec4(uint *array, uint pos, uint a, uint b, uint c, ui
 </pre>
 
 <p>
-So one of the things that Seduce provides you with is the ability to  print out text. the letters are all drawn with lines using OpenGL. The font have been drawn
-in the editor above, and if you have problems with it, you can just draw a new one! ;-)
+So one of the things that Seduce provides you with is the ability to display text. The letters are all drawn with lines using OpenGL.
+The font is hard-coded in the library, and has been drawn by hand (using the editor mentioned above). If you have problems with it,
+you can just draw a new one! ;-)
 </p>
 <p>
 First we have two defines for the standard size and spacing of text:
@@ -854,24 +859,25 @@ extern float sui_get_letter_size(char letter);
 </pre>
 
 <p>
-To draw an entire string of text with kerning and all call the following function. the "pos_x" and "pos_y" is where you would like to draw the text, "size" is
-the font size, "spacing" is the space between letters after kerning (normally SUI_T_SPACE), and "red", "green" and "blue" is the color.
+To draw an entire string of text with kerning and all, call the following function. The <code>pos_x</code> and <code>pos_y</code> is where you would
+like to draw the text; <code>size</code> is the font size; <code>spacing<code> is the space between letters after kerning (normally SUI_T_SPACE), and
+<code>red</code>, <code>green</code> and <code>blue</code> define the color.
 </p>
 <pre class="code">
 extern void sui_draw_text(float pos_x, float pos_y, float size, float spacing, char *text, float red, float green, float blue);
 </pre>
 
 <p>
-Sometimes it can be good to know how long a text will be once printed, to be able to do centering and other things. use the same values as for sui_draw_text
-with the following to get the correct length.
+Sometimes it can be good to know how long a string of text will be once rendered, to be able to do centering and other things. Use the same values
+as for <code>sui_draw_text()</code> with the following to get the correct length:
 </p>
 <pre class="code">
 extern float sui_compute_text_length(float size, float spacing, char *text);
 </pre>
 
 <p>
-If you want a text button the next function does that for you. Remember that it does only draw a text it does not draw any button graphics. the param center
-lets you make the button left aligned (0), centered (0.5) or right aligned (1)
+If you want a text button the next function does that for you. Remember that it does only draw a text it does not draw any button graphics. The param
+<code>center</code> lets you make the button left aligned (0), centered (0.5) or right aligned (1.0)
 <pre class="code">
 extern boolean sw_text_button(BInputState *input, float pos_x, float pos_y, float center, float size, float spacing, char *text, float red, float green, float blue);
 </pre>
