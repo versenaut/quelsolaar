@@ -108,7 +108,7 @@ table.table
 <h2><a name="intro">Introduction</a></h2>
 <p>
 This document guides through the source files that create "Loq Airou", "Quel Solaar", "Connector", and the UV editor
-just known as "uv". Although these apps are separate they shard source code and are built on the same principles.
+just known as "uv". Although these applications are separate they share source code and are built on the same principles.
 Generally the code has very few comments, but it should still be fairly clear, with the help of this guide. This
 guide will also include information on reading and writing in my coding style, please try to maintain the coding
 style if you modify the code.
@@ -171,7 +171,7 @@ access the same data.
 <p>
 Verse is not really a module in this package, it's in its own CVS. Verse is needed by all applications, and was written by
 the same person who wrote the other modules (Eskil). In fact the module and the applications where created to show-case
-Verse. Verse it's the real time network I/O that replaces all the file loading and saving in the apps. Read more about
+Verse. Verse it's the real time network I/O that replaces all the file loading and saving in the applications. Read more about
 Verse at www.blender.org/modules/verse.
 </p>
 
@@ -184,10 +184,10 @@ other library or module to compile, it has no external dependencies.
 <h3><a name="mod-enough">Enough</a></h3>
 <p>
 Enough is the storage lib that stores incoming data from Verse. It downloads the basic structure of the content of the Verse host it is
-connected to. Enough can handle multiple connections at the same time (although none of the apps or Persuade supports this). Enough does
-not download data, like Geometry and Bitmap layers until the user actually asks for it. Enough does not support any quick searching or
-advanced data storage such as subdivision or BSP. In enough you can store user pointers and function pointers that can be very useful
-if you want to store your own representations of the nodes. This is used extensively in "Co On" and in Persuade.
+connected to. Enough can handle multiple connections at the same time (although none of the applications, or Persuade, supports this).
+Enough does not download data, like Geometry and Bitmap layers until the user actually asks for it. Enough does not support any quick
+searching or advanced data storage such as subdivision or BSP. In enough you can store user pointers and function pointers that can be
+very useful if you want to store your own representations of the nodes. This is used extensively in "Co On" and in Persuade.
 </p>
 
 <h3><a name="mod-betray">Betray</a></h3>
@@ -196,7 +196,7 @@ Betray is the module that wraps all OS calls like access to input and opening wi
 <a href="http://www.opengl.org/resources/libraries/glut.html">GLUT</a>,
 <a href="http://glfw.sourceforge.net/">GLFW</a> or
 <a href="http://www.libsdl.org/">SDL</a>,
-all are highly portable and they should keep all applications portable. If you would like to port any of the apps to another platform or
+all are highly portable and they should keep all applications portable. If you would like to port any of the applications to another platform or
 give them native support on a platform where they already exist this is where you should add it. The Betray module uses <code>define</code>s
 in the <code>betray.h</code> file to switch between the different libraries.
 </p>
@@ -238,7 +238,7 @@ with drawing or input. This mode is the only mode that will be called if the app
 
 <h3><a name="mod-seduce">Seduce</a></h3>
 <p>
-Seduce is the basic interface modules used by all apps. Seduce  used to include buttons and other interface elements, but I have found it easier and
+Seduce is the basic interface modules used by all applications. Seduce  used to include buttons and other interface elements, but I have found it easier and
 more flexible to create UI tool kits ad hock for each application to make them fit better. So Seduce mainly includes helper code that is used in all
 types of interfaces like checking if the mouse pointer is inside a rectangle, storing settings, typing in text and drawing text. In addition Seduce
 includes a editor for designing wire frame graphics used in all applications. Although this editor is some what limited it has made it easy to crate
@@ -770,7 +770,7 @@ extern void betray_launch_main_loop(void);
 
 <p>
 Two functions to read the time independent of Verse, although you should use Verse timer API if you are timing anything like animation in the interface
-(too bad I haven't used in the apps so all the timing on the animation is all screwed up...) They also work before you have a communication.
+(too bad I haven't used in the applications so all the timing on the animation is all screwed up...) They also work before you have a communication.
 </p>
 <pre class="code">
 extern void   betray_get_current_time(uint32 *seconds, uint32 *fractions);
