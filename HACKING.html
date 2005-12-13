@@ -119,23 +119,59 @@ style if you modify the code.
 The code is divided in to a number of modules they are "Verse", "Enough", "Betray", "Seduce" "Persuade" and "ST".
 </p>
 <p>
-All modules have header file named after the module (like enough.h and betray.h), all other files begins with the
-first letter of the name of the module followed by under score. So a file named e_head.c is a file used by Enough
-while s_main is a file used by Seduce. Outside a module only, the interface found in the main header files should
-be used. All application specific code is found in files that begin with the applications initials followed by under
-score. So files from "Loq Airou" are named <code>la_...</code>. In some cases multiple files in a module or app are in a "sub
-module" then they can be named to formed groups. For instance in the Loq Airou source files there are a number of
-files named far form a group with all the tools found in the pop-up menus, they are named la_tool_... In general I
-write fairly short .c files and the practice of having one .h files for every .c file would not be very practical,
-because it would turn out to bee too many .h files contain only one or two externs. Therefore many c files share h
-files. H files inside nodule are usually only used when many c files in one sub module needs to access the same data.
+All modules have header file named after the module (like <tt>enough.h</tt> and <tt>betray.h</tt>), all other files begins
+with the first letter of the name of the module followed by an underscore. So a file named <tt>e_head.c</tt> is a file used by
+Enough while <tt>s_main*</tt> is a file used by Seduce. The following table summarizes the module-specific filename prefixes used
+(in alphabetical order):
+</p>
+<table class="table">
+<tr>
+ <th>Prefix</th>
+ <th>Module</th>
+ <th>Description</th>
+</tr>
+<tr>
+ <td><tt>b_</tt></td>
+ <td><a href="#mod-betray">Betray</a></td>
+ <td>Windowing abstractions</td>
+</tr>
+<tr>
+ <td><tt>e_</tt></td>
+ <td><a href="#mod-enough">Enough</a></td>
+ <td>Verse data storage</td>
+</tr>
+<tr>
+ <td><tt>p_</tt>
+ <td><a href="#mod-persuade">Persuade</a></td>
+ <td>High-quality rendering</td>
+</tr>
+<tr>
+ <td><tt>s_</tt></td>
+ <td><a href="#mod-seduce">Seduce</a></tt>
+ <td>User interface</td>
+</tr>
+<tr>
+ <td><tt>st_</tt>
+ <td><a href="#mod-st">"Standard"</a>
+ <td>Utility code</td>
+</tr>
+</table>
+<p>
+Outside a module only, the interface found in the main header files should be used. All application specific code is found in
+files that begin with the applications initials followed by under score. So files from "Loq Airou" are named <code>la_*</code>.
+In some cases multiple files in a module or app are in a "sub module" then they can be named to formed groups. For instance in
+the Loq Airou source files there are a number of files named far form a group with all the tools found in the pop-up menus,
+they are named la_tool_... In general I write fairly short C files and the practice of having one header file for every C file
+would not be very practical, because it would turn out to bee too many header files contain only one or two externs. Therefore
+many C files share header files. Header files inside module are usually only used when many C files in one sub-module needs to
+access the same data.
 </p>
 
 <h3><a name="mod-verse">Verse</a></h3>
 <p>
-Verse is not really a module in this packet it is in its own CVS, but it is needed by all applications, and written
-by the same person who wrote the other modules (me). In fact the module and the applications where created to show case
-Verse. Verse it the real time network I/O that replaces all the file loading and saving in the apps. Read more about
+Verse is not really a module in this package, it's in its own CVS. Verse is needed by all applications, and was written by
+the same person who wrote the other modules (Eskil). In fact the module and the applications where created to show-case
+Verse. Verse it's the real time network I/O that replaces all the file loading and saving in the apps. Read more about
 Verse at www.blender.org/modules/verse.
 </p>
 
@@ -202,8 +238,8 @@ with drawing or input. This mode is the only mode that will be called if the app
 
 <h3><a name="mod-seduce">Seduce</a></h3>
 <p>
-seduce is the basic interface modules used by all apps. Seduce  used to include buttons and other interface elements, but I have found it easier and
-more flexible to create UI tool kits ad hock for each application to make them fit better. So seduce mainly includes helper code that is used in all
+Seduce is the basic interface modules used by all apps. Seduce  used to include buttons and other interface elements, but I have found it easier and
+more flexible to create UI tool kits ad hock for each application to make them fit better. So Seduce mainly includes helper code that is used in all
 types of interfaces like checking if the mouse pointer is inside a rectangle, storing settings, typing in text and drawing text. In addition Seduce
 includes a editor for designing wire frame graphics used in all applications. Although this editor is some what limited it has made it easy to crate
 good looking icons and manipulators. Seduce only requires St and Betray to compile, and can be used for non-Verse related applications (in fact I have
@@ -221,8 +257,8 @@ much has to be done in the background.
 </p>
 <p>
 Persuade is currently in development and is less then stable. Therefore you can compile applications that use it with out it simply by removing all the
-persuade files and replace persuade.h with a empty persuade.h file. (the persuade.h file contains the define "PERSUADE_H" if it isn't found the code that
-uses it will be removed by ifdefs)
+Persuade files and replace <tt>persuade.h</tt> with an empty <tt>persuade.h</tt> file (the <tt>persuade.h</tt> file contains the define "PERSUADE_H" if
+it isn't found the code that uses it will be removed by <code>ifdef</code>:s).
 </p>
 
 <h2><a name="building">Building</a></h2>
@@ -246,7 +282,7 @@ All applications use the same set of external libs there are:
 <p>
 Most of the application code is very straight forward. Each application has a main c file where you will find the man function. Each application then gives a
 pointer to Betray that will be the main loop. In most applications this function if first a main loop for the connect/login/splash screen. Later when the application
-is connected the application gives Betray the main loop function that will run the application. These main functions are found in the xx_input_handle.c files. These
+is connected the application gives Betray the main loop function that will run the application. These main functions are found in the <tt>xx_input_handle.c</tt> files. These
 are possibly the most important file of the application here you will find the main file that traverses the users actions and makes use of all the functionality of
 the application. Note that this function is called three times per frame, Once to draw, once to activate functionality and once for pure computational updates.
 </p>
@@ -906,7 +942,7 @@ extern boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y
 </pre>
 
 <p>
-Next is seduce's settings API. To initialize it, call the following function with the name of a settings file as argument.
+Next is Seduce's settings API. To initialize it, call the following function with the name of a settings file as argument.
 </p>
 <pre class="code">
 extern void sui_init_settings(char *settings);
