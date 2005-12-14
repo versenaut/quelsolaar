@@ -1,12 +1,9 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-"http://www.w3.org/TR/html4/strict.dtd">
-
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+  <meta http-equiv="Content-Type"  content="text/html; charset=ISO-8859-1">
 
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-
-<style type="text/css">
+  <style type="text/css">
 <!--
 
 div.title
@@ -44,988 +41,915 @@ table.table
 }
 
 -->
-</style>
-
-<title>"Quel Solaar" Source Guide</title>
+  </style>
+  <title>"Quel Solaar" Source Guide</title>
 </head>
 
 <body>
-
 <div class="title">
- <h1>"Quel Solaar" Source Guide</h1>
+<h1>"Quel Solaar" Source Guide</h1>
 </div>
 <div class="credits">
- <p>
- Written by Eskil Steenberg (<a href="mailto:eskil@obsession.se">eskil@obsession.se</a>)<br>
- Converted to HTML by Emil Brink (<a href="mailto:emil@obsession.se">emil@obsession.se</a>)
- </p>
+<p> Written by Eskil Steenberg (<a href="mailto:eskil@obsession.se">eskil@obsession.se</a>),<br>
+Converted to HTML by Emil Brink (<a href="mailto:emil@obsession.se">emil@obsession.se</a>),<br>
+Additional proofreading by Camilla Berglund (<a href="mailto:camilla.berglund@gmail.com">camilla.berglund@gmail.com</a>).
+</p>
 </div>
-
 <hr>
 <h2>Table of Contents</h2>
 <ul class="toc">
- <li><a href="#intro">Introduction</a></li>
- <li><a href="#modules">Modules and What They Do</a>
-  <ul class="toc">
-   <li><a href="#mod-verse">Verse</a></li>
-   <li><a href="#mod-st">St</a></li>
-   <li><a href="#mod-enough">Enough</a></li>
-   <li><a href="#mod-betray">Betray</a></li>
-   <li><a href="#mod-seduce">Seduce</a></li>
-   <li><a href="#mod-persuade">Persuade</a></li>
-  </ul>
- </li>
- <li><a href="#building">Building</a>
-  <ul class="toc">
-   <li><a href="#building-appspec">Application-Specific Code</a></li>
-   <li><a href="#building-codestyle">Code Style</a></li>
-  </ul>
- </li>
- <li><a href="#api">Module API Reference</a>
-  <ul class="toc">
-   <li><a href="#api-enough">Enough</a>
+  <li><a href="#intro">Introduction</a></li>
+  <li><a href="#modules">Modules and What They Do</a>
     <ul class="toc">
-     <li><a href="#api-enough-con">Managing Connections</a></li>
-     <li><a href="#api-enough-nodes">Node Handling</a></li>
-     <li><a href="#api-enough-cdata">Custom Data</a></li>
-     <li><a href="#api-enough-ndata">Node Data</a></li>
-     <li><a href="#api-enough-nspec">Special Node Functions</a>
-      <ul class="toc">
-       <li><a href="#api-enough-nspec-g">Geometry Node</a></li>
-       <li><a href="#api-enough-nspec-b">Bitmap Node</a></li>
-      </ul>
-     </li>
+      <li><a href="#mod-verse">Verse</a></li>
+      <li><a href="#mod-st">St</a></li>
+      <li><a href="#mod-enough">Enough</a></li>
+      <li><a href="#mod-betray">Betray</a></li>
+      <li><a href="#mod-seduce">Seduce</a></li>
+      <li><a href="#mod-persuade">Persuade</a></li>
     </ul>
-   </li>
-   <li><a href="#api-betray">Betray</a></li>
-   <li><a href="#api-seduce">Seduce</a></li>
-  </ul>
- </li>
- <li><a href="#links">Links</a></li>
+  </li>
+  <li><a href="#building">Building</a>
+    <ul class="toc">
+      <li><a href="#building-appspec">Application-Specific Code</a></li>
+      <li><a href="#building-codestyle">Code Style</a></li>
+    </ul>
+  </li>
+  <li><a href="#api">Module API Reference</a>
+    <ul class="toc">
+      <li><a href="#api-enough">Enough</a>
+        <ul class="toc">
+          <li><a href="#api-enough-con">Managing Connections</a></li>
+          <li><a href="#api-enough-nodes">Node Handling</a></li>
+          <li><a href="#api-enough-cdata">Custom Data</a></li>
+          <li><a href="#api-enough-ndata">Node Data</a></li>
+          <li><a href="#api-enough-nspec">Special Node Functions</a>
+            <ul class="toc">
+              <li><a href="#api-enough-nspec-g">Geometry Node</a></li>
+              <li><a href="#api-enough-nspec-b">Bitmap Node</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#api-betray">Betray</a></li>
+      <li><a href="#api-seduce">Seduce</a></li>
+    </ul>
+  </li>
+  <li><a href="#links">Links</a></li>
 </ul>
 <hr>
-
 <h2><a name="intro">Introduction</a></h2>
 <p>
-This document guides through the source files that create "Loq Airou", "Quel Solaar", "Connector", and the UV editor
-just known as "uv". Although these applications are separate they share source code and are built on the same principles.
-Generally the code has very few comments, but it should still be fairly clear, with the help of this guide. This
-guide will also include information on reading and writing in my coding style, please try to maintain the coding
+This is a guide through the source code of Loq Airou, Quel Solaar,
+Connector, and the UV editor
+known just as "uv". Although these applications are separate they share
+source code and are built on the same principles.
+Generally the code has very few comments, but it should still be fairly
+clear, with the help of this guide. This
+guide also includes information on my coding style. Please try to
+maintain the coding
 style if you modify the code.
 </p>
-
 <h2><a name="modules">Modules and What They Do</a></h2>
 <p>
-The code is divided in to a number of modules they are "Verse", "Enough", "Betray", "Seduce" "Persuade" and "St".
+The code is divided into a number of modules. They are Verse, Enough,
+Betray, Seduce, Persuade and St.
 </p>
 <p>
-All modules have header file named after the module (like <tt>enough.h</tt> and <tt>betray.h</tt>), all other files begins
-with the first letter of the name of the module followed by an underscore. So a file named <tt>e_head.c</tt> is a file used by
-Enough while <tt>s_main*</tt> is a file used by Seduce. The following table summarizes the module-specific filename prefixes used
+All modules have a header file named after the module (like <tt>enough.h</tt>
+and <tt>betray.h</tt>). All other files begin
+with the first letter of the name of the module, followed by an
+underscore, so a file named <tt>e_head.c</tt> is a file used by
+Enough while <tt>s_main*</tt> is a file used by Seduce. The following
+table summarizes the module-specific filename prefixes used
 (in alphabetical order):
 </p>
 <table class="table">
-<tr>
- <th>Prefix</th>
- <th>Module</th>
- <th>Description</th>
-</tr>
-<tr>
- <td><tt>b_</tt></td>
- <td><a href="#mod-betray">Betray</a></td>
- <td>Windowing abstractions</td>
-</tr>
-<tr>
- <td><tt>e_</tt></td>
- <td><a href="#mod-enough">Enough</a></td>
- <td>Verse data storage</td>
-</tr>
-<tr>
- <td><tt>p_</tt>
- <td><a href="#mod-persuade">Persuade</a></td>
- <td>High-quality rendering</td>
-</tr>
-<tr>
- <td><tt>s_</tt></td>
- <td><a href="#mod-seduce">Seduce</a></tt>
- <td>User interface</td>
-</tr>
-<tr>
- <td><tt>st_</tt>
- <td><a href="#mod-st">"Standard"</a>
- <td>Utility code</td>
-</tr>
+  <tbody>
+    <tr>
+      <th>Prefix</th>
+      <th>Module</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td><tt>b_</tt></td>
+      <td><a href="#mod-betray">Betray</a></td>
+      <td>Windowing abstractions</td>
+    </tr>
+    <tr>
+      <td><tt>e_</tt></td>
+      <td><a href="#mod-enough">Enough</a></td>
+      <td>Verse data storage</td>
+    </tr>
+    <tr>
+      <td><tt>p_</tt> </td>
+      <td><a href="#mod-persuade">Persuade</a></td>
+      <td>High-quality rendering</td>
+    </tr>
+    <tr>
+      <td><tt>s_</tt></td>
+      <td><a href="#mod-seduce">Seduce</a> </td>
+      <td>User interface</td>
+    </tr>
+    <tr>
+      <td><tt>st_</tt> </td>
+      <td><a href="#mod-st">"Standard"</a> </td>
+      <td>Utility code</td>
+    </tr>
+  </tbody>
 </table>
 <p>
-Outside a module, the interface found in the main header files should be used. All application specific code is found in
-files that begin with the applications initials followed by under score. So files from "Loq Airou" are named <code>la_*</code>.
-In some cases multiple files in a module or app are in a "sub module" then they can be named to formed groups. For instance in
-the Loq Airou source files there are a number of files named far from a group with all the tools found in the pop-up menus,
-they are named <tt>la_tool_*</tt>. In general I write fairly short C files and the practice of having one header file for every C file
-would not be very practical, because it would turn out to bee too many header files contain only one or two externs. Therefore
-many C files share header files. Header files inside module are usually only used when many C files in one sub-module needs to
+Outside of a module, only the interface in its main header file should
+be used. All application specific code is found in
+files that begin with the application's initials, followed by an
+underscore. For example, files from Loq Airou are named <code>la_*</code>.
+In some cases, when multiple files in a module or application make up a
+"sub-module", they may be named to reflect this. For instance, in Loq
+Airou there are a number of files named <tt>la_tool_*</tt>, which
+contain all the tools found in the pop-up menus<tt></tt>. I generally
+write fairly short implementation files, and the practice of having one
+header file for every .c file
+would not be very practical, because many header files would contain
+only one or two external symbols. Therefore,
+many .c files share header files. Header files inside modules are
+usually only used when many .c files in one sub-module needs to
 access the same data.
 </p>
-
 <h3><a name="mod-verse">Verse</a></h3>
 <p>
-Verse is not really a module in this package, it's in its own CVS. Verse is needed by all applications, and was written by
-the same person who wrote the other modules (Eskil). In fact the module and the applications where created to show-case
-Verse. Verse it's the real time network I/O that replaces all the file loading and saving in the applications. Read more about
-Verse at www.blender.org/modules/verse.
+Verse is not really a module in this package, and it resides in its own
+CVS module. Verse is needed by all applications, however, and was
+written by
+the same person who wrote the other modules (Eskil). In fact, the
+modules and applications were created to showcase
+Verse. Verse is the real-time network I/O layer that replaces all the
+file loading and saving in the applications. Read more about
+Verse at <a href="http://www.blender.org/modules/verse/">blender.org</a>.
 </p>
-
 <h3><a name="mod-st">St</a></h3>
 <p>
-St is a tiny module that include basic definitions and some simple universally used functions. St does not require any
-other library or module to compile, it has no external dependencies.
+St is a tiny module that include basic definitions and some simple
+globally used functions. St has no external dependencies, and so does
+not require any
+other library or module to compile.
 </p>
-
 <h3><a name="mod-enough">Enough</a></h3>
 <p>
-Enough is the storage lib that stores incoming data from Verse. It downloads the basic structure of the content of the Verse host it is
-connected to. Enough can handle multiple connections at the same time (although none of the applications, or Persuade, supports this).
-Enough does not download data, like Geometry and Bitmap layers until the user actually asks for it. Enough does not support any quick
-searching or advanced data storage such as subdivision or BSP. In enough you can store user pointers and function pointers that can be
-very useful if you want to store your own representations of the nodes. This is used extensively in "Co On" and in Persuade.
+Enough is the storage library, and stores incoming data from Verse. It
+downloads the basic structure of the content of the Verse host it is
+connected to. Enough can handle multiple connections at the same time
+(although neither any of the applications nor Persuade supports this).
+Enough does not download data, like Geometry and Bitmap layers, until
+the user actually asks for it. Enough does not support any form of
+quick
+searching or advanced data storage such as subdivision or BSP. In
+Enough you can store user-defined and function pointers, which may be
+very useful if you want to store your own representations of the nodes.
+This is used extensively in both Connector and Persuade.
 </p>
-
 <h3><a name="mod-betray">Betray</a></h3>
 <p>
-Betray is the module that wraps all OS calls like access to input and opening windows. Betray can be compiled either against
+Betray is the module that wraps all OS-specific calls, like access to
+input devices and creation of windows. Betray can be compiled against
+any one of
 <a href="http://www.opengl.org/resources/libraries/glut.html">GLUT</a>,
 <a href="http://glfw.sourceforge.net/">GLFW</a> or
-<a href="http://www.libsdl.org/">SDL</a>,
-all are highly portable and they should keep all applications portable. If you would like to port any of the applications to another platform or
-give them native support on a platform where they already exist this is where you should add it. The Betray module uses <code>define</code>s
-in the <code>betray.h</code> file to switch between the different libraries.
+<a href="http://www.libsdl.org/">SDL</a>. All are highly portable,
+which in turn should make the applications portable. If you would like
+to port any of the applications to another platform, or
+give them native support on a platform where they already exist, then
+this is where you should add it. The Betray module uses <code>define</code>s
+in the <code>betray.h</code> file to switch between the different
+libraries.
 </p>
 <p>
-If you would like to add some sort of system specific functionality, the Betray API can be extended, but should be the same disregarding how
-Betray is compiled. The user of Betray should not have to read defines to know where or not some thing is available. The functionality may
-not work on all platforms but should at least compile.
+If you would like to add some sort of system-specific functionality,
+the Betray API can be extended. However, it should be the same
+regardless of how
+Betray is compiled. Users of Betray should not have to read defines to
+know whether or not something is available. The functionality may
+not work on all platforms, but it should at least compile.
 </p>
 <p>
-Betray holds the main loop and calls a function pointer that the application gives it. The function call includes a pointer to the very important
-structure "BInputState". This structure includes the position of the mouse pointer, the state of the mouse buttons, key events and other. It also
-holds a "mode". This is perhaps the most important thing to know about the source code that is kind of non-obvious. Because the function is not
-called once every frame but <strong>three</strong> times! Once is for drawing, once is for input and the third time is for computational updates.
-This means that Betray can choose to update any of the events at it sees fit.
+Betray contains the main loop and calls a function provided to it by
+the application, which takes a pointer to the (very important)
+<code>BInputState</code>
+structure. This structure includes the position of the mouse pointer,
+the state of the mouse buttons, key events and other data. It also
+contains a "mode", which is perhaps the most important thing, but
+rather non-obvious, because the function is not
+called once per frame but <strong>three</strong> times! Once for
+drawing, once for input and the third time for computational updates.
+This means that Betray can choose to send any of these events at it
+sees fit.
 </p>
 <p>
-For instance Betray can run the compute command more gotten then the draw command and the draw command more often then the event command. This
-how ever means that all code has to check what mode it is currently running in. This may seem strange why not have there separate entry points,
-but there is actually a very good reason for this. Imagine that you want to implement a button. Then you would create a function like this:
+For instance Betray can run the compute command more often than the
+draw command, and the draw command more often than the event command.
+However, this means that your code has to check what mode it is
+currently
+running in. This may seem strange, after all, why not have there
+separate entry
+points? There is actually a very good reason for this, though. Imagine
+that you
+want to implement a button. Then you would create a function like this:
 </p>
-
-<pre class="code">boolean my_nice_button(BInputState *input, float pos_x, float pos_y, char *name);
-</pre>
+<pre class="code">boolean my_nice_button(BInputState *input, float pos_x, float pos_y, char *name);<br></pre>
 <p>
-now inside this function I can switch to ether draw a button or, I can check if the user just clicked the button. The function will always return
-FALSE in draw mode, and that means that the app can use the function like this:
-<pre class="code">
-if(my_nice_button(input, 0.2, 0.4, "cut"))
-	do_the_cutting();
-</pre>
+Now, inside this function I can ether draw the button or
+check if the user just clicked the button. The function will always
+return
+<code>FALSE</code> in draw mode, which means that the application can use the
+function
+like this:
+</p>
+<pre class="code">if(my_nice_button(input, 0.2f, 0.4f, "cut"))<br>	do_the_cutting();<br></pre>
 <p>
-Now the <code>do_the_cutting()</code> function will only be called in event mode and never in draw mode. As you can see it makes it fairly simple to to write
-interfaces since you don't have to have two different functions to describe the interface, that have to be kept synchronized.
+Now the <code>do_the_cutting()</code> function will only be called in
+event mode and never in draw mode. As you can see, it makes it fairly
+easy to to write
+interfaces, since you don't need two different functions to
+describe the interface, which then have to be kept synchronized.
 </p>
 <p>
-The compute mode is usually branched away quickly and is only used for things like keeping Verse alive, and doing computation that has nothing to do
-with drawing or input. This mode is the only mode that will be called if the application is iconified.
+The compute mode is usually processed quickly, and is only used for
+things like keeping Verse alive and performing computation that has
+nothing
+to do
+with drawing or input. This mode is the only mode that will be called
+if the application is iconified.
 </p>
-
 <h3><a name="mod-seduce">Seduce</a></h3>
 <p>
-Seduce is the basic interface modules used by all applications. Seduce  used to include buttons and other interface elements, but I have found it easier and
-more flexible to create UI tool kits ad hock for each application to make them fit better. So Seduce mainly includes helper code that is used in all
-types of interfaces like checking if the mouse pointer is inside a rectangle, storing settings, typing in text and drawing text. In addition Seduce
-includes a editor for designing wire frame graphics used in all applications. Although this editor is some what limited it has made it easy to crate
-good looking icons and manipulators. Seduce only requires St and Betray to compile, and can be used for non-Verse related applications (in fact I have
+Seduce is the basic interface module used by all applications. Seduce
+used to include buttons and other interface elements, but I have found
+it easier and
+more flexible to create ad hoc UI toolkits for each application, in
+order to make
+them fit better. Therefore, Seduce mainly includes helper code that is
+used in
+all
+types of interfaces, such as checking if the mouse pointer is inside a
+rectangle, storing settings, entering and drawing text. In
+addition, Seduce
+includes an editor for designing wireframe graphics used in all
+applications. Although this editor is somewhat limited, it has made it
+easy to create
+good looking icons and manipulators. Seduce only requires St and Betray
+to compile, and can be used for non-Verse related applications (in fact
+I have
 frequently used it for demos and rendering research projects).
 </p>
-
 <h3><a name="mod-persuade">Persuade</a></h3>
 <p>
-Persuade is a rendering library that is currently under construction, it uses <a href="http://www.opengl.org/">OpenGL</a> to draw Verse data. It includes
-Subdivision geometry code, shading code using the OpenGL shading language. Persuade can be used to draw entire Verse scenes but can also be used to to draw
-a specific geometry or get a GL handle to a texture provided by Verse. Persuade requires enough and Verse to compile. Persuade has a built-in "kernel" with
-a task manager that does all the computations. All computations are chopped up in small blocks that are computed one by one. This means that if some thing
-needs to be computed that is quite demanding it will be spit up and wont lock down the computer, meaning continuous smooth frame-rates disregarding of how
+Persuade is a rendering library, and is currently under construction.
+It uses <a href="http://www.opengl.org/">OpenGL</a> to draw Verse
+data. It also includes subdivision geometry code, and shading code
+using the OpenGL Shading Language. Persuade can be used to draw whole
+Verse scenes, but can also
+be used to to draw
+a specific geometry node, or to get an OpenGL handle to a texture
+provided by Verse.
+Persuade requires Enough and Verse to compile. It has a built-in
+"kernel" with
+a task manager that does all the computations. All computations are
+chopped up in small blocks that are computed one by one. This means
+that if something
+needs to be computed that is quite demanding, it will be split up, and
+won't lock up the computer. This ensures continuous smooth framerates,
+regardless of how
 much has to be done in the background.
 </p>
 <p>
-Persuade is currently in development and is less then stable. Therefore you can compile applications that use it with out it simply by removing all the
-Persuade files and replace <tt>persuade.h</tt> with an empty <tt>persuade.h</tt> file (the <tt>persuade.h</tt> file contains the define "PERSUADE_H" if
-it isn't found the code that uses it will be removed by <code>ifdef</code>:s).
+Persuade is currently in development and is somewhat less than stable.
+Therefore,
+you can compile applications that use it without it simply by removing
+all the
+Persuade files and replace <tt>persuade.h</tt> with an empty <tt>persuade.h</tt>
+file (the <tt>persuade.h</tt> file contains the define <code>PERSUADE_H</code>,
+which if not defined, will cause the code using Persuade to be removed
+by <code>ifdef</code>:s).
 </p>
-
 <h2><a name="building">Building</a></h2>
 <p>
-To build one of the applications, compile and link all module files (including Verse) with the files for the applications you want to build. Although
-the modules can be compiled as separate libs, I find easier to build them all at once. I keep them in one large project, It helps when debugging and lets
+To build one of the applications, compile and link all module files
+(including Verse) with the files for the applications you want to
+build. Although
+the modules can be compiled as separate libraries, I find easier to
+build
+them all at once. I keep them in one large project, It helps when
+debugging and lets
 me have access to the entire source base at any time.
 </p>
 <h3><a name="building-deps">Dependencies</a></h3>
 <p>
-All applications use the same set of external libs there are:
+All applications use the same set of external libraries:
 </p>
 <ul>
- <li>Standard-lib</li>
- <li>Sockets (wsock32.lib on windows)</li>
- <li>OpenGL</li>
- <li>GLUT, GLFW or SDL (Betray back-end)</li>
+  <li>Standard C library<br>
+  </li>
+  <li>Sockets (wsock32.lib on windows)</li>
+  <li>OpenGL</li>
+  <li>GLUT, GLFW or SDL (Betray back-end)</li>
 </ul>
-
 <h3><a name="building-appspec">Application specific code</a></h3>
 <p>
-Most of the application code is very straight forward. Each application has a main c file where you will find the man function. Each application then gives a
-pointer to Betray that will be the main loop. In most applications this function if first a main loop for the connect/login/splash screen. Later when the application
-is connected the application gives Betray the main loop function that will run the application. These main functions are found in the <tt>xx_input_handle.c</tt> files. These
-are possibly the most important file of the application here you will find the main file that traverses the users actions and makes use of all the functionality of
-the application. Note that this function is called three times per frame, Once to draw, once to activate functionality and once for pure computational updates.
+Most of the application code is very straightforward. Each application
+has a main .c file where you will find the main function. Each
+application then hands a
+function pointer to Betray, which will be the action function. In most
+applications this
+is initially the function for the connect/login/splash screen.
+Later, when the application
+is connected, it gives Betray the action function that
+will drive the application. These main functions are found in the <tt>xx_input_handle.c</tt>
+files. These
+are possibly the most important files of the application. Here you will
+find the main file that handles the user's actions and uses
+all the functionality of
+the application. Again, note that an action function is called three
+times per
+frame; once to draw, once to activate functionality and once for pure
+computational updates.
 </p>
-
 <h3><a name="building-codestyle">Code style</a></h3>
 <p>
-My code style is best described by reading it, and if you are adding or modifying the code I would appreciate if you kept it consistent. In general I try to keep all
-naming descriptive and prefer "vertex_count" rather then "vc", this does result in kind of wide code but I think it is important to keep it readable.
+My coding style is best described by seeing it. If you are adding to or
+modifying the code, I would appreciate it if you kept the style
+consistent. In
+general I try to keep all
+names descriptive, preferring <code>vertex_count</code> over <code>vc</code>. This
+does result in rather wide code, but I think it is important to keep it
+readable.
 </p>
 <p>
-All functions, structures and typedefs should start with the First letter of the module that they reside in, this makes it easy to always know from what module a
-function is taken. All functions, typedef members, and variables are written in lower case with underscores as dividers. All functions that are used as function
-pointers get the post fix "func", typedef:ed types are written in lower case without any spaces. Macros, defines and enum members are all written in capital letters
-with underscores as spaces. Enum members should also have a sub-category that defines in which enum they are defined. Structures and enum types are written in lower
-case with lower case letters, but instead of under scores the first letter in each word is capital.
+All functions, structures and typedefs should start with the first
+letter of the module that they reside in. This makes it easy to tell
+from what module a
+function is taken. Functions, structure members, and variables are
+written in lowercase with underscores as dividers. Functions that
+are used as function
+pointers get the suffix <code>_func</code>. Typedef:ed types are written in
+lowercase without any spaces. Macros, defines and enum members are all
+written in uppercase
+with underscores as spaces. Enum members should also have a
+sub-category that defines in which enum they are defined. Structures
+and enum types are written in lowercase with lowercase letters, but
+instead of underscores, the first
+letter in each word is in uppercase.
 </p>
 <p>
 Examples for the fictitious module "Leuq":
 </p>
-<pre class="code">
-typedef unsigned int luint
-
-typedef struct{
-	float	silly;
-	int 	very_silly;
-	void	*noughty_bits;
-}LMySillyStruct;
-
-void l_my_hair_dryer(LHair *hair, float time);
-void l_cut_short_func(LHair *hair, void *user); /* function used as pointer */
-
-#define L_THERE_ARE_TOO_FEW_VERSE_APPS TRUE
-
-typedef struct{
-	L_MSE_ONE_WAY,
-	L_MSE_OR_AN_OTHER
-}LMySillyEnum;
-</pre>
+<pre class="code">typedef unsigned int luint;<br><br>typedef struct{<br>	float	silly;<br>	int 	very_silly;<br>	void	*noughty_bits;<br>}LMySillyStruct;<br><br>void l_my_hair_dryer(LHair *hair, float time);<br>void l_cut_short_func(LHair *hair, void *user); /* function used as pointer */<br><br>#define L_THERE_ARE_TOO_FEW_VERSE_APPS TRUE<br><br>typedef struct{<br>	L_MSE_ONE_WAY,<br>	L_MSE_OR_AN_OTHER<br>}LMySillyEnum;<br></pre>
 <p>
-I use the tab size of 4 in my editor.
+I use a tab size of 4 in my editor.
 </p>
-
 <h2><a name="api">Module API Reference</a></h2>
-
 <h3><a name="api-enough">Enough</a></h3>
 <p>
-Enough is a simple storage library that stores all incoming data from Verse. To send data changes back to Verse, the normal verse.h API is used. Enough stores
-the data in a fairly simplistic way, it does not sort the data or prepare the data for any specific use, therefore if you use Enough you are likely to need to
+Enough is a simple storage library that stores all incoming data from
+Verse. To send data changes back to Verse, the normal Verse API (in
+verse.h) is
+used. Enough stores
+the data in a fairly simplistic way. It does not sort the data or
+prepare it for any specific use. Therefore, if you use Enough you
+are likely to need to
 write a data conversion code on top of it.
 </p>
 <p>
-OK, let's start looking at the API:
+OK, let's start looking at the API.
 </p>
 <h4><a name="api-enough-con">Managing Connections</a></h4>
 <p>
 To initialize you first need to run:
 </p>
-<pre class="code">
-void enough_init(void);
-</pre>
+<pre class="code">void enough_init(void);<br></pre>
 <p>
-Enough can store more than one connection, and lets you switch between all existing connections. You need to use Enoughs connect command rather then the
-verse.h connection command. So use:
+Enough can manage more than one connection, and lets you switch between
+all existing connections. You need to use Enough's connect command
+rather than the regular Verse connection command. So use:
 </p>
-<pre class="code">
-uint e_vc_connect(char *server_address, char *name, char *pass);
-</pre>
+<pre class="code">uint e_vc_connect(char *server_address, char *name, char *pass);<br></pre>
 <p>
-Once you have sent the connection you can test to see if you got a connection.
+Once you have sent the connection you can test to see if you got a
+connection.
 </p>
-<pre class="code">
-extern boolean	e_vc_check_connected(void);
-extern boolean	e_vc_check_connected_slot(uint	connection);
-extern boolean	e_vc_check_accepted_slot(uint connection);
-</pre>
+<pre class="code">extern boolean	e_vc_check_connected(void);<br>extern boolean	e_vc_check_connected_slot(uint	connection);<br>extern boolean	e_vc_check_accepted_slot(uint connection);<br></pre>
+<p>You disconnect using one of these functions:
+</p>
+<pre class="code">extern void	e_vc_disconnect(uint connection);<br>extern void	e_vc_disconnect_all(void);<br></pre>
 <p>
-And disconnect using these functions:
+To "update" the network, and to switch to a different connection, you
+need to run:
 </p>
-<pre class="code">
-extern void	e_vc_disconnect(uint connection);
-extern void	e_vc_disconnect_all(void);
-</pre>
+<pre class="code">extern void	e_vc_set_current_active_connection(uint connection);<br>extern void	e_vc_connection_update(uint connection, uint time);<br></pre>
 <p>
-To "update" the network and to switch the different connections you need to run:
+By default Enough will download all node types but you can control the
+downloading of individual types by calling:
 </p>
-<pre class="code">
-extern void	e_vc_set_current_active_connection(uint connection);
-extern void	e_vc_connection_update(uint connection, uint time);
-</pre>
-
-<p>
-By default Enough will download all node types but you can turn it on and off by calling:
-</p>
-<pre class="code">
-void e_vc_set_auto_subscribe(VNodeType type, boolean set);
-</pre>
-
+<pre class="code">void e_vc_set_auto_subscribe(VNodeType type, boolean set);<br></pre>
 <h4><a name="api-enough-nodes">Node Handling</a></h4>
 <p>
-All nodes are handled using the type "ENode". The basic way of getting a node is by one of these functions:
+All nodes are handled using the <code>ENode</code> type. The basic way of getting
+a node is with one of these functions:
 </p>
-<pre class="code">
-extern	ENode *e_ns_get_node(uint connection, uint node_id);
-extern	ENode *e_ns_get_node_next(uint id, uint connection, VNodeType type);
-extern	ENode *e_ns_get_node_avatar(uint connection);
-extern	ENode *e_ns_get_node_link(ENode *parent, uint node_id);
-</pre>
+<pre class="code">extern	ENode *e_ns_get_node(uint connection, uint node_id);<br>extern	ENode *e_ns_get_node_next(uint id, uint connection, VNodeType type);<br>extern	ENode *e_ns_get_node_avatar(uint connection);<br>extern	ENode *e_ns_get_node_link(ENode *parent, uint node_id);<br></pre>
 <p>
 You can get the number of nodes of any type by calling:
 </p>
-<pre class="code">
-extern	uint e_ns_get_node_count(uint connection, VNodeType type);
-</pre>
+<pre class="code">extern	uint e_ns_get_node_count(uint connection, VNodeType type);<br></pre>
 <p>
 Once you have a node you can read out data from it by calling:
 </p>
-<pre class="code">
-extern	uint      e_ns_get_node_id(ENode *node);
-extern	VNodeType e_ns_get_node_type(ENode *node);
-extern	uint      e_ns_get_node_owner(ENode *node);
-extern	char *    e_ns_get_node_name(ENode *node);
-extern	uint      e_ns_get_node_connection(ENode *node);
-</pre>
+<pre class="code">extern	uint      e_ns_get_node_id(ENode *node);<br>extern	VNodeType e_ns_get_node_type(ENode *node);<br>extern	uint      e_ns_get_node_owner(ENode *node);<br>extern	char *    e_ns_get_node_name(ENode *node);<br>extern	uint      e_ns_get_node_connection(ENode *node);<br></pre>
 <p>
-Remember that any ENode or underlying data or pointers become invalid every time you call network update. This is because the nodes may have been
-deleted or changed. So you have to store the node ids and the look up the node again.
+Remember that any <code>ENode</code> or underlying data or pointers become invalid
+every time you call network update. This is because the nodes may have
+been
+deleted or changed. Therefore, you have to store the node IDs and then
+look up
+the node again.
 </p>
 <p>
-Some data like geometry and bitmap layers will not be subscribed to until the user sends calls to get the data.  so if you want to use enough to write
-a saver you cant just connect, wait a while and then traverse the data. When you receive the data you need to traverse the layers and ask Enough for
-pointers to the data. The first time they are requested they will return pointers pointing to blank data, but then they will start filling up as Enough
-requests the data from the server. If you are writing an application that is connected to a host for a long time, this is very natural behavior.
+Some data like geometry and bitmap layers will not be subscribed to
+until the user requests it. Thus, if you want to use Enough to write
+a saver, you can't just connect, wait a while and then traverse the
+data.
+When you receive the data you need to traverse the layers and ask
+Enough for
+pointers to the data. The first time they are requested they will
+return pointers pointing to blank data, but then they will start
+filling up as Enough
+requests the data from the server. If you are writing an application
+that is connected to a host for a long time, this is very natural
+behavior.
 </p>
-
 <h4><a name="api-enough-cdata">Custom data</a></h4>
 <p>
-When you use enough you may still need to store your own custom data. Enough has various functionalities to this end.
+When you use Enough you may still need to store your own custom data.
+Enough provides various functions to do this.
 </p>
-<pre class="code">
-extern void   e_ns_set_custom_data(ENode *node, uint slot, void *data);
-extern void * e_ns_get_custom_data(ENode *node, uint slot);
-</pre>
-<p>
-Can be used to store pointers for each node. There are 16 different slots for each node. It is recommended that you use a <code>define</code> for
-the slot IDs you use to store your data. By doing this it is easier to switch slots if you want to merge your code with other code bases that use
-Enough as storage lib. However, this is not enough if the node gets deleted, the slots will disappear and you will get a memory leak. Therefore
+<pre class="code">extern void   e_ns_set_custom_data(ENode *node, uint slot, void *data);<br>extern void * e_ns_get_custom_data(ENode *node, uint slot);<br></pre>
+<p>They can be used to store pointers for each node. There are 16
+different
+slots for each node. It is recommended that you use a <code>define</code>
+for
+the slot IDs you use to store your data. This makes it easier to
+change slots if you want to merge your code with other codebases that
+use
+Enough for storage. However, this is not enough. If the node is
+deleted, the slots will disappear and you will have a memory leak.
+Therefore,
 use this function:
 </p>
-<pre class="code">
-typedef enum{
-	E_CDC_CREATE,
-	E_CDC_STRUCT,
-	E_CDC_DATA,
-	E_CDC_DESTROY
-}ECustomDataCommand;
-
-extern void e_ns_set_custom_func(uint slot, VNodeType type, void (*func)(ENode *node, ECustomDataCommand command));
-</pre>
+<pre class="code">typedef enum{<br>	E_CDC_CREATE,<br>	E_CDC_STRUCT,<br>	E_CDC_DATA,<br>	E_CDC_DESTROY<br>}ECustomDataCommand;<br><br>extern void e_ns_set_custom_func(uint slot, VNodeType type, void (*func)(ENode *node, ECustomDataCommand command));<br></pre>
 <p>
-this lets you assign call back that will be called when ever a node is created, destroyed or updated. This lets you write service functions that keep your
+This lets you assign callbacks that will be called whenever a node is
+created, destroyed or updated. This lets you write service functions
+that keep your
 custom data synced with Verses data.
 </p>
-<p>
-Now on top of this each node has 2 version numbers that can be used to see if a node has been updated or not.
+<p>Additionally, each node has two version numbers that can be used to
+tell if a node has been updated or not.
 </p>
-<pre class="code">
-extern uint e_ns_get_node_version_struct(ENode *node);
-extern uint e_ns_get_node_version_data(ENode *node);
-</pre>
+<pre class="code">extern uint e_ns_get_node_version_struct(ENode *node);<br>extern uint e_ns_get_node_version_data(ENode *node);<br></pre>
 <p>
-the data version is updated if there is any change to the node at all, and the structure version will only be updated if there is a structural change.
-For instance a new vertex, will result in a structural update, while moving an existing vertex will only be a data update. You can also poke at these
-version numbers yourself to force an update by calling:
+The data version is updated if there is any change to the node at all,
+while the structure version will only be updated if there is a
+structural
+change.
+For instance, a new vertex will result in a structural update, while
+moving an existing vertex will only be considered a data update. You
+can also force updates of these version numbers yourself by calling:
 </p>
-<pre class="code">
-extern void e_ns_update_node_version_struct(ENode *node);
-extern void e_ns_update_node_version_data(ENode *node);
-</pre>
-
+<pre class="code">extern void e_ns_update_node_version_struct(ENode *node);<br>extern void e_ns_update_node_version_data(ENode *node);<br></pre>
 <p>
-On top of all this functionality there is actually an other callback that you can give enough to call:
+On top of all this functionality, Enough provides yet another callback:
 </p>
-<pre class="code">
-extern void e_ns_set_node_create_func(void (* func)(uint connection, uint id, VNodeType type, void *user), void *user);
-</pre>
+<pre class="code">extern void e_ns_set_node_create_func(void (* func)(uint connection, uint id, VNodeType type, void *user), void *user);<br></pre>
 <p>
-This callback is called when ever your connection receives a node create command from a node that you have asked to create. This is useful
-if you write a app that creates a node and then automatically want to add more data to it.
+This callback is called whenever your connection receives a node
+creation command for a node that you have asked be created. This is
+useful
+if you write an application that creates a node and then automatically
+want to
+add more data to it.
 </p>
-
 <p>
-Similarly to the node graph, you can in the material graph store custom data and get update callbacks with thees calls:
+Similarly to the node graph, you can store custom
+data in the material graph and register update callbacks with these
+calls:
 </p>
-<pre class="code">
-extern uint   e_nsm_get_fragment_version(ENode *node, VNMFragmentID id);
-
-extern void   e_nsm_set_custom_data(ENode *node, VNMFragmentID frag, uint slot, void *data);
-extern void * e_nsm_get_custom_data(ENode *node, VNMFragmentID frag, uint slot);
-
-extern void   e_nsm_set_custom_func(uint slot, void (*func)(ENode *node, VNMFragmentID frag, ECustomDataCommand command));
-</pre>
-
+<pre class="code">extern uint   e_nsm_get_fragment_version(ENode *node, VNMFragmentID id);<br><br>extern void   e_nsm_set_custom_data(ENode *node, VNMFragmentID frag, uint slot, void *data);<br>extern void * e_nsm_get_custom_data(ENode *node, VNMFragmentID frag, uint slot);<br><br>extern void   e_nsm_set_custom_func(uint slot, void (*func)(ENode *node, VNMFragmentID frag, ECustomDataCommand command));<br></pre>
 <h4><a name="api-enough-ndata">Node data</a></h4>
 <p>
-This is a very short documentation and most of the functionality is self explanatory if you know how Verse works. But however there are some things to explain.
-Layers and other data have their own handles like:
+This is very brief documentation and most of the functionality is
+self-explanatory if you know how Verse works. However, there are
+some things to explain.
+Layers and other data have their own handles:
 </p>
-<pre class="code">
-typedef void EObjLink;
-typedef void EGeoLayer;
-typedef void EBitLayer;
-typedef void ECodeBuffer;
-</pre>
+<pre class="code">typedef void EObjLink;<br>typedef void EGeoLayer;<br>typedef void EBitLayer;<br>typedef void ECodeBuffer;<br></pre>
 <p>
-They are obtained just like ENode handles using the same types of functions.
+They are obtained just like ENode handles, using the same types of
+functions.
 </p>
 <p>
-All of them have functions named "_next" this will give you the next available handles that has the same or higher id as the one given. This allows you to make
-loops that lists all nodes or layers. Here is an example of a loop that gives you all object nodes.
+All of them have functions named <code>_next</code>, which will give you the next
+available handle that has the same or higher ID as the one given. This
+allows you to easily iterate over all nodes or layers. Here is an
+example of a loop that
+gives you all object nodes.
 </p>
-<pre class="code">
-ENode *node;
-
-for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT);
-    node != NULL;
-    node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT)
-{
-        /* ... process the node here ... */
-}
-</pre>
-
+<pre class="code">ENode *node;<br><br>for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT);<br>    node != NULL;<br>    node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT)<br>{<br>        /* ... process the node here ... */<br>}<br></pre>
 <p>
-Some data types don't have their own C-level types and only IDs are used. They have similar _next functions. Here is an example of going through
+Some data types don't have their own C-level types and only IDs are
+used. They have similar <code>_next</code> functions. Here is an example of going
+through
 all tag groups of a node:
 </p>
-<pre class="code">
-for(id = e_ns_get_next_tag_group(node, 0);
-    id != (uint16) -1;
-    e_ns_get_next_tag_group(node, id + 1))
-{
-        /* ... process the tag group here ... */
-}
-</pre>
-
+<pre class="code">for(id = e_ns_get_next_tag_group(node, 0);<br>    id != (uint16) -1;<br>    e_ns_get_next_tag_group(node, id + 1))<br>{<br>        /* ... process the tag group here ... */<br>}<br></pre>
 <h4><a name="api-enough-nspec">Special Node Functions</a></h4>
 <p>
-These are functions that are node-specific, i.e. they work only on nodes of certain types.
+These are functions that are node-specific, i.e. they work only on
+certain types
+of nodes.
 </p>
 <h5><a name="api-enough-nspec-g">Geometry Node</a></h5>
 <p>
-When modifying a geometry node, by adding new vertices and polygons, one needs empty IDs. To find such IDs, use the functions:
+When adding new vertices and polygons to a geometry node,
+one needs empty IDs. To find such IDs, use these functions:
 </p>
-<pre class="code">
-extern uint e_nsg_find_empty_vertex_slot(ENode *node, uint start);
-extern uint e_nsg_find_empty_polygon_slot(ENode *node, uint start);
-</pre>
+<pre class="code">extern uint e_nsg_find_empty_vertex_slot(ENode *node, uint start);<br>extern uint e_nsg_find_empty_polygon_slot(ENode *node, uint start);<br></pre>
 <p>
-Use the "start" param if you need to more than one ID. A typical loop to obtain ten IDs can look like this:
+Use the <code>start</code> param if you need to more than one ID. A typical loop
+to obtain ten IDs can look like this:
 </p>
-<pre class="code">
-uint ids[10], i;
-
-ids[0] = e_nsg_find_empty_vertex_slot(node, 0);
-
-for(i = 1; i < 10; i++)
-	ids[i] = e_nsg_find_empty_vertex_slot(node, ids[i - 1]);
-</pre>
-
+<pre class="code">uint ids[10], i;<br><br>ids[0] = e_nsg_find_empty_vertex_slot(node, 0);<br><br>for(i = 1; i &lt; 10; i++)<br>	ids[i] = e_nsg_find_empty_vertex_slot(node, ids[i - 1]);<br></pre>
 <h5><a name="api-enough-nspec-b">Bitmap Node</a></h5>
 <p>
-The bitmap node has the same type of functions as the other nodes. But it also has some extra functionality for reading out colors from layers.
-All you need to do is to get a handle, and then use that to read out a color at any UV coordinate. The functionality will handle, layer searching,
-data conversion, and pixel filtering and pixel lookup. Here is an example:
-<pre class="code">
-EBMHandle *my_handle;
-EBMPrecision my_pixel[3];
-
-my_handle = e_nsb_get_image_handle(node_id, "col_r", "col_g", "col_b");
-for(i = 0; i < 200; i++)
-{
-	e_nsb_evaluate_image_handle_tile(my_handle, my_pixel, u, v, w);
-	...
-}
-
-e_nsb_destroy_image_handle(my_handle);
-</pre>
-<p>
-The image handle doesn't ever get in valid and will work even if the node gets deleted, or if layers are crated, destroyed, change name or type.
+The bitmap node has the same type of functions as the other nodes, but
+it also has some extra functionality for reading out colors from
+layers.
+All you need to do is to get a handle, and then use that to read out a
+color at any UV coordinate. The functionality will handle layer
+searching,
+data conversion, pixel filtering and pixel lookup. Here is an
+example:
 </p>
-
+<pre class="code">EBMHandle *my_handle;<br>EBMPrecision my_pixel[3];<br><br>my_handle = e_nsb_get_image_handle(node_id, "col_r", "col_g", "col_b");<br>for(i = 0; i &lt; 200; i++)<br>{<br>	e_nsb_evaluate_image_handle_tile(my_handle, my_pixel, u, v, w);<br>	...<br>}<br><br>e_nsb_destroy_image_handle(my_handle);<br></pre>
+<p>
+The image handle doesn't ever become invalidated and will work even if
+the
+node gets deleted or if layers are created, deleted, or have their
+names or types changed.
+</p>
 <h3><a name="api-betray">Betray</a></h3>
 <p>
-Betray has a very simple API that is very straight forward and should be easy use.
+Betray has a very simple API, which is very straightforward and should
+be easy use.
 </p>
-
 <p>
-This code switches Betray between using GLUT, GLFW, or SDL (only one should be <code>define</code>d before building):
+This code switches Betray between using GLUT, GLFW, or SDL (only one
+should be <code>define</code>d before building):
 </p>
-<pre class="code">
-/*#define BETRAY_SDL_SYSTEM_WRAPPER*/
-/*#define BETRAY_GLFW_SYSTEM_WRAPPER*/
-#define BETRAY_GLUT_SYSTEM_WRAPPER
-</pre>
+<pre class="code">/*#define BETRAY_SDL_SYSTEM_WRAPPER*/<br>/*#define BETRAY_GLFW_SYSTEM_WRAPPER*/<br>#define BETRAY_GLUT_SYSTEM_WRAPPER<br></pre>
 <p>
 Here are the three modes that the action function can be called in:
 </p>
-<pre class="code">
-typedef enum{
-	BAM_DRAW,
-	BAM_EVENT,
-	BAM_MAIN
-}BActionMode;
-</pre>
-
+<pre class="code">typedef enum{<br>	BAM_DRAW,<br>	BAM_EVENT,<br>	BAM_MAIN<br>}BActionMode;<br></pre>
 <p>
-This structure is the main structure given to the action function containing all the input data.
+This structure is the main structure given to the action function. It
+contains all of the input data.
 </p>
-<pre class="code">
-typedef struct{
-	boolean		mouse_button[DEVICE_BUTTONS_COUNT];
-	boolean		last_mouse_button[DEVICE_BUTTONS_COUNT];
-	float		pointer_x;
-	float		pointer_y;
-	float		click_pointer_x;
-	float		click_pointer_y;
-	float		delta_pointer_x;
-	float		delta_pointer_y;
-	BButtonEvent	event[16];
-	uint		event_count;
-	double		time;
-	BActionMode	mode;
-}BInputState;
-</pre>
-
+<pre class="code">typedef struct{<br>	boolean		mouse_button[DEVICE_BUTTONS_COUNT];<br>	boolean		last_mouse_button[DEVICE_BUTTONS_COUNT];<br>	float		pointer_x;<br>	float		pointer_y;<br>	float		click_pointer_x;<br>	float		click_pointer_y;<br>	float		delta_pointer_x;<br>	float		delta_pointer_y;<br>	BButtonEvent	event[16];<br>	uint		event_count;<br>	double		time;<br>	BActionMode	mode;<br>}BInputState;<br></pre>
 <p>
-The <code>mouse_button</code> member tells you whether or not a button is pressed, with the following index mapping:
+The <code>mouse_button</code> member tells you whether or not a button
+is pressed, with the following index mapping:
 </p>
-
 <table class="table">
-<tr>
-<th>Index</th>
-<th align="left">Describes</th>
-</tr>
-<tr>
- <td align="center">0</td><td>Left mouse button</td>
-</tr>
-<tr>
- <td align="center">1</td><td>Middle mouse button</td>
-</tr>
-<tr>
- <td align="center">2</td><td>Right mouse button</td>
-</tr>
+  <tbody>
+    <tr>
+      <th>Index</th>
+      <th align="left">Describes</th>
+    </tr>
+    <tr>
+      <td align="center">0</td>
+      <td>Left mouse button</td>
+    </tr>
+    <tr>
+      <td align="center">1</td>
+      <td>Middle mouse button</td>
+    </tr>
+    <tr>
+      <td align="center">2</td>
+      <td>Right mouse button</td>
+    </tr>
+  </tbody>
 </table>
-
 <p>
-The <code>last_mouse_button</code> field stores the value of the last frame's <code>mouse_button</code> value. This makes it possible
-to do tests like:
-<pre class="code">
-if(index->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
-{
-        /* ... process press here ... */
-}
-</pre>
-<p>
-to check for a button press.
+The <code>last_mouse_button</code> field stores the value of the last
+frame's <code>mouse_button</code> value. This makes it possible
+to do tests like this to check for a button press:
 </p>
+<pre class="code">if(index-&gt;mouse_button[0] == TRUE &amp;&amp; input-&gt;last_mouse_button[0] == FALSE)<br>{<br>        /* ... process press here ... */<br>}<br></pre>
 <p>
-The current position of the mouse is in <code>pointer_x</code> and <code>pointer_y</code>, while <code>click_pointer_x</code> and
-<code>click_pointer_y</code> are the position of the mouse the last time the left mouse button wasn't pressed. For movement,
-<code>delta_pointer_x</code> and <code>delta_pointer_y</code> are the delta movement of the pointer from the last frame.
-The <code>event</code> and <code>event_count</code> fields contain all key presses since the last frame.
+The current position of the mouse is stored in <code>pointer_x</code>
+and <code>pointer_y</code>,
+while <code>click_pointer_x</code> and
+<code>click_pointer_y</code> are the position of the mouse the last
+time the left mouse button wasn't pressed. For movement,
+<code>delta_pointer_x</code> and <code>delta_pointer_y</code> are the
+delta movement of the pointer from the last frame.
+The <code>event</code> and <code>event_count</code> fields contain
+all key presses since the last frame.
 </p>
-
-<pre class="code">
-extern void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, boolean window_fullscreen, char *name);
-</pre>
+<pre class="code">extern void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, boolean window_fullscreen, char *name);<br></pre>
+<p>Initializes Betray and creates a window.
+</p>
+<pre class="code">extern void betray_action(BActionMode mode);<br></pre>
 <p>
-Initializes Betray and creates a window.
+Runs the current action function in a specific made (for testing
+mostly)
 </p>
-
-<pre class="code">
-extern void betray_action(BActionMode mode);
-</pre>
-<p>
-Runs the current action func in a specific made (for testing mostly)
-</p>
-
-<pre class="code">
-extern void betray_set_action_func(void (*input_compute_func)(BInputState *data, void *user_pointer), void *user_pointer);
-</pre>
+<pre class="code">extern void betray_set_action_func(void (*input_compute_func)(BInputState *data, void *user_pointer), void *user_pointer);<br></pre>
 <p>
 Sets the action function.
 </p>
-
-<pre class="code">
-extern void betray_set_mouse_warp(boolean warp);
-</pre>
+<pre class="code">extern void betray_set_mouse_warp(boolean warp);<br></pre>
 <p>
-Turn on or of the wrapping of the mouse for is that don't use the pointer (FPS type of controls) us the delta pointer field to read the mouse input.
+Turn on or of the wrapping of the mouse, for applications that don't
+use the
+pointer (FPS type of controls) use the delta pointer field to read the
+mouse input.
 </p>
-
-<pre class="code">
-extern void betray_execute(char *command);
-</pre>
+<pre class="code">extern void betray_execute(char *command);<br></pre>
 <p>
 Used to execute a program outside the code.
 </p>
-
-<pre class="code">
-extern float betray_get_time();
-</pre>
+<pre class="code">extern float betray_get_time();<br></pre>
 <p>
 Gives you the current time.
 </p>
-
-<pre class="code">
-extern void * betray_get_gl_proc_address();
-</pre>
-<p>
-gives you the address used by gl to get extension functions.
+<pre class="code">extern void * betray_get_gl_proc_address();<br></pre>
+<p>Gives you a pointer to the function used to retrieve OpenGL
+extension functions.
 </p>
-
-<pre class="code">
-extern boolean betray_get_key(uint key);
-</pre>
+<pre class="code">extern boolean betray_get_key(uint key);<br></pre>
 <p>
 Gives you a simple way to check if a key is pressed.
 </p>
-
-<pre class="code">
-extern void betray_get_key_up_down(boolean *press, boolean *last_press, uint key);
-</pre>
+<pre class="code">extern void betray_get_key_up_down(boolean *press, boolean *last_press, uint key);<br></pre>
 <p>
-Gives you the ability to read out a continuous state of a key, mouse button style.
+Gives you the ability to read out a continuous state of a key, mouse
+button style.
 </p>
-
-<pre class="code">
-extern BInputState * betray_get_input_state();
-</pre>
+<pre class="code">extern BInputState * betray_get_input_state();<br></pre>
 <p>
-Gives you the input state if you have lost it, (used in Seduce to avid input params)
+Gives you the input state if you have lost it, (used in Seduce to avoid
+input parameters).
 </p>
-
-<pre class="code">
-extern void betray_reshape_view(uint x_size, uint y_size);
-</pre>
-<p>
-To set the screen size / mode to a specific mode call:
-<pre class="code">
-extern boolean betray_set_screen_mode(uint x_size, uint y_size, boolean fullscreen);
-</pre>
-<p>
-To read out the current screen size call the following function, it returns the aspect, and accepts NULL as any parameter.
+<pre class="code">extern void betray_reshape_view(uint x_size, uint y_size);<br></pre>
+<p><br>
 </p>
-<pre class="code">
-extern double betray_get_screen_mode(uint *x_size, uint *y_size, boolean *fullscreen);
-</pre>
-
-<p>
-The Betray library has some special input functionality to handle text editing. To start the type-in mode, simply call:
-<pre class="code">
-extern void betray_start_type_in(char *text, uint size, void (*done_func)(void *user, boolean cancel), uint *cursor, void *user_pointer);
-</pre>
-<p>
-Here, <code>text</code> is a pointer to the buffer that is being edited; <code>size</code> is the size of that buffer; <code>cursor</code>
-is a pointer to an int where the position of the editing cursor in the buffer is stored; <code>done_func</code> is a pointer to a function
-that will be called once the user presses enter or the following function:
+<pre class="code">extern boolean betray_set_screen_mode(uint x_size, uint y_size, boolean fullscreen);<br></pre>
+<p>Sets the window size, or changes to a specific screen mode.<br>
 </p>
-<pre class="code">
-extern void betray_end_type_in_mode(boolean cancel);
-</pre>
-<p>
-You can check if you are in the type in mode:
+<pre class="code">extern double betray_get_screen_mode(uint *x_size, uint *y_size, boolean *fullscreen);<br></pre>
+<p>Gives you the current screen size. It
+returns the aspect, and allows any of the arguments to be <code>NULL</code>.<br>
 </p>
-<pre class="code">
-extern boolean betray_is_type_in();
-</pre>
-
-<p>
-To start the main loop you simply run:
+<pre class="code">extern void betray_start_type_in(char *text, uint size, void (*done_func)(void *user, boolean cancel), uint *cursor, void *user_pointer);<br></pre>
+<p>Starts the type-in mode. The Betray library has special input
+functionality to handle text
+editing. Here, <code>text</code> is a pointer to the buffer that is
+being
+edited; <code>size</code> is the size of that buffer; <code>cursor</code>
+is a pointer to an int where the position of the editing cursor in the
+buffer is stored; <code>done_func</code> is a pointer to a function
+that will be called once the user presses enter or the following
+function is called:
 </p>
-<pre class="code">
-extern void betray_launch_main_loop(void);
-</pre>
-
-<p>
-Two functions to read the time independent of Verse, although you should use Verse timer API if you are timing anything like animation in the interface
-(too bad I haven't used in the applications so all the timing on the animation is all screwed up...) They also work before you have a communication.
+<pre class="code">extern void betray_end_type_in_mode(boolean cancel);<br></pre>
+<p>Ends the type-in mode, and calls the callback function provided when
+it was started.
 </p>
-<pre class="code">
-extern void   betray_get_current_time(uint32 *seconds, uint32 *fractions);
-extern double betray_get_delta_time();
-</pre>
+<pre class="code">extern boolean betray_is_type_in();<br></pre>
+<p>Checks whether you are in the type-in mode.<br>
+</p>
+<pre class="code">extern void betray_launch_main_loop(void);<br></pre>
+<p>Starts the main loop.</p>
+<pre class="code">extern void   betray_get_current_time(uint32 *seconds, uint32 *fractions);<br>extern double betray_get_delta_time();<br></pre>
 <p>
-<code>betray_get_current_time()</code> works just like the timer function in Verse. For inter-frame timing, <code>betray_get_delta_time()</code> returns
+Two functions to read the time independent of Verse, although you
+should use Verse timer API if you are timing anything like animation in
+the interface
+(too bad I haven't used in the applications so all the timing on the
+animation is all screwed up...). They also work before you have a
+connection.<br>
+</p>
+<p><code>betray_get_current_time()</code> works just like the timer
+function in Verse. For inter-frame timing, <code>betray_get_delta_time()</code>
+returns
 the fraction of a section since the last drawn frame.
 </p>
-
 <h3><a name="api-seduce">Seduce</a></h3>
-
 <p>
-Seduce is the module that provides base functionality for user interface construction and management.
+Seduce is the module that provides basic functionality for user
+interface construction and management.
 </p>
-
 <p>
 To initialize Seduce call:
 </p>
-<pre class="code">
-extern void sui_init(void);
-</pre>
-
+<pre class="code">extern void sui_init(void);<br></pre>
 <p>
 To draw a mouse pointer call:
 </p>
-<pre class="code">
-extern void sui_draw_pointer(float x, float y);
-</pre>
-
+<pre class="code">extern void sui_draw_pointer(float x, float y);<br></pre>
 <p>
-To create quadratic buttons or click areas these functions check if the mouse pointer is or was inside an area.
+To help create quadratic buttons or click areas, these functions check
+if the
+mouse pointer is or was inside an area:
 </p>
-<pre class="code">
-extern boolean sui_box_click_test(float x_pos, float y_pos, float x_size, float y_size);
-extern boolean sui_box_down_click_test(float x_pos, float y_pos, float x_size, float y_size);
-</pre>
-
+<pre class="code">extern boolean sui_box_click_test(float x_pos, float y_pos, float x_size, float y_size);<br>extern boolean sui_box_down_click_test(float x_pos, float y_pos, float x_size, float y_size);<br></pre>
 <p>
-The perhaps largest functionality of Seduce is the built in vector line editor. They are arguably not very good and
-have been modified so many times a re write would not be bad, but since this is something only I have needed to use,
-and the functionality is manageable. To run the editor feed one of the following functions as action functions to Betray.
+The perhaps largest functionality of Seduce is the built in vector line
+editor. They are arguably not very good and
+have been modified many times. A rewrite would not be a bad thing, but
+since
+this is something only I have needed to use, the functionality is
+manageable. To run the editor, pass one of the
+following functions as action functions to Betray.
 </p>
-<pre class="code">
-extern void * sui_symbol_editor_func(BInputState *input, void *user_pointer);
-extern void * sui_font_editor_func(BInputState *input, void *user_pointer);
-</pre>
-
+<pre class="code">extern void * sui_symbol_editor_func(BInputState *input, void *user_pointer);<br>extern void * sui_font_editor_func(BInputState *input, void *user_pointer);<br></pre>
 <p>
-Once long ago there was an other module called "NGL" that wrapped GL, it has been removed but GL code can be quite talkative
-so to not make the code 5 times bigger I wrote a set of very simple functions to handle basic drawing using gl. If you want the
-details I suggest you look inside the code to get the full story. Any how to draw geometry I call:
+Once long ago there was an other module called NGL that wrapped
+OpenGL. It has since been removed, but GL code can be quite verbose,
+so in order to not make the code five times bigger, I wrote a set of
+very simple
+functions to handle basic drawing using the GL. If you want the
+details I suggest you look at the code itself.<br>
 </p>
-<pre class="code">
-extern void sui_draw_gl(uint draw_type, float *array, uint length, uint dimensions, float red, float green, float blue);
-extern void sui_draw_elements_gl(uint draw_type, float *array, uint reference, uint length, uint dimensions, float red, float green, float blue);
-</pre>
-
-<p>
-To draw simple lines:
+<p>Anyhow to draw geometry, call:
 </p>
-<pre class="code">
-extern void sui_draw_2d_line_gl(float start_x, float start_y, float end_x, float end_y, float red, float green, float blue);
-extern void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end_x, float end_y, float end_z, float red, float green, float blue);
-</pre>
-
+<pre class="code">extern void sui_draw_gl(uint draw_type, float *array, uint length, uint dimensions, float red, float green, float blue);<br>extern void sui_draw_elements_gl(uint draw_type, float *array, uint reference, uint length, uint dimensions, float red, float green, float blue);<br></pre>
 <p>
-To set blending mode:
+To draw simple lines, call:
 </p>
-<pre class="code">
-extern void sui_set_blend_gl(uint source, uint destination);
-</pre>
-
+<pre class="code">extern void sui_draw_2d_line_gl(float start_x, float start_y, float end_x, float end_y, float red, float green, float blue);<br>extern void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end_x, float end_y, float end_z, float red, float green, float blue);<br></pre>
 <p>
-To draw arrays with normals, colors or textures I call:
+To set blending mode, call:
 </p>
-<pre class="code">
-extern void sui_set_color_array_gl(float *array, uint length, uint channels);
-extern void sui_set_normal_array_gl(float *array, uint length);
-extern void sui_set_texture2D_array_gl(float *array, uint length, uint dimensions, uint texture);
-</pre>
-
+<pre class="code">extern void sui_set_blend_gl(uint source, uint destination);<br></pre>
 <p>
-The following functions (like much of the code above) is about saving lines of code. They simply set more then one value of an array. They may seem a little
-to simple but they kind of made the porting from NGL nicer....
+To draw arrays with normals, colors or textures, call:
 </p>
-<pre class="code">
-extern void sui_draw_set_vec2(float *array, uint pos, float a, float b);
-extern void sui_draw_set_vec3(float *array, uint pos, float a, float b, float c);
-extern void sui_draw_set_vec4(float *array, uint pos, float a, float b, float c, float d);
-
-extern void sui_draw_set_ivec2(uint *array, uint pos, uint a, uint b);
-extern void sui_draw_set_ivec3(uint *array, uint pos, uint a, uint b, uint c);
-extern void sui_draw_set_ivec4(uint *array, uint pos, uint a, uint b, uint c, uint d);
-</pre>
-
+<pre class="code">extern void sui_set_color_array_gl(float *array, uint length, uint channels);<br>extern void sui_set_normal_array_gl(float *array, uint length);<br>extern void sui_set_texture2D_array_gl(float *array, uint length, uint dimensions, uint texture);<br></pre>
 <p>
-So one of the things that Seduce provides you with is the ability to display text. The letters are all drawn with lines using OpenGL.
-The font is hard-coded in the library, and has been drawn by hand (using the editor mentioned above). If you have problems with it,
+The following functions (like much of the code above) are about saving
+lines of code. They simply set more than one value of an array. They
+may seem a bit
+too simple, but they made the porting from NGL nicer.
+</p>
+<pre class="code">extern void sui_draw_set_vec2(float *array, uint pos, float a, float b);<br>extern void sui_draw_set_vec3(float *array, uint pos, float a, float b, float c);<br>extern void sui_draw_set_vec4(float *array, uint pos, float a, float b, float c, float d);<br><br>extern void sui_draw_set_ivec2(uint *array, uint pos, uint a, uint b);<br>extern void sui_draw_set_ivec3(uint *array, uint pos, uint a, uint b, uint c);<br>extern void sui_draw_set_ivec4(uint *array, uint pos, uint a, uint b, uint c, uint d);<br></pre>
+<p>
+One of the things that Seduce provides you with is the ability to
+display text. The letters are all drawn with lines, using OpenGL.
+The font is hard-coded into the library, and has been drawn by hand
+(using the editor mentioned above). If you have problems with it,
 you can just draw a new one! ;-)
 </p>
 <p>
-First we have two defines for the standard size and spacing of text:
+First we have two defines, for the standard size and spacing of text:
 </p>
-<pre class="code">
-#define SUI_T_SIZE 0.01 
-#define SUI_T_SPACE 0.3
-</pre>
-
+<pre class="code">#define SUI_T_SIZE 0.01 <br>#define SUI_T_SPACE 0.3<br></pre>
 <p>
-Then to actually draw a single letter you use the function:
+To actually draw a single letter, you use this function:
 </p>
-<pre class="code">
-extern void sui_draw_letter(uint8 letter, float red, float green, float blue);
-</pre>
-
+<pre class="code">extern void sui_draw_letter(uint8 letter, float red, float green, float blue);<br></pre>
 <p>
-To be able to do some simple kerning its nice to know how large the letter is:
+To be able to do some simple kerning (it's nice to know how large the
+letter is), call:
 </p>
-<pre class="code">
-extern float sui_get_letter_size(char letter);
-</pre>
-
+<pre class="code">extern float sui_get_letter_size(char letter);<br></pre>
 <p>
-To draw an entire string of text with kerning and all, call the following function. The <code>pos_x</code> and <code>pos_y</code> is where you would
-like to draw the text; <code>size</code> is the font size; <code>spacing<code> is the space between letters after kerning (normally SUI_T_SPACE), and
-<code>red</code>, <code>green</code> and <code>blue</code> define the color.
+To draw an entire string of text with kerning and all, call the
+following function. The <code>pos_x</code> and <code>pos_y</code> is
+where you would
+like to draw the text; <code>size</code> is the font size; <code>spacing</code>
+is the space between letters after kerning (normally <code><code>SUI_T_SPACE</code></code>),
+and
+<code><code><code>red</code></code></code>, <code><code><code>green</code></code></code>
+and <code><code><code>blue</code></code></code> define the
+color.<code><code>
+</code></code></p>
+<pre class="code">extern void sui_draw_text(float pos_x, float pos_y, float size, float spacing, char *text, float red, float green, float blue);<br></pre>
+<p>
+Sometimes it can be good to know how long a string of text will be once
+rendered, to be able to do centering and other things. Use the same
+values
+as for <code>sui_draw_text()</code> with the following function to get
+the
+correct length:
 </p>
-<pre class="code">
-extern void sui_draw_text(float pos_x, float pos_y, float size, float spacing, char *text, float red, float green, float blue);
-</pre>
-
+<pre class="code">extern float sui_compute_text_length(float size, float spacing, char *text);<br></pre>
 <p>
-Sometimes it can be good to know how long a string of text will be once rendered, to be able to do centering and other things. Use the same values
-as for <code>sui_draw_text()</code> with the following to get the correct length:
+If you want a text button the next function does that for you. Remember
+that it only draws text; it does not draw any button graphics. The
+<code>center</code>
+parameter lets you make the button left aligned (0), centered
+(0.5) or right aligned (1.0)
 </p>
-<pre class="code">
-extern float sui_compute_text_length(float size, float spacing, char *text);
-</pre>
-
+<pre class="code">extern boolean sw_text_button(BInputState *input, float pos_x, float pos_y, float center, float size, float spacing, char *text, float red, float green, float blue);<br></pre>
 <p>
-If you want a text button the next function does that for you. Remember that it does only draw a text it does not draw any button graphics. The param
-<code>center</code> lets you make the button left aligned (0), centered (0.5) or right aligned (1.0)
-<pre class="code">
-extern boolean sw_text_button(BInputState *input, float pos_x, float pos_y, float center, float size, float spacing, char *text, float red, float green, float blue);
-</pre>
-
-<p>
-The Betray type in input API has been wrapped in Seduce to include click area and the printing of the text. All this wraps up in the function:
-<pre class="code">
-extern boolean	sui_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size,
-		            void (*done_func)(void *user, char *text), void* user, float red, float green, float blue);
-</pre>
-<p>
-Note that the "length" is the length of the click area, and "size" is the size of the string.
+The Betray type-in API has been wrapped by Seduce to include
+a click area and text drawing, all done by this
+function:
 </p>
-
+<pre class="code">extern boolean	sui_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size,<br>		            void (*done_func)(void *user, char *text), void* user, float red, float green, float blue);<br></pre>
 <p>
-Adding to this two similar functions have been added to handle the input of numerical values. They work very similarly, but please not the "id" pointer.
-This is a pointer that the function stores once activated to know what number is being activated. It can be any pointer that is unique and not given to the
-function in any other place. Often this pointer can be the same as the pointer to the value you are changing, but this isn't always practical. There are
-two different functions, one for doubles and one for integers they are:
+Note that <code>length</code> is the length of the click area, and <code>size</code> is
+the size of the string.
 </p>
-<pre class="code">
-extern boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, float length, float size, double *number, void *id,
-				      float red, float green, float blue);
-extern boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float length, float size, uint32 *number, void *id,
-				    float red, float green, float blue);
-</pre>
-
 <p>
-Next is Seduce's settings API. To initialize it, call the following function with the name of a settings file as argument.
+Adding to this, two similar functions have been added to handle the
+input of numerical values. They work very similarly, but please note the
+<code>id</code> pointer.
+This is a pointer that the function stores once activated to know what
+number is being activated. It can be any pointer that is unique and not
+given to the
+function in any other place. Often this pointer can be the same as the
+pointer to the value you are changing, but this isn't always practical.
+There are
+two different functions, one for doubles and one for integers:
 </p>
-<pre class="code">
-extern void sui_init_settings(char *settings);
-</pre>
+<pre class="code">extern boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, float length, float size, double *number, void *id,<br>				      float red, float green, float blue);<br>extern boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float length, float size, uint32 *number, void *id,<br>				    float red, float green, float blue);<br></pre>
 <p>
-To read out a setting or to set a setting you call the following functions with a keyword and a value or a default value that will be
-used if the setting doesn't not exist in the database. So you don't need to register the setting you just use it. Thees functions are not
-super-fast, so if you need the same setting many times, read it out to a temporary value once rather then calling the functions in an inner
-loop.
+Next is Seduce's settings API. To initialize it, call the this
+function with the name of a settings file:
 </p>
-<pre class="code">
-extern double  sui_get_setting_double(char *setting, double default_value);
-extern void    sui_set_setting_double(char *setting, double value);
-extern uint    sui_get_setting_int(char *setting, uint default_value);
-extern void    sui_set_setting_int(char *setting, uint value);
-extern char *  sui_get_setting_text(char *setting, char *default_text);
-extern void    sui_set_setting_text(char *setting, char *text);
-extern boolean sui_test_setting_version(uint *version);
-</pre>
+<pre class="code">extern void sui_init_settings(char *settings);<br></pre>
 <p>
-Finally to load or save your settings call the following with the name of the file as argument.
+To query or set a settings field you call the following
+functions with a keyword and a value, or a default value that will be
+used if the setting doesn't not exist in the database. Thus, you don't
+need to register the setting, you just use it. These functions are not
+particularly fast, so if you need to access the same setting many
+times, save it as a temporary value rather then calling the functions
+from inside an inner-loop.
 </p>
-<pre class="code">
-extern void sui_save_settings(char *file_name);
-extern void sui_load_settings(char *file_name);
-</pre>
-
+<pre class="code">extern double  sui_get_setting_double(char *setting, double default_value);<br>extern void    sui_set_setting_double(char *setting, double value);<br>extern uint    sui_get_setting_int(char *setting, uint default_value);<br>extern void    sui_set_setting_int(char *setting, uint value);<br>extern char *  sui_get_setting_text(char *setting, char *default_text);<br>extern void    sui_set_setting_text(char *setting, char *text);<br>extern boolean sui_test_setting_version(uint *version);<br></pre>
+<p>
+Finally, to load or save your settings, call the following functions,
+specifying the name
+of the file:
+</p>
+<pre class="code">extern void sui_save_settings(char *file_name);<br>extern void sui_load_settings(char *file_name);<br></pre>
 <p>
 </p>
-<pre class="code">
-extern void sui_create_shadow_edge(float size, uint count, float *shadow, float *color, float *square);
-</pre>
-
+<pre class="code">extern void sui_create_shadow_edge(float size, uint count, float *shadow, float *color, float *square);<br></pre>
 <p>
-Perhaps to most advanced function in Seduce is the pop-up function. It draws and executes pop-up menus. The buttons or areas in side the menus
-can be quite complicated and are described in the <code>SUIPUElement</code> structure. Once it is passed in to the function it will return the number of
+Perhaps to most advanced function in Seduce is the pop-up function. It
+draws and executes pop-up menus. The buttons or areas in side the menus
+can be quite complicated and are described in the <code>SUIPUElement</code>
+structure. Once it is passed in to the function it will return the
+number of
 the element that got changed by the user.
 </p>
-<pre class="code">
-extern uint sui_draw_pop-up(BInputState *input, float pos_x, float pos_y, SUIPUElement *element, uint element_count, uint button);
-</pre>
-
-<h2><a name="links">Links</a></h2
-<p>
-(This entire section was added by Emil Brink in December 2005, when converting Eskil's original raw text version of this
+<pre class="code">extern uint sui_draw_pop-up(BInputState *input, float pos_x, float pos_y, SUIPUElement *element, uint element_count, uint button);<br></pre>
+<h2><a name="links">Links</a></h2>
+<p>(This entire section was added by Emil Brink in December 2005, when
+converting Eskil's original raw text version of this
 document to HTML).
 </p>
 <p>
 These are some Web links that might be of interest to the reader of this document:
 </p>
-
 <dl>
-<dt><a href="http://www.quelsolaar.com/">Quel Solaar</a>
-<dd>Eskil's Quel Solaar site.
-
-<dt><a href="http://verse.blender.org/">Verse</a>
-<dd>The main Verse site. Go here to find new releases of Verse, and more.
-
-<dt><a href="http://www.opengl.org/">OpenGL</a>
-<dd>The OpenGL 3D graphics library main site.
-
-<dt><a href="http://www.opengl.org/resources/libraries/glut.html">GLUT</a>
-<dd>The "classic" OpenGL utility library, which can be used as a system-independent back-end for Betray.
-
-<dt><a href="http://glfw.sourceforge.net/">GLFW</a>
-<dd>A more modern system-independent framework for OpenGL applications, usable as a back-end for Betray.
-
-<dt><a href="http://www.libsdl.org/">SDL</a>
-<dd>A more general-purpose (not OpenGL-specific) system-independent library, useful as a back-end for Betray.
-
-<dt><a href="http://www.uni-verse.org/">Uni-Verse</a>
-<dd>The most recent development of Verse has been done as part of the Uni-Verse Consortium.
-partly funded by the <a href="http://europa.eu.int/comm/research/fp6/index_en.html">EU Sixth Framework Programme</a>.
+  <dt><a href="http://www.quelsolaar.com/">Quel Solaar</a> </dt>
+  <dd>Eskil's Quel Solaar site. </dd>
+  <dt><a href="http://verse.blender.org/">Verse</a> </dt>
+  <dd>The main Verse site. Go here to find new releases of Verse, and more. </dd>
+  <dt><a href="http://www.opengl.org/">OpenGL</a> </dt>
+  <dd>The OpenGL 3D graphics library main site. </dd>
+  <dt><a href="http://www.opengl.org/resources/libraries/glut.html">GLUT</a>
+  </dt>
+  <dd>The "classic" OpenGL utility library, which can be used as a system-independent back-end for Betray. </dd>
+  <dt><a href="http://glfw.sourceforge.net/">GLFW</a> </dt>
+  <dd>A more modern system-independent framework for OpenGL applications, usable as a back-end for Betray. </dd>
+  <dt><a href="http://www.libsdl.org/">SDL</a> </dt>
+  <dd>A more general-purpose (not OpenGL-specific) system-independent library, useful as a back-end for Betray. </dd>
+  <dt><a href="http://www.uni-verse.org/">Uni-Verse</a> </dt>
+  <dd>The most recent development of Verse has been done as part of the Uni-Verse Consortium. partly funded by the <a
+ href="http://europa.eu.int/comm/research/fp6/index_en.html">EU Sixth
+Framework Programme</a>. </dd>
 </dl>
-
 <hr>
-
 <p>
  <a href="http://validator.w3.org/check?uri=referer">
   <img src="http://www.w3.org/Icons/valid-html401"
        alt="Valid HTML 4.01 Strict" height="31" width="88">
  </a>
 </p>
-
 </body>
 </html>
