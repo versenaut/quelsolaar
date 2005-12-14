@@ -54,6 +54,9 @@ table.table
 Converted to HTML by Emil Brink (<a href="mailto:emil@obsession.se">emil@obsession.se</a>),<br>
 Additional proofreading by Camilla Berglund (<a href="mailto:camilla.berglund@gmail.com">camilla.berglund@gmail.com</a>).
 </p>
+<p>
+December, 2005
+</p>
 </div>
 <hr>
 <h2>Table of Contents</h2>
@@ -254,7 +257,9 @@ points? There is actually a very good reason for this, though. Imagine
 that you
 want to implement a button. Then you would create a function like this:
 </p>
-<pre class="code">boolean my_nice_button(BInputState *input, float pos_x, float pos_y, char *name);<br></pre>
+<pre class="code">
+extern boolean my_nice_button(BInputState *input, float pos_x, float pos_y, char *name);
+</pre>
 <p>
 Now, inside this function I can ether draw the button or
 check if the user just clicked the button. The function will always
@@ -263,7 +268,10 @@ return
 function
 like this:
 </p>
-<pre class="code">if(my_nice_button(input, 0.2f, 0.4f, "cut"))<br>	do_the_cutting();<br></pre>
+<pre class="code">
+if(my_nice_button(input, 0.2f, 0.4f, "cut"))
+    do_the_cutting();
+</pre>
 <p>
 Now the <code>do_the_cutting()</code> function will only be called in
 event mode and never in draw mode. As you can see, it makes it fairly
@@ -346,8 +354,7 @@ me have access to the entire source base at any time.
 All applications use the same set of external libraries:
 </p>
 <ul>
-  <li>Standard C library<br>
-  </li>
+  <li>Standard C library</li>
   <li>Sockets (wsock32.lib on windows)</li>
   <li>OpenGL</li>
   <li>GLUT, GLFW or SDL (Betray back-end)</li>
@@ -401,7 +408,25 @@ letter in each word is in uppercase.
 <p>
 Examples for the fictitious module "Leuq":
 </p>
-<pre class="code">typedef unsigned int luint;<br><br>typedef struct{<br>	float	silly;<br>	int 	very_silly;<br>	void	*noughty_bits;<br>}LMySillyStruct;<br><br>void l_my_hair_dryer(LHair *hair, float time);<br>void l_cut_short_func(LHair *hair, void *user); /* function used as pointer */<br><br>#define L_THERE_ARE_TOO_FEW_VERSE_APPS TRUE<br><br>typedef struct{<br>	L_MSE_ONE_WAY,<br>	L_MSE_OR_AN_OTHER<br>}LMySillyEnum;<br></pre>
+<pre class="code">
+typedef unsigned int luint;
+
+typedef struct{
+	float	silly;
+	int 	very_silly;
+	void	*noughty_bits;
+}LMySillyStruct;
+
+extern void l_my_hair_dryer(LHair *hair, float time);
+extern void l_cut_short_func(LHair *hair, void *user); /* function used as pointer */
+
+#define L_THERE_ARE_TOO_FEW_VERSE_APPS TRUE
+
+typedef struct{
+	L_MSE_ONE_WAY,
+	L_MSE_OR_AN_OTHER
+}LMySillyEnum;
+</pre>
 <p>
 I use a tab size of 4 in my editor.
 </p>
@@ -424,45 +449,72 @@ OK, let's start looking at the API.
 <p>
 To initialize you first need to run:
 </p>
-<pre class="code">void enough_init(void);<br></pre>
+<pre class="code">
+extern void enough_init(void);
+</pre>
 <p>
-Enough can manage more than one connection, and lets you switch between
-all existing connections. You need to use Enough's connect command
+Enough can manage more than one connection, and lets you switch between all existing connections. You need to use Enough's connect command
 rather than the regular Verse connection command. So use:
 </p>
-<pre class="code">uint e_vc_connect(char *server_address, char *name, char *pass);<br></pre>
+<pre class="code">
+extern uint e_vc_connect(char *server_address, char *name, char *pass);
+</pre>
 <p>
-Once you have sent the connection you can test to see if you got a
-connection.
+Once you have sent the connection you can test to see if you got a connection.
 </p>
-<pre class="code">extern boolean	e_vc_check_connected(void);<br>extern boolean	e_vc_check_connected_slot(uint	connection);<br>extern boolean	e_vc_check_accepted_slot(uint connection);<br></pre>
+<pre class="code">
+extern boolean	e_vc_check_connected(void);
+extern boolean	e_vc_check_connected_slot(uint	connection);
+extern boolean	e_vc_check_accepted_slot(uint connection);
+</pre>
 <p>You disconnect using one of these functions:
 </p>
-<pre class="code">extern void	e_vc_disconnect(uint connection);<br>extern void	e_vc_disconnect_all(void);<br></pre>
+<pre class="code">
+extern void	e_vc_disconnect(uint connection);
+extern void	e_vc_disconnect_all(void);
+</pre>
 <p>
 To "update" the network, and to switch to a different connection, you
 need to run:
 </p>
-<pre class="code">extern void	e_vc_set_current_active_connection(uint connection);<br>extern void	e_vc_connection_update(uint connection, uint time);<br></pre>
+<pre class="code">
+extern void	e_vc_set_current_active_connection(uint connection);
+extern void	e_vc_connection_update(uint connection, uint time);
+</pre>
 <p>
 By default Enough will download all node types but you can control the
 downloading of individual types by calling:
 </p>
-<pre class="code">void e_vc_set_auto_subscribe(VNodeType type, boolean set);<br></pre>
+<pre class="code">
+void e_vc_set_auto_subscribe(VNodeType type, boolean set);
+</pre>
 <h4><a name="api-enough-nodes">Node Handling</a></h4>
 <p>
 All nodes are handled using the <code>ENode</code> type. The basic way of getting
 a node is with one of these functions:
 </p>
-<pre class="code">extern	ENode *e_ns_get_node(uint connection, uint node_id);<br>extern	ENode *e_ns_get_node_next(uint id, uint connection, VNodeType type);<br>extern	ENode *e_ns_get_node_avatar(uint connection);<br>extern	ENode *e_ns_get_node_link(ENode *parent, uint node_id);<br></pre>
+<pre class="code">
+extern	ENode *e_ns_get_node(uint connection, uint node_id);
+extern	ENode *e_ns_get_node_next(uint id, uint connection, VNodeType type);
+extern	ENode *e_ns_get_node_avatar(uint connection);
+extern	ENode *e_ns_get_node_link(ENode *parent, uint node_id);
+</pre>
 <p>
 You can get the number of nodes of any type by calling:
 </p>
-<pre class="code">extern	uint e_ns_get_node_count(uint connection, VNodeType type);<br></pre>
+<pre class="code">
+extern	uint e_ns_get_node_count(uint connection, VNodeType type);
+</pre>
 <p>
 Once you have a node you can read out data from it by calling:
 </p>
-<pre class="code">extern	uint      e_ns_get_node_id(ENode *node);<br>extern	VNodeType e_ns_get_node_type(ENode *node);<br>extern	uint      e_ns_get_node_owner(ENode *node);<br>extern	char *    e_ns_get_node_name(ENode *node);<br>extern	uint      e_ns_get_node_connection(ENode *node);<br></pre>
+<pre class="code">
+extern	uint      e_ns_get_node_id(ENode *node);
+extern	VNodeType e_ns_get_node_type(ENode *node);
+extern	uint      e_ns_get_node_owner(ENode *node);
+extern	char *    e_ns_get_node_name(ENode *node);
+extern	uint      e_ns_get_node_connection(ENode *node);
+</pre>
 <p>
 Remember that any <code>ENode</code> or underlying data or pointers become invalid
 every time you call network update. This is because the nodes may have
@@ -490,7 +542,10 @@ behavior.
 When you use Enough you may still need to store your own custom data.
 Enough provides various functions to do this.
 </p>
-<pre class="code">extern void   e_ns_set_custom_data(ENode *node, uint slot, void *data);<br>extern void * e_ns_get_custom_data(ENode *node, uint slot);<br></pre>
+<pre class="code">
+extern void   e_ns_set_custom_data(ENode *node, uint slot, void *data);
+extern void * e_ns_get_custom_data(ENode *node, uint slot);
+</pre>
 <p>They can be used to store pointers for each node. There are 16
 different
 slots for each node. It is recommended that you use a <code>define</code>
@@ -503,7 +558,16 @@ deleted, the slots will disappear and you will have a memory leak.
 Therefore,
 use this function:
 </p>
-<pre class="code">typedef enum{<br>	E_CDC_CREATE,<br>	E_CDC_STRUCT,<br>	E_CDC_DATA,<br>	E_CDC_DESTROY<br>}ECustomDataCommand;<br><br>extern void e_ns_set_custom_func(uint slot, VNodeType type, void (*func)(ENode *node, ECustomDataCommand command));<br></pre>
+<pre class="code">
+typedef enum{
+	E_CDC_CREATE,
+	E_CDC_STRUCT,
+	E_CDC_DATA,
+	E_CDC_DESTROY
+}ECustomDataCommand;
+
+extern void e_ns_set_custom_func(uint slot, VNodeType type, void (*func)(ENode *node, ECustomDataCommand command));
+</pre>
 <p>
 This lets you assign callbacks that will be called whenever a node is
 created, destroyed or updated. This lets you write service functions
@@ -513,7 +577,10 @@ custom data synced with Verses data.
 <p>Additionally, each node has two version numbers that can be used to
 tell if a node has been updated or not.
 </p>
-<pre class="code">extern uint e_ns_get_node_version_struct(ENode *node);<br>extern uint e_ns_get_node_version_data(ENode *node);<br></pre>
+<pre class="code">
+extern uint e_ns_get_node_version_struct(ENode *node);
+extern uint e_ns_get_node_version_data(ENode *node);
+</pre>
 <p>
 The data version is updated if there is any change to the node at all,
 while the structure version will only be updated if there is a
@@ -523,11 +590,16 @@ For instance, a new vertex will result in a structural update, while
 moving an existing vertex will only be considered a data update. You
 can also force updates of these version numbers yourself by calling:
 </p>
-<pre class="code">extern void e_ns_update_node_version_struct(ENode *node);<br>extern void e_ns_update_node_version_data(ENode *node);<br></pre>
+<pre class="code">
+extern void e_ns_update_node_version_struct(ENode *node);
+extern void e_ns_update_node_version_data(ENode *node);
+</pre>
 <p>
 On top of all this functionality, Enough provides yet another callback:
 </p>
-<pre class="code">extern void e_ns_set_node_create_func(void (* func)(uint connection, uint id, VNodeType type, void *user), void *user);<br></pre>
+<pre class="code">
+extern void e_ns_set_node_create_func(void (* func)(uint connection, uint id, VNodeType type, void *user), void *user);
+</pre>
 <p>
 This callback is called whenever your connection receives a node
 creation command for a node that you have asked be created. This is
@@ -541,7 +613,14 @@ Similarly to the node graph, you can store custom
 data in the material graph and register update callbacks with these
 calls:
 </p>
-<pre class="code">extern uint   e_nsm_get_fragment_version(ENode *node, VNMFragmentID id);<br><br>extern void   e_nsm_set_custom_data(ENode *node, VNMFragmentID frag, uint slot, void *data);<br>extern void * e_nsm_get_custom_data(ENode *node, VNMFragmentID frag, uint slot);<br><br>extern void   e_nsm_set_custom_func(uint slot, void (*func)(ENode *node, VNMFragmentID frag, ECustomDataCommand command));<br></pre>
+<pre class="code">
+extern uint   e_nsm_get_fragment_version(ENode *node, VNMFragmentID id);
+
+extern void   e_nsm_set_custom_data(ENode *node, VNMFragmentID frag, uint slot, void *data);
+extern void * e_nsm_get_custom_data(ENode *node, VNMFragmentID frag, uint slot);
+
+extern void   e_nsm_set_custom_func(uint slot, void (*func)(ENode *node, VNMFragmentID frag, ECustomDataCommand command));
+</pre>
 <h4><a name="api-enough-ndata">Node data</a></h4>
 <p>
 This is very brief documentation and most of the functionality is
@@ -549,7 +628,12 @@ self-explanatory if you know how Verse works. However, there are
 some things to explain.
 Layers and other data have their own handles:
 </p>
-<pre class="code">typedef void EObjLink;<br>typedef void EGeoLayer;<br>typedef void EBitLayer;<br>typedef void ECodeBuffer;<br></pre>
+<pre class="code">
+typedef void EObjLink;
+typedef void EGeoLayer;
+typedef void EBitLayer;
+typedef void ECodeBuffer;
+</pre>
 <p>
 They are obtained just like ENode handles, using the same types of
 functions.
@@ -561,14 +645,30 @@ allows you to easily iterate over all nodes or layers. Here is an
 example of a loop that
 gives you all object nodes.
 </p>
-<pre class="code">ENode *node;<br><br>for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT);<br>    node != NULL;<br>    node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT)<br>{<br>        /* ... process the node here ... */<br>}<br></pre>
+<pre class="code">
+ENode *node;
+
+for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT);
+    node != NULL;
+    node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT)
+{
+        /* ... process the node here ... */
+}
+</pre>
 <p>
 Some data types don't have their own C-level types and only IDs are
 used. They have similar <code>_next</code> functions. Here is an example of going
 through
 all tag groups of a node:
 </p>
-<pre class="code">for(id = e_ns_get_next_tag_group(node, 0);<br>    id != (uint16) -1;<br>    e_ns_get_next_tag_group(node, id + 1))<br>{<br>        /* ... process the tag group here ... */<br>}<br></pre>
+<pre class="code">
+for(id = e_ns_get_next_tag_group(node, 0);
+    id != (uint16) -1;
+    e_ns_get_next_tag_group(node, id + 1))
+{
+        /* ... process the tag group here ... */
+}
+</pre>
 <h4><a name="api-enough-nspec">Special Node Functions</a></h4>
 <p>
 These are functions that are node-specific, i.e. they work only on
@@ -580,12 +680,22 @@ of nodes.
 When adding new vertices and polygons to a geometry node,
 one needs empty IDs. To find such IDs, use these functions:
 </p>
-<pre class="code">extern uint e_nsg_find_empty_vertex_slot(ENode *node, uint start);<br>extern uint e_nsg_find_empty_polygon_slot(ENode *node, uint start);<br></pre>
+<pre class="code">
+extern uint e_nsg_find_empty_vertex_slot(ENode *node, uint start);
+extern uint e_nsg_find_empty_polygon_slot(ENode *node, uint start);
+</pre>
 <p>
 Use the <code>start</code> param if you need to more than one ID. A typical loop
 to obtain ten IDs can look like this:
 </p>
-<pre class="code">uint ids[10], i;<br><br>ids[0] = e_nsg_find_empty_vertex_slot(node, 0);<br><br>for(i = 1; i &lt; 10; i++)<br>	ids[i] = e_nsg_find_empty_vertex_slot(node, ids[i - 1]);<br></pre>
+<pre class="code">
+uint ids[10], i;
+
+ids[0] = e_nsg_find_empty_vertex_slot(node, 0);
+
+for(i = 1; i &lt; 10; i++)
+	ids[i] = e_nsg_find_empty_vertex_slot(node, ids[i - 1]);
+</pre>
 <h5><a name="api-enough-nspec-b">Bitmap Node</a></h5>
 <p>
 The bitmap node has the same type of functions as the other nodes, but
@@ -597,7 +707,19 @@ searching,
 data conversion, pixel filtering and pixel lookup. Here is an
 example:
 </p>
-<pre class="code">EBMHandle *my_handle;<br>EBMPrecision my_pixel[3];<br><br>my_handle = e_nsb_get_image_handle(node_id, "col_r", "col_g", "col_b");<br>for(i = 0; i &lt; 200; i++)<br>{<br>	e_nsb_evaluate_image_handle_tile(my_handle, my_pixel, u, v, w);<br>	...<br>}<br><br>e_nsb_destroy_image_handle(my_handle);<br></pre>
+<pre class="code">
+EBMHandle *my_handle;
+EBMPrecision my_pixel[3];
+
+my_handle = e_nsb_get_image_handle(node_id, "col_r", "col_g", "col_b");
+for(i = 0; i &lt; 200; i++)
+{
+	e_nsb_evaluate_image_handle_tile(my_handle, my_pixel, u, v, w);
+	...
+}
+
+e_nsb_destroy_image_handle(my_handle);
+</pre>
 <p>
 The image handle doesn't ever become invalidated and will work even if
 the
@@ -613,16 +735,41 @@ be easy use.
 This code switches Betray between using GLUT, GLFW, or SDL (only one
 should be <code>define</code>d before building):
 </p>
-<pre class="code">/*#define BETRAY_SDL_SYSTEM_WRAPPER*/<br>/*#define BETRAY_GLFW_SYSTEM_WRAPPER*/<br>#define BETRAY_GLUT_SYSTEM_WRAPPER<br></pre>
+<pre class="code">
+/*#define BETRAY_SDL_SYSTEM_WRAPPER*/
+/*#define BETRAY_GLFW_SYSTEM_WRAPPER*/
+#define BETRAY_GLUT_SYSTEM_WRAPPER
+</pre>
 <p>
 Here are the three modes that the action function can be called in:
 </p>
-<pre class="code">typedef enum{<br>	BAM_DRAW,<br>	BAM_EVENT,<br>	BAM_MAIN<br>}BActionMode;<br></pre>
+<pre class="code">
+typedef enum{
+	BAM_DRAW,
+	BAM_EVENT,
+	BAM_MAIN
+}BActionMode;
+</pre>
 <p>
 This structure is the main structure given to the action function. It
 contains all of the input data.
 </p>
-<pre class="code">typedef struct{<br>	boolean		mouse_button[DEVICE_BUTTONS_COUNT];<br>	boolean		last_mouse_button[DEVICE_BUTTONS_COUNT];<br>	float		pointer_x;<br>	float		pointer_y;<br>	float		click_pointer_x;<br>	float		click_pointer_y;<br>	float		delta_pointer_x;<br>	float		delta_pointer_y;<br>	BButtonEvent	event[16];<br>	uint		event_count;<br>	double		time;<br>	BActionMode	mode;<br>}BInputState;<br></pre>
+<pre class="code">
+typedef struct{
+	boolean		mouse_button[DEVICE_BUTTONS_COUNT];
+	boolean		last_mouse_button[DEVICE_BUTTONS_COUNT];
+	float		pointer_x;
+	float		pointer_y;
+	float		click_pointer_x;
+	float		click_pointer_y;
+	float		delta_pointer_x;
+	float		delta_pointer_y;
+	BButtonEvent	event[16];
+	uint		event_count;
+	double		time;
+	BActionMode	mode;
+}BInputState;
+</pre>
 <p>
 The <code>mouse_button</code> member tells you whether or not a button
 is pressed, with the following index mapping:
@@ -652,7 +799,12 @@ The <code>last_mouse_button</code> field stores the value of the last
 frame's <code>mouse_button</code> value. This makes it possible
 to do tests like this to check for a button press:
 </p>
-<pre class="code">if(index-&gt;mouse_button[0] == TRUE &amp;&amp; input-&gt;last_mouse_button[0] == FALSE)<br>{<br>        /* ... process press here ... */<br>}<br></pre>
+<pre class="code">
+if(index-&gt;mouse_button[0] == TRUE &amp;&amp; input-&gt;last_mouse_button[0] == FALSE)
+{
+        /* ... process press here ... */
+}
+</pre>
 <p>
 The current position of the mouse is stored in <code>pointer_x</code>
 and <code>pointer_y</code>,
@@ -664,62 +816,93 @@ delta movement of the pointer from the last frame.
 The <code>event</code> and <code>event_count</code> fields contain
 all key presses since the last frame.
 </p>
-<pre class="code">extern void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, boolean window_fullscreen, char *name);<br></pre>
+<pre class="code">
+extern void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, boolean window_fullscreen, char *name);
+</pre>
 <p>Initializes Betray and creates a window.
 </p>
-<pre class="code">extern void betray_action(BActionMode mode);<br></pre>
+<pre class="code">
+extern void betray_action(BActionMode mode);
+</pre>
 <p>
 Runs the current action function in a specific made (for testing
 mostly)
 </p>
-<pre class="code">extern void betray_set_action_func(void (*input_compute_func)(BInputState *data, void *user_pointer), void *user_pointer);<br></pre>
+<pre class="code">
+extern void betray_set_action_func(void (*input_compute_func)(BInputState *data, void *user_pointer), void *user_pointer);
+</pre>
 <p>
 Sets the action function.
 </p>
-<pre class="code">extern void betray_set_mouse_warp(boolean warp);<br></pre>
+<pre class="code">
+extern void betray_set_mouse_warp(boolean warp);
+</pre>
 <p>
 Turn on or of the wrapping of the mouse, for applications that don't
 use the
 pointer (FPS type of controls) use the delta pointer field to read the
 mouse input.
 </p>
-<pre class="code">extern void betray_execute(char *command);<br></pre>
+<pre class="code">
+extern void betray_execute(char *command);
+</pre>
 <p>
 Used to execute a program outside the code.
 </p>
-<pre class="code">extern float betray_get_time();<br></pre>
+<pre class="code">
+extern float betray_get_time();
+</pre>
 <p>
 Gives you the current time.
 </p>
-<pre class="code">extern void * betray_get_gl_proc_address();<br></pre>
+<pre class="code">
+extern void * betray_get_gl_proc_address();
+</pre>
 <p>Gives you a pointer to the function used to retrieve OpenGL
 extension functions.
 </p>
-<pre class="code">extern boolean betray_get_key(uint key);<br></pre>
+<pre class="code">
+extern boolean betray_get_key(uint key);
+</pre>
 <p>
 Gives you a simple way to check if a key is pressed.
 </p>
-<pre class="code">extern void betray_get_key_up_down(boolean *press, boolean *last_press, uint key);<br></pre>
+<pre class="code">
+extern void betray_get_key_up_down(boolean *press, boolean *last_press, uint key);
+</pre>
 <p>
 Gives you the ability to read out a continuous state of a key, mouse
 button style.
 </p>
-<pre class="code">extern BInputState * betray_get_input_state();<br></pre>
+<pre class="code">
+extern BInputState * betray_get_input_state();
+</pre>
 <p>
 Gives you the input state if you have lost it, (used in Seduce to avoid
 input parameters).
 </p>
-<pre class="code">extern void betray_reshape_view(uint x_size, uint y_size);<br></pre>
-<p><br>
+<pre class="code">
+extern void betray_reshape_view(uint x_size, uint y_size);
+</pre>
+<p>
+
 </p>
-<pre class="code">extern boolean betray_set_screen_mode(uint x_size, uint y_size, boolean fullscreen);<br></pre>
-<p>Sets the window size, or changes to a specific screen mode.<br>
+<pre class="code">
+extern boolean betray_set_screen_mode(uint x_size, uint y_size, boolean fullscreen);
+</pre>
+<p>Sets the window size, or changes to a specific screen mode.
+
 </p>
-<pre class="code">extern double betray_get_screen_mode(uint *x_size, uint *y_size, boolean *fullscreen);<br></pre>
+<pre class="code">
+extern double betray_get_screen_mode(uint *x_size, uint *y_size, boolean *fullscreen);
+</pre>
 <p>Gives you the current screen size. It
-returns the aspect, and allows any of the arguments to be <code>NULL</code>.<br>
+returns the aspect, and allows any of the arguments to be <code>NULL</code>.
+
 </p>
-<pre class="code">extern void betray_start_type_in(char *text, uint size, void (*done_func)(void *user, boolean cancel), uint *cursor, void *user_pointer);<br></pre>
+<pre class="code">
+extern void betray_start_type_in(char *text, uint size, void (*done_func)(void *user, boolean cancel), uint *cursor, void *user_pointer);
+</pre>
 <p>Starts the type-in mode. The Betray library has special input
 functionality to handle text
 editing. Here, <code>text</code> is a pointer to the buffer that is
@@ -730,23 +913,34 @@ buffer is stored; <code>done_func</code> is a pointer to a function
 that will be called once the user presses enter or the following
 function is called:
 </p>
-<pre class="code">extern void betray_end_type_in_mode(boolean cancel);<br></pre>
+<pre class="code">
+extern void betray_end_type_in_mode(boolean cancel);
+</pre>
 <p>Ends the type-in mode, and calls the callback function provided when
 it was started.
 </p>
-<pre class="code">extern boolean betray_is_type_in();<br></pre>
-<p>Checks whether you are in the type-in mode.<br>
+<pre class="code">
+extern boolean betray_is_type_in();
+</pre>
+<p>Checks whether you are in the type-in mode.
+
 </p>
-<pre class="code">extern void betray_launch_main_loop(void);<br></pre>
+<pre class="code">
+extern void betray_launch_main_loop(void);
+</pre>
 <p>Starts the main loop.</p>
-<pre class="code">extern void   betray_get_current_time(uint32 *seconds, uint32 *fractions);<br>extern double betray_get_delta_time();<br></pre>
+<pre class="code">
+extern void   betray_get_current_time(uint32 *seconds, uint32 *fractions);
+extern double betray_get_delta_time();
+</pre>
 <p>
 Two functions to read the time independent of Verse, although you
 should use Verse timer API if you are timing anything like animation in
 the interface
 (too bad I haven't used in the applications so all the timing on the
 animation is all screwed up...). They also work before you have a
-connection.<br>
+connection.
+
 </p>
 <p><code>betray_get_current_time()</code> works just like the timer
 function in Verse. For inter-frame timing, <code>betray_get_delta_time()</code>
@@ -761,17 +955,24 @@ interface construction and management.
 <p>
 To initialize Seduce call:
 </p>
-<pre class="code">extern void sui_init(void);<br></pre>
+<pre class="code">
+extern void sui_init(void);
+</pre>
 <p>
 To draw a mouse pointer call:
 </p>
-<pre class="code">extern void sui_draw_pointer(float x, float y);<br></pre>
+<pre class="code">
+extern void sui_draw_pointer(float x, float y);
+</pre>
 <p>
 To help create quadratic buttons or click areas, these functions check
 if the
 mouse pointer is or was inside an area:
 </p>
-<pre class="code">extern boolean sui_box_click_test(float x_pos, float y_pos, float x_size, float y_size);<br>extern boolean sui_box_down_click_test(float x_pos, float y_pos, float x_size, float y_size);<br></pre>
+<pre class="code">
+extern boolean sui_box_click_test(float x_pos, float y_pos, float x_size, float y_size);
+extern boolean sui_box_down_click_test(float x_pos, float y_pos, float x_size, float y_size);
+</pre>
 <p>
 The perhaps largest functionality of Seduce is the built in vector line
 editor. They are arguably not very good and
@@ -781,37 +982,61 @@ this is something only I have needed to use, the functionality is
 manageable. To run the editor, pass one of the
 following functions as action functions to Betray.
 </p>
-<pre class="code">extern void * sui_symbol_editor_func(BInputState *input, void *user_pointer);<br>extern void * sui_font_editor_func(BInputState *input, void *user_pointer);<br></pre>
+<pre class="code">
+extern void * sui_symbol_editor_func(BInputState *input, void *user_pointer);
+extern void * sui_font_editor_func(BInputState *input, void *user_pointer);
+</pre>
 <p>
 Once long ago there was an other module called NGL that wrapped
 OpenGL. It has since been removed, but GL code can be quite verbose,
 so in order to not make the code five times bigger, I wrote a set of
 very simple
 functions to handle basic drawing using the GL. If you want the
-details I suggest you look at the code itself.<br>
+details I suggest you look at the code itself.
+
 </p>
 <p>Anyhow to draw geometry, call:
 </p>
-<pre class="code">extern void sui_draw_gl(uint draw_type, float *array, uint length, uint dimensions, float red, float green, float blue);<br>extern void sui_draw_elements_gl(uint draw_type, float *array, uint reference, uint length, uint dimensions, float red, float green, float blue);<br></pre>
+<pre class="code">
+extern void sui_draw_gl(uint draw_type, float *array, uint length, uint dimensions, float red, float green, float blue);
+extern void sui_draw_elements_gl(uint draw_type, float *array, uint reference, uint length, uint dimensions, float red, float green, float blue);
+</pre>
 <p>
 To draw simple lines, call:
 </p>
-<pre class="code">extern void sui_draw_2d_line_gl(float start_x, float start_y, float end_x, float end_y, float red, float green, float blue);<br>extern void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end_x, float end_y, float end_z, float red, float green, float blue);<br></pre>
+<pre class="code">
+extern void sui_draw_2d_line_gl(float start_x, float start_y, float end_x, float end_y, float red, float green, float blue);
+extern void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end_x, float end_y, float end_z, float red, float green, float blue);
+</pre>
 <p>
 To set blending mode, call:
 </p>
-<pre class="code">extern void sui_set_blend_gl(uint source, uint destination);<br></pre>
+<pre class="code">
+extern void sui_set_blend_gl(uint source, uint destination);
+</pre>
 <p>
 To draw arrays with normals, colors or textures, call:
 </p>
-<pre class="code">extern void sui_set_color_array_gl(float *array, uint length, uint channels);<br>extern void sui_set_normal_array_gl(float *array, uint length);<br>extern void sui_set_texture2D_array_gl(float *array, uint length, uint dimensions, uint texture);<br></pre>
+<pre class="code">
+extern void sui_set_color_array_gl(float *array, uint length, uint channels);
+extern void sui_set_normal_array_gl(float *array, uint length);
+extern void sui_set_texture2D_array_gl(float *array, uint length, uint dimensions, uint texture);
+</pre>
 <p>
 The following functions (like much of the code above) are about saving
 lines of code. They simply set more than one value of an array. They
 may seem a bit
 too simple, but they made the porting from NGL nicer.
 </p>
-<pre class="code">extern void sui_draw_set_vec2(float *array, uint pos, float a, float b);<br>extern void sui_draw_set_vec3(float *array, uint pos, float a, float b, float c);<br>extern void sui_draw_set_vec4(float *array, uint pos, float a, float b, float c, float d);<br><br>extern void sui_draw_set_ivec2(uint *array, uint pos, uint a, uint b);<br>extern void sui_draw_set_ivec3(uint *array, uint pos, uint a, uint b, uint c);<br>extern void sui_draw_set_ivec4(uint *array, uint pos, uint a, uint b, uint c, uint d);<br></pre>
+<pre class="code">
+extern void sui_draw_set_vec2(float *array, uint pos, float a, float b);
+extern void sui_draw_set_vec3(float *array, uint pos, float a, float b, float c);
+extern void sui_draw_set_vec4(float *array, uint pos, float a, float b, float c, float d);
+
+extern void sui_draw_set_ivec2(uint *array, uint pos, uint a, uint b);
+extern void sui_draw_set_ivec3(uint *array, uint pos, uint a, uint b, uint c);
+extern void sui_draw_set_ivec4(uint *array, uint pos, uint a, uint b, uint c, uint d);
+</pre>
 <p>
 One of the things that Seduce provides you with is the ability to
 display text. The letters are all drawn with lines, using OpenGL.
@@ -822,16 +1047,23 @@ you can just draw a new one! ;-)
 <p>
 First we have two defines, for the standard size and spacing of text:
 </p>
-<pre class="code">#define SUI_T_SIZE 0.01 <br>#define SUI_T_SPACE 0.3<br></pre>
+<pre class="code">
+#define SUI_T_SIZE 0.01 
+#define SUI_T_SPACE 0.3
+</pre>
 <p>
 To actually draw a single letter, you use this function:
 </p>
-<pre class="code">extern void sui_draw_letter(uint8 letter, float red, float green, float blue);<br></pre>
+<pre class="code">
+extern void sui_draw_letter(uint8 letter, float red, float green, float blue);
+</pre>
 <p>
 To be able to do some simple kerning (it's nice to know how large the
 letter is), call:
 </p>
-<pre class="code">extern float sui_get_letter_size(char letter);<br></pre>
+<pre class="code">
+extern float sui_get_letter_size(char letter);
+</pre>
 <p>
 To draw an entire string of text with kerning and all, call the
 following function. The <code>pos_x</code> and <code>pos_y</code> is
@@ -843,7 +1075,9 @@ and
 and <code><code><code>blue</code></code></code> define the
 color.<code><code>
 </code></code></p>
-<pre class="code">extern void sui_draw_text(float pos_x, float pos_y, float size, float spacing, char *text, float red, float green, float blue);<br></pre>
+<pre class="code">
+extern void sui_draw_text(float pos_x, float pos_y, float size, float spacing, char *text, float red, float green, float blue);
+</pre>
 <p>
 Sometimes it can be good to know how long a string of text will be once
 rendered, to be able to do centering and other things. Use the same
@@ -852,7 +1086,9 @@ as for <code>sui_draw_text()</code> with the following function to get
 the
 correct length:
 </p>
-<pre class="code">extern float sui_compute_text_length(float size, float spacing, char *text);<br></pre>
+<pre class="code">
+extern float sui_compute_text_length(float size, float spacing, char *text);
+</pre>
 <p>
 If you want a text button the next function does that for you. Remember
 that it only draws text; it does not draw any button graphics. The
@@ -860,13 +1096,18 @@ that it only draws text; it does not draw any button graphics. The
 parameter lets you make the button left aligned (0), centered
 (0.5) or right aligned (1.0)
 </p>
-<pre class="code">extern boolean sw_text_button(BInputState *input, float pos_x, float pos_y, float center, float size, float spacing, char *text, float red, float green, float blue);<br></pre>
+<pre class="code">
+extern boolean sw_text_button(BInputState *input, float pos_x, float pos_y, float center, float size, float spacing, char *text, float red, float green, float blue);
+</pre>
 <p>
 The Betray type-in API has been wrapped by Seduce to include
 a click area and text drawing, all done by this
 function:
 </p>
-<pre class="code">extern boolean	sui_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size,<br>		            void (*done_func)(void *user, char *text), void* user, float red, float green, float blue);<br></pre>
+<pre class="code">
+extern boolean	sui_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size,
+		            void (*done_func)(void *user, char *text), void* user, float red, float green, float blue);
+</pre>
 <p>
 Note that <code>length</code> is the length of the click area, and <code>size</code> is
 the size of the string.
@@ -883,12 +1124,19 @@ pointer to the value you are changing, but this isn't always practical.
 There are
 two different functions, one for doubles and one for integers:
 </p>
-<pre class="code">extern boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, float length, float size, double *number, void *id,<br>				      float red, float green, float blue);<br>extern boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float length, float size, uint32 *number, void *id,<br>				    float red, float green, float blue);<br></pre>
+<pre class="code">
+extern boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, float length, float size, double *number, void *id,
+				      float red, float green, float blue);
+extern boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float length, float size, uint32 *number, void *id,
+				    float red, float green, float blue);
+</pre>
 <p>
 Next is Seduce's settings API. To initialize it, call the this
 function with the name of a settings file:
 </p>
-<pre class="code">extern void sui_init_settings(char *settings);<br></pre>
+<pre class="code">
+extern void sui_init_settings(char *settings);
+</pre>
 <p>
 To query or set a settings field you call the following
 functions with a keyword and a value, or a default value that will be
@@ -898,16 +1146,29 @@ particularly fast, so if you need to access the same setting many
 times, save it as a temporary value rather then calling the functions
 from inside an inner-loop.
 </p>
-<pre class="code">extern double  sui_get_setting_double(char *setting, double default_value);<br>extern void    sui_set_setting_double(char *setting, double value);<br>extern uint    sui_get_setting_int(char *setting, uint default_value);<br>extern void    sui_set_setting_int(char *setting, uint value);<br>extern char *  sui_get_setting_text(char *setting, char *default_text);<br>extern void    sui_set_setting_text(char *setting, char *text);<br>extern boolean sui_test_setting_version(uint *version);<br></pre>
+<pre class="code">
+extern double  sui_get_setting_double(char *setting, double default_value);
+extern void    sui_set_setting_double(char *setting, double value);
+extern uint    sui_get_setting_int(char *setting, uint default_value);
+extern void    sui_set_setting_int(char *setting, uint value);
+extern char *  sui_get_setting_text(char *setting, char *default_text);
+extern void    sui_set_setting_text(char *setting, char *text);
+extern boolean sui_test_setting_version(uint *version);
+</pre>
 <p>
 Finally, to load or save your settings, call the following functions,
 specifying the name
 of the file:
 </p>
-<pre class="code">extern void sui_save_settings(char *file_name);<br>extern void sui_load_settings(char *file_name);<br></pre>
+<pre class="code">
+extern void sui_save_settings(char *file_name);
+extern void sui_load_settings(char *file_name);
+</pre>
 <p>
 </p>
-<pre class="code">extern void sui_create_shadow_edge(float size, uint count, float *shadow, float *color, float *square);<br></pre>
+<pre class="code">
+extern void sui_create_shadow_edge(float size, uint count, float *shadow, float *color, float *square);
+</pre>
 <p>
 Perhaps to most advanced function in Seduce is the pop-up function. It
 draws and executes pop-up menus. The buttons or areas in side the menus
@@ -916,7 +1177,9 @@ structure. Once it is passed in to the function it will return the
 number of
 the element that got changed by the user.
 </p>
-<pre class="code">extern uint sui_draw_pop-up(BInputState *input, float pos_x, float pos_y, SUIPUElement *element, uint element_count, uint button);<br></pre>
+<pre class="code">
+extern uint sui_draw_pop-up(BInputState *input, float pos_x, float pos_y, SUIPUElement *element, uint element_count, uint button);
+</pre>
 <h2><a name="links">Links</a></h2>
 <p>(This entire section was added by Emil Brink in December 2005, when
 converting Eskil's original raw text version of this
@@ -926,23 +1189,22 @@ document to HTML).
 These are some Web links that might be of interest to the reader of this document:
 </p>
 <dl>
-  <dt><a href="http://www.quelsolaar.com/">Quel Solaar</a> </dt>
-  <dd>Eskil's Quel Solaar site. </dd>
-  <dt><a href="http://verse.blender.org/">Verse</a> </dt>
-  <dd>The main Verse site. Go here to find new releases of Verse, and more. </dd>
-  <dt><a href="http://www.opengl.org/">OpenGL</a> </dt>
-  <dd>The OpenGL 3D graphics library main site. </dd>
-  <dt><a href="http://www.opengl.org/resources/libraries/glut.html">GLUT</a>
-  </dt>
-  <dd>The "classic" OpenGL utility library, which can be used as a system-independent back-end for Betray. </dd>
-  <dt><a href="http://glfw.sourceforge.net/">GLFW</a> </dt>
-  <dd>A more modern system-independent framework for OpenGL applications, usable as a back-end for Betray. </dd>
-  <dt><a href="http://www.libsdl.org/">SDL</a> </dt>
-  <dd>A more general-purpose (not OpenGL-specific) system-independent library, useful as a back-end for Betray. </dd>
-  <dt><a href="http://www.uni-verse.org/">Uni-Verse</a> </dt>
-  <dd>The most recent development of Verse has been done as part of the Uni-Verse Consortium. partly funded by the <a
- href="http://europa.eu.int/comm/research/fp6/index_en.html">EU Sixth
-Framework Programme</a>. </dd>
+ <dt><a href="http://www.quelsolaar.com/">Quel Solaar</a> </dt>
+ <dd>Eskil's Quel Solaar site. </dd>
+ <dt><a href="http://verse.blender.org/">Verse</a> </dt>
+ <dd>The main Verse site. Go here to find new releases of Verse, and more. </dd>
+ <dt><a href="http://www.opengl.org/">OpenGL</a> </dt>
+ <dd>The OpenGL 3D graphics library main site. </dd>
+ <dt><a href="http://www.opengl.org/resources/libraries/glut.html">GLUT</a>
+ </dt>
+ <dd>The "classic" OpenGL utility library, which can be used as a system-independent back-end for Betray. </dd>
+ <dt><a href="http://glfw.sourceforge.net/">GLFW</a> </dt>
+ <dd>A more modern system-independent framework for OpenGL applications, usable as a back-end for Betray. </dd>
+ <dt><a href="http://www.libsdl.org/">SDL</a> </dt>
+ <dd>A more general-purpose (not OpenGL-specific) system-independent library, useful as a back-end for Betray. </dd>
+ <dt><a href="http://www.uni-verse.org/">Uni-Verse</a> </dt>
+ <dd>The most recent development of Verse has been done as part of the Uni-Verse Consortium. partly funded by the
+     <a href="http://europa.eu.int/comm/research/fp6/index_en.html">EU Sixth Framework Programme</a>. </dd>
 </dl>
 <hr>
 <p>
