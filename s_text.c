@@ -169,9 +169,9 @@ boolean sui_type_in(BInputState *input, float pos_x, float pos_y, float length, 
 
 #define SUI_ILLEGAL_NUMBER         1.7976931348623158e+308 /* max value */
 
-char *sui_type_in_number_text;
-double sui_type_in_number_output = SUI_ILLEGAL_NUMBER;
-void *sui_type_in_number_id;
+static char *sui_type_in_number_text = NULL;
+static double sui_type_in_number_output = SUI_ILLEGAL_NUMBER;
+static void *sui_type_in_number_id = NULL;
 
 void sui_end_type_number_func(void *user, boolean cancel)
 {
