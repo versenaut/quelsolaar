@@ -191,7 +191,7 @@ Verse at <a href="http://www.blender.org/modules/verse/">blender.org</a>.
 </p>
 <h3><a name="mod-st">St</a></h3>
 <p>
-St is a tiny module that include basic definitions and some simple
+St is a tiny module that includes basic definitions and some simple
 globally used functions. St has no external dependencies, and so does
 not require any
 other library or module to compile.
@@ -275,9 +275,8 @@ if(my_nice_button(input, 0.2f, 0.4f, "cut"))
 <p>
 Now the <code>do_the_cutting()</code> function will only be called in
 event mode and never in draw mode. As you can see, it makes it fairly
-easy to to write
-interfaces, since you don't need two different functions to
-describe the interface, which then have to be kept synchronized.
+easy to write interfaces, since you don't need two different functions
+to describe the interface, which then have to be kept synchronized.
 </p>
 <p>
 The compute mode is usually processed quickly, and is only used for
@@ -314,40 +313,30 @@ Persuade is a rendering library, and is currently under construction.
 It uses <a href="http://www.opengl.org/">OpenGL</a> to draw Verse
 data. It also includes subdivision geometry code, and shading code
 using the OpenGL Shading Language. Persuade can be used to draw whole
-Verse scenes, but can also
-be used to to draw
-a specific geometry node, or to get an OpenGL handle to a texture
-provided by Verse.
+Verse scenes, but can also be used to draw a specific geometry node, or
+to get an OpenGL handle to a texture provided by Verse.
 Persuade requires Enough and Verse to compile. It has a built-in
-"kernel" with
-a task manager that does all the computations. All computations are
-chopped up in small blocks that are computed one by one. This means
-that if something
-needs to be computed that is quite demanding, it will be split up, and
-won't lock up the computer. This ensures continuous smooth framerates,
-regardless of how
-much has to be done in the background.
+"kernel" with a task manager that does all the computations. All
+computations are chopped up in small blocks that are computed one by one.
+This means that if something needs to be computed that is quite demanding,
+it will have to be split up, and won't lock up the computer. This ensures
+continuous smooth framerates, regardless of how much has to be done in the
+background.
 </p>
 <p>
-Persuade is currently in development and is somewhat less than stable.
-Therefore,
-you can compile applications that use it without it simply by removing
-all the
-Persuade files and replace <tt>persuade.h</tt> with an empty <tt>persuade.h</tt>
-file (the <tt>persuade.h</tt> file contains the define <code>PERSUADE_H</code>,
-which if not defined, will cause the code using Persuade to be removed
-by <code>ifdef</code>:s).
+Persuade is currently in development and is somewhat less than stable. Therefore, you
+can compile applications that use it without it simply by removing all the Persuade
+files and replace <tt>persuade.h</tt> with an empty <tt>persuade.h</tt> file (the
+<tt>persuade.h</tt> file contains the define <code>PERSUADE_H</code>, which if not
+defined, will cause the code using Persuade to be removed by <code>ifdef</code>:s).
 </p>
 <h2><a name="building">Building</a></h2>
 <p>
-To build one of the applications, compile and link all module files
-(including Verse) with the files for the applications you want to
-build. Although
-the modules can be compiled as separate libraries, I find easier to
-build
-them all at once. I keep them in one large project, It helps when
-debugging and lets
-me have access to the entire source base at any time.
+To build one of the applications, compile and link all module files (including Verse)
+with the files for the applications you want to build. Although the modules can be
+compiled as separate libraries, I find easier to build them all at once. I keep them
+in one large project, it helps when debugging and lets me have access to the entire
+source base at any time.
 </p>
 <h3><a name="building-deps">Dependencies</a></h3>
 <p>
@@ -601,11 +590,9 @@ On top of all this functionality, Enough provides yet another callback:
 extern void e_ns_set_node_create_func(void (* func)(uint connection, uint id, VNodeType type, void *user), void *user);
 </pre>
 <p>
-This callback is called whenever your connection receives a node
-creation command for a node that you have asked be created. This is
-useful
-if you write an application that creates a node and then automatically
-want to
+This callback is called whenever your connection receives a node creation
+command for a node that you have asked to be created. This is useful if you
+write an application that creates a node and then automatically want to
 add more data to it.
 </p>
 <p>
@@ -685,8 +672,8 @@ extern uint e_nsg_find_empty_vertex_slot(ENode *node, uint start);
 extern uint e_nsg_find_empty_polygon_slot(ENode *node, uint start);
 </pre>
 <p>
-Use the <code>start</code> param if you need to more than one ID. A typical loop
-to obtain ten IDs can look like this:
+Use the <code>start</code> parameter if you need to more than one ID. A typical
+loop to obtain ten IDs can look like this:
 </p>
 <pre class="code">
 uint ids[10], i;
@@ -1131,8 +1118,8 @@ extern boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y
 				    float red, float green, float blue);
 </pre>
 <p>
-Next is Seduce's settings API. To initialize it, call the this
-function with the name of a settings file:
+Next is Seduce's settings API. To initialize it, call this function with the
+name of a settings file:
 </p>
 <pre class="code">
 extern void sui_init_settings(char *settings);
