@@ -6,3 +6,64 @@ Connector was written by Eskil Steenberg.
 The Verse homepage is at <http://www.blender.org/modules/verse/>, and the
 project page at Blender, where you can find out how to access the code in
 CVS, is at <http://projects.blender.org/projects/verse/>.
+
+The following documentation is by the author, Eskil (slightly edited):
+
+				--- * ---
+
+Connector
+
+Connector is a Verse application that lets you view and modify Verse data
+using a schematic view. You can create, delete and modify all Verse nodes,
+it includes built-in editors for the material node as well as for the curve
+node.
+
+USAGE
+
+Connector has a special interface that is somewhat different from other
+applications, but it has been designed to be easy to use (at least easier
+relative to my other apps).
+
+Connecting
+
+Once you have started Connector you will see a short animated intro. At any
+time you can click anywhere in the window to display the connect
+interface. Either you can click on "localhost", to connect to a local
+host, or you can type in the address of a non-localhost (IP address or
+DNS name) and name and password if needed.
+
+Switching Modes
+
+Once you have connected, you find yourself viewing a white desktop. This
+is where you can arrange your nodes and view their links. At the moment it
+is empty because you need to select some nodes to work with. In order to do
+this you must go to the node list. Click in empty space to switch to the node
+list. Now some nodes will appear. To get out of a node simply click in empty
+space in the node list to return to the desktop.
+
+Node List
+
+In the node list, all nodes on the host are visible in rows from top to
+bottom. The nodes are visualized as circles that look like different
+planets. Each node type is visualized as a different type of planet.
+
+For instance object nodes are visualized as suns, and geometry nodes are
+Saturn-like planets with rings surrounding them. By clicking on one of the
+nodes, you return to the desktop but now the node is available on the
+desktop. In each node you can also read the name of the node.
+
+The top row of nodes are actually not real nodes but if you click on one of
+them you will create a new node and show place it on the desktop. If you have
+nodes they wont all fit on the screen at once so in order to scroll the list
+up or down, simply click and drag the background. Note that there is a
+difference between clicking on the background (to return to desktop) and
+dragging the background (to scroll). By clicking on a node in the node
+list using the middle mouse button, you display it on the desktop without
+actually returning to the desktop.
+
+The Desktop
+
+Once you return to the desktop you can rearrange your nodes by clicking
+and dragging them. You can also scroll the desktop by grabbing it and
+dragging it. If you grab the desktop at the far left or right edge of the
+window you can zoom in and out of the desktop.
