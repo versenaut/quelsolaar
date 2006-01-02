@@ -106,8 +106,13 @@ dist-loqairou:	loqairou.exe
 	echo $(dl)
 	if exist $(dl). ( rmdir /s /q $(dl). )
 	mkdir $(dl)
+	mkdir $(dl)/docs
+	mkdir $(dl)/docs/loq-airou
 	copy /b loqairou.exe $(dl)
 	copy /a README.loqairou $(dl)
+	copy /a docs/loq-airou/*.html docs/loq-airou/
+	copy /b docs/loq-airou/*.png  docs/loq-airou/
+	copy /b docs/loq-airou/*.jpg  docs/loq-airou/
 	copy /b c:\winnt\system32\sdl.dll $(dl)
 	zip -r $(dl).zip $(dl)
 	rmdir /s /q $(dl)
