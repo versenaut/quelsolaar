@@ -4,7 +4,7 @@
 
 VERSE=../verse
 
-.PHONY:		clean
+.PHONY:		clean dist dist-enough dist-connector dist-loqairou
 
 CFLAGS=-I$(VERSE) -g -Wstrict-prototypes
 LDFLAGS=-L$(VERSE) -L/usr/X11R6/lib
@@ -83,8 +83,8 @@ dist-enough:	libenough.a enough.h README.enough
 dist-connector:	connector README.connector
 		tar czf connector-$(DIST).tar.gz $^
 
-dist-loqairou:	loqairou
-		tar czf loqairou-$(DIST).tar.gz loqairou
+dist-loqairou:	loqairou README.loqairou
+		tar czf loqairou-$(DIST).tar.gz $^
 
 # -----------------------------------------------
 
