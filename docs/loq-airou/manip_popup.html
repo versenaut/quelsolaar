@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+
+<META NAME="Author"           CONTENT="Eskil Steenberg">
+<META NAME="Keywords"         CONTENT="balance, Obsession, games-development, about games development, gamedesign, gameplay, what makes games good, games, quake, edge, leveldesign, team, graphics, AI, computer-game AI, computer graphics" LANG=en>
+<META NAME="Description"      CONTENT="balance: About the tricky balancing of great game design. Main menu.">
+<META NAME="Generator"        CONTENT="My Creative Mind v 0.2">
+<META NAME="Resource-Type"    CONTENT="document">
+<META NAME="Content-Type"     CONTENT="text/html, charset=iso-8859-1">
+
+
+<TITLE>Loq Airou Manual</TITLE>
+</HEAD>
+<BODY CLASS=Main TEXT="#000000" LINK="#4A65D9" VLINK="#2299ff" BGCOLOR="#000000">
+
+<br><br><br><br><br><br><br><br><br><center>
+<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 COLS=2>
+<TR><TD BACKGROUND="background.png" WIDTH="936" VALIGN = "TOP">
+<CENTER>
+<TABLE BORDER=0 WIDTH=85%" CELLSPACING=0 CELLPADDING=0 COLS=2><TR><TD VALIGN = "TOP" WIDTH="95%"><CENTER>
+<a href="./popup.html"> Prev</a> |
+<a href="./index1.html"> index</a> |
+<a href="./edge_popup.html"> next</a>
+</CENTER></TD><TD>
+</TD></TR></TABLE>
+
+<TABLE COLS=3 CELLSPACING=5 CELLPADDING=0  WIDTH="100%"  BORDER=0 BACKGROUND="netscape_sucks.png"><TR>
+<TD VALIGN = "TOP" WIDTH="30%">
+
+<FONT color=#5172ff size=3><B>T H E&nbsp;&nbsp;M A N I P U L A T O R&nbsp;&nbsp;P O P U P
+</B></FONT>
+<P>
+The manipulator popup contains:
+</P>
+<LI>Reverse</LI>
+<LI>Duplitcate</LI>
+<LI>Detach</LI>
+                <LI>Collapse</LI>
+<LI>Full crease</LI>
+<LI>No crease</LI>
+<LI>Flip</LI>
+<LI>Smooth Selection</LI>
+<LI>Delete</LI>
+                <P> "Reverse", makes all non selected vertexes selected and all 
+                  selected vertexes unselected. (all soft selection goes threw 
+                  the formula: new_selection = 1 - old_selection) This functionality 
+                  is very useful because you can now un select portion by using 
+                  Inverse Select. Select some vertexes and the inverse the selection 
+                  again. </P>
+</TD><TD VALIGN = "TOP" WIDTH="30%">
+                <P> "Duplicate", duplicates all selected polygons and selects 
+                  the new surface. When using this action make shore you use the 
+                  manipulator to move the new surface away form its position before 
+                  clearing the selection, otherwise you will end up with two surfaces 
+                  in the same place that can make it hard to separate them. </P>
+                <P> "Detach", detaches all selected polygons in to a separate 
+                  entity. </P>
+                <P> "Collapse", collapses all vertexes in to one. That will delete 
+                  some polygons of reshape some quads in to triangles. If the 
+                  single vertex created by the collapse isn't used by any polygon 
+                  it will be deleted. A Detach followed by a collapse can be used 
+                  to delete selected polygons. </P>
+<P>
+"Full crease", makes all selected edges creased. 
+</P>
+<P>
+"No crease", makes all selected edges uncreased. 
+</P>
+</TD><TD VALIGN = "TOP" WIDTH="30%">
+                <P> "Flip", turns all faces to face the opposite direction. All 
+                  non selected polygons that shares a edge with a selected polygon 
+                  will be destroyed since a single edge can not have two polygons 
+                  facing different directions. </P>
+                <P> "Smooth Selection", makes the vertexes selected borders semi 
+                  selected and expands the selection to make surrounding vertexes 
+                  some what selected too. This Action can be applied multiple 
+                  times to get an even smoother selection. It is a very useful 
+                  function since it turns the transform manipulator in to a deformer 
+                  style tool. </P>
+                <P> "Delete", deletes all selected polygons. It is a useful 
+                  alternative to the standard delete tool since it allows you to 
+                  select large pieces of geometry and delete them quickly. </P>
+
+</TD></TR>
+</TABLE>
+
+<TT>
+</tt></center></TD><TD BGCOLOR="#000000" WIDTH="2">
+<img border="0" src="black_line.jpg"><br>
+</TD></TR></TABLE>
+
+</CENTER>
+
+<TD></TD>
+
+
+</BODY>
+</HTML>
+
+
+
+
+
+
+
+

@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+
+<META NAME="Author"           CONTENT="Eskil Steenberg">
+<META NAME="Keywords"         CONTENT="balance, Obsession, games-development, about games development, gamedesign, gameplay, what makes games good, games, quake, edge, leveldesign, team, graphics, AI, computer-game AI, computer graphics" LANG=en>
+<META NAME="Description"      CONTENT="balance: About the tricky balancing of great game design. Main menu.">
+<META NAME="Generator"        CONTENT="My Creative Mind v 0.2">
+<META NAME="Resource-Type"    CONTENT="document">
+<META NAME="Content-Type"     CONTENT="text/html, charset=iso-8859-1">
+
+
+<TITLE>Loq Airou Manual</TITLE>
+</HEAD>
+<BODY CLASS=Main TEXT="#000000" LINK="#4A65D9" VLINK="#2299ff" BGCOLOR="#000000">
+
+<br><br><br><br><br><br><br><br><br><center>
+<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 COLS=2>
+<TR><TD BACKGROUND="background.png" WIDTH="936" VALIGN = "TOP">
+<CENTER>
+<TABLE BORDER=0 WIDTH=85%" CELLSPACING=0 CELLPADDING=0 COLS=2><TR><TD VALIGN = "TOP" WIDTH="95%"><CENTER>
+<a href="./index2.html"> Prev</a> |
+<a href="./index1.html"> index</a> |
+<a href="./basics2.html"> next</a>
+</CENTER></TD><TD>
+</TD></TR></TABLE>
+
+<TABLE COLS=3 CELLSPACING=5 CELLPADDING=0  WIDTH="100%"  BORDER=0 BACKGROUND="netscape_sucks.png"><TR>
+<TD VALIGN = "TOP" WIDTH="30%">
+<TD VALIGN = "TOP" WIDTH="30%">
+<FONT color=#5172ff size=3><B>B A S I C S
+</B></FONT>
+<P>
+In Loq Airou you model with one primitive: Creased Subdivision Surfaces.
+The basic idea behind SDS(SubDivision Surfaces) is that the user creates
+a cage of flat polygons and the software uses an algorithm to compute
+a smooth third degree surface. This primitive has a number of advantages, first
+of all it is simple to use, it creates great looking surfaces and it has 
+arbitrary topology. Since not all objects are smooth we have added the 
+ability to have creased edges making it possible to model sharp edges.
+</P>
+                <P> Loq Airou uses single sided surfaces, this means that surfaces 
+                  can only be visible form one side. The surface is also non-manifold, 
+                  which means that only 2 polygons can use the same edge. The 
+                  control mesh is restricted to only triangles and quads. </P>
+</TD><TD VALIGN = "TOP" WIDTH="30%">
+                <P> It is recommended to use mainly quads and to use triangles 
+                  in junction points between quads. This clears up the view and 
+                  makes it easier to see your model. Quad based models also tend 
+                  to be easier to make smooth. </P>
+                <P> When viewing the model you actually can see two different 
+                  surfaces, first you have the actual surface (in blue) and then 
+                  you have the cage (transparent). The cage is the geometry that 
+                  is modified so when we refer to modifying the different parts 
+                  of model we always refer to the cage, and not the actual surface. 
+                </P>
+</TD><TD VALIGN = "TOP" WIDTH="30%">
+<img border="0" src="./component.png">
+</TD></TR>
+</TABLE>
+
+<TT>
+</tt></center></TD><TD BGCOLOR="#000000" WIDTH="2">
+<img border="0" src="black_line.jpg"><br>
+</TD></TR></TABLE>
+
+</CENTER>
+
+<TD></TD>
+
+
+</BODY>
+</HTML>
+
+
+
+
+
+
+
+

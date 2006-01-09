@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+
+<META NAME="Author"           CONTENT="Eskil Steenberg">
+<META NAME="Keywords"         CONTENT="balance, Obsession, games-development, about games development, gamedesign, gameplay, what makes games good, games, quake, edge, leveldesign, team, graphics, AI, computer-game AI, computer graphics" LANG=en>
+<META NAME="Description"      CONTENT="balance: About the tricky balancing of great game design. Main menu.">
+<META NAME="Generator"        CONTENT="My Creative Mind v 0.2">
+<META NAME="Resource-Type"    CONTENT="document">
+<META NAME="Content-Type"     CONTENT="text/html, charset=iso-8859-1">
+
+
+<TITLE>Loq Airou Manual</TITLE>
+</HEAD>
+<BODY CLASS=Main TEXT="#000000" LINK="#4A65D9" VLINK="#2299ff" BGCOLOR="#000000">
+
+<br><br><br><br><br><br><br><br><br><center>
+<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 COLS=2>
+<TR><TD BACKGROUND="background.png" WIDTH="936" VALIGN = "TOP">
+<CENTER>
+<TABLE BORDER=0 WIDTH=85%" CELLSPACING=0 CELLPADDING=0 COLS=2><TR><TD VALIGN = "TOP" WIDTH="95%"><CENTER>
+<a href="./view.html"> Prev</a> |
+<a href="./index1.html"> index</a> |
+<a href="./snap.html"> next</a>
+</CENTER></TD><TD>
+</TD></TR></TABLE>
+
+<TABLE COLS=3 CELLSPACING=5 CELLPADDING=0  WIDTH="100%"  BORDER=0 BACKGROUND="netscape_sucks.png"><TR>
+<TD VALIGN = "TOP" WIDTH="30%">
+
+<FONT color=#5172ff size=3><B>C R E A T I N G&nbsp;&nbsp;G E O M E T R Y
+</B></FONT>
+                <P> In Loq Airou you do not draw surfaces but rather edges that 
+                  create surfaces when connected. Any edges that forms a triangle 
+                  or quad will create a surface. When a polygon is created it 
+                  will be turned in the same direction as its neighboring polygons. 
+                  If there are no neighboring polygons it will be created facing 
+                  the camera. If the neighboring polygons are facing different 
+                  directions the modeler will create the polygon facing the direction 
+                  of the majority of the neighbors (or towards the camera if there 
+                  is tie). When a polygon is created it will delete neighboring 
+                  polygons facing the wrong direction or polygons that break the 
+                  two polygons per edge rule. This takes some time to get used 
+                  to but turns out to be fairly intuitive. It is recommended that 
+                  you as a user only use this creation tool to begin with until 
+                  you are comfortable using it. </P>
+</TD><TD VALIGN = "TOP" WIDTH="30%">
+                <P> By clicking and dragging with the left mouse button you 
+                  can create an edge. Both ends can be snapped to existing geometry 
+                  to make connected edges. The edges are by default created in 
+                  the view plane, perpendicular to your view point, the depth 
+                  is depending on the last drawn point. However when you draw you 
+                  can see three lines representing X, Y And Z and by drawing close 
+                  to them you can draw in a specific dimensions and not just in 
+                  the view plane. </P>
+                <P> If you which to draw in a plane perpendicular or one of the 
+                  three axis (x/y, y/z or x/z) you can do by placing the camera 
+                  in roughly one of the 3 axis. The software will then snap the 
+                  drawing plane to the closest axis. </P>
+<P>
+Note: at this time there is no indication to when the view is directed close
+ enough to axis for the snap to be active, this will be addressed in future versions.
+</P>
+</TD><TD VALIGN = "TOP" WIDTH="30%">
+                <P> To create a continuous line consisting of multiple edges you 
+                  can tap the middle mouse button while creating an edge to leave 
+                  off vertexes. </P>
+</TD></TR>
+</TABLE>
+
+<TT>
+</tt></center></TD><TD BGCOLOR="#000000" WIDTH="2">
+<img border="0" src="black_line.jpg"><br>
+</TD></TR></TABLE>
+
+</CENTER>
+
+<TD></TD>
+
+
+</BODY>
+</HTML>
+
+
+
+
+
+
+
+
