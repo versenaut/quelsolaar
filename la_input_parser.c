@@ -388,7 +388,9 @@ void la_edit_func(BInputState *input, void *user)
 	if(input->mode == BAM_MAIN)
 	{
 		verse_callback_update(0);
+#if defined PERSUADE_H
 		p_task_compute(1);
+#endif
 		return;
 	}
 	if(input->mode == BAM_DRAW)
