@@ -12,11 +12,14 @@ ALL:		$(TARGETS)
 CFLAGS=/nologo /I$(VERSE)\include
 LIBEXE=link /lib
 LIBFLAGS=/nologo /out:
+# Comment out the next two lines to build without the "Persuade" library.
+#PERSUADE=persuade.lib
+#CFLAGS=$(CFLAGS) /DPERSUADE_ENABLED
 
 connector.exe:	co_main.obj co_game.obj co_intro.obj co_vn_audio.obj co_vn_bitmap.obj co_vn_curve.obj co_vn_geometry.obj co_vn_graphics.obj \
 		co_vn_handle.obj co_vn_head.obj co_vn_mat_render.obj co_vn_material.obj co_vn_object.obj co_vn_search.obj \
 		co_vn_text.obj co_widgets.obj  \
-		seduce.lib betray.lib enough.lib persuade.lib deceive.lib
+		seduce.lib betray.lib enough.lib $(PERSUADE) deceive.lib
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib sdlmain.lib
 
 loqairou.exe:	la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.obj la_input_parser.obj la_intro.obj la_key_input.obj \
@@ -25,18 +28,18 @@ loqairou.exe:	la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.obj la_input_
 		la_tool_manipulator.obj la_tool_poly_select.obj la_tool_reshape.obj la_tool_revolve.obj la_tool_select.obj \
 		la_tool_slice.obj la_tool_splitter.obj la_tool_subdivide.obj \
 		st_math.obj st_matrix_operations.obj st_text.obj \
-		seduce.lib betray.lib enough.lib deceive.lib persuade.lib
+		seduce.lib betray.lib enough.lib deceive.lib $(PERSUADE)
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib sdlmain.lib
 
 quelsolaar.exe:	qs_camera.obj qs_intro.obj qs_main.obj \
 		st_math.obj st_matrix_operations.obj st_text.c st_types.obj \
-		persuade.lib seduce.lib betray.lib enough.lib
+		$(PERSUADE) seduce.lib betray.lib enough.lib
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib
 
 uvedit.exe:	uv_main.obj uv_draw.obj uv_edge_collapse.obj uv_geometry.obj uv_menu.obj uv_overlay.obj uv_popup.obj uv_texture.obj uv_tool_corner.obj \
 		uv_tool_edge.obj uv_tool_polygon.obj uv_transform.obj uv_tool_select.obj uv_tool_strip.obj uv_unfold.obj \
 		uv_view.obj uv_input_parse.obj \
-		betray.lib enough.lib persuade.lib deceive.lib seduce.lib
+		betray.lib enough.lib deceive.lib seduce.lib $(PERSUADE)
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib
 
 # -------------------------------------------------------------
@@ -106,13 +109,13 @@ dist-loqairou:	loqairou.exe
 	echo $(dl)
 	if exist $(dl). ( rmdir /s /q $(dl). )
 	mkdir $(dl)
-	mkdir $(dl)/docs
-	mkdir $(dl)/docs/loq-airou
+	mkdir $(dl)\docs
+	mkdir $(dl)\docs\loq-airou
 	copy /b loqairou.exe $(dl)
 	copy /a README.loqairou $(dl)
-	copy /a docs/loq-airou/*.html docs/loq-airou/
-	copy /b docs/loq-airou/*.png  docs/loq-airou/
-	copy /b docs/loq-airou/*.jpg  docs/loq-airou/
+	copy /a docs\loq-airou\*.html $(dl)\docs\loq-airou/
+	copy /b docs\loq-airou\*.png  $(dl)\docs\loq-airou/
+	copy /b docs\loq-airou\*.jpg  $(dl)\docs\loq-airou/
 	copy /b c:\winnt\system32\sdl.dll $(dl)
 	zip -r $(dl).zip $(dl)
 	rmdir /s /q $(dl)
