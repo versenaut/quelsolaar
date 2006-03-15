@@ -34,7 +34,7 @@ boolean p_extension_test(const char *string)
 	const char *a;
 
 	extension = glGetString(GL_EXTENSIONS);
-	printf("%s", extension);
+	printf("%s\n", extension);
 
 	for(a = extension; a[0] != 0; a++)
 	{
