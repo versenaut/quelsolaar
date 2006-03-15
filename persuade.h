@@ -1,12 +1,21 @@
+/* Undef this to disable use of Persuade in the various applications. The symbol
+ * actually cared about by the other code is PERSUADE_H, so that is wrapped here
+ * by the PERSUADE_ENABLED symbol for ease of disabling/enabling.
+ *
+ * Typically, we set this externally in the Makefile, since there are linking
+ * considerations too.
+*/
+
+/*#define PERSUADE_ENABLED*/
+
+#if defined PERSUADE_ENABLED
+
 #if !defined PERSUADE_H
 #define	PERSUADE_H
 
 #include "enough.h"
 
-
-
 typedef void PMesh;
-
 
 extern void persuade_init(uint max_tesselation_level, void *(*gl_GetProcAddress)(const char* proc)); /* initialize persuade and set the maximum SDS level*/
 extern void p_task_compute(uint count); /* this function makes Persuade update everything that needs to be computedcompute */
@@ -43,4 +52,6 @@ extern uint		p_th_get_texture_id(PTextureHandle *handle);
 
 extern void		p_draw_scene(void);
 
-#endif
+#endif		/* PERSUADE_H */
+
+#endif		/* PERSUADE_ENABLED */
