@@ -19,7 +19,7 @@ extern float co_get_pos_x(float x);
 extern float co_get_pos_y(float y);
 extern float co_get_view_x(float x);
 extern float co_get_view_y(float y);
-extern void co_draw_sumary(ENode *node, float x, float y);
+extern void co_draw_summary(ENode *node, float x, float y);
 
 boolean co_draw_3d_click_test_node(float x, float y)
 {
@@ -38,7 +38,7 @@ boolean co_draw_3d_click_test_node(float x, float y)
 	return FALSE;
 }
 
-void co_draw_sumary(ENode *node, float x, float y);
+void co_draw_summary(ENode *node, float x, float y);
 
 void co_draw_3d_summary(void)
 {
@@ -52,7 +52,7 @@ void co_draw_3d_summary(void)
 		e_nso_get_pos_time(node, pos, seconds, fractions);
 		p_get_projection_screen(output, pos[0], pos[1], pos[2]);
 		if(output[2] < 0)
-			co_draw_sumary(node, output[0], output[1]);
+			co_draw_summary(node, output[0], output[1]);
 	}
 }
 

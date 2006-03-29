@@ -180,7 +180,7 @@ static float co_draw_node_summary(ENode *node, float x, float y, uint recursion)
 	return line;
 }
 
-void co_draw_sumary(ENode *node, float x, float y)
+void co_draw_summary(ENode *node, float x, float y)
 {
 	glPushMatrix();
 	glTranslatef(-x, -y, -1);
