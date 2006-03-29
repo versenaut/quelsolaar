@@ -1,6 +1,20 @@
 
 #define CO_ENOUGH_NODE_SLOT 2
 #define CO_ENOUGH_DATA_SLOT 1
+#define CONNECTOR_ENOUGH_SLOTT 1
+
+
+
+typedef struct{
+	uint		node_id;
+	float		pos_x;
+	float		pos_y;
+	boolean		search;	
+	boolean		viewlock;	
+	boolean		hidden;
+	void		*render_cash;
+	void		*persuade;
+}COVerseNode;
 
 extern void co_init_handle_verse_node(void);
 
