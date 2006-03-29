@@ -9,8 +9,6 @@
 #include "enough.h"
 #include "seduce.h"
 
-#include "co_vn_graphics.h"
-
 /* These can be reduced for low-performance machines. Restrictions
  * apply, lowest "safe" settings are probably 12/12/1 respectively.
 */
@@ -136,7 +134,7 @@ void co_intro_draw(void *user)
 	uint i;
 	co_vng_update_time();
 	aspect = betray_get_screen_mode(NULL, NULL, NULL);
-	
+
 	if(timer > 0)
 		timer -= 0.16 * betray_get_delta_time();
 	if(timer > 1)
