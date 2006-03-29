@@ -250,7 +250,8 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 	float size, color, color_light;
 	double value;
 	char *type_names[] = {"Object", "Geometry", "Material", "Bitmap", "Text", "Curve", "Audio"};
-	uint16 i, j, k, l, m;
+	uint16 i, j, k, l;
+	uint32 m;
 	VNTag *tag, t;
 	float y;
 
