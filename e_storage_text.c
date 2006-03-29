@@ -32,7 +32,7 @@ typedef struct {
 
 extern void	e_ns_update_node_version_struct(ESTextNode *node);
 
-const char * e_nst_get_language(const ESTextNode *t_node)
+char * e_nst_get_language(ESTextNode *t_node)
 {
 	return t_node->language;
 }
@@ -77,7 +77,7 @@ uint e_nst_get_buffer_id(ESTextBuffer *buffer)
 	return buffer->buffer_id;
 }
 
-const char * e_nst_get_buffer_name(ESTextBuffer *buffer)
+char * e_nst_get_buffer_name(ESTextBuffer *buffer)
 {
 	return buffer->name;
 }
