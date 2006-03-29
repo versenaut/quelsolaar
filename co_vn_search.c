@@ -16,9 +16,7 @@ boolean co_text_search(const char *text, const char *search)
 	{
 		if(text[i] == search[0] || search[0] + 32 == text[i] || search[0] - 32 == text[i])
 		{
-			for(j = 0; text[i + j] != 0 && search[j] != 0 && (text[i + j] == search[j] ||
-				  (text[i + j] > 64 && text[i + j] < 91 && text[i + j] + 32 == search[j]) ||
-				  (search[j] > 64 && search[j] < 91 && search[j] + 32 == text[i + j])); j++);
+			for(j = 0; text[i + j] != 0 && search[j] != 0 && (text[i + j] == search[j] || (text[i + j] > 64 && text[i + j] < 91 && text[i + j] + 32 == search[j]) || (search[j] > 64 && search[j] < 91 && search[j] + 32 == text[i + j])); j++);
 			if(search[j] == 0)
 				return TRUE;
 		}
@@ -32,7 +30,6 @@ boolean co_text_search(const char *text, const char *search)
 				return TRUE;
 		}
 	}
-//	printf("search: %s %s\n", text, search);
 	return FALSE;
 }
 
@@ -185,3 +182,40 @@ boolean co_search_node(ENode *node, char *search)
 
 	return FALSE;
 }
+
+static char co_compare[64] = {0};
+
+void co_search_clear(void)
+{
+	ENode *node;
+	COVerseNode *co_node;
+	uint i, type;
+	for(type = 0; type < V_NT_NUM_TYPES; type++)
+		for(node = e_ns_get_node_next(0, 0, type); node != 0; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, type))
+			if((co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT)) != NULL)
+				co_node->search = TRUE;
+	for(i = 0; i < 64; i++)
+		co_compare[i] = 0;
+}
+
+void co_search_update(char *search)
+{
+	ENode *node;
+	COVerseNode *co_node;
+	uint i, type;
+	for(i = 0; search[i] == co_compare[i] && i < 64; i++)
+	if(search[i] == co_compare[i])
+		return;
+	co_search_clear();
+
+	for(type = 0; type < V_NT_NUM_TYPES; type++)
+		for(node = e_ns_get_node_next(0, 0, type); node != 0; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, type))	
+			if((co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT)) != NULL)
+				if(co_node->search == TRUE)
+					if(co_search_node(node, search) != TRUE)
+						co_node->search = FALSE;
+
+	for(i = 0; i < 64; i++)
+		co_compare[i] = search[i];
+}
+
