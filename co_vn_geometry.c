@@ -32,7 +32,7 @@ void co_geometry_destroy(PeGeometry *g)
 }
 
 
-PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g)
+PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g, boolean fill, float red, float green, float blue)
 {
 	egreal *vertex;
 	uint i, *ref, ref_length, length;
@@ -112,11 +112,12 @@ PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g)
 			}
 		}
 	}
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	if(!fill)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if(g->tri_count != 0)
-		sui_draw_gl(GL_TRIANGLES, g->tri, g->tri_count * 3, 3, 0.5, 0.5, 0.5);
+		sui_draw_gl(GL_TRIANGLES, g->tri, g->tri_count * 3, 3, red, green, blue);
 	if(g->quad_count != 0)
-		sui_draw_gl(GL_QUADS, g->quad, g->quad_count * 4,  3, 0.5, 0.5, 0.5);
+		sui_draw_gl(GL_QUADS, g->quad, g->quad_count * 4,  3, red, green, blue);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	return g;
 }
@@ -358,8 +359,8 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 				}
 				sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, text[i], color_light, color_light, color_light);  
 				if(sui_type_number_double(input, 0.15, y, 0.15, SUI_T_SIZE, edit, edit, color, color, color))
-					verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent,
-								 t[0], t[1], t[2], e_nsg_get_bone_pos_label(node, bone),
+					verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref,
+								 parent, t[0], t[1], t[2], e_nsg_get_bone_pos_label(node, bone),
 								 &rot, e_nsg_get_bone_rot_label(node, bone));
 				if(co_w_slider(input, 0.3, y, 0.35, edit, color, color, color))
 					/*verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], &rot)*/;
