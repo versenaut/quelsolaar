@@ -289,7 +289,7 @@ extern boolean co_draw_ships(BInputState *input);
 
 extern void co_draw_3d_view(float x, float y);
 extern boolean co_draw_3d_click_test_node(float x, float y);
-extern void co_draw_3d_sumary(void);
+extern void co_draw_3d_summary(void);
 extern void co_draw_3d_node_lock(ENode *node);
 extern void co_pu_empty(BInputState *input);
 
@@ -330,7 +330,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		p_view_set();
 		co_draw_3d_view(input->pointer_x, input->pointer_y);
 		glPopMatrix();
-		co_draw_3d_sumary();
+		co_draw_3d_summary();
 
 	}
 
