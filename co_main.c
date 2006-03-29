@@ -53,6 +53,7 @@ int main(int argc, char **argv)
 	betray_init(argc, argv, 1280, 1024, FALSE, "Connector");
 	sui_init();
 
+	p_init();
 	glClearColor(1, 1, 1, 0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	sui_load_settings("co_config.cfg");
