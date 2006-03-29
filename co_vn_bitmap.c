@@ -127,7 +127,7 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 		for(layer = e_nsb_get_layer_next(node, 0); layer != NULL ; layer = e_nsb_get_layer_next(node, e_nsb_get_layer_id(layer) + 1))
 		{
 			char *names[] = {"UINT1", "UINT8", "UINT16", "REAL32", "REAL64"};
-			static uint32 popup = -1;
+			static uint32 popup = ~0;
 			VNBLayerType type;
 
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer name:", color_light, color_light, color_light);  
