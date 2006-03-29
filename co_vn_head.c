@@ -251,7 +251,6 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 	double value;
 	char *type_names[] = {"Object", "Geometry", "Material", "Bitmap", "Text", "Curve", "Audio"};
 	uint16 i, j, k, l, m;
-	uint32 n;
 	VNTag *tag, t;
 	float y;
 
@@ -283,7 +282,7 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 		sui_draw_text(0.0, y - 0.125, SUI_T_SIZE, SUI_T_SPACE, "Type:", 1.0 - 1.0 / 4.0, 1.0 - 1.0 / 4.0, 1.0 - 1.0 / 4.0); 
 		sui_draw_text(0.15, y - 0.125, SUI_T_SIZE, SUI_T_SPACE, type_names[e_ns_get_node_type(node)], 1.0 - 1.0 / 4.0, 1.0 - 1.0 / 4.0, 1.0 - 1.0 / 4.0); 
 	}
-
+	co_w_scroll(input, 0, 2);
 	y -= 0.15;
 	co_vng_divider(input, 0.2, y, &tag_rot, &color, &color_light, &show_tags, "Tags");
 	y -= 0.05;
@@ -435,11 +434,11 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 					break;
 					case VN_TAG_BLOB :
 						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Size:", color_light, color_light, color_light);  
-						n = t.vblob.size;
-						if(sui_type_number_uint(input, 0.15, y + size, 0.5, SUI_T_SIZE, &n, tag, color, color, color))
+						m = t.vblob.size;
+						if(sui_type_number_uint(input, 0.15, y + size, 0.5, SUI_T_SIZE, &m, tag, color, color, color))
 						{
 							uint8 blob[VN_TAG_MAX_BLOB_SIZE];
-							t.vblob.size = n;
+							t.vblob.size = m;
 							if(t.vblob.size >= VN_TAG_MAX_BLOB_SIZE)
 								t.vblob.size = VN_TAG_MAX_BLOB_SIZE - 1;
 							for(l = 0; l < tag->vblob.size; l++)
@@ -467,8 +466,8 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 							if(sui_type_number_uint(input, 0.15 + (0.07 * (float)(l % 8)), y + size, 0.5, SUI_T_SIZE, &entry, &((uint8*)tag->vblob.blob)[l], color, color, color))
 							{
 								uint8 blob[VN_TAG_MAX_BLOB_SIZE];
-								for(n = 0; n < tag->vblob.size; n++)
-									blob[m] = ((uint8 *)t.vblob.blob)[n];
+								for(m = 0; m < tag->vblob.size; m++)
+									blob[m] = ((uint8 *)t.vblob.blob)[m];
 								if(entry < 256)
 									blob[l] = (uint8)entry;
 								else
