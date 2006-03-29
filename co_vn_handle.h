@@ -3,8 +3,6 @@
 #define CO_ENOUGH_DATA_SLOT 1
 #define CONNECTOR_ENOUGH_SLOT 1
 
-
-
 typedef struct{
 	uint		node_id;
 	float		pos_x;
