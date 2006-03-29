@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 /*	p_op_lod_settings(sui_get_setting_int("MIN_TESS_LEVEL", 1),	sui_get_setting_double("GEOMETRY_COMPLEXITY", 40), sui_get_setting_double("LOD_TRESHOLD", 1.5), FALSE);
 	p_op_lod_set_tess_levels(limit, 5);
 	p_op_service_set_auto(TRUE); /* choosing to run enough lib in auto service mode */
-#ifdef PERSUADE_H
+#if defined PERSUADE_H
 	persuade_init(2, betray_get_gl_proc_address());
 #endif
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);/*GL_AMBIENT_AND_DIFFUSE*/
