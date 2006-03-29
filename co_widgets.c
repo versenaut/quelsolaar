@@ -542,3 +542,41 @@ boolean co_w_close_button(BInputState *input, float pos_x, float pos_y, float re
 				return TRUE;
 	return FALSE;
 }
+
+
+float co_w_scroll(BInputState *input, float pos, float size)
+{
+	static boolean drag = FALSE;
+	float aspect, p;
+	aspect = betray_get_screen_mode(NULL, NULL, NULL);
+	p = (1 - pos / -size) * aspect;
+/*	if(size < aspect)
+		return pos;
+	pos /= aspect;
+	size /= aspect;*/
+	if(input->mode == BAM_DRAW)
+	{
+		sui_draw_2d_line_gl(0.98, p, 0.98, p - 5.0 / (size * aspect), 0.5, 0.5, 0.5);
+		sui_draw_2d_line_gl(0.97, p, 0.97, p - 5.0 / (size * aspect), 0.5, 0.5, 0.5);
+		sui_draw_2d_line_gl(0.96, p, 0.96, p - 5.0 / (size * aspect), 0.5, 0.5, 0.5);
+	}
+	else
+	{
+		if(input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE)
+		{
+			if(input->pointer_x > 0.95 && input->pointer_y < p)
+				pos += (5.0 / (size * aspect)) / aspect * -size;
+			if(input->pointer_x > 0.95 && input->pointer_y > p - 4.0 / (size * aspect))
+				pos -= (5.0 / (size * aspect)) / aspect * -size;
+		}
+		if(input->mouse_button[0] == TRUE && input->click_pointer_x > 0.95 && input->pointer_y < p && input->pointer_y > p - 4.0 / (size * aspect))
+			drag = TRUE;
+		if(drag)
+			pos += input->delta_pointer_y * size / aspect;
+		if(input->mouse_button[0] == FALSE || input->last_mouse_button[0] == FALSE)
+			drag = FALSE;
+	//	pos = (-1 + (p / aspect) * -1) * -size;
+	//	p = (1 - -pos / size) * aspect;
+	}
+	return pos;
+}

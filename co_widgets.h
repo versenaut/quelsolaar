@@ -8,3 +8,5 @@ extern boolean co_w_slider(BInputState *input, float pos_x, float pos_y, float l
 
 extern void sui_draw_rounded_square(float pos_x, float pos_y, float size_x, float size_y, float red, float green, float blue);
 extern boolean co_w_close_button(BInputState *input, float pos_x, float pos_y, float red, float green, float blue);
+
+extern float co_w_scroll(BInputState *input, float pos, float size);
