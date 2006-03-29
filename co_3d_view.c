@@ -40,7 +40,7 @@ boolean co_draw_3d_click_test_node(float x, float y)
 
 void co_draw_sumary(ENode *node, float x, float y);
 
-void co_draw_3d_sumary()
+void co_draw_3d_summary(void)
 {
 	uint seconds, fractions;
 	double pos[3], output[3];
@@ -166,9 +166,9 @@ void co_draw_3d_view_pass(boolean fill, float color)
 	}
 }
 
-boolean draw_3d_view = TRUE;
+static boolean draw_3d_view = TRUE;
 
-boolean co_draw_3d_view_get()
+boolean co_draw_3d_view_get(void)
 {
 	return draw_3d_view;
 }
