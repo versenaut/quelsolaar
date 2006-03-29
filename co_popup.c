@@ -5,8 +5,7 @@
 
 #include "co_vn_handle.h"
 
-
-void co_pu_hide_all()
+void co_pu_hide_all(void)
 {
 
 	ENode *node;
@@ -22,7 +21,7 @@ void co_pu_hide_all()
 	}
 }
 
-extern boolean co_draw_3d_view_get();
+extern boolean co_draw_3d_view_get(void);
 extern void co_draw_3d_view_set(boolean set);
 
 void co_pu_empty(BInputState *input)
@@ -53,8 +52,6 @@ void co_pu_empty(BInputState *input)
 	element[3].data.angle[0] = 225;
 	element[3].data.angle[1] = 315;
 
-
-
 	if(input->mode == BAM_DRAW)
 	{
 		glDisable(GL_DEPTH_TEST);
@@ -72,19 +69,19 @@ void co_pu_empty(BInputState *input)
 	switch(ring)
 	{
 		case 0 :
-	//		co_pu_hide_all();
+	/*		co_pu_hide_all();*/
 		break;
 		case 1 :
 			co_pu_hide_all();
-	//		la_t_revolve(edge, 16);
+	/*		la_t_revolve(edge, 16);*/
 		break;
 		case 2 :
-	//		co_draw_3d_view_set(!co_draw_3d_view_get());
-	//		la_t_tube(edge, 8);
+	/*		co_draw_3d_view_set(!co_draw_3d_view_get());*/
+	/*		la_t_tube(edge, 8);*/
 		break;
 		case 3 :
 			co_draw_3d_view_set(!co_draw_3d_view_get());
-	//		la_t_select_hull(edge);
+	/*		la_t_select_hull(edge);*/
 		break;
 	}
 	if(input->mode == BAM_DRAW)
