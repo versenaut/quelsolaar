@@ -135,7 +135,7 @@ static float co_draw_node_summary(ENode *node, float x, float y, uint recursion)
 				content = FALSE;
 				for(i = e_nsm_get_fragment_next(node, 0); i != (VNMFragmentID)-1; i = e_nsm_get_fragment_next(node, i + 1))
 				{
-					if(e_nsm_get_fragment(node, i) == VN_M_FT_OUTPUT)
+					if(e_nsm_get_fragment_type(node, i) == VN_M_FT_OUTPUT)
 					{
 						VMatFrag *frag;
 						if(content == FALSE)
