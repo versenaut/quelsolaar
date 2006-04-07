@@ -6,11 +6,12 @@
 #include "deceive.h"
 
 #include "lp_projection.h"
+#include "lp_layer_groups.h"
 
 float slider_vertex[20];
 
 
-void lp_init_slider()
+void lp_init_slider(void)
 {
 	slider_vertex[0] = 0;
 	slider_vertex[1] = -0.01;
