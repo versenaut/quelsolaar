@@ -4,6 +4,8 @@
 #include "seduce.h"
 #include "deceive.h"
 
+#include "lp_layer_groups.h"
+
 #define MAX_GROUP_DISPLAY_COUNT 16 
 #define MAX_NODE_DISPLAY_COUNT 16 
 
