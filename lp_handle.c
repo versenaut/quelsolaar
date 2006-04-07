@@ -11,7 +11,7 @@
 void lp_geometry_draw(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *blue);
 extern uint lp_pu_empty(BInputState *input, uint node_id);
 
-void lp_unlock_paint();
+void lp_unlock_paint(void);
 void lp_lock_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *blue);
 void lp_color_paint(BInputState *input, ENode *node);
 void lp_apply_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *blue, double *value, uint integer);
