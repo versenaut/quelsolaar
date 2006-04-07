@@ -68,7 +68,6 @@ void lp_update_layer_groups(ENode *node)
 		if(1 !=  e_nsg_get_layer_id(layer))
 		{
 			name = e_nsg_get_layer_name(layer);
-			printf("Layer exists %s\n", name);
 			type = e_nsg_get_layer_type(layer);
 			i = lp_groups_count;
 			if(type != VN_G_LAYER_VERTEX_XYZ && type != VN_G_LAYER_VERTEX_UINT32 && type != VN_G_LAYER_POLYGON_CORNER_UINT32 && type != VN_G_LAYER_POLYGON_FACE_UINT8 && type != VN_G_LAYER_POLYGON_FACE_UINT32)
