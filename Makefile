@@ -47,6 +47,12 @@ loqairou:	la_draw_overlay.o la_flare_fx.o la_geometry_undo.o la_input_parser.o l
 		libseduce.a libbetray.a libenough.a libdeceive.a $(PERSUADE)
 		gcc -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
+lpaint:		lp_geometry.o lp_handle.o lp_layer_group.o lp_main.o lp_menu.o lp_paint.o lp_popup.o \
+		lp_projection.o \
+		st_matrix_operations.o \
+		libbetray.a libdeceive.a libenough.a libseduce.a
+		gcc -o $@ $^ $(LDFLAGS) $(LDLIBS)
+
 quelsolaar:	qs_camera.o qs_intro.o qs_main.o \
 		st_math.o st_matrix_operations.o st_text.c st_types.o \
 		libpersuade.a libseduce.a libbetray.a libenough.a
