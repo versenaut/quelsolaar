@@ -31,11 +31,9 @@ uint lp_pu_empty(BInputState *input, uint node_id)
 	element[3].text = "NEW GEOMETRY";*/
 	count = 0;
 
-	
 	node = e_ns_get_node_next(0, 0, V_NT_GEOMETRY);
 	for(i = 1; node != NULL && i < start; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_GEOMETRY))
 		i++;
-
 
 	groups = lp_layer_get_group_count();
 	if(groups > MAX_GROUP_DISPLAY_COUNT)
@@ -47,10 +45,6 @@ uint lp_pu_empty(BInputState *input, uint node_id)
 		element[count].text = lp_layer_get_name(i);
 		count++;
 	}
-
-
-
-
 
 	if(start != 0)
 	{
