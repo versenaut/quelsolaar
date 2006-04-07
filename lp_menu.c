@@ -125,8 +125,9 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 {
 	static double brush_size = 0.1;
 	static double start_range = 0, end_range = 1;
-	float position = 0, color[3];
+	float position = 0, color[3] = { 0, 0, 0 };
 	VNGLayerType type;
+
 	if(node != NULL)
 	{
 		position = betray_get_screen_mode(NULL, NULL, NULL) - 0.05;
@@ -160,8 +161,6 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 			position -= 0.2;
 		}else
 		{
-			
-
 			if(type == VN_G_LAYER_VERTEX_UINT32 || type == VN_G_LAYER_POLYGON_CORNER_UINT32 || type == VN_G_LAYER_POLYGON_FACE_UINT8 || type == VN_G_LAYER_POLYGON_FACE_UINT32)
 			{
 				sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Integer:", 0, 0, 0);
