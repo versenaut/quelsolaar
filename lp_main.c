@@ -6,6 +6,10 @@
 
 #include "lp_projection.h"
 
+/* Disable hijacking of main() by SDL. */
+#if defined _WIN32 && defined BETRAY_SDL_SYSTEM_WRAPPER
+#undef main
+#endif
 
 extern void lp_input_handler(BInputState *input, void *user);
 
