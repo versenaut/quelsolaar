@@ -39,7 +39,7 @@ double *lp_polygon_influence_back = NULL;
 void *lp_channels[3] = {NULL, NULL, NULL};
 egreal *lp_normal = NULL;
 
-void lp_unlock_paint()
+void lp_unlock_paint(void)
 {
 	if(lp_vertex_influence != NULL)
 	{
