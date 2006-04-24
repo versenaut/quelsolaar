@@ -4,15 +4,11 @@
 #include <math.h>
 //#include "ngl.h"
 
-#ifdef _WIN32
+#ifdef WIN32
 	#include <windows.h>
 	#include <GL/gl.h>
 #else
-#if defined(__APPLE__) || defined(MACOSX)
-	#include <OpenGL/gl.h>
-#else
 	#include <GL/gl.h>
-#endif
 #endif
 
 /*#include "enough.h"*/
@@ -80,9 +76,7 @@ void p_link_update(ENode *node)
 					o->mesh_count += 16;
 				}
 				if(o->meshes[i] == NULL)
-				{
 					o->meshes[i] = p_rm_create(g_node);
-				}
 			}
 		}
 		for(i = 0; i < o->mesh_count && o->meshes[i] != NULL; i++);
@@ -90,14 +84,14 @@ void p_link_update(ENode *node)
 
 		for(i = 0; i < o->mesh_count && o->meshes[i] != NULL; i++)
 		{
-			for(link = e_nso_get_next_link(node, 0); link != NULL ; link = e_nso_get_next_link(node, e_nso_get_link_id(link) + 1))
-				if(p_rm_get_geometry_node(o->meshes[i]) == e_nso_get_link_id(link))
+			for(link = e_nso_get_next_link(node, 0); link != NULL; link = e_nso_get_next_link(node, e_nso_get_link_id(link) + 1))
+				if(p_rm_get_geometry_node(o->meshes[i]) == e_nso_get_link_node(link))
 					break;
-			if(link != NULL)
+			if(link == NULL)
 			{
-				for(j = i + 1; j < count; j++)
-					o->meshes[i - 1] = o->meshes[i];
-				o->meshes[i - 1] = NULL;
+			/*	for(j = i + 1; j < count; j++)
+					o->meshes[j - 1] = o->meshes[j];
+				o->meshes[j - 1] = NULL;*/
 			}
 		}
 		o->version = e_ns_get_node_version_struct(node);

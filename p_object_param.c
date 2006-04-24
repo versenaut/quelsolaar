@@ -113,6 +113,7 @@ boolean p_array_update(PGeoParams *p, PMesh *mesh, uint32 geometry, uint32 mater
 					p->data[i].compleat[j] = 0;
 				}
 			}
+			p->count = p_shader_get_param_count(m_node);
 		}
 	}
 
