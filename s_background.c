@@ -1,6 +1,7 @@
 
 #include <stdlib.h>
 
+#define WIDGET_DEFENITION
 #include "seduce.h"
 #include <math.h>
 

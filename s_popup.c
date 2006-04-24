@@ -10,8 +10,6 @@
 #define S_POPUP_SLIDE 0.005
 #define S_POPUP_SLIDE2 (S_POPUP_INNER * 2 - S_POPUP_OUTER)
 
-extern void sw_draw_background_ring(float pos_x, float pos_y, float color);
-
 void sui_draw_popup_top_bottom(float pos_x, float pos_y, float scale, float color)
 {
 	static float array[] = {0.060000, 0.040000, 0.075307, 0.035433, 0.075307, 0.035433, 0.088284, 0.022426, 0.088284, 0.022426, 0.096955, 0.002961, 0.096955, 0.002961, 0.100000, -0.020000, -0.060000, 0.040000, -0.075307, 0.035433, -0.075307, 0.035433, -0.088284, 0.022426, -0.088284, 0.022426, -0.096955, 0.002961, -0.096955, 0.002961, -0.100000, -0.020000, -0.000000, -0.600000, -0.022252, -0.585458, -0.022252, -0.585458, -0.043388, -0.542562, -0.043388, -0.542562, -0.062349, -0.473462, -0.062349, -0.473462, -0.078183, -0.381624, -0.078183, -0.381624, -0.090097, -0.271653, -0.090097, -0.271653, -0.097493, -0.149062, -0.097493, -0.149062, -0.100000, -0.020000, -0.000000, -0.600000, 0.022252, -0.585458, 0.022252, -0.585458, 0.043388, -0.542562, 0.043388, -0.542562, 0.062349, -0.473462, 0.062349, -0.473462, 0.078183, -0.381624, 0.078183, -0.381624, 0.090097, -0.271653, 0.090097, -0.271653, 0.097493, -0.149062, 0.097493, -0.149062, 0.100000, -0.020000};
@@ -147,6 +145,7 @@ typedef struct{
 uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *element, uint element_count, uint button, float back_color)
 {
 	uint i, j, top = 0, bottom = 0;
+	float x, y;
 
 	if(input->mode == BAM_DRAW)
 	{
@@ -186,13 +185,13 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 						if(element[i].type == PU_T_ANGLE && ((element[i].data.angle[0] - 1 < element[j].data.angle[0] && element[i].data.angle[0] + 1 > element[j].data.angle[0]) || (element[i].data.angle[0] - 1 < element[j].data.angle[1] && element[i].data.angle[0] + 1 > element[j].data.angle[1])))
 							break;
 					if(j == i)
-						sui_draw_popup_angle_line(pos_x, pos_y, element[i].data.angle[0] + 180);
+						sui_draw_popup_angle_line(pos_x, pos_y, element[i].data.angle[0]);
 
 					for(j = 0; j < i; j++)
 						if(element[i].type == PU_T_ANGLE && ((element[i].data.angle[1] - 1 < element[j].data.angle[0] && element[i].data.angle[1] + 1 > element[j].data.angle[0]) || (element[i].data.angle[1] - 1 < element[j].data.angle[1] && element[i].data.angle[1] + 1 > element[j].data.angle[1])))
 							break;
 					if(j == i)
-						sui_draw_popup_angle_line(pos_x, pos_y, element[i].data.angle[1] + 180);
+						sui_draw_popup_angle_line(pos_x, pos_y, element[i].data.angle[1]);
 
 					if(element[i].data.angle[0] < 0)
 					{
@@ -207,7 +206,7 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 						glRotatef(90 - (element[i].data.angle[0] + element[i].data.angle[1]) * 0.5, 0, 0, 1);
 						sui_draw_text(0.15, -SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color);
 						glPopMatrix();
-					}else /*if(element[i].data.angle[0] > 180)*/
+					}else if(element[i].data.angle[0] > 180)
 					{
 						glPushMatrix();
 						glTranslatef(pos_x, pos_y, 0);
