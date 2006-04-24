@@ -125,6 +125,7 @@ extern uint			e_nso_get_method_param_count(ENode *node, uint16 group_id, uint16 
 extern char **		e_nso_get_method_param_names(ENode *node, uint16 group_id, uint16 method_id);
 extern VNOParamType *	e_nso_get_method_param_types(ENode *node, uint16 group_id, uint16 method_id);
 
+
 /*
 extern double		e_nso_evaluate_anim_handle_single(EOAnimhandle *handle, uint seconds, uint fractions);
 extern double		e_nso_evaluate_anim_handle_mult(double *output, EOAnimhandle *handle, uint seconds, uint fractions);
@@ -265,11 +266,11 @@ extern void				e_nsc_send_c_key_set(ENode *node, ECurve *curve, uint32 key_id, r
 
 typedef void ETextBuffer;
 
-extern char *		e_nst_get_language(ENode *t_node);
+extern char *			e_nst_get_language(ENode *t_node);
 extern ETextBuffer *	e_nst_get_buffer_by_name(ENode *node, char *name);
 extern ETextBuffer *	e_nst_get_buffer_by_id(ENode *node,  uint buffer_id);
 extern ETextBuffer *	e_nst_get_buffer_next(ENode *node, uint buffer_id);
-extern const char *		e_nst_get_buffer_data(ENode *node, ETextBuffer *buffer);
+extern char *			e_nst_get_buffer_data(ENode *node, ETextBuffer *buffer);
 extern uint				e_nst_get_buffer_data_length(ENode *node, ETextBuffer *buffer);
 extern uint				e_nst_get_buffer_id(ETextBuffer *buffer);
 extern char *			e_nst_get_buffer_name(ETextBuffer *buffer);
