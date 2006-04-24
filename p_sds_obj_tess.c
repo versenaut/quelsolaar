@@ -318,6 +318,8 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 					level[i] = j;
 					if(level[i] < mesh->tess.force)
 						level[i] = mesh->tess.force;
+					if(level[i] > smesh->level)
+						level[i] = smesh->level;
 				}
 				table = get_dynamic_table_quad(smesh->level, level);
 				if(smesh->crease[stage * 4] > 0.1)
@@ -353,6 +355,8 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 					level[i] = j;
 					if(level[i] < mesh->tess.force)
 						level[i] = mesh->tess.force;
+					if(level[i] > smesh->level)
+						level[i] = smesh->level;
 				}
 				table = get_dynamic_table_tri(smesh->level, level);
 				if(smesh->crease[smesh->quad_length * 4 + (stage - smesh->base_quad_count) * 3] > 0.1)
