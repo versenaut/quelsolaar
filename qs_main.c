@@ -29,6 +29,12 @@ void p_status_print(void);
 extern void callback_send_g_vertex_set_real_xyz(void *user_data, VNodeID node_id, VLayerID layer_id, uint32 vertex_id, egreal x, egreal y, egreal z);
 
 
+extern void		qs_camera_init();
+extern float	*qs_get_cam_matrix(void);
+extern float	*qs_get_cam_pos(void);
+extern void		qs_set_camera();
+extern void		qs_compute_camera(BInputState *input, float delta_time);
+
 void qs_draw_handler(BInputState *input, void *user)
 {
 
@@ -55,8 +61,9 @@ void qs_draw_handler(BInputState *input, void *user)
 	//	glTranslatef(0, 0, -1);
 	//	p_status_print();
 	//	draw_table_debuging();
-		g_set_ship_camera(input, betray_get_delta_time());
-	//	p_lod_set_view_pos(double view_cam);
+		
+		qs_set_camera();
+	//	p_lod_set_wiev_pos(double view_cam);
 	//	p_draw_scene();
 
 	//	glScalef(12, 12, 12);
@@ -76,7 +83,8 @@ void qs_draw_handler(BInputState *input, void *user)
 		p_draw_scene();
 //		sds_2_test();
 		glPopMatrix();
-	}
+	}else
+		qs_compute_camera(input, betray_get_delta_time());
 }
 
 
@@ -190,22 +198,23 @@ void qs_intro_handler(BInputState *input, void *user)
 
 extern void *se_symbol_editor_func(BInputState *input, void *user_pointer);
 extern void *se_font_editor_func(BInputState *input, void *user_pointer);
-extern void qs_intro_init(void);
-void g_dropp_ship_init(void);
+extern void qs_intro_init();
+
 
 int main(int argc, char **argv)
 {
 	betray_init(argc, argv, 1280, 1024, FALSE, "Quel Solaar");
 	sui_load_settings("qs_config.cfg");
 	sui_init();
+	qs_camera_init();
 	glClearColor(1, 1, 1, 0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	enough_init();					/* initializing the Enough Lib, setting the max subdivision level to 3*/
 #ifdef PERSUADE_H
-	persuade_init(5, betray_get_gl_proc_address());
+	persuade_init(3, betray_get_gl_proc_address());
+	p_geo_set_sds_level(2);
 #endif
 	qs_intro_init();
-	g_dropp_ship_init();
 //	betray_set_mouse_warp(TRUE);
 
 	betray_set_action_func(qs_intro_handler, NULL);
