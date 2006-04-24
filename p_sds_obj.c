@@ -10,19 +10,20 @@
 
 #include <math.h>
 
+extern void p_pre_load_material_select(ENode *node);
 extern void p_get_tri_tess_index(uint *index, uint base_tess);
 extern void p_get_quad_tess_index(uint *index, uint base_tess);
-extern boolean p_lod_displacement_update_test(PMesh *mesh);
-extern boolean p_lod_material_test(PMesh *mesh, ENode *o_node);
 
 PMesh *p_rm_create(ENode *node)
 {
+	PPolyStore *smesh;
 	PMesh *mesh;
-	if(e_ns_get_node_type(node) != V_NT_GEOMETRY)
+	smesh = p_sds_get_mesh(node);
+	if(e_ns_get_node_type(node) != V_NT_GEOMETRY || smesh == NULL)
 		return NULL;
 	mesh = malloc(sizeof *mesh);
 	mesh->geometry_id =	e_ns_get_node_id(node);
-	mesh->geometry_version = e_ns_get_node_version_struct(node);
+	mesh->geometry_version = smesh->geometry_version;
 	mesh->stage = 0;
 	mesh->sub_stages[0] = 0;
 	mesh->sub_stages[1] = 0;
@@ -73,8 +74,6 @@ void p_rm_set_eay(PMesh *mesh, egreal *eay)
 
 void p_rm_destroy(PMesh *mesh)
 {
-	if(mesh == NULL)
-		return;
 	if(mesh->temp != NULL)
 		free(mesh->temp);
 	if(mesh->tess.tess != NULL)
@@ -184,7 +183,7 @@ uint p_rm_get_param_count(PMesh *mesh)
 #define P_TRI_TESS_REF 10000
 #define P_QUAD_TESS_REF 7500
 
-
+boolean p_lod_material_test(PMesh *mesh, ENode *o_node);
 
 PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 {
@@ -194,22 +193,19 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 	PPolyStore *smesh;
 	uint i, j, k, poly_size = 4;
 	uint32 seconds, fractions;
-
 	g_node = e_ns_get_node(0, mesh->geometry_id);
 	smesh = p_sds_get_mesh(g_node);
 
 	if(vertex == NULL)
 		vertex = e_nsg_get_layer_data(g_node, e_nsg_get_layer_by_id(g_node, 0));
-
-
 	if(smesh == NULL || e_ns_get_node_version_struct(g_node) != smesh->geometry_version)
+	{
+		p_pre_load_material_select(o_node);
 		return mesh;
-
+	}
 	verse_session_get_time(&seconds, &fractions);
 	if(mesh->stage == POS_DONE && mesh->next == NULL && (p_lod_compute_lod_update(o_node, g_node, seconds, fractions, mesh->tess.factor) || p_lod_material_test(mesh, o_node)))
 		mesh->geometry_version--;
-
-
 
 	if(smesh->geometry_version != mesh->geometry_version && mesh->next == NULL)
 	{
@@ -222,7 +218,6 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 			mesh->next = p_rm_create(g_node);
 		}
 	}
-
 	if(mesh->next != NULL)
 	{
 		if(smesh->geometry_version != ((PMesh *)mesh->next)->geometry_version)
@@ -236,7 +231,6 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 	}
 	for(i = 1 ; i < smesh->level; i++)
 		poly_size *= 4;
-
 	switch(mesh->stage)
 	{
 		case POS_ALLOCATE : /* clearing and allocating */
@@ -271,9 +265,10 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 			p_lod_gap_count(g_node, smesh, mesh, o_node);
 			break;
 		case POS_TESS_SELECT : /* choosing quad split tesselation */
+
 			p_lod_select_tesselation(mesh, smesh, vertex);
 			break;
-		case POS_SECOND_ALLOCATE : /* allocating all the stuff */
+		case POS_SECOND_ALLOCATE : /* allocating all the stuff */	
 			mesh->render.vertex_array = malloc((sizeof *mesh->render.vertex_array) * mesh->render.vertex_count * 3);
 			mesh->render.normal_array = malloc((sizeof *mesh->render.normal_array) * mesh->render.vertex_count * 3);
 			mesh->normal.normal_ref = malloc((sizeof *mesh->normal.normal_ref) * mesh->render.vertex_count * 4);
@@ -284,7 +279,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 			mesh->depend.reference = malloc((sizeof *mesh->depend.reference) * mesh->depend.length);
 			mesh->depend.weight = malloc((sizeof *mesh->depend.weight) * mesh->depend.length);
 			mesh->depend.ref_count = malloc((sizeof *mesh->depend.ref_count) * mesh->render.vertex_count);
-
+			mesh->render.element_count = 0;
 			mesh->render.vertex_count = 0;
 			mesh->depend.length = 0;
 			mesh->stage++;
@@ -294,21 +289,22 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 			{
 				if(mesh->sub_stages[0] == mesh->render.mat[mesh->sub_stages[3]].tri_end)
 				{
-					mesh->render.mat[mesh->sub_stages[3]].render_end = mesh->sub_stages[2];
+					mesh->render.mat[mesh->sub_stages[3]].render_end = mesh->render.element_count;
 					mesh->sub_stages[3]++;
 				}
 				table = mesh->tess.tess[mesh->sub_stages[0]];
 				for(j = 0; j < table->element_count;)
 				{
-					mesh->render.reference[mesh->sub_stages[2]++] = table->index[j++] + mesh->sub_stages[1];
-					mesh->render.reference[mesh->sub_stages[2]++] = table->index[j++] + mesh->sub_stages[1];
-					mesh->render.reference[mesh->sub_stages[2]++] = table->index[j++] + mesh->sub_stages[1];
+					mesh->render.reference[mesh->render.element_count++] = table->index[j++] + mesh->sub_stages[1];
+					mesh->render.reference[mesh->render.element_count++] = table->index[j++] + mesh->sub_stages[1];
+					mesh->render.reference[mesh->render.element_count++] = table->index[j++] + mesh->sub_stages[1];
 				}
 				mesh->sub_stages[1] += table->vertex_count;
 			}
+			
 			if(mesh->sub_stages[0] == mesh->tess.tri_count + mesh->tess.quad_count)
 			{
-				mesh->render.mat[mesh->sub_stages[3]].render_end = mesh->sub_stages[2];
+				mesh->render.mat[mesh->sub_stages[3]].render_end = mesh->render.element_count;
 				mesh->stage++;
 				mesh->sub_stages[0] = 0;
 				mesh->sub_stages[1] = 0;
@@ -317,6 +313,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 			}
 			break;
 		case POS_CREATE_DEPEND : /* building depend */
+
 			{
 				PDepend *dep;
 				uint poly;
@@ -327,9 +324,9 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 					if(mesh->sub_stages[0] == mesh->render.mat[mesh->sub_stages[1]].tri_end)
 						mesh->sub_stages[1]++;
 					if(mesh->sub_stages[0] < mesh->render.mat[mesh->sub_stages[1]].quad_end)
-						poly = mesh->sub_stages[0] * smesh->poly_per_base * 4;
+						poly = mesh->tess.order_temp_mesh[mesh->sub_stages[0]] * smesh->poly_per_base * 4;
 					else
-						poly = smesh->quad_length / 4 + mesh->sub_stages[0] * smesh->poly_per_base * 3;
+						poly = smesh->quad_length / 4 + mesh->tess.order_temp_mesh[mesh->sub_stages[0]] * smesh->poly_per_base * 3;
 
 					for(j = 0; j < table->vertex_count; j++)
 					{
@@ -391,11 +388,15 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 			mesh->stage++;
 			break;
 		case POS_ANIMATE :
+	
 			if(o_node != NULL)	
 				p_lod_anim_vertex_array(mesh->anim.cvs, mesh->anim.cv_count, mesh, g_node);
 			mesh->stage++;
 			break;
 		case POS_CREATE_VERTICES :
+			j = 0;
+			for(i = 0; i < mesh->render.vertex_count; i++)
+				j += mesh->depend.ref_count[i];
 			if(o_node != NULL)	
 				p_lod_compute_vertex_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->depend.ref_count, mesh->depend.reference, mesh->depend.weight, mesh->anim.cvs);
 			else
@@ -419,6 +420,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 				boolean update = FALSE;
 				static double timer = 0;
 				timer += 0.1;
+				printf("ip\n");
 				p_lod_update_layer_param(g_node, mesh);
 				if(p_lod_anim_bones_update_test(mesh, o_node, g_node))
 					update = TRUE;
@@ -434,6 +436,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 				}
 				if(update)
 				{
+					printf("update\n");
 					p_lod_anim_vertex_array(mesh->anim.cvs, mesh->anim.cv_count, mesh, g_node);
 					p_lod_compute_vertex_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->depend.ref_count, mesh->depend.reference, mesh->depend.weight, mesh->anim.cvs);
 					p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
@@ -496,6 +499,7 @@ void p_lod_compute_vertex_array(egreal *vertex, uint vertex_count, const uint *r
 {
 	uint i, j, k = 0, v = 0, count, r;
 	egreal f;
+//	printf("vertex_count %u\n", vertex_count);
 	for(i = 0; i < vertex_count; i++)
 	{
 		vertex[v + 0] = 0;
@@ -506,11 +510,12 @@ void p_lod_compute_vertex_array(egreal *vertex, uint vertex_count, const uint *r
 		{
 			r = reference[k];
 			f = weight[k++];
+	//		printf("cvs %u %f %f %f\n", r / 3, cvs[r], cvs[r + 1], cvs[r + 2]);
 			vertex[v + 0] += cvs[r++] * f;
 			vertex[v + 1] += cvs[r++] * f;
 			vertex[v + 2] += cvs[r] * f;
 		}
-//		printf("%f %f %f\n", vertex[v + 0], vertex[v + 1], vertex[v + 2]);
+	//	printf("float %f %f %f\n", vertex[v + 0], vertex[v + 1], vertex[v + 2]);
 		v += 3;
 	}
 

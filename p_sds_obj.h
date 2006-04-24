@@ -2,6 +2,7 @@
 
 typedef struct{
 	uint32	material;
+	uint32  material_version;
 	uint	render_end;
 	uint	quad_end;
 	uint	tri_end;

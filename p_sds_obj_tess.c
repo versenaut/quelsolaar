@@ -206,7 +206,7 @@ double view_cam_lod_factor = 0.01;
 double view_cam_lod_limit = 1.5;
 double view_cam_lod_geometry_only = 1000;
 
-void p_lod_set_view_pos(double *view_cam)
+void p_lod_set_wiev_pos(double *view_cam)
 {
 	view_cam_lod_eye_pos[0] = view_cam[0];
 	view_cam_lod_eye_pos[1] = view_cam[1];
@@ -233,6 +233,8 @@ egreal p_lod_compute_lod_level(ENode *o_node, ENode *g_node, uint32 time_s, uint
 boolean p_lod_compute_lod_update(ENode *o_node, ENode *g_node, uint32 time_s, uint32 time_f, egreal factor)
 {
 	double f;
+	if(o_node == NULL)
+		return FALSE;
 	f = p_lod_compute_lod_level(o_node, g_node, time_s, time_f);
 	if(f * (view_cam_lod_limit + view_cam_lod_limit - 1) < factor || f / view_cam_lod_limit > factor)
 		return TRUE;
@@ -291,13 +293,159 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 		mesh->render.mat[0].vertex_start = 0;
 		for(stage = mesh->sub_stages[1]; stage < mesh->tess.tri_count + mesh->tess.quad_count; stage++)
 		{
+			if(stage < mesh->tess.quad_count)
+			{
+				poly = stage * smesh->poly_per_base * 4;
+				v2 = &vertex[smesh->ref[poly + quad_table->reference[0]] * 3];
+				for(i = 0; i < 4; i++)
+				{
+					temp[0] = 0;
+					temp[1] = 0;
+					temp[2] = 0;
+					dep = &smesh->vertex_dependency[smesh->ref[poly + quad_table->reference[i * 2 + 1]]];
+					for(j = 0; j < dep->length; j++)
+					{
+						f = dep->element[j].value;
+						v3 = &cvs[dep->element[j].vertex * 3];
+						temp[0] += v3[0] * f;
+						temp[1] += v3[1] * f;
+						temp[2] += v3[2] * f;
+					}
+					v = v2;
+					v2 = &vertex[smesh->ref[poly + quad_table->reference[((i + 1) % 4) * 2]] * 3];
+					f = p_sds_edge_tesselation_global_func(v, v2, temp, NULL) * mesh->tess.factor;
+					for(j = 0; j < smesh->level - 1 && limit[j] < f; j++);
+					level[i] = j;
+					if(level[i] < mesh->tess.force)
+						level[i] = mesh->tess.force;
+				}
+				table = get_dynamic_table_quad(smesh->level, level);
+				if(smesh->crease[stage * 4] > 0.1)
+					mesh->render.element_count += (table->edges[1] - table->edges[0]);
+				if(smesh->crease[stage * 4 + 1] > 0.1)
+					mesh->render.element_count += (table->edges[2] - table->edges[1]);
+				if(smesh->crease[stage * 4 + 2] > 0.1)
+					mesh->render.element_count += (table->edges[3] - table->edges[2]);
+				if(smesh->crease[stage * 4 + 3] > 0.1)
+					mesh->render.element_count += (table->edges[4] - table->edges[3]);
+			}else
+			{
+				poly = smesh->quad_length + (stage - smesh->base_quad_count) * smesh->poly_per_base * 3;
+				v2 = &vertex[smesh->ref[poly + tri_table->reference[0]] * 3];
+				for(i = 0; i < 3; i++)
+				{
+					temp[0] = 0;
+					temp[1] = 0;
+					temp[2] = 0;
+					dep = &smesh->vertex_dependency[smesh->ref[poly + tri_table->reference[i * 2 + 1]]];
+					for(j = 0; j < dep->length; j++)
+					{
+						f = dep->element[j].value;
+						v3 = &cvs[dep->element[j].vertex * 3];
+						temp[0] += v3[0] * f;
+						temp[1] += v3[1] * f;
+						temp[2] += v3[2] * f;
+					}
+					v = v2;
+					v2 = &vertex[smesh->ref[poly + tri_table->reference[(i + 1) % 3 * 2]] * 3];
+					f = p_sds_edge_tesselation_global_func(v, v2, temp, NULL) * mesh->tess.factor;
+					for(j = 0; j < smesh->level - 1 && limit[j] < f; j++);
+					level[i] = j;
+					if(level[i] < mesh->tess.force)
+						level[i] = mesh->tess.force;
+				}
+				table = get_dynamic_table_tri(smesh->level, level);
+				if(smesh->crease[smesh->quad_length * 4 + (stage - smesh->base_quad_count) * 3] > 0.1)
+					mesh->render.element_count += (table->edges[1] - table->edges[0]);
+				if(smesh->crease[smesh->quad_length * 4 + (stage - smesh->base_quad_count) * 3 + 1] > 0.1)
+					mesh->render.element_count += (table->edges[2] - table->edges[1]);
+				if(smesh->crease[smesh->quad_length * 4 + (stage - smesh->base_quad_count) * 3 + 2] > 0.1)
+					mesh->render.element_count += (table->edges[3] - table->edges[2]);
+			}
+			for(j = 0; j < table->vertex_count; j++)
+				mesh->depend.length += smesh->vertex_dependency[smesh->ref[poly + table->reference[j]]].length;
+			mesh->tess.tess[mesh->tess.order_temp_mesh_rev[stage]] = table;
+			mesh->render.element_count += table->element_count;
+			mesh->render.vertex_count += table->vertex_count;
+		}
+		mesh->sub_stages[1] = stage;
+		if(mesh->sub_stages[1] == mesh->tess.tri_count + mesh->tess.quad_count)
+		{
+			mesh->stage++;
+			mesh->sub_stages[0] = 0;
+			mesh->sub_stages[1] = 0;
+			mesh->sub_stages[2] = 0;
+			mesh->sub_stages[3] = 0;
+			free(mesh->temp);
+			mesh->temp = NULL;
+		}
+	}
+}
+
+
+
+
+void p_lod_select_tesselation_old(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
+{
+	egreal *vertex, *v, *v2, *v3, f, temp[3], limit[7] = {0.01, 0.05, 0.17, 0.5, 1.6, 5, 15}; // limit[6] = {2, 5, 17, 40, 80, 160};
+	PDepend *dep;
+	uint poly, i, j, stage;
+	if(mesh->sub_stages[0] == 0)
+	{
+		mesh->temp = vertex = malloc((sizeof *vertex) * mesh->anim.cv_count * 3);
+		mesh->sub_stages[0]++;
+		mesh->sub_stages[1] = 0;
+	}
+	if(mesh->sub_stages[0] == 1)
+	{
+		vertex = mesh->temp;
+		v = &vertex[mesh->sub_stages[1] * 3];
+		for(i = 0; i + mesh->sub_stages[1] < mesh->anim.cv_count; i++)
+		{
+		//	v = &vertex[(mesh->sub_stages[1] + 1) * 3];
+			v[0] = 0;
+			v[1] = 0;
+			v[2] = 0;
+			dep = &smesh->vertex_dependency[mesh->sub_stages[1] + i];
+			for(j = 0; j < dep->length; j++)
+			{
+				f = dep->element[j].value;
+				v3 = &cvs[dep->element[j].vertex * 3];
+				v[0] += v3[0] * f;
+				v[1] += v3[1] * f;
+				v[2] += v3[2] * f;
+			}
+			v += 3;
+		}
+		mesh->sub_stages[1] += i;
+		if(i + mesh->sub_stages[1] == mesh->anim.cv_count)
+		{
+			mesh->sub_stages[0]++;
+			mesh->sub_stages[1] = 0;
+			mesh->sub_stages[2] = 0;
+		}	
+	}
+	if(mesh->sub_stages[0] == 2)
+	{
+		PTessTableElement *table, *tri_table, *quad_table;
+		uint level[4] = {1, 1, 1, 1};
+		vertex = mesh->temp;
+		tri_table = get_dynamic_table_tri(smesh->level, level);
+		quad_table = get_dynamic_table_quad(smesh->level, level);
+		mesh->render.mat[0].vertex_start = 0;
+		for(stage = mesh->sub_stages[1]; stage < mesh->tess.tri_count + mesh->tess.quad_count; stage++)
+		{
 			if(stage == mesh->render.mat[mesh->sub_stages[2]].tri_end)
 			{
+				if(mesh->render.mat_count > 1)
+					printf("new material\n");
 				mesh->sub_stages[2]++;
-				mesh->render.mat[0].vertex_start = mesh->render.vertex_count;
+				mesh->render.mat[mesh->sub_stages[2]].vertex_start = mesh->render.vertex_count;
 			}
 			if(stage < mesh->render.mat[mesh->sub_stages[2]].quad_end)
 			{
+				if(mesh->render.mat_count > 1)
+					printf("*quad %u %u\n", stage, mesh->tess.order_temp_mesh[stage]);
 				poly = mesh->tess.order_temp_mesh[stage] * smesh->poly_per_base * 4;
 				v2 = &vertex[smesh->ref[poly + quad_table->reference[0]] * 3];
 				for(i = 0; i < 4; i++)
@@ -325,6 +473,8 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 				table = get_dynamic_table_quad(smesh->level, level);
 			}else
 			{
+				if(mesh->render.mat_count > 1)
+					printf("*tri %u %u\n", stage, mesh->tess.order_temp_mesh[stage]);
 				poly = smesh->quad_length + (mesh->tess.order_temp_mesh[stage] - smesh->base_quad_count) * smesh->poly_per_base * 3;
 				v2 = &vertex[smesh->ref[poly + tri_table->reference[0]] * 3];
 				for(i = 0; i < 3; i++)
@@ -370,3 +520,4 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 		}
 	}
 }
+

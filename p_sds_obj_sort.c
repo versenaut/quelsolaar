@@ -19,6 +19,31 @@ boolean p_lod_material_test(PMesh *mesh, ENode *o_node)
 	return mesh->render.mat[0].material != material;
 }
 
+void p_pre_load_material_select(ENode *node)
+{
+	ENode *m_node,  *g_node;
+	EObjLink *g_link = NULL, *m_link = NULL;
+	EGeoLayer *layer;
+	if(node != NULL)
+	{
+		for(g_link = e_nso_get_next_link(node, 0); g_link != 0; g_link = e_nso_get_next_link(node, e_nso_get_link_id(g_link) + 1))
+		{
+			if((g_node = e_ns_get_node(0, e_nso_get_link_node(g_link))) != NULL && V_NT_GEOMETRY == e_ns_get_node_type(g_node))
+			{
+				for(m_link = e_nso_get_next_link(node, 0); m_link != 0; m_link = e_nso_get_next_link(node, e_nso_get_link_id(m_link) + 1))
+				{
+					if((m_node = e_ns_get_node(0, e_nso_get_link_node(m_link))) != NULL && V_NT_MATERIAL == e_ns_get_node_type(m_node))
+					{
+						layer = e_nsg_get_layer_by_name(g_node, e_nso_get_link_name(m_link));
+						if(layer != NULL && (VN_G_LAYER_POLYGON_FACE_UINT8 == e_nsg_get_layer_type(layer) || VN_G_LAYER_POLYGON_FACE_UINT32 == e_nsg_get_layer_type(layer)))
+							e_nsg_get_layer_data(node, layer);
+					}
+				}
+			}
+		}
+	}
+}
+
 void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_node)
 {
 
@@ -27,60 +52,57 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 	EGeoLayer *layer;
 	PMeshMaterial *mat;
 	egreal *v;
-	uint32 i, *ref, stage, ref_count, vertex_count, mat_count = 1, param_count = 0;
+	uint32 i, j, k, *ref, stage, ref_count, vertex_count, mat_count = 0, param_count = 0;
 
 	if(mesh->sub_stages[0] == 0)
 	{
+		mesh->render.mat_count = 0;
 		if(o_node != NULL)
 		{
 			for(link = e_nso_get_next_link(o_node, 0); link != 0; link = e_nso_get_next_link(o_node, e_nso_get_link_id(link) + 1))
 				if((m_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL && V_NT_MATERIAL == e_ns_get_node_type(m_node))
 					mat_count++;
-			mesh->render.mat = mat = malloc((sizeof *mat) * mat_count);
-			mesh->render.mat_count = 0;
-
-			for(link = e_nso_get_next_link(o_node, 0); link != 0; link = e_nso_get_next_link(o_node, e_nso_get_link_id(link) + 1))
+			if(mat_count > 0)
 			{
-				if((m_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL && V_NT_MATERIAL == e_ns_get_node_type(m_node))
+				mesh->render.mat = mat = malloc((sizeof *mat) * mat_count);
+				for(link = e_nso_get_next_link(o_node, 0); link != 0; link = e_nso_get_next_link(o_node, e_nso_get_link_id(link) + 1))
 				{
-					if(p_shader_get_param_count(m_node) > param_count)
-						param_count = p_shader_get_param_count(m_node);
-				//	if(def == NULL && strcmp("default", e_nso_get_link_name(link)) == 0)
-				//		def = link; FIXME
-					else if((layer = e_nsg_get_layer_by_name(node, e_nso_get_link_name(link))) != NULL && (VN_G_LAYER_POLYGON_FACE_UINT8 == e_nsg_get_layer_type(layer) || VN_G_LAYER_POLYGON_FACE_UINT32 == e_nsg_get_layer_type(layer)))
+					if((m_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL && V_NT_MATERIAL == e_ns_get_node_type(m_node))
 					{
-						mat[mesh->render.mat_count].material = e_nso_get_link_node(link);
-						mat[mesh->render.mat_count].tri_end = 0;
-						mat[mesh->render.mat_count].quad_end = 0;
-						mat[mesh->render.mat_count].id = e_nso_get_link_target_id(link);
-						mat[mesh->render.mat_count].layer = e_nsg_get_layer_id(layer);
-						mesh->render.mat_count++;
+						if(p_shader_get_param_count(m_node) > param_count)
+							param_count = p_shader_get_param_count(m_node);
+						layer = e_nsg_get_layer_by_name(node, e_nso_get_link_name(link));
+						if(mesh->render.mat_count == 0 || (layer != NULL && (VN_G_LAYER_POLYGON_FACE_UINT8 == e_nsg_get_layer_type(layer) || VN_G_LAYER_POLYGON_FACE_UINT32 == e_nsg_get_layer_type(layer))))
+						{
+							mat[mesh->render.mat_count].material = e_nso_get_link_node(link);
+							mat[mesh->render.mat_count].material_version = 0;
+							mat[mesh->render.mat_count].tri_end = 0;
+							mat[mesh->render.mat_count].quad_end = 0;
+							mat[mesh->render.mat_count].id = e_nso_get_link_target_id(link);
+							if(layer != NULL)
+								mat[mesh->render.mat_count].layer = e_nsg_get_layer_id(layer);
+							else
+								mat[mesh->render.mat_count].layer = -1;
+							mesh->render.mat_count++;
+						}
 					}
 				}
 			}
-
-			for(link = e_nso_get_next_link(o_node, 0); link != 0; link = e_nso_get_next_link(o_node, e_nso_get_link_id(link) + 1))
-				if((m_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL && V_NT_MATERIAL == e_ns_get_node_type(m_node))
-					break;
-			if(def != NULL)	
-				mat[mesh->render.mat_count].material = e_nso_get_link_node(def);
-			else if(mesh->render.mat_count == 0 && link != 0)
-				mat[mesh->render.mat_count].material = e_nso_get_link_node(link);
-			else
-				mat[mesh->render.mat_count].material = -1;
-		}else
+		}
+		if(mesh->render.mat_count == 0)
 		{
 			mesh->render.mat = mat = malloc(sizeof *mat);
 			mesh->render.mat_count = 0;
+			mat[mesh->render.mat_count].tri_end = 0;
+			mat[mesh->render.mat_count].quad_end = 0;
+			mat[mesh->render.mat_count].id = 0;
+			mat[mesh->render.mat_count].layer = -1;
 			mat[mesh->render.mat_count].material = -1;
+			mat[mesh->render.mat_count].material_version = 0;
+			mesh->render.mat_count++;
 		}
 
-		mat[mesh->render.mat_count].tri_end = 0;
-		mat[mesh->render.mat_count].quad_end = 0;
-		mat[mesh->render.mat_count].id = -1;
-		mat[mesh->render.mat_count].layer = -1;
-		mesh->render.mat_count++;
-		mesh->sub_stages[0] = 1;
+
 
 		if(param_count != 0)
 		{
@@ -93,6 +115,7 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 			mesh->param.array = 0;
 			mesh->param.array_count = 0;
 		}
+		mesh->sub_stages[0] = 1;
 	}
 	if(mesh->sub_stages[0] == 1)
 	{
@@ -121,10 +144,82 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 	}
 	if(mesh->sub_stages[0] == 3)
 	{
+		uint32 *buf;
 		v = e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node, 0));
 		ref = e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node, 1));
-		ref_count = e_nsg_get_polygon_length(node) * 4;
+		ref_count = e_nsg_get_polygon_length(node);
 		vertex_count = e_nsg_get_vertex_length(node);
+		buf = malloc((sizeof *buf) * ref_count);
+		for(i = 0; i < ref_count; i++)
+			buf[i] = mat[0].id;
+		for(i = mesh->render.mat_count - 1; i < mesh->render.mat_count; i--)
+		{
+			layer = e_nsg_get_layer_by_id(node, mesh->render.mat[i].layer);
+			if(layer != NULL)
+			{
+				VNGLayerType type;
+				void *data;
+				k = mat[i].id;
+				type = e_nsg_get_layer_type(layer);
+				data = e_nsg_get_layer_data(node, layer);
+				if(VN_G_LAYER_POLYGON_FACE_UINT8 == type && k < 256)
+					for(j = 0; j < ref_count; j++)
+						if(((uint8 *)data)[j] == k)
+							buf[j] = i;
+
+				if(VN_G_LAYER_POLYGON_FACE_UINT32 == type)
+					for(j = 0; j < ref_count; j++)
+						if(((uint32 *)data)[j] == k)
+							buf[j] = i;
+			}
+		}
+/*
+		uint32 *order_temp_mesh;  how the PMesh polys refers to the geometry mesh polygs (deleted once used)
+		uint32 *order_temp_mesh_rev;  how the geometry mesh polys refers to the PMesh polys (deleted once used)	
+*/
+		ref_count *= 4;
+		for(i = 0; i < mesh->render.mat_count; i++)
+		{
+			j = 0;
+		//	k = geometry->base_quad_count;
+			for(stage = mesh->sub_stages[1]; stage < ref_count && stage < MAX_COUNT_STAGE_LOOPS ; stage += 4)
+			{
+				if(ref[stage] < vertex_count && ref[stage + 1] < vertex_count &&  ref[stage + 2] < vertex_count && v[ref[stage] * 3] != E_REAL_MAX && v[ref[stage + 1] * 3] != E_REAL_MAX && v[ref[stage + 2] * 3] != E_REAL_MAX)
+				{
+					if(ref[stage + 3] < vertex_count && v[ref[stage + 3] * 3] != E_REAL_MAX)
+					{
+						if(mesh->render.mat[i].id == buf[stage / 4])
+						{
+							mesh->tess.order_temp_mesh[mesh->sub_stages[2]] = j;
+							mesh->tess.order_temp_mesh_rev[j] = mesh->sub_stages[2];
+							mesh->tess.order_node[mesh->sub_stages[2]++] = stage / 4;
+						}
+						j++;
+					}
+				}
+			}
+			mesh->render.mat[i].quad_end = mesh->sub_stages[2];
+			for(stage = mesh->sub_stages[1]; stage < ref_count && stage < MAX_COUNT_STAGE_LOOPS ; stage += 4)
+			{
+				if(ref[stage] < vertex_count && ref[stage + 1] < vertex_count &&  ref[stage + 2] < vertex_count && v[ref[stage] * 3] != E_REAL_MAX && v[ref[stage + 1] * 3] != E_REAL_MAX && v[ref[stage + 2] * 3] != E_REAL_MAX)
+				{
+					if(ref[stage + 3] >= vertex_count || v[ref[stage + 3] * 3] == E_REAL_MAX)
+					{
+						if(mesh->render.mat[i].id == buf[stage / 4])
+						{
+							mesh->tess.order_temp_mesh[mesh->sub_stages[2]] = j;
+							mesh->tess.order_temp_mesh_rev[j] = mesh->sub_stages[2];
+							mesh->tess.order_node[mesh->sub_stages[2]++] = stage / 4;
+						}
+						j++;
+					}
+				}
+			}
+			mesh->render.mat[i].tri_end = mesh->sub_stages[2];
+		}
+	//	if(mesh->render.mat_count > 1)
+	//		exit(0);
+/*
 		for(stage = mesh->sub_stages[1]; stage < ref_count && stage < MAX_COUNT_STAGE_LOOPS ; stage += 4)
 		{
 			if(ref[stage] < vertex_count && ref[stage + 1] < vertex_count &&  ref[stage + 2] < vertex_count && v[ref[stage] * 3] != E_REAL_MAX && v[ref[stage + 1] * 3] != E_REAL_MAX && v[ref[stage + 2] * 3] != E_REAL_MAX)
@@ -136,10 +231,9 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 			}
 		}
 		mesh->sub_stages[1] = stage;
-		if(stage == ref_count)
+		if(stage == ref_count)*/
 		{
-			mesh->render.mat->quad_end = mesh->sub_stages[2];
-			mesh->render.mat->tri_end = mesh->sub_stages[3];
+
 			mesh->sub_stages[0] = 0;
 			mesh->sub_stages[1] = 0;
 			mesh->sub_stages[2] = 0;
@@ -149,7 +243,7 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 	}
 }
 
-#if 0
+/*
 
 void p_sds_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh)
 {
@@ -207,7 +301,7 @@ void p_sds_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh)
 		}
 	}
 	
-	if(mesh->sub_stages[0] == 1)
+/*	if(mesh->sub_stages[0] == 1)
 	{
 		for(stage = mesh->sub_stages[1]; stage < ref_count && stage < MAX_COUNT_STAGE_LOOPS ; stage += 4)
 		{
@@ -231,156 +325,5 @@ void p_sds_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh)
 		mesh->stage++;
 		mesh->sub_stages[0] = 0;
 	}
-}
-#endif
+}*/
 
-
-#if 0
-
-void p_sort_materials(ENode *g_node, ENode *o_node, PMesh *mesh)
-{
-	EObjLink *link, *def = NULL;
-	EGeoLayer *layer;
-	PMeshMaterial *mat;
-	ENode *m_node;
-	uint i, j, k, mat_count = 1, *holes, *sort, sort_pos = 0, poly_length;
-	char *t;
-
-//	holes = mesh->tess.order;
-
-	mat = malloc((sizeof *mat) * mat_count);
-	mat_count = 0;
-
-	for(link = e_nso_get_next_link(o_node, 0); link != 0; link = e_nso_get_next_link(o_node, e_nso_get_link_id(link) + 1))
-	{
-		if((m_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL && V_NT_MATERIAL == e_ns_get_node_type(m_node))
-		{
-	/*		if(def == NULL && strcmp("default", e_nso_get_link_name(link)) == 0)
-				def = link; FIXME
-			else*/ if((layer = e_nsg_get_layer_by_name(g_node, e_nso_get_link_name(link))) != NULL && (VN_G_LAYER_POLYGON_FACE_UINT8 == e_nsg_get_layer_type(layer) || VN_G_LAYER_POLYGON_FACE_UINT32 == e_nsg_get_layer_type(layer)));
-			{
-				mat[mat_count].material = e_nso_get_link_node(link);
-				mat[mat_count].tri_end = 0;
-				mat[mat_count].id = e_nso_get_link_target_id(link);
-				mat[mat_count].layer = e_nsg_get_layer_id(layer);
-				mat_count++;
-			}
-		}
-	}
-
-	if(mat_count == 0)
-	{
-		free(mat);
-		return;
-	}
-	sort = malloc((sizeof *sort) * (mesh->tess.tri_count + mesh->tess.quad_count));
-
-	poly_length = e_nsg_get_polygon_length(g_node);
-	for(i = 1; i < mat_count - 1 && mat[0].layer == mat[i].layer ;i++);
-	if(i < mat_count - 1)
-	{
-		uint8 **data8;
-		uint32 **data32;
-		boolean *type;
-		data8 = malloc((sizeof *data8) * mat_count);
-		data32 = malloc((sizeof *data32) * mat_count);
-		type = malloc((sizeof *type) * mat_count);
-		for(i = 0; i < mat_count - 1; i++)
-		{
-			layer = e_nsg_get_layer_by_id(g_node, mat[i].layer);
-			type[i] = (VN_G_LAYER_POLYGON_FACE_UINT8 == e_nsg_get_layer_type(layer));
-			if(type[i])
-				data8[i] = e_nsg_get_layer_data(g_node, layer);
-			else
-				data32[i] = e_nsg_get_layer_data(g_node, layer);
-		}
-		for(i = 0; i < mat_count - 1; i++)
-		{
-			for(j = 0; j < poly_length; j++)
-			{
-				if(data8[j] == mat[i].id)
-				{
-					for(k = 0; k < i; k++)
-					{
-						if(type[k])
-						{
-							if(data8[holes[j]] == mat[i].id)
-								break;
-						}else
-						{
-							if(data32[holes[j]] == mat[i].id)
-								break;
-						}
-					}
-					if(k == i)
-						sort[sort_pos++] = j;
-				}
-			}
-			mat[i].tri_end = sort_pos;
-		}
-		for(j = 0; j < poly_length; j++)
-		{
-			for(k = 0; k < i; k++)
-			{
-				if(type[k])
-				{
-					if(data8[holes[j]] == mat[i].id)
-						break;
-				}else if(data32[holes[j]] == mat[i].id)
-					break;
-			}
-			if(k == i)
-				sort[sort_pos++] = j;
-		}
-		mat[i].tri_end = sort_pos;
-		free(data8);
-		free(data32);
-		free(type);
-	}else
-	{
-		layer = e_nsg_get_layer_by_id(g_node, mat[i].layer);
-		if(VN_G_LAYER_POLYGON_FACE_UINT8 == e_nsg_get_layer_type(layer))
-		{
-			uint8 *data;
-			data = e_nsg_get_layer_data(g_node, layer);
-			for(i = 0; i < mat_count - 1; i++)
-			{
-				for(j = 0; j < poly_length; j++)
-					if(data[holes[j]] == mat[i].id)
-						sort[sort_pos++] = j;
-					mat[i].tri_end = j;
-			}
-			for(j = 0; j < poly_length; j++)
-			{
-				for(k = 0; k < mat_count - 1 && data[holes[j]] != mat[i].id; k++);
-				if(k == mat_count)
-				{
-					sort[sort_pos++] = j;
-
-				}
-			}
-			mat[i].tri_end = j;
-		}else
-		{
-			uint32 *data;
-			data = e_nsg_get_layer_data(g_node, layer);
-			for(i = 0; i < mat_count - 1; i++)
-			{
-				for(j = 0; j < poly_length; j++)
-					if(data[holes[j]] == mat[i].id)
-						sort[sort_pos++] = j;
-				mat[i].tri_end = j;
-			}
-			for(j = 0; j < poly_length; j++)
-			{
-				for(k = 0; k < mat_count - 1 && data[holes[j]] != mat[i].id; k++);
-				if(k == mat_count)
-					sort[sort_pos++] = j;
-			}
-			mat[i].tri_end = j;
-		}
-	}
-//	mesh->tess.order = sort;
-}
-
-#endif

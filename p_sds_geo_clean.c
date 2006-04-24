@@ -1,8 +1,3 @@
-/*
- *
-*/
-
-#include <stdio.h>
 
 #include "verse.h"
 #include "enough.h"
@@ -26,7 +21,7 @@ void p_sds_add_depend(PDepend *dep, PDepend *add, egreal mult)
 		for(j = 0; j < dep->length && dep->element[j].vertex != add->element[i].vertex && dep->element[j].vertex != -1; j++);
 		if(j == dep->length)
 		{
-			dep->length += 32;		/* FIXME: Should be 8. */
+			dep->length += 32; // FIX ME should be 8
 			dep->element = realloc(dep->element, (sizeof *dep->element) * dep->length);
 			for(k = j; k < dep->length; k++)
 			{
@@ -119,7 +114,7 @@ typedef struct{
 
 float p_sds_compute_neighbor(PPolyStore *poly)
 {
-	uint i, cor, clear = 0, *n, *v, a, b, *ref;
+	uint i, j, temp, count, cor, other_count, clear = 0, *n, *v, a, b, *ref;
 	uint counter = 0, laps = 0;
 	ref = poly->ref;
 	n = malloc((sizeof *n) * (poly->quad_length + poly->tri_length));
@@ -145,7 +140,7 @@ float p_sds_compute_neighbor(PPolyStore *poly)
 				v[ref[i]] = -1;
 			else
 			{
-				if(cor > poly->quad_length)
+				if(cor >= poly->quad_length)
 				{	/* other poly is a tri */
 					a = (i / 4) * 4;
 					b = poly->quad_length + ((cor - poly->quad_length) / 3) * 3;
@@ -228,7 +223,7 @@ float p_sds_compute_neighbor(PPolyStore *poly)
 				v[ref[i]] = -1;
 			else 
 			{
-				if(cor > poly->quad_length)
+				if(cor >= poly->quad_length)
 				{	/* other poly is a tri */
 					a = poly->quad_length + ((i - poly->quad_length) / 3) * 3;
 					b = poly->quad_length + ((cor - poly->quad_length) / 3) * 3;
@@ -310,7 +305,6 @@ float p_sds_compute_neighbor(PPolyStore *poly)
 		if(n[i] == -1)
 			counter++;
 	poly->open_edges = counter;
-	printf("counter = %u laps = %u corner = %u\n", counter, laps, poly->quad_length + poly->tri_length);
 	free(v);
 	poly->neighbor = poly->base_neighbor = n;
 	return 100; 
@@ -483,26 +477,6 @@ float p_sds_stage_clean_poly_cerease(PPolyStore *mesh, uint *ref, uint ref_count
 	return 1;
 }
 
-float p_sds_stage(uint *naighbour, uint ref_count, egreal *crease)
-{
-	egreal f;
-	uint i;
-	for(i = 0; i < ref_count * 4; i++)
-	{
-		if(*naighbour < i)
-		{
-			f = (crease[i] + *naighbour) * 0.5;
-			crease[i] = f;
-			*naighbour = f;
-		}
-		*naighbour++;
-	}
-	return 1;
-}
-
-
-
-
 egreal p_sds_get_crease(PPolyStore *mesh, uint edge)
 {
 	uint id;
@@ -589,9 +563,10 @@ void sds_test_draw(PPolyStore *s, egreal *vertex)
 
 void sds_test_draw_2(PPolyStore *s, egreal *vertex)
 {
-	float array[12];
+	static float t = 0;
+	float array[12], center[3];
 	PDepend *dep;
-	uint i = 0, j, k;
+	uint i = 0, j, k, color, pos;
 //	vertex[4] = sin(t++ * 0.1) * 0.001;
 //	vertex[4] -= 0.001;
 	for(i = 0; i < s->quad_length; i += 4)
@@ -698,7 +673,7 @@ void p_sds_final_clean(PPolyStore *mesh)
 PPolyStore *p_sds_allocate_next(PPolyStore *pre)
 {
 	PPolyStore *mesh;
-
+	uint i, count;
 	mesh = malloc(sizeof *mesh);
 	mesh->tri_length = pre->tri_length * 4;
 	mesh->quad_length = pre->quad_length * 4;

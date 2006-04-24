@@ -1,7 +1,6 @@
-/*
-extern void p_extention_init(void *(*gl_GetProcAddress)(const char* proc));
-extern boolean p_extention_test(char *string);
-*/
+
+extern void p_extension_init(void *(*gl_GetProcAddress)(const char* proc));
+extern boolean p_extension_test(char *string);
 
 extern void p_shader_init(void);
 extern void p_shader_param_load(ENode *parent, uint32 node_id, void *array, uint count, uint environment, uint diffuse_environment);

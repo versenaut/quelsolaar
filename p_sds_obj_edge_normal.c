@@ -26,9 +26,10 @@ uint p_lod_get_base_corner_translate(uint base_quad, uint corner)
 		return base_quad + (((corner - base_quad) / 3) * 4) + (corner - base_quad) % 3;
 }
 
+
 void p_lod_compute_vertex_normals(PPolyStore *smesh, PMesh *mesh)
 {
-	uint i, j, corner, other_corner, tmp, length;
+	uint i, j, corner, other_corner, tmp, length, material = 0;
 	uint *corner_normals;
 	length = (smesh->base_tri_count * 3 + smesh->base_quad_count * 4);
 
@@ -113,7 +114,44 @@ void p_lod_compute_vertex_normals(PPolyStore *smesh, PMesh *mesh)
 	for(i = 0; i < length * 2; i++)
 		if(corner_normals[i] == -1)
 			corner_normals[i] = 0;
+/*
+	for(i = 0; i < length * 2; i++)
+	{
+		j = mesh->tess.order_temp_mesh_rev[i];
+		if(corner_normals[i] < mesh->base_quad_count * 4)
+		{
+		}
+	}*/
 }
+
+
+
+/*
+
+
+
+uint p_lod_get_rev_corner(PPolyStore *mesh, uint corner)
+{
+	if(corner < mesh->base_quad_count * 4)
+	{
+		poly = corner / 4;
+		corner -= poly * 4;
+		poly = mesh->tess.order_temp_mesh_rev[poly];
+		return poly * 4
+	}
+	else
+		poly = mesh->base_quad_count + (corner - mesh->base_quad_count * 4) / 3;
+	corner -= poly * 4;
+	poly = mesh->tess.order_temp_mesh_rev[poly];
+	return poly 
+}
+
+
+*/
+
+
+
+
 
 uint p_lod_edge_shadow_length_quad(PPolyStore *smesh, PMesh *mesh, uint poly, uint edge, uint *crease, egreal def)
 {
@@ -129,7 +167,6 @@ uint p_lod_edge_shadow_length_quad(PPolyStore *smesh, PMesh *mesh, uint poly, ui
 	else
 		return TRUE;
 }
-
 
 boolean p_lod_handle_edge(PPolyStore *smesh, PMesh *mesh, uint current_poly, uint current_edge)
 {
@@ -192,18 +229,27 @@ boolean p_lod_handle_edge(PPolyStore *smesh, PMesh *mesh, uint current_poly, uin
 	}
 	return FALSE;
 }
-
+/*
+mesh->tess.order_temp_mesh_ref[mesh->sub_stages[0]]
+*/
 
 void p_rm_create_vertex_normals(uint *output, PMesh *mesh, uint poly, uint corner)
 {
 	PTessTableElement *corner_table;
-	uint *vertex_normals, corner_poly, corner_corner, corner_start;
-	vertex_normals = &((uint32 *)mesh->temp)[mesh->tess.order_temp_mesh[poly] * 8];
+	uint *vertex_normals, corner_poly, corner_corner, corner_start, a;
+
+	if(mesh->tess.order_temp_mesh[poly] < mesh->tess.quad_count)
+		vertex_normals = &((uint32 *)mesh->temp)[mesh->tess.order_temp_mesh[poly] * 8];
+	else
+		vertex_normals = &((uint32 *)mesh->temp)[mesh->tess.quad_count * 8 + (mesh->tess.order_temp_mesh[poly] - mesh->tess.quad_count) * 6];
+
 
 	corner_poly = (vertex_normals[corner * 2] / 4);
 	corner_corner = (vertex_normals[corner * 2] % 4);
+
 	corner_table = mesh->tess.tess[mesh->tess.order_temp_mesh_rev[corner_poly]];
 	corner_start = mesh->tess.order_temp_poly_start[corner_poly];
+	corner_start = mesh->tess.order_temp_poly_start[mesh->tess.order_temp_mesh_rev[corner_poly]];
 	output[0] = corner_start + corner_table->normals[corner_table->edges[corner_corner] * 4];
 	output[1] = corner_start + corner_table->normals[corner_table->edges[corner_corner] * 4 + 1];
 
@@ -211,6 +257,44 @@ void p_rm_create_vertex_normals(uint *output, PMesh *mesh, uint poly, uint corne
 	corner_corner = (vertex_normals[corner * 2 + 1] % 4);
 	corner_table = mesh->tess.tess[mesh->tess.order_temp_mesh_rev[corner_poly]];
 	corner_start = mesh->tess.order_temp_poly_start[corner_poly];
+	corner_start = mesh->tess.order_temp_poly_start[mesh->tess.order_temp_mesh_rev[corner_poly]];
+	output[2] = corner_start + corner_table->normals[corner_table->edges[corner_corner] * 4 + 2];
+	output[3] = corner_start + corner_table->normals[corner_table->edges[corner_corner] * 4 + 1];
+}
+
+void p_rm_create_vertex_normals_old(uint *output, PMesh *mesh, uint poly, uint corner)
+{
+	PTessTableElement *corner_table;
+	uint *vertex_normals, corner_poly, corner_corner, corner_start;
+	vertex_normals = &((uint32 *)mesh->temp)[mesh->tess.order_temp_mesh[poly] * 8];
+
+	if(vertex_normals[corner * 2] < mesh->tess.quad_count * 4)
+	{
+		corner_poly = (vertex_normals[corner * 2] / 4);
+		corner_corner = (vertex_normals[corner * 2] % 4);
+	}else
+	{
+		corner_poly = mesh->tess.quad_count + (vertex_normals[corner * 2] - mesh->tess.quad_count * 4) / 3;
+		corner_corner = (vertex_normals[corner * 2] - mesh->tess.quad_count * 4) % 3;
+	}
+	corner_table = mesh->tess.tess[mesh->tess.order_temp_mesh_rev[corner_poly]];
+	corner_start = mesh->tess.order_temp_poly_start[corner_poly];
+	corner_start = mesh->tess.order_temp_poly_start[mesh->tess.order_temp_mesh_rev[corner_poly]];
+	output[0] = corner_start + corner_table->normals[corner_table->edges[corner_corner] * 4];
+	output[1] = corner_start + corner_table->normals[corner_table->edges[corner_corner] * 4 + 1];
+
+	if(vertex_normals[corner * 2 + 1] < mesh->tess.quad_count * 4)
+	{
+		corner_poly = (vertex_normals[corner * 2 + 1] / 4);
+		corner_corner = (vertex_normals[corner * 2 + 1] % 4);
+	}else
+	{
+		corner_poly = mesh->tess.quad_count + (vertex_normals[corner * 2 + 1] - mesh->tess.quad_count * 4) / 3;
+		corner_corner = (vertex_normals[corner * 2 + 1] - mesh->tess.quad_count * 4) % 3;
+	}
+	corner_table = mesh->tess.tess[mesh->tess.order_temp_mesh_rev[corner_poly]];
+	corner_start = mesh->tess.order_temp_poly_start[corner_poly];
+	corner_start = mesh->tess.order_temp_poly_start[mesh->tess.order_temp_mesh_rev[corner_poly]];
 	output[2] = corner_start + corner_table->normals[corner_table->edges[corner_corner] * 4 + 2];
 	output[3] = corner_start + corner_table->normals[corner_table->edges[corner_corner] * 4 + 1];
 }
@@ -218,8 +302,8 @@ void p_rm_create_vertex_normals(uint *output, PMesh *mesh, uint poly, uint corne
 void p_lod_create_normal_ref_and_shadow_skirts(PPolyStore *smesh, PMesh *mesh)
 {
 	PTessTableElement *table;
-	uint i, j, start, corners, *vertex_normals;
-	vertex_normals = mesh->temp;
+	uint i, j, start, corners/*, *vertex_normals*/;
+//	vertex_normals = mesh->temp;
 	for(; mesh->sub_stages[0] < mesh->tess.tri_count + mesh->tess.quad_count; mesh->sub_stages[0]++)
 	{
 		if(mesh->sub_stages[0] == mesh->render.mat[mesh->sub_stages[2]].tri_end)
@@ -254,11 +338,14 @@ void p_lod_create_normal_ref_and_shadow_skirts(PPolyStore *smesh, PMesh *mesh)
 		{
 			for(i = 0; i < 3; i++) /* triangles */
 			{
+				p_rm_create_vertex_normals(&mesh->normal.normal_ref[mesh->sub_stages[1]], mesh, mesh->sub_stages[0], i);
+				mesh->sub_stages[1] += 4;
+/*
 				mesh->normal.normal_ref[mesh->sub_stages[1]++] = start + table->normals[table->edges[i] * 4];
 				mesh->normal.normal_ref[mesh->sub_stages[1]++] = start + table->normals[table->edges[i] * 4 + 1];
 				mesh->normal.normal_ref[mesh->sub_stages[1]++] = start + table->normals[table->edges[i] * 4 + 2];
 				mesh->normal.normal_ref[mesh->sub_stages[1]++] = start + table->normals[table->edges[i] * 4 + 3];
-				
+				*/
 				if(!p_lod_handle_edge(smesh, mesh, mesh->sub_stages[0], i))
 				{
 					for(j = table->edges[i] + 1; j < table->edges[i + 1]; j++)

@@ -40,6 +40,8 @@ GLvoid (APIENTRY *p_glUnmapBufferARB)(GLenum target);
 #define GL_BUFFER_MAP_POINTER_ARB                       0x88BD
 #define GL_STATIC_DRAW_ARB                              0x88E4
 
+extern void *p_extension_get_address(const char* proc);
+
 boolean use_vertex_buffer_object = FALSE;
 
 void p_array_init()

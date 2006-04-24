@@ -118,10 +118,7 @@ void p_render_object(ENode *node)
 	PMesh *mesh;
 	PObject *o;
 	uint32 i, j = 0, count, range, *ref;
-
 	o = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
-	if(o == NULL)
-		return;
 
 	if(!o->task)
 		p_task_add(e_ns_get_node_id(node), 1, p_object_task_func);
@@ -129,17 +126,19 @@ void p_render_object(ENode *node)
 
 	for(i = 0; i < o->mesh_count && o->meshes[i] != NULL; i++)
 	{
+		
 		mesh = o->meshes[i];
 		if(p_rm_drawable(mesh))
 		{
-#ifdef E_GEOMETRY_REAL_PRECISION_64_BIT
+			#ifdef E_GEOMETRY_REAL_PRECISION_64_BIT
 			glVertexPointer(3, GL_DOUBLE, 0, p_rm_get_vertex(mesh));
 			glNormalPointer(GL_DOUBLE, 0 , p_rm_get_normal(mesh));
-#endif
-#ifdef E_GEOMETRY_REAL_PRECISION_32_BIT
+			#endif
+			#ifdef E_GEOMETRY_REAL_PRECISION_32_BIT
 			glVertexPointer(3, GL_FLOAT, 0, p_rm_get_vertex(mesh));
+
 			glNormalPointer(GL_FLOAT, 0 , p_rm_get_normal(mesh));
-#endif
+			#endif
 			count = p_rm_get_mat_count(mesh);
 			ref = p_rm_get_reference(mesh);
 			range = 0;
@@ -151,7 +150,6 @@ void p_render_object(ENode *node)
 				range = p_rm_get_material_range(mesh, j);
 				p_shader_unbind(p_rm_get_material(mesh, j));
 			}
-//			p_shader_unbind(set->material);
 		}	
 	}
 }
@@ -183,7 +181,7 @@ void p_draw_scene(void)
 	glEnable(GL_NORMALIZE);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_VERTEX_ARRAY);
-	if(p_shaders_supported())
+/*	if(p_shaders_supported())
 	{
 		p_set_enable_shadow(1);
 		for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
@@ -202,12 +200,13 @@ void p_draw_scene(void)
 		glDepthMask(0);
 		glDepthFunc(GL_LEQUAL);
 		for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
-			p_render_lit_and_transformed_object(node);
+			p_render_object_shadow(node);
+
 		glCullFace(GL_FRONT);
 		glStencilOp(GL_KEEP, GL_DECR, GL_KEEP); 
 		glColor3f(0, 0.8, 0);
 		for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
-			p_render_lit_and_transformed_object(node);
+			p_render_object_shadow(node);
 		glEnable(GL_DEPTH_TEST);
 
 		glDisable(GL_POLYGON_OFFSET_FILL);
@@ -221,7 +220,7 @@ void p_draw_scene(void)
 		glEnable(GL_STENCIL_TEST);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 		glStencilFunc(GL_EQUAL, 0, 0xFF);
-	}
+	}*/
 
 	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 		p_render_lit_and_transformed_object(node);

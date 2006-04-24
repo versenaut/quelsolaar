@@ -134,7 +134,7 @@ uint p_sds_get_vertex(PPolyStore *old_mesh, uint corner)
 				p_sds_add_depend(dep, &old_mesh->vertex_dependency[vertex[i]], ((1 - second_best) + crease[i] * (1 - third_best)) / vertex_count);
 			for(i = 0; i < poly_count; i++)
 				p_sds_add_polygon(old_mesh, dep, polys[i], (1 - second_best) * (1 - third_best) / vertex_count);
-			p_sds_add_depend(dep, &old_mesh->vertex_dependency[old_mesh->ref[corner]], (vertex_count - 2));
+			p_sds_add_depend(dep, &old_mesh->vertex_dependency[old_mesh->ref[corner]], (vertex_count - 2) * (1 - second_best) + 2 * second_best);
 		}
 		/*
 		uint i, j, a, b, list_count = 0, corner_start, vertex;
@@ -317,9 +317,10 @@ float p_sds_divide(PPolyStore *mesh)
 	uint i,  j, stage, *ref, *n;
 	new_mesh = mesh->next;
 	
-	stage = new_mesh->stage[1] = 0;
-	for(i = 0; stage < mesh->quad_length; stage += 4)
+	stage = mesh->stage[1];
+	for(i = 0; stage < mesh->quad_length && i < 200; stage += 4)
 	{
+		i++;
 		ref = &new_mesh->ref[stage * 4];
 		ref[0] = p_sds_get_vertex(mesh, stage); // first corner
 		ref[1] = p_sds_get_edge(mesh, stage); // first edge
@@ -363,11 +364,11 @@ float p_sds_divide(PPolyStore *mesh)
 		n[11] = stage * 4 + 13;
 		n[12] = stage * 4 + 2;
 		n[13] = stage * 4 + 11;
-		i++;
+
 	}
-//	new_mesh->stage[1] = stage;
-	for(; stage < mesh->quad_length + mesh->tri_length; stage += 3)
+	for(; stage < mesh->quad_length + mesh->tri_length && i < 200; stage += 3)
 	{
+		i++;
 		ref = &new_mesh->ref[stage * 4];
 		ref[0] = p_sds_get_vertex(mesh, stage); // first corner
 		ref[1] = p_sds_get_edge(mesh, stage); // first edge
@@ -406,9 +407,14 @@ float p_sds_divide(PPolyStore *mesh)
 		n[9] = j + 5;
 		n[10] = j + 6;
 		n[11] = j + 1;
-		i++;
 	}
-	return 1000;
+	mesh->stage[1] = stage;
+	if(stage == mesh->quad_length + mesh->tri_length)
+	{
+		mesh->stage[1] = 0;
+		mesh->stage[0]++;
+	}
+	return (float)i;
 //	mesh_new->quad_length = mesh_new->quad_length - length;
 
 }

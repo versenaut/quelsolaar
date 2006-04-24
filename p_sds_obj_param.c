@@ -618,9 +618,14 @@ void p_lod_create_layer_param(ENode *g_node, PMesh *mesh)
 	{
 		mesh->param.array_count = 0;
 		for(i = 0; i < mesh->render.mat_count; i++)
+		{
 			if((m_node = e_ns_get_node(0, mesh->render.mat[i].material)) != NULL)
+			{
+				mesh->render.mat[i].material_version = e_ns_get_node_version_struct(m_node);
 				if(mesh->param.array_count < p_shader_get_param_count(m_node))
 					mesh->param.array_count = p_shader_get_param_count(m_node);
+			}
+		}
 		if(mesh->param.array_count == 0)
 		{
 			mesh->stage++;
@@ -667,10 +672,16 @@ void p_lod_create_layer_param(ENode *g_node, PMesh *mesh)
 				mesh->param.version[mesh->sub_stages[1]] = e_nsg_get_layer_version(layer);
 		}
 		ref = e_nsg_get_layer_data(g_node, e_nsg_get_layer_by_id(g_node,  1));
-
+		mesh->sub_stages[2] = 0;
 		for(mesh->sub_stages[3] = 0; mesh->sub_stages[3] < mesh->render.mat[material].tri_end ; mesh->sub_stages[3]++)
 		{
-			create_param_polygon(g_node, &((egreal *)mesh->temp)[mesh->sub_stages[2] * 3], ((PTessTableElement **)mesh->tess.tess)[mesh->sub_stages[3]], layer, &ref[mesh->tess.order_node[mesh->sub_stages[3]] * 4], channel, mesh->tess.order_node[mesh->sub_stages[3]], mesh->sub_stages[3] < mesh->render.mat[material].quad_end);
+			create_param_polygon(g_node, &((egreal *)mesh->temp)[mesh->sub_stages[2] * 3],
+										((PTessTableElement **)mesh->tess.tess)[mesh->sub_stages[3]],
+										layer,
+										&ref[mesh->tess.order_node[mesh->sub_stages[3]] * 4],
+										channel,
+										mesh->tess.order_node[mesh->sub_stages[3]],
+										mesh->sub_stages[3] < mesh->render.mat[material].quad_end);
 			mesh->sub_stages[2] += ((PTessTableElement **)mesh->tess.tess)[mesh->sub_stages[3]]->vertex_count;
 		}
 		if(mesh->sub_stages[2] == mesh->render.vertex_count)
@@ -693,7 +704,35 @@ void p_lod_create_layer_param(ENode *g_node, PMesh *mesh)
 	}
 }
 
+void p_lod_update_material_param_count(ENode *g_node, PMesh *mesh)
+{
+	ENode *m_node;
+	uint i, j, found = 0, *v;
+	for(i = 0; i < mesh->render.mat_count; i++)
+		if((m_node = e_ns_get_node(0, mesh->render.mat[i].material)) != NULL)
+			if(mesh->render.mat[i].material_version != e_ns_get_node_version_struct(m_node))
+				if(p_shader_get_param_count(m_node) > found)
+					found = p_shader_get_param_count(m_node);
 
+
+	if(mesh->param.array_count < found)
+	{
+
+		mesh->param.array = realloc(mesh->param.array, (sizeof *mesh->param.array) * found);
+		v = malloc((sizeof *v) * found * mesh->render.mat_count * 3);
+
+		for(i = 0; i < mesh->param.array_count; i++)
+			v[i] = mesh->param.version[i];
+		for(i = 0; i < found; i++)
+			v[i] = -1;
+		free(mesh->param.version);
+		mesh->param.version = v;
+		for(i = mesh->param.array_count; i < found; i++)
+			p_ra_get_array_real(&mesh->param.array[i], mesh->render.vertex_count);
+		mesh->param.array_count = found;
+		mesh->param.data_version = -1;
+	}
+}
 
 boolean p_lod_update_layer_param(ENode *g_node, PMesh *mesh)
 {
@@ -701,15 +740,16 @@ boolean p_lod_update_layer_param(ENode *g_node, PMesh *mesh)
 	ENode *m_node;
 	VMatFrag *frag;
 	EGeoLayer *layer;
+	p_lod_update_material_param_count(g_node, mesh);
 	if(mesh->param.data_version == e_ns_get_node_version_data(g_node))
 		return FALSE;
 
-
 	for(i = 0; i < mesh->param.array_count * mesh->render.mat_count * 3; i++)
 	{
-		channel = (mesh->sub_stages[1] /  mesh->render.mat_count) % 3;
-		material = mesh->sub_stages[1] % mesh->render.mat_count;
-		param = mesh->sub_stages[1] / (3 * mesh->render.mat_count);
+		channel = (i /  mesh->render.mat_count) % 3;
+		material = i % mesh->render.mat_count;
+		param = i / (3 * mesh->render.mat_count);	
+		
 		m_node = e_ns_get_node(0, mesh->render.mat[material].material);
 		if(m_node != NULL && param < p_shader_get_param_count(m_node))
 		{
