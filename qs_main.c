@@ -28,12 +28,11 @@ void p_status_print(void);
 
 extern void callback_send_g_vertex_set_real_xyz(void *user_data, VNodeID node_id, VLayerID layer_id, uint32 vertex_id, egreal x, egreal y, egreal z);
 
-
-extern void		qs_camera_init();
+extern void	qs_camera_init(void);
 extern float	*qs_get_cam_matrix(void);
 extern float	*qs_get_cam_pos(void);
-extern void		qs_set_camera();
-extern void		qs_compute_camera(BInputState *input, float delta_time);
+extern void	qs_set_camera(void);
+extern void	qs_compute_camera(BInputState *input, float delta_time);
 
 void qs_draw_handler(BInputState *input, void *user)
 {
