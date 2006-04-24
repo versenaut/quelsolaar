@@ -15,6 +15,7 @@
 #include "co_vn_handle.h"
 #include "co_vn_graphics.h"
 #include "co_widgets.h"
+#include "co_projection.h"
 
 extern void co_input_handler(BInputState *input, void *user);
 extern void co_intro_handler(BInputState *input, void *user);
@@ -55,13 +56,13 @@ int main(int argc, char **argv)
 
 	p_init();
 	glClearColor(1, 1, 1, 0);
-	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	sui_load_settings("co_config.cfg");
 	co_init_handle_verse_node();
 	enough_init();					/* initializing the Enough Lib, setting the max subdivision level to 3*/
 #ifdef PERSUADE_H
-	persuade_init(5, betray_get_gl_proc_address());
-	p_geo_set_sds_level(4);
+	persuade_init(3, betray_get_gl_proc_address());
+	p_geo_set_sds_level(1);
 #endif
 	co_vng_init();
 	co_intro_init();

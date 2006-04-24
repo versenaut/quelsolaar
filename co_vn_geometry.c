@@ -17,6 +17,8 @@ typedef struct{
 	uint tri_count;
 	uint quad_count;
 	uint version;
+	float scale;
+	float center[3];
 }PeGeometry;
 
 void co_geometry_destroy(PeGeometry *g)
@@ -32,9 +34,10 @@ void co_geometry_destroy(PeGeometry *g)
 }
 
 
-PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g, boolean fill, float red, float green, float blue)
+PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g, boolean fill, boolean scale, float red, float green, float blue)
 {
 	egreal *vertex;
+	float f, range[6];
 	uint i, *ref, ref_length, length;
 	if(g == NULL)
 	{
@@ -111,6 +114,71 @@ PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g, boolean fill, float red
 				}
 			}
 		}
+		if(g->tri_count != 0)
+		{
+			range[0] = g->tri[0];
+			range[1] = g->tri[0];
+			range[2] = g->tri[1];
+			range[3] = g->tri[1];
+			range[4] = g->tri[2];
+			range[5] = g->tri[2];
+		}
+		else if(g->quad_count != 0)
+		{
+			range[0] = g->quad[0];
+			range[1] = g->quad[0];
+			range[2] = g->quad[1];
+			range[3] = g->quad[1];
+			range[4] = g->quad[2];
+			range[5] = g->quad[2];
+		}
+
+		for(i = 0; i < g->tri_count * 3 * 3; i += 3)
+		{
+			if(g->tri[i] > range[0])
+				range[0] = g->tri[i];
+			if(g->tri[i] < range[1])
+				range[1] = g->tri[i];
+			if(g->tri[i + 1] > range[2])
+				range[2] = g->tri[i + 1];
+			if(g->tri[i + 1] < range[3])
+				range[3] = g->tri[i + 1];
+			if(g->tri[i + 2] > range[4])
+				range[4] = g->tri[i + 2];
+			if(g->tri[i + 2] < range[5])
+				range[5] = g->tri[i + 2];
+		}
+		for(i = 0; i < g->quad_count * 4 * 3; i += 3)
+		{
+			if(g->quad[i] > range[0])
+				range[0] = g->quad[i];
+			if(g->quad[i] < range[1])
+				range[1] = g->quad[i];
+			if(g->quad[i + 1] > range[2])
+				range[2] = g->quad[i + 1];
+			if(g->quad[i + 1] < range[3])
+				range[3] = g->quad[i + 1];
+			if(g->quad[i + 2] > range[4])
+				range[4] = g->quad[i + 2];
+			if(g->quad[i + 2] < range[5])
+				range[5] = g->quad[i + 2];
+		}
+		f = range[0] - range[1];
+		if(f < range[2] - range[3])
+			f = range[2] - range[3];
+		if(f < range[4] - range[5])
+			f = range[4] - range[5];
+		g->scale = 1 / f;
+		g->center[0] = (range[0] + range[1]) / 2.0;
+		g->center[1] = (range[2] + range[3]) / 2.0;
+		g->center[2] = (range[4] + range[5]) / 2.0;
+	}
+	if(scale)
+	{
+		glPushMatrix();
+
+		glScaled(g->scale, g->scale, g->scale);
+		glTranslated(-g->center[0], -g->center[1], -g->center[2]);
 	}
 	if(!fill)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -119,6 +187,8 @@ PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g, boolean fill, float red
 	if(g->quad_count != 0)
 		sui_draw_gl(GL_QUADS, g->quad, g->quad_count * 4,  3, red, green, blue);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	if(scale)
+		glPopMatrix();	
 	return g;
 }
 
@@ -187,12 +257,12 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 		}
 		if(sw_text_button(input, 0, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Vertex Color", color, color, color))
 		{
-			if(e_nsg_get_layer_by_name(node, "col_r") == NULL)
-				verse_send_g_layer_create(change_g_node_id, -1, "col_r", VN_G_LAYER_VERTEX_REAL, 0, 0);
-			if(e_nsg_get_layer_by_name(node, "col_g") == NULL)
-				verse_send_g_layer_create(change_g_node_id, -2, "col_g", VN_G_LAYER_VERTEX_REAL, 0, 0);
-			if(e_nsg_get_layer_by_name(node, "col_b") == NULL)
-				verse_send_g_layer_create(change_g_node_id, -3, "col_b", VN_G_LAYER_VERTEX_REAL, 0, 0);
+			if(e_nsg_get_layer_by_name(node, "color_r") == NULL)
+				verse_send_g_layer_create(change_g_node_id, -1, "color_r", VN_G_LAYER_VERTEX_REAL, 0, 0);
+			if(e_nsg_get_layer_by_name(node, "color_g") == NULL)
+				verse_send_g_layer_create(change_g_node_id, -2, "color_g", VN_G_LAYER_VERTEX_REAL, 0, 0);
+			if(e_nsg_get_layer_by_name(node, "color_b") == NULL)
+				verse_send_g_layer_create(change_g_node_id, -3, "color_b", VN_G_LAYER_VERTEX_REAL, 0, 0);
 		}
 		if(sw_text_button(input, 0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Texture Mapping", color, color, color))
 		{
@@ -225,6 +295,8 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 				type -= VN_G_LAYER_POLYGON_CORNER_UINT32 - 1 - VN_G_LAYER_VERTEX_REAL;
 			if(type > 7)
 				type = 7;
+			if(type < 0)
+				type = 0;
 			
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer type:", color_light, color_light, color_light);  
 			if(sw_text_button(input, 0.15, y, 0, SUI_T_SIZE, SUI_T_SPACE, names[type], color, color, color))
@@ -232,9 +304,9 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 
 			if(popup == e_nsg_get_layer_id(layer))
 			{
-				SUIPUElement e[7];
+				SUIPUElement e[8];
 				uint i, output;
-				for(i = 0; i < 7; i++)
+				for(i = 0; i < 8; i++)
 					e[i].text = names[i]; 
 				for(i = 0; i < 3; i++)
 				{
@@ -242,17 +314,17 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 					e[i].data.angle[0] = 45 + (float)i * 30;
 					e[i].data.angle[1] = 45 + (float)(i + 1) * 30;
 				}
-				for(; i < 7; i++)
+				for(; i < 8; i++)
 				{
 					e[i].type = PU_T_ANGLE; 
 					e[i].data.angle[0] = 180 + 45 + (float)(i - 3) * 22.5;
 					e[i].data.angle[1] = 180 + 45 + (float)(i - 2) * 22.5;
 				}
-				output = sui_draw_popup(input, 0.15, y, e, 7, 0, 0.9);
+				output = sui_draw_popup(input, 0.15, y, e, 8, 0, 0.9);
 				if(output != -1 && output != type)
 				{
-					if(output > 3)
-						output -=  VN_G_LAYER_POLYGON_CORNER_UINT32 - VN_G_LAYER_VERTEX_REAL - 1; 
+					if(output > VN_G_LAYER_VERTEX_REAL)
+						output += VN_G_LAYER_POLYGON_CORNER_UINT32 - VN_G_LAYER_VERTEX_REAL - 1; 
 					verse_send_g_layer_create(e_ns_get_node_id(node), popup, e_nsg_get_layer_name(layer), output, 0, 0);
 				}
 			}
@@ -359,9 +431,9 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 				}
 				sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, text[i], color_light, color_light, color_light);  
 				if(sui_type_number_double(input, 0.15, y, 0.15, SUI_T_SIZE, edit, edit, color, color, color))
-					verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref,
-								 parent, t[0], t[1], t[2], e_nsg_get_bone_pos_label(node, bone),
-								 &rot, e_nsg_get_bone_rot_label(node, bone));
+					verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent,
+								 t[0], t[1], t[2], e_nsg_get_bone_pos_label(node, bone), &rot, 
+								 e_nsg_get_bone_rot_label(node, bone));
 				if(co_w_slider(input, 0.3, y, 0.35, edit, color, color, color))
 					/*verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], &rot)*/;
 				y -= 0.05;

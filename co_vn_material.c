@@ -100,7 +100,7 @@ void rename_m_fragment(void *user, char *text)
 
 void clear_new_frag(VMatFrag *frag, uint type)
 {
-	char *color = "color", *name = "name", *group = "group", *col_r = "col_r", *col_g = "col_g", *col_b = "col_b";
+	char *color = "color", *name = "name", *group = "group", *color_r = "color_r", *color_g = "color_g", *color_b = "col_b";
 	uint i;
 	switch(type)
 	{	
@@ -132,27 +132,27 @@ void clear_new_frag(VMatFrag *frag, uint type)
 			frag->volume.color = -1;
 			break;
 		case VN_M_FT_GEOMETRY :
-			for(i = 0; col_r[i] != 0; i++)
-				frag->geometry.layer_r[i] = col_r[i]; 
+			for(i = 0; color_r[i] != 0; i++)
+				frag->geometry.layer_r[i] = color_r[i]; 
 			frag->geometry.layer_r[i] = 0; 
-			for(i = 0; col_g[i] != 0; i++)
-				frag->geometry.layer_g[i] = col_g[i]; 
+			for(i = 0; color_g[i] != 0; i++)
+				frag->geometry.layer_g[i] = color_g[i]; 
 			frag->geometry.layer_g[0] = 0; 
-			for(i = 0; col_b[i] != 0; i++)
-				frag->geometry.layer_b[i] = col_b[i]; 
+			for(i = 0; color_b[i] != 0; i++)
+				frag->geometry.layer_b[i] = color_b[i]; 
 			frag->geometry.layer_b[0] = 0; 
 			break;
 		case VN_M_FT_TEXTURE :
 			frag->texture.bitmap = -1;
 			frag->texture.mapping = -1;
-			for(i = 0; col_r[i] != 0; i++)
-				frag->texture.layer_r[i] = col_r[i]; 
+			for(i = 0; color_r[i] != 0; i++)
+				frag->texture.layer_r[i] = color_r[i]; 
 			frag->texture.layer_r[i] = 0; 
-			for(i = 0; col_g[i] != 0; i++)
-				frag->texture.layer_g[i] = col_g[i]; 
+			for(i = 0; color_g[i] != 0; i++)
+				frag->texture.layer_g[i] = color_g[i]; 
 			frag->texture.layer_g[0] = 0; 
-			for(i = 0; col_b[i] != 0; i++)
-				frag->texture.layer_b[i] = col_b[i]; 
+			for(i = 0; color_b[i] != 0; i++)
+				frag->texture.layer_b[i] = color_b[i]; 
 			frag->texture.layer_b[0] = 0; 
 			break;
 		case VN_M_FT_NOISE :

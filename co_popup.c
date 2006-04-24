@@ -22,7 +22,9 @@ void co_pu_hide_all(void)
 }
 
 extern boolean co_draw_3d_view_get(void);
+extern boolean co_draw_3d_persuade_get(void);
 extern void co_draw_3d_view_set(boolean set);
+extern void co_draw_3d_persuade_set(boolean set);
 
 void co_pu_empty(BInputState *input)
 {
@@ -40,7 +42,10 @@ void co_pu_empty(BInputState *input)
 	element[1].data.angle[1] = 135;
 
 	element[2].type = PU_T_ANGLE;
-	element[2].text = "";//"Measure Grid";
+	if(co_draw_3d_persuade_get())
+		element[2].text = "Wireframe";
+	else
+		element[2].text = "Shaded";
 	element[2].data.angle[0] = 135;
 	element[2].data.angle[1] = 225;
 
@@ -76,7 +81,7 @@ void co_pu_empty(BInputState *input)
 	/*		la_t_revolve(edge, 16);*/
 		break;
 		case 2 :
-	/*		co_draw_3d_view_set(!co_draw_3d_view_get());*/
+			co_draw_3d_persuade_set(!co_draw_3d_persuade_get());
 	/*		la_t_tube(edge, 8);*/
 		break;
 		case 3 :

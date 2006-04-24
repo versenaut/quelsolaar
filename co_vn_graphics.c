@@ -58,9 +58,9 @@ void co_vng_init(void)
 		sui_draw_set_vec2(COVNGraphicsData.ring, 2 * i + 1, sin((double)(i + 1) * 2.0 * 3.14 / SUN_RING_SPLIT), cos((double)(i + 1) * 2.0 * 3.14 / SUN_RING_SPLIT));
 	}
 
-	COVNGraphicsData.color_vertex = malloc((sizeof *COVNGraphicsData.color_vertex) * (COLOR_RING_SPLITS + 1) * 2);
+	COVNGraphicsData.color_vertex = malloc((sizeof *COVNGraphicsData.color_vertex) * (COLOR_RING_SPLITS * 2 + 2));
 	COVNGraphicsData.color_ref = malloc((sizeof *COVNGraphicsData.color_ref) * COLOR_RING_SPLITS * 3);
-	COVNGraphicsData.color_color = malloc((sizeof *COVNGraphicsData.color_color) * (COLOR_RING_SPLITS + 1) * 3);
+	COVNGraphicsData.color_color = malloc((sizeof *COVNGraphicsData.color_color) * (COLOR_RING_SPLITS * 3 + 3));
 
 	for(i = 0; i < COLOR_RING_SPLITS; i++)
 	{
@@ -497,7 +497,7 @@ uint co_vng_render_name(BInputState *input, const char *name, float pos_x, float
 		}
 		if((pos_x - 0.64 - pointer_x) * (pos_x - 0.64 - pointer_x) + (pos_y - pointer_y) * (pos_y - pointer_y) < 0.04 * 0.04)
 		{
-			sui_draw_text(-1.1, 0.21 + 0.5 * SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, "Hide recursively", color, color, color);
+			sui_draw_text(-1.1, 0.21 + 0.5 * SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, "Hide recursevly", color, color, color);
 			sui_draw_set_vec2(COVNGraphicsData.moon_line, 3, pointer_x - pos_x, 0.06);
 			sui_draw_gl(GL_LINES, COVNGraphicsData.moon_line, 4, 2, color, color, color);
 		}

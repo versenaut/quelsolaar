@@ -10,7 +10,7 @@
 #include "co_vn_handle.h"
 
 void co_geometry_destroy(void *g);
-void *co_geometry_draw(ENode *node, void *g, boolean fill, float red, float green, float blue);
+void *co_geometry_draw(ENode *node, void *g, boolean fill, boolean scale, float red, float green, float blue);
 void co_vng_ring(void);
 
 uint select_node = -1;
@@ -123,6 +123,7 @@ ENode *co_draw_3d_test(float x, float y)
 
 void co_draw_3d_view_pass(boolean fill, float color)
 {
+	float star[3 * 6] = {0.02, 0, 0, -0.02, 0, 0, 0,  0.02, 0, 0, -0.02, 0, 0, 0, 0.02, 0, 0, -0.02};
 	uint seconds, fractions;
 	ENode *node, *g_node;
 	double pos[3], scale[3];
@@ -130,6 +131,7 @@ void co_draw_3d_view_pass(boolean fill, float color)
 	VNQuat64 rot;
 	double matrix[16];
 	COVerseNode *co_g_node, *co_node;
+	boolean draw;
 	verse_session_get_time(&seconds, &fractions);
 	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 	{
@@ -137,6 +139,7 @@ void co_draw_3d_view_pass(boolean fill, float color)
 
 		if(co_node->search == TRUE)
 		{
+			draw = FALSE;
 			for(link = e_nso_get_next_link(node, 0); link != NULL; link = e_nso_get_next_link(node, e_nso_get_link_id(link) + 1))
 			{
 				if((g_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL && V_NT_GEOMETRY == e_ns_get_node_type(g_node))
@@ -154,23 +157,78 @@ void co_draw_3d_view_pass(boolean fill, float color)
 					co_g_node = e_ns_get_custom_data(g_node, CONNECTOR_ENOUGH_SLOT);
 			
 					if((!co_node->hidden || select_node == e_ns_get_node_id(node)) && !fill)
-						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, 0, 0, 0);
+						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, FALSE, 0, 0, 0);
 					else if(!co_g_node->hidden && !fill)
-						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, 0.7, 0.7, 0.7);
+						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, FALSE, 0.7, 0.7, 0.7);
 					else
-						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, color, color, color);
+						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, FALSE, color, color, color);
 					glPopMatrix();
+					draw = TRUE;
 				}
+			}
+			if(!draw)
+			{
+				e_nso_get_pos_time(node, pos, seconds, fractions);
+				glPushMatrix();
+				p_get_projection_screen(scale, pos[0], pos[1], pos[2]);
+				glTranslatef(pos[0], pos[1], pos[2]);
+				glScalef(scale[2], scale[2], scale[2]);
+				if(co_node->hidden)
+					sui_draw_gl(GL_LINES, star, 6,  3, 0.7, 0.7, 0.7);
+				else
+					sui_draw_gl(GL_LINES, star, 6,  3, 0, 0, 0);
+				glPopMatrix();
 			}
 		}
 	}
 }
+/*
+void co_draw_3d_view_persuade()
+{
+	uint seconds, fractions;
+	ENode *node, *g_node;
+	double pos[3], scale[3];
+	EObjLink *link;
+	VNQuat64 rot;
+	double matrix[16];
+	COVerseNode *co_g_node, *co_node;
+	verse_session_get_time(&seconds, &fractions);
+	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
+	{
+		co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
+
+		for(link = e_nso_get_next_link(node, 0); link != NULL; link = e_nso_get_next_link(node, e_nso_get_link_id(link) + 1))
+		{
+			if((g_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL && V_NT_GEOMETRY == e_ns_get_node_type(g_node))
+			{
+				e_nso_get_pos_time(node, pos, seconds, fractions);
+				e_nso_get_scale(node, scale);
+				glPushMatrix();
+				glTranslatef(pos[0], pos[1], pos[2]);
+				glScalef(scale[0], scale[1], scale[2]);
+				e_nso_get_rot(node, &rot, NULL, NULL, NULL, NULL, NULL);
+				rot.w = sqrt(1 - (rot.x * rot.x + rot.y * rot.y + rot.z * rot.z));
+				e_quaternions_to_matrixd(matrix, &rot);
+				glMultMatrixd(matrix);
+				p_render_object(node);
+				glPopMatrix();
+			}
+		}
+	}
+}
+*/
 
 static boolean draw_3d_view = TRUE;
+static boolean draw_3d_persuade = FALSE;
 
 boolean co_draw_3d_view_get(void)
 {
 	return draw_3d_view;
+}
+
+boolean co_draw_3d_persuade_get(void)
+{
+	return draw_3d_persuade;
 }
 
 void co_draw_3d_view_set(boolean set)
@@ -179,18 +237,32 @@ void co_draw_3d_view_set(boolean set)
 	draw_3d_view = set;
 }
 
+void co_draw_3d_persuade_set(boolean set)
+{
+	select_node = -1;
+	draw_3d_persuade = set;
+}
+
 void co_draw_3d_view(float x, float y)
 {
 	if(!draw_3d_view)
 		return;
 	co_draw_3d_test(x, y);
 	glEnable(GL_DEPTH_TEST);
+	
+//	co_draw_3d_view_persuade();
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glDepthRange(0.5, 1.0);
-	glPolygonOffset(1.0, 1.0);
-	co_draw_3d_view_pass(TRUE, 0.99);
-	glPolygonOffset(0, 0);
-	co_draw_3d_view_pass(FALSE, 0.9);
-	glDisable(GL_DEPTH_TEST);
+	if(draw_3d_persuade)
+		p_draw_scene();
+	else
+	{
+		glPolygonOffset(1.0, 1.0);
+/*		co_draw_3d_view_pass(TRUE, 0.99);*/
+		glPolygonOffset(0, 0);
+		co_draw_3d_view_pass(FALSE, 0.9);
+	}
 	glDepthRange(0.0, 0.5);
+	glDisable(GL_DEPTH_TEST);
+	
 }

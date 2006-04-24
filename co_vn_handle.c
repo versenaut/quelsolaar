@@ -106,7 +106,7 @@ void verse_node_create_func(ENode *node, ECustomDataCommand command)
 
 void co_draw_bitmap(ENode *node);
 void co_geometry_destroy(void *g);
-void *co_geometry_draw(ENode *node, void *g, boolean fill, float red, float green, float blue);
+void *co_geometry_draw(ENode *node, void *g, boolean fill, boolean scale, float red, float green, float blue);
 
 void p_render_object(ENode *node);
 
@@ -220,7 +220,7 @@ void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 					glPushMatrix();
 					glRotatef(time * 360, 0, 1, 0);
 					co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
-					co_node->render_cash = co_geometry_draw(node, co_node->render_cash, FALSE, 0.7, 0.7, 0.7);
+					co_node->render_cash = co_geometry_draw(node, co_node->render_cash, FALSE, TRUE, 0.7, 0.7, 0.7);
 					glPopMatrix();
 				}
 			break;
@@ -298,7 +298,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 {
 	static COInteractMode mode = COIM_NONE;
 	static VNodeID active = -1;
-	static VNodeType link_id;
+	static VNodeType link_id = -1;
 	static float clear_color = 1, create_move = 0, popup_move = 0, type_count, create_scroll = 0;
 	static char search[64];
 	static uint search_cursor = 0;
@@ -315,7 +315,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		co_material_compute(1);
 		co_vng_update_time();
 #ifdef PERSUADE_H
-		p_task_compute(1);
+		p_task_compute(10);
 #endif
 		return;
 	}
@@ -324,14 +324,13 @@ void co_input_handler(BInputState *input, void *user_pointer)
 	{
 		glDisable(GL_DEPTH_TEST);
 	//	glEnable(GL_LINE_SMOOTH);
-		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		glPushMatrix();
 		p_view_set();
 		co_draw_3d_view(input->pointer_x, input->pointer_y);
 		glPopMatrix();
 		co_draw_3d_summary();
-
 	}
 
 	if(co_is_game_active())
@@ -702,7 +701,9 @@ void co_input_handler(BInputState *input, void *user_pointer)
 			{
 				if(V_NT_OBJECT == e_ns_get_node_type(linker))
 				{
-					if((link = e_nso_get_link(linker, link_id)) != NULL)
+					if(found == -1)
+						verse_send_o_link_destroy(active, link_id);
+					else if((link = e_nso_get_link(linker, link_id)) != NULL)
 						verse_send_o_link_set(active, link_id, found, e_nso_get_link_name(link), e_nso_get_link_target_id(link));
 					else
 						verse_send_o_link_set(active, link_id, found, "my_link", 0);

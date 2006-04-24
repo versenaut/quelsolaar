@@ -18,7 +18,7 @@ void co_draw_bitmap(ENode *node)
 	float vertex[8] = {-0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, 0.5};
 	float uv[8] = {1, 1, 0, 1, 0, 0, 1, 0};
 	PTextureHandle *h;
-	h = p_th_create_texture_handle(e_ns_get_node_id(node), "col_r", "col_g", "col_b");
+	h = p_th_create_texture_handle(e_ns_get_node_id(node), "color_r", "color_g", "color_b");
 	sui_set_texture2D_array_gl(uv, 4, 2, p_th_get_texture_id(h));
 	sui_draw_gl(GL_QUADS, vertex, 4, 2, 1, 1, 1);
 	p_th_destroy_texture_handle(h);
@@ -98,30 +98,30 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 		}
 		if(sw_text_button(input, 0, y, 0, SUI_T_SIZE, SUI_T_SPACE, "RGB 8bit", color, color, color))
 		{
-			if(e_nsb_get_layer_by_name(node, "col_r") == NULL)
-				verse_send_b_layer_create(change_b_node_id, -1, "col_r", VN_B_LAYER_UINT8);
-			if(e_nsb_get_layer_by_name(node, "col_g") == NULL)
-				verse_send_b_layer_create(change_b_node_id, -2, "col_g", VN_B_LAYER_UINT8);
-			if(e_nsb_get_layer_by_name(node, "col_b") == NULL)
-				verse_send_b_layer_create(change_b_node_id, -3, "col_b", VN_B_LAYER_UINT8);
+			if(e_nsb_get_layer_by_name(node, "color_r") == NULL)
+				verse_send_b_layer_create(change_b_node_id, -1, "color_r", VN_B_LAYER_UINT8);
+			if(e_nsb_get_layer_by_name(node, "color_g") == NULL)
+				verse_send_b_layer_create(change_b_node_id, -2, "color_g", VN_B_LAYER_UINT8);
+			if(e_nsb_get_layer_by_name(node, "color_b") == NULL)
+				verse_send_b_layer_create(change_b_node_id, -3, "color_b", VN_B_LAYER_UINT8);
 		}
 		if(sw_text_button(input, 0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "RGB 16bit", color, color, color))
 		{
-			if(e_nsb_get_layer_by_name(node, "col_r") == NULL)
-				verse_send_b_layer_create(change_b_node_id, -1, "col_r", VN_B_LAYER_UINT16);
-			if(e_nsb_get_layer_by_name(node, "col_g") == NULL)
-				verse_send_b_layer_create(change_b_node_id, -2, "col_g", VN_B_LAYER_UINT16);
-			if(e_nsb_get_layer_by_name(node, "col_b") == NULL)
-				verse_send_b_layer_create(change_b_node_id, -3, "col_b", VN_B_LAYER_UINT16);
+			if(e_nsb_get_layer_by_name(node, "color_r") == NULL)
+				verse_send_b_layer_create(change_b_node_id, -1, "color_r", VN_B_LAYER_UINT16);
+			if(e_nsb_get_layer_by_name(node, "color_g") == NULL)
+				verse_send_b_layer_create(change_b_node_id, -2, "color_g", VN_B_LAYER_UINT16);
+			if(e_nsb_get_layer_by_name(node, "color_b") == NULL)
+				verse_send_b_layer_create(change_b_node_id, -3, "color_b", VN_B_LAYER_UINT16);
 		}
 		if(sw_text_button(input, 0.54, y, 0, SUI_T_SIZE, SUI_T_SPACE, "RGB 32bit", color, color, color))
 		{
-			if(e_nsb_get_layer_by_name(node, "col_r") == NULL)
-				verse_send_b_layer_create(change_b_node_id, -1, "col_r", VN_B_LAYER_REAL32);
-			if(e_nsb_get_layer_by_name(node, "col_g") == NULL)
-				verse_send_b_layer_create(change_b_node_id, -2, "col_g", VN_B_LAYER_REAL32);
-			if(e_nsb_get_layer_by_name(node, "col_b") == NULL)
-				verse_send_b_layer_create(change_b_node_id, -3, "col_b", VN_B_LAYER_REAL32);
+			if(e_nsb_get_layer_by_name(node, "color_r") == NULL)
+				verse_send_b_layer_create(change_b_node_id, -1, "color_r", VN_B_LAYER_REAL32);
+			if(e_nsb_get_layer_by_name(node, "color_g") == NULL)
+				verse_send_b_layer_create(change_b_node_id, -2, "color_g", VN_B_LAYER_REAL32);
+			if(e_nsb_get_layer_by_name(node, "color_b") == NULL)
+				verse_send_b_layer_create(change_b_node_id, -3, "color_b", VN_B_LAYER_REAL32);
 		}
 		y -= 0.05;
 		for(layer = e_nsb_get_layer_next(node, 0); layer != NULL ; layer = e_nsb_get_layer_next(node, e_nsb_get_layer_id(layer) + 1))
