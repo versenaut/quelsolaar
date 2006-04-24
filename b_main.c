@@ -1,18 +1,21 @@
 
-#include <stdio.h>
+/*#include "opengl3.0.h"*/
+
 #include <stdlib.h>
 
 #include "betray.h"
-
-#if defined _WIN32
+#include <time.h>
+#ifdef WIN32
 	#include <windows.h>
+	#include <GL/gl.h>
 #else
-	#include <sys/time.h>
+//	#include <gl.h>
+/*	#include <GLUT/glut.h>*/
+/*	#include <GL/glut.h>*/
 #endif
 
 extern boolean b_sdl_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
 extern boolean b_glut_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
-extern boolean b_glfw_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
 
 typedef struct{
 	uint		x_size;
@@ -44,7 +47,7 @@ void betray_reshape_view(uint x_size, uint y_size)
 	glMatrixMode(GL_PROJECTION);
 	aspect = w / h;
 	glLoadIdentity();
-	glFrustum(-fov * 0.005, fov * 0.005, (-fov / aspect) * 0.005, (fov / aspect) * 0.005, 0.005, 100.0);
+	glFrustum(-fov * 0.005, fov * 0.005, (-fov / aspect) * 0.005, (fov / aspect) * 0.005, 0.005, 10000.0);
 	if(aspect > w / h)
 		glViewport((uint)0, (uint)(h - (w / aspect)) / 2, (uint)w, (uint)(w / aspect));	
 	else
@@ -89,7 +92,6 @@ double betray_get_screen_mode(uint *x_size, uint *y_size, boolean *fullscreen)
 
 extern void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, char *caption);
 extern void b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, char *caption);
-extern void b_glfw_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, char *caption);
 
 void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, boolean window_fullscreen, char *name)
 {
@@ -168,6 +170,7 @@ void betray_get_key_up_down(boolean *press, boolean *last_press, uint key)
 
 extern void b_glut_main_loop(void);
 
+
 static char *type_in_string = NULL;
 static uint type_in_alocated = 0;
 static int cursor_pos = 0;
@@ -178,6 +181,7 @@ static void *func_param;
 
 void betray_start_type_in(char *string, uint length, void (*done_func)(void *user, boolean cancel), uint *cursor, void *user_pointer)
 {
+	uint	i;
 	type_in_string = string;
 	type_in_alocated = length;
 	type_in_done_func = done_func;
@@ -198,13 +202,15 @@ void betray_end_type_in_mode(boolean cancel)
 		char *string;
 		void (*func)(void *p, boolean c);
 		string = type_in_string;
-		type_in_string = NULL;
 		func = type_in_done_func;
-		type_in_done_func = NULL;
-		*cursor_pos_pointer = 0;
 		if(func != NULL)
 			func(func_param, cancel);
 	}
+	type_in_string = NULL;
+	type_in_done_func = NULL;
+	if(cursor_pos_pointer != 0)
+		*cursor_pos_pointer = 0;
+	cursor_pos_pointer = NULL;
 }
 
 void betray_insert_character(char character)
@@ -242,9 +248,11 @@ void betray_delete_character(void)
 
 void betray_move_cursor(int move)
 {
+	int pos;
 	(*cursor_pos_pointer) += move;
 	if(*cursor_pos_pointer < 0)
 		*cursor_pos_pointer = 0;
+
 	if((*cursor_pos_pointer) > type_in_length)
 		(*cursor_pos_pointer) = type_in_length;
 }
