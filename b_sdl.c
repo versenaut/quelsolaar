@@ -9,6 +9,7 @@
 static boolean	input_focus = TRUE;
 static uint	screen_size_x = 800;
 static uint	screen_size_y = 600;
+static boolean	mouse_warp = FALSE;
 
 extern void sui_get_input(BInputState *data);
 
@@ -85,6 +86,11 @@ void system_wrapper_lose_focus(void)
 	SDL_ShowCursor(TRUE);
 }
 
+void betray_set_mouse_warp(boolean warp)
+{
+	mouse_warp = warp;
+}
+
 uint system_wrapper_eventloop(BInputState *input)
 {
 	SDL_Event	event;
@@ -102,6 +108,12 @@ uint system_wrapper_eventloop(BInputState *input)
 	else	
 		return 0;
 */
+	if(mouse_warp)
+	{
+		input->pointer_x = 0;
+		input->pointer_y = 0;
+	}
+
 	while(SDL_PollEvent(&event)) 
 	{
 		switch(event.type)
@@ -218,9 +230,9 @@ uint system_wrapper_eventloop(BInputState *input)
 			break;
 		}
 	}
-/*	if(mouse_warp)
+	if(mouse_warp)
 		SDL_WarpMouse(screen_size_x / 2, screen_size_y / 2);
-*/	return TRUE;
+	return TRUE;
 }
 
 void *betray_get_gl_proc_address()
