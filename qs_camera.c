@@ -2,95 +2,58 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "enough.h"
+#include "st_types.h"
+#include "betray.h"
 #include "persuade.h"
 #include "seduce.h"
-#include "st_types.h"
 
-struct{
-	float	matrix[16];
-	float	pos[3];
-	float	vector[3];
-	uint	entity_id;
-	float	pointer[2];
-	float	speed;
-}GDroppShip;
+static struct{
+	double	matrix[16];
+	double	pos[3];
+	double	pitch;
+	double	jaw;
+	double	pitch_goal;
+	double	jaw_goal;
+	double	speed;
+	double	side_speed;
+} GView;
 
 
-void g_dropp_ship_init(void)
+void qs_camera_init(void)
 {
 	uint i;
 	for(i = 0; i < 16; i++)
 	{
 		if(i % 5 == 0)
-			GDroppShip.matrix[i] = 1;
+			GView.matrix[i] = 1;
 		else
-			GDroppShip.matrix[i] = 0;
+			GView.matrix[i] = 0;
 	}
-	GDroppShip.pointer[0] = 0;
-	GDroppShip.pointer[1] = 0;
-	GDroppShip.speed = 0;
-	GDroppShip.pos[0] = 0;
-	GDroppShip.pos[1] = 0;
-	GDroppShip.pos[2] = 1;
+	GView.pos[0] = 0;
+	GView.pos[1] = 0;
+	GView.pos[2] = 0;
+	GView.pitch = 0;
+	GView.jaw = 0;
+	GView.pitch_goal = 0;
+	GView.jaw_goal = 0;
+	GView.pitch_goal = 0;
+	GView.jaw_goal = 0;
 }
 
-float *g_get_cam_matrix(void)
+double  *qs_get_cam_matrix(void)
 {
-	return GDroppShip.matrix;
+	return GView.matrix;
 }
 
-float *g_get_cam_pos(void)
+double  *qs_get_cam_pos(void)
 {
-	return GDroppShip.pos;
+	return GView.pos;
 }
 
-void reverse_camera_matrix(float *matrix)
+void qs_compute_matrix(double *matrix)
 {
-	float swap;
-	swap = matrix[1];
-	matrix[1] = matrix[4];
-	matrix[4] = swap;
-	swap = matrix[2];
-	matrix[2] = matrix[8];
-	matrix[8] = swap;
-	swap = matrix[6];
-	matrix[6] = matrix[9];
-	matrix[9] = swap;
-}
-
-
-float ge_compute_matrix_read(float *pos, float *goal, uint axis, float *matrix)
-{
-	float vec[3], r;
-	vec[0] = (goal[0] - pos[0]);
-	vec[1] = (goal[1] - pos[1]);
-	vec[2] = (goal[2] - pos[2]);
-	r = matrix[8] * vec[0] + matrix[9] * vec[1] + matrix[10] * vec[2];
-	if(r < 1)
-		r = 1;
-	axis *= 4;
-	return matrix[axis + 0] * vec[0] / r + matrix[axis + 1] * vec[1] / r + matrix[axis + 2] * vec[2] / r;
-}
-
-
-void ge_rotate_matrix(float *matrix, float sides, float heigt)
-{
-	float r;
-	matrix[8] += matrix[4] * heigt + matrix[0] * sides;
-	matrix[9] += matrix[5] * heigt + matrix[1] * sides;
-	matrix[10] += matrix[6] * heigt + matrix[2] * sides;
-}
-
-void ge_straighten_matrix(float *matrix, float factor, float *vec, float bank)
-{
-	matrix[4] += (vec[0] + matrix[0] * bank) * factor;
-	matrix[5] += (vec[1] + matrix[1] * bank) * factor;
-	matrix[6] += (vec[2] + matrix[2] * bank) * factor;
-}
-
-void ge_compute_matrix(float *matrix)
-{
-	float r;
+	double r;
 	r = sqrt(matrix[8] * matrix[8] + matrix[9] * matrix[9] + matrix[10] * matrix[10]);
 	matrix[8] = matrix[8] / r;
 	matrix[9] = matrix[9] / r;
@@ -113,104 +76,120 @@ void ge_compute_matrix(float *matrix)
 	matrix[6] = matrix[8] * matrix[1] - matrix[9] * matrix[0];
 }
 
-void ge_move_matrix(float *pos, float *goal, float *matrix, float speed, float delta_time)
+void qs_set_camera(void)
 {
-	float f;
-	f = ge_compute_matrix_read(pos, goal, 2, matrix);
-	f *= f;
-	speed *= delta_time;
-	if(f < 1 && f > 0)
-		speed *= 0.1 + 0.9 * f;
-	pos[0] += matrix[8] * speed;
-	pos[1] += matrix[9] * speed;
-	pos[2] += matrix[10] * speed;
+	double matrix[16];
+	matrix[0] = GView.matrix[0];
+	matrix[1] = GView.matrix[4];
+	matrix[2] = GView.matrix[8];
+	matrix[3] = GView.matrix[12];
+	matrix[4] = GView.matrix[1];
+	matrix[5] = GView.matrix[5];
+	matrix[6] = GView.matrix[9];
+	matrix[7] = GView.matrix[13];
+	matrix[8] = GView.matrix[2];
+	matrix[9] = GView.matrix[6];
+	matrix[10] = GView.matrix[10];
+	matrix[11] = GView.matrix[14];
+	matrix[12] = GView.matrix[3];
+	matrix[13] = GView.matrix[7];
+	matrix[14] = GView.matrix[11];
+	matrix[15] = GView.matrix[15];
+
+	glMultMatrixd(matrix);
+	glTranslatef(-GView.pos[0], -GView.pos[1], -GView.pos[2]);
 }
 
-void ge_move_matrix_axis(float *pos, uint axis, float *matrix, float speed, float delta_time)
+static void eulers_to_quat(VNQuat64 *quat, real32 heading, real32 attitude)
 {
-	speed *= delta_time;
-	axis *= 4;
-	pos[0] += matrix[axis] * speed;
-	pos[1] += matrix[axis + 1] * speed;
-	pos[2] += matrix[axis + 2] * speed;
+	real32	c1 = cosf(heading / 2.0f), c2 = cosf(attitude / 2.0f), c3 = 1.0f;
+	real32	s1 = sinf(heading / 2.0f), s2 = sinf(attitude / 2.0f), s3 = 0.0f;
+
+	quat->x = s1 * s2 * c3 + c1 * c2 * s3;
+	quat->y = s1 * c2 * c3 + c1 * s2 * s3;
+	quat->z = c1 * s2 * c3 - s1 * c2 * s3;
+	quat->w = c1 * c2 * c3 - s1 * s2 * s3;
 }
 
-void g_just_set_camera(void)
+void qs_compute_camera(BInputState *input, float delta_time)
 {
-	glMultMatrixf(GDroppShip.matrix);
-	glTranslatef(-GDroppShip.pos[0], -GDroppShip.pos[1], -GDroppShip.pos[2]);
-}
+	static real64 old_pos[3] = { 0.0f };
+	static boolean w = FALSE, lw = FALSE, s = FALSE, ls = FALSE, a = FALSE, la = FALSE, d = FALSE, ld = FALSE;
+	double x, y, z;
 
-void g_get_projection_screen(float *output, float x, float y, float z)
-{
-	x = GDroppShip.pos[0] - x;
-	y = GDroppShip.pos[1] - y;
-	z = GDroppShip.pos[2] - z;
-	output[0] = (GDroppShip.matrix[0] * x) + (GDroppShip.matrix[4] * y) + (GDroppShip.matrix[8] * z) + GDroppShip.matrix[12];
-	output[1] = (GDroppShip.matrix[1] * x) + (GDroppShip.matrix[5] * y) + (GDroppShip.matrix[9] * z) + GDroppShip.matrix[13];
-	output[2] = (GDroppShip.matrix[2] * x) + (GDroppShip.matrix[6] * y) + (GDroppShip.matrix[10] * z) + GDroppShip.matrix[14];
-	output[0] = -output[0] / output[2];
-	output[1] = -output[1] / output[2];
-}
-void g_get_projection_screen_no_presp(float *output, float x, float y, float z)
-{
-	x = GDroppShip.pos[0] - x;
-	y = GDroppShip.pos[1] - y;
-	z = GDroppShip.pos[2] - z;
-	output[0] = (GDroppShip.matrix[0] * x) + (GDroppShip.matrix[4] * y) + (GDroppShip.matrix[8] * z) + GDroppShip.matrix[12];
-	output[1] = (GDroppShip.matrix[1] * x) + (GDroppShip.matrix[5] * y) + (GDroppShip.matrix[9] * z) + GDroppShip.matrix[13];
-	output[2] = (GDroppShip.matrix[2] * x) + (GDroppShip.matrix[6] * y) + (GDroppShip.matrix[10] * z) + GDroppShip.matrix[14];
-}
-
-void g_set_ship_camera(BInputState *input, float delta_time)
-{
-	float	vec[3] = {0, 1, 0};
-	float speed = 0;
-
-	reverse_camera_matrix(GDroppShip.matrix);
-//	GDroppShip.pointer[0] = (GDroppShip.pointer[0] + input->pointer_x * 0.3) * 0.9;
-//	GDroppShip.pointer[1] = (GDroppShip.pointer[1] + input->pointer_y * 0.3) * 0.9;
 	if(input->mouse_button[0])
+		betray_set_mouse_warp(TRUE);
+
+	if(input->mouse_button[0] && input->last_mouse_button[0])
 	{
-		GDroppShip.pointer[0] = input->delta_pointer_x;
-		GDroppShip.pointer[1] = input->delta_pointer_y;
-	}else
-	{
-		GDroppShip.pointer[0] = 0;
-		GDroppShip.pointer[1] = 0;
+		VNQuat64	rot;
+
+		betray_set_mouse_warp(TRUE);
+		GView.matrix[4] = 0;
+		GView.matrix[5] = 1;
+		GView.matrix[6] = 0;
+		GView.pitch_goal -= input->delta_pointer_y * 4;
+		GView.jaw_goal -= input->delta_pointer_x * 4;
+
+		GView.pitch = GView.pitch_goal * 0.3 + GView.pitch * 0.7;
+		GView.jaw = GView.jaw_goal * 0.3 + GView.jaw * 0.7;
+
+/*		GView.jaw -= input->delta_pointer_x * 4;
+		if(GView.jaw > PI)
+			GView.jaw -= PI * 2.0;
+		if(GView.jaw < -PI)
+			GView.jaw += PI * 2.0;
+		GView.pitch -= input->delta_pointer_y * 4;
+*/		if(GView.pitch > PI * 0.499)
+			GView.pitch = PI * 0.499;
+		if(GView.pitch < -PI * 0.499)
+			GView.pitch = -PI * 0.499;
+
+		y = cos(GView.pitch);
+		GView.matrix[8] = sin(GView.jaw) * y;
+		GView.matrix[9] = sin(GView.pitch);
+		GView.matrix[10] = cos(GView.jaw) * y;
+
+		qs_compute_matrix(GView.matrix);
+
+		eulers_to_quat(&rot, GView.jaw + M_PI/ 2 , -GView.pitch);
+		verse_send_o_transform_rot_real64(e_ns_get_node_id(e_ns_get_node_avatar(0)),
+						  0, 0, &rot, NULL, NULL, NULL, 0.0f);
 	}
-	ge_rotate_matrix(GDroppShip.matrix, -GDroppShip.pointer[0], -GDroppShip.pointer[1]);
-//	ge_rotate_matrix(matrix, 0.01, 0);
-//	ge_rotate_matrix(matrix, 0, 0.1);
-	ge_straighten_matrix(GDroppShip.matrix, delta_time, vec, GDroppShip.pointer[0] * GDroppShip.speed * 4);
-	ge_compute_matrix(GDroppShip.matrix);
-	if(input->mouse_button[0])
-		GDroppShip.speed += 0.05;
-	if(input->mouse_button[0] && input->last_mouse_button[0] == FALSE && GDroppShip.speed > 0 && GDroppShip.speed < 1)
-		GDroppShip.speed += (2 - GDroppShip.speed) * 0.6;
-	if(input->mouse_button[1])
-		GDroppShip.speed -= 0.05;
-	GDroppShip.speed *= 0.9;
-//	ge_move_matrix(e, GDroppShip.matrix, GDroppShip.speed, delta_time);
-	vec[0] = GDroppShip.matrix[8] * -GDroppShip.speed * 0.2;
-	vec[1] = GDroppShip.matrix[9] * -GDroppShip.speed * 0.2;
-	vec[2] = GDroppShip.matrix[10] * -GDroppShip.speed * 0.2;
-	GDroppShip.vector[0] = (GDroppShip.vector[0] + vec[0] * 0.3) * 0.9;
-	GDroppShip.vector[1] = (GDroppShip.vector[1] + vec[1] * 0.3) * 0.9;
-	GDroppShip.vector[2] = (GDroppShip.vector[2] + vec[2] * 0.3) * 0.9;
-	GDroppShip.pos[0] += (GDroppShip.vector[0] + vec[0] + GDroppShip.matrix[8] * GDroppShip.pointer[0]) * delta_time;
-	GDroppShip.pos[1] += (GDroppShip.vector[1] + vec[1] + GDroppShip.matrix[9] * GDroppShip.pointer[0]) * delta_time;
-	GDroppShip.pos[2] += (GDroppShip.vector[2] + vec[2] + GDroppShip.matrix[10] * GDroppShip.pointer[0]) * delta_time;
-//		glGetFloatv(GL_MODELVIEW_MATRIX, GDroppShip.matrix);
-	reverse_camera_matrix(GDroppShip.matrix);
-//		glRotatef(90, 0, 1, 0);
-	glMultMatrixf(GDroppShip.matrix);
-	glTranslatef(-GDroppShip.pos[0], -GDroppShip.pos[1], -GDroppShip.pos[2]);
+	betray_get_key_up_down(&w, &lw, 'w');
+	betray_get_key_up_down(&s, &ls, 's');
+	betray_get_key_up_down(&a, &la, 'a');
+	betray_get_key_up_down(&d, &ld, 'd');
+	x = 0;
+	y = 0;
+	if(w || input->mouse_button[1])
+		GView.speed++;
+	if(s)
+		GView.speed--;
+	if(a)
+		GView.side_speed++;
+	if(d)
+		GView.side_speed--;
+
+	GView.speed *= 0.9;
+	GView.side_speed *= 0.9;
+
+	GView.pos[0] -= GView.matrix[8] * delta_time * GView.speed;
+	GView.pos[1] -= GView.matrix[9] * delta_time * GView.speed;
+	GView.pos[2] -= GView.matrix[10] * delta_time * GView.speed;
+	GView.pos[0] -= GView.matrix[0] * delta_time * GView.side_speed;
+	GView.pos[1] -= GView.matrix[1] * delta_time * GView.side_speed;
+	GView.pos[2] -= GView.matrix[2] * delta_time * GView.side_speed;
+
+	if(GView.pos[0] != old_pos[0] ||
+	   GView.pos[1] != old_pos[1] ||
+	   GView.pos[2] != old_pos[2])
 	{
-		double view_cam[3];
-		view_cam[0] = GDroppShip.pos[0]; 
-		view_cam[1] = GDroppShip.pos[1]; 
-		view_cam[2] = GDroppShip.pos[2]; 
-		p_lod_set_view_pos(view_cam);
+		verse_send_o_transform_pos_real64(e_ns_get_node_id(e_ns_get_node_avatar(0)),
+						  0, 0, GView.pos, NULL, NULL, NULL, 0.0f);
+		memcpy(old_pos, GView.pos, sizeof old_pos);
 	}
+
+	if(!input->mouse_button[0] && !input->last_mouse_button[0])
+		betray_set_mouse_warp(FALSE);
 }
