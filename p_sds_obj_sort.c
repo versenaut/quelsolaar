@@ -165,12 +165,12 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 				if(VN_G_LAYER_POLYGON_FACE_UINT8 == type && k < 256)
 					for(j = 0; j < ref_count; j++)
 						if(((uint8 *)data)[j] == k)
-							buf[j] = i;
+							buf[j] = k;
 
 				if(VN_G_LAYER_POLYGON_FACE_UINT32 == type)
 					for(j = 0; j < ref_count; j++)
 						if(((uint32 *)data)[j] == k)
-							buf[j] = i;
+							buf[j] = k;
 			}
 		}
 /*
@@ -178,6 +178,7 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 		uint32 *order_temp_mesh_rev;  how the geometry mesh polys refers to the PMesh polys (deleted once used)	
 */
 		ref_count *= 4;
+		mesh->sub_stages[2] = 0;
 		for(i = 0; i < mesh->render.mat_count; i++)
 		{
 			j = 0;
@@ -233,13 +234,13 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 		mesh->sub_stages[1] = stage;
 		if(stage == ref_count)*/
 		{
-
 			mesh->sub_stages[0] = 0;
 			mesh->sub_stages[1] = 0;
 			mesh->sub_stages[2] = 0;
 			mesh->sub_stages[3] = 0;
 			mesh->stage++;
 		}
+		free(buf);
 	}
 }
 
