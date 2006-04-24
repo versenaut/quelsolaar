@@ -268,7 +268,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 
 			p_lod_select_tesselation(mesh, smesh, vertex);
 			break;
-		case POS_SECOND_ALLOCATE : /* allocating all the stuff */	
+		case POS_SECOND_ALLOCATE : /* allocating all the stuff */
 			mesh->render.vertex_array = malloc((sizeof *mesh->render.vertex_array) * mesh->render.vertex_count * 3);
 			mesh->render.normal_array = malloc((sizeof *mesh->render.normal_array) * mesh->render.vertex_count * 3);
 			mesh->normal.normal_ref = malloc((sizeof *mesh->normal.normal_ref) * mesh->render.vertex_count * 4);
@@ -420,7 +420,6 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 				boolean update = FALSE;
 				static double timer = 0;
 				timer += 0.1;
-				printf("ip\n");
 				p_lod_update_layer_param(g_node, mesh);
 				if(p_lod_anim_bones_update_test(mesh, o_node, g_node))
 					update = TRUE;
@@ -436,7 +435,6 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 				}
 				if(update)
 				{
-					printf("update\n");
 					p_lod_anim_vertex_array(mesh->anim.cvs, mesh->anim.cv_count, mesh, g_node);
 					p_lod_compute_vertex_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->depend.ref_count, mesh->depend.reference, mesh->depend.weight, mesh->anim.cvs);
 					p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
