@@ -254,7 +254,11 @@ void co_draw_3d_view(float x, float y)
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glDepthRange(0.5, 1.0);
 	if(draw_3d_persuade)
+	{
+#if defined PERSUADE_ENABLED
 		p_draw_scene();
+#endif
+	}
 	else
 	{
 		glPolygonOffset(1.0, 1.0);
