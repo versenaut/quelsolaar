@@ -197,7 +197,7 @@ void qs_intro_handler(BInputState *input, void *user)
 
 extern void *se_symbol_editor_func(BInputState *input, void *user_pointer);
 extern void *se_font_editor_func(BInputState *input, void *user_pointer);
-extern void qs_intro_init();
+extern void qs_intro_init(void);
 
 
 int main(int argc, char **argv)
