@@ -75,10 +75,8 @@ void p_task_compute(uint count)
 			PGlobalTaskManager.init = p_init_table(0);
 		return;
 	}*/
-	for(i = 0; i < count; i++)
+	for(i = 0; i < count && PGlobalTaskManager.count != 0; i++)
 	{
-		if(PGlobalTaskManager.count == 0)
-			return;
 //		for(t = &PGlobalTaskManager.tasks[PGlobalTaskManager.current]; t->wait < 0.99; t = &PGlobalTaskManager.tasks[PGlobalTaskManager.current])
 //		{
 //			t->wait += t->importance;
@@ -89,8 +87,6 @@ void p_task_compute(uint count)
 		if(t->func(t->id))
 		{
 			PGlobalTaskManager.tasks[PGlobalTaskManager.current] = PGlobalTaskManager.tasks[--PGlobalTaskManager.count];
-			if(PGlobalTaskManager.current == PGlobalTaskManager.count)
-				PGlobalTaskManager.current = 0;
 		}
 	}
 }
