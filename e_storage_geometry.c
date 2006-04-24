@@ -394,6 +394,7 @@ void callback_send_g_vertex_set_real_xyz(void *user_data, VNodeID node_id, VLaye
 	egreal			*write, input[3];
 	EGeoLayer		*layer;
 	uint			i, j;
+	boolean			update = FALSE;
 	node = (ESGeometryNode *)e_ns_get_node_networking(node_id);
 	if(layer_id >= node->layer_allocated || node->layers[layer_id].name[0] == 0 || node->layers[layer_id].type != VN_G_LAYER_VERTEX_XYZ)
 		return;
@@ -430,12 +431,14 @@ void callback_send_g_vertex_set_real_xyz(void *user_data, VNodeID node_id, VLaye
 	}
 
 	write += vertex_id * 3;
+	if(layer_id == 0 && *write == E_REAL_MAX)
+		update = TRUE;
 	*write++ = input[0];
 	*write++ = input[1];
 	*write++ = input[2];
 
 	e_ns_update_node_version_data(node);
-	if(layer_id == 0)
+	if(update)
 		e_ns_update_node_version_struct(node);
 }
 
