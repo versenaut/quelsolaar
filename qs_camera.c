@@ -20,6 +20,27 @@ static struct{
 	double	side_speed;
 } GView;
 
+static void qs_set_tag(void)
+{
+	static boolean group_done = FALSE, tag_done = FALSE;
+
+	if(!group_done)
+	{
+		uint32	me = e_ns_get_node_id(e_ns_get_node_avatar(0));
+		verse_send_tag_group_create(me, ~0, "listener");
+		group_done = TRUE;
+	}
+/*	if(group_done && !tag_done)
+	{
+		uint16	gid = e_ns_get_group_by_name(e_ns_get_node_avatar(0), "avatar");
+		if(gid != (uint16) ~0)
+		{
+			verse_send_tag_create(e_ns_get_node_id(e_ns_get_node_avatar(0)),
+					      gid, (uint16) ~0, "
+		}
+	}
+*/
+}
 
 void qs_camera_init(void)
 {
@@ -117,6 +138,8 @@ void qs_compute_camera(BInputState *input, float delta_time)
 	static real64 old_pos[3] = { 0.0f };
 	static boolean w = FALSE, lw = FALSE, s = FALSE, ls = FALSE, a = FALSE, la = FALSE, d = FALSE, ld = FALSE;
 	double x, y, z;
+
+	qs_set_tag();
 
 	if(input->mouse_button[0])
 		betray_set_mouse_warp(TRUE);
