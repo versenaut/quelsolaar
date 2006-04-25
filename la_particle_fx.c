@@ -5,8 +5,8 @@
 
 //#include "presuade.h"
 
-extern boolean	la_load_targa(char *file_name, uint8 *texture_id);
-extern uint		la_save_targa(char *file_name, float *data, unsigned int size);
+extern boolean	la_load_targa(char *file_name, uint *texture_id);
+extern uint	la_save_targa(char *file_name, float *data, unsigned int size);
 
 #define TEX_SPLIT 8
 
