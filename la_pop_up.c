@@ -461,7 +461,7 @@ void la_pu_manipulator(BInputState *input)
 		break;
 		case 18 :
 		{
-			la_t_poly_auto_cereas();
+			la_t_poly_auto_crease();
 		}
 		break;
 		case 19 :
