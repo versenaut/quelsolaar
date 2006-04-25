@@ -5,7 +5,7 @@
 # Location of a (compiled) Verse core directory. Must contain verse.h and libverse.a.
 VERSE=C:\projects\verse-sdk
 
-TARGETS=connector.exe loqairou.exe quelsolaar.exe uvedit.exe
+TARGETS=connector.exe loqairou.exe quelsolaar.exe uvedit.exe lpaint.exe
 
 ALL:		$(TARGETS)
 
