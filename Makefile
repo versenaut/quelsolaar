@@ -38,8 +38,8 @@ uvedit:		uv_draw.o uv_edge_collapse.o uv_geometry.o uv_main.o uv_menu.o uv_overl
 		uv_view.o uv_input_parse.o libbetray.a libenough.a $(PERSUADE) libdeceive.a libseduce.a
 		gcc -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
-loqairou:	la_draw_overlay.o la_flare_fx.o la_geometry_undo.o la_input_parser.o la_intro.o la_key_input.o \
-		la_main.o la_particle_fx.o la_pop_up.o la_projection.o la_reference.o la_save.o \
+loqairou:	la_cache.o la_draw_overlay.o la_flare_fx.o la_geometry_undo.o la_hole.o la_input_parser.o la_intro.o la_key_input.o \
+		la_main.o la_neighbor.o la_particle_fx.o la_pop_up.o la_projection.o la_reference.o la_save.o \
 		la_settings.o la_tool_collapse.o la_tool_center.o la_tool_deploy.o la_tool_draw.o la_tool_edge_connector.o \
 		la_tool_manipulator.o la_tool_poly_select.o la_tool_reshape.o la_tool_revolve.o la_tool_select.o \
 		la_tool_slice.o la_tool_splitter.o la_tool_subdivide.o \
