@@ -151,6 +151,7 @@ typedef struct{
 
 
 #define MAX_NODE_DISPLAY_COUNT 16 
+extern void la_close_all_holes();
 
 boolean la_pu_empty(BInputState *input)
 {
@@ -222,8 +223,9 @@ boolean la_pu_empty(BInputState *input)
 	switch(ring)
 	{
 		case 0 :
-	//		betray_set_action_func(draw_settings_menu, NULL);
-			geometry_load_obj(NULL, "./girl_hi.obj");
+/*			betray_set_action_func(draw_settings_menu, NULL);
+			geometry_load_obj(NULL, "./sds_girl_higher.obj");
+*/			la_close_all_holes();
 		break;
 		case 1 :
 			udg_undo_geometry();
@@ -290,7 +292,7 @@ void la_pu_vertex(BInputState *input, uint vertex)
 
 void la_pu_manipulator(BInputState *input)
 {
-	SUIPUElement element[17];
+	SUIPUElement element[20];
 	static float x, y;
 	uint ring;
 	element[0].type = PU_T_ANGLE;
@@ -326,6 +328,7 @@ void la_pu_manipulator(BInputState *input)
 	element[8].text = "Delete";
 	element[9].type = PU_T_TOP;
 	element[9].text = "Mirror";
+
 	element[10].type = PU_T_TOP;
 	element[10].text = "Flatten";
 	element[11].type = PU_T_BOTTOM;
@@ -340,6 +343,12 @@ void la_pu_manipulator(BInputState *input)
 	element[15].text = "Center Manipulator";
 	element[16].type = PU_T_BOTTOM;
 	element[16].text = "Create Tag";
+	element[17].type = PU_T_BOTTOM;
+	element[17].text = "Triangulate";
+	element[18].type = PU_T_BOTTOM;
+	element[18].text = "Auto Crease";
+	element[19].type = PU_T_BOTTOM;
+	element[19].text = "Find Quads";
 	if(input->mode == BAM_DRAW)
 	{
 		glDisable(GL_DEPTH_TEST);
@@ -353,7 +362,7 @@ void la_pu_manipulator(BInputState *input)
 		x = input->pointer_x;
 		y = input->pointer_y;
 	}
-	ring = sui_draw_popup(input, x, y, element, 16, 2, 0);
+	ring = sui_draw_popup(input, x, y, element, 20, 2, 0);
 	switch(ring)
 	{
 		case 0 :
@@ -445,6 +454,21 @@ void la_pu_manipulator(BInputState *input)
 			udg_create_tag(pos);
 		}
 		break;
+		case 17 :
+		{
+			la_t_poly_triangulate();
+		}
+		break;
+		case 18 :
+		{
+			la_t_poly_auto_cereas();
+		}
+		break;
+		case 19 :
+		{
+			la_t_poly_find_quads();
+		}
+		break;
 	}
 	if(input->mode == BAM_DRAW)
 	{
@@ -505,7 +529,7 @@ void la_pu_edge(BInputState *input, uint *edge)
 			la_t_select_open_edge();
 		break;
 		case 1 :
-			la_t_revolve(edge, 18);
+			la_t_revolve(edge, 16);
 		break;
 		case 2 :
 			la_t_tube(edge, 8);

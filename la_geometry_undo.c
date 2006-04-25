@@ -745,12 +745,12 @@ void udg_set_modeling_node(uint32 node_id)
 		UNDOGlobal.edge_version = 0;
 		UNDOGlobal.tags_version = 0;
 
-/*		if(e_nsg_get_layer_by_type(g_node, VN_G_LAYER_POLYGON_CORNER_UINT32, "crease") == NULL)
+		if(e_nsg_get_layer_by_type(g_node, VN_G_LAYER_POLYGON_CORNER_UINT32, "crease") == NULL)
 			verse_send_g_layer_create(node_id, -1, "crease", VN_G_LAYER_POLYGON_CORNER_UINT32, 0, 0);
-		if(e_nsg_get_layer_by_type(g_node, VN_G_LAYER_VERTEX_REAL, "select") == NULL)
+/*		if(e_nsg_get_layer_by_type(g_node, VN_G_LAYER_VERTEX_REAL, "select") == NULL)
 			verse_send_g_layer_create(node_id, -2, "select", VN_G_LAYER_VERTEX_REAL, 0, 0);
-		verse_send_g_crease_set_edge(node_id, "crease", 0);
-*/		udg_update_geometry();
+*/		verse_send_g_crease_set_edge(node_id, "crease", 0);
+		udg_update_geometry();
 	}
 }
 uint udg_get_version(boolean	structure, boolean vertex, boolean select, boolean edge, boolean tags)
@@ -913,20 +913,20 @@ void udg_polygon_delete(uint32 id)
 		double pos_a[3];
 		double pos_b[3];
 		double pos_c[3];
-		printf("polygon %u %u %u %u \n", event->event[0].polygon.a, event->event[0].polygon.b, event->event[0].polygon.c, event->event[0].polygon.d);
+//		printf("polygon %u %u %u %u \n", event->event[0].polygon.a, event->event[0].polygon.b, event->event[0].polygon.c, event->event[0].polygon.d);
 		udg_get_vertex_pos(pos_a, event->event[0].polygon.a);
 		udg_get_vertex_pos(pos_b, event->event[0].polygon.b);
 		la_pfx_create_dust_line(pos_a, pos_b);
 		udg_get_vertex_pos(pos_c, event->event[0].polygon.c);
 		la_pfx_create_dust_line(pos_c, pos_b);
-		printf("vertex %f %f %f\n", pos_a[0], pos_a[1], pos_a[2]);
-		printf("vertex %f %f %f\n", pos_b[0], pos_b[1], pos_b[2]);
-		printf("vertex %f %f %f\n", pos_c[0], pos_c[1], pos_c[2]);
+//		printf("vertex %f %f %f\n", pos_a[0], pos_a[1], pos_a[2]);
+//		printf("vertex %f %f %f\n", pos_b[0], pos_b[1], pos_b[2]);
+//		printf("vertex %f %f %f\n", pos_c[0], pos_c[1], pos_c[2]);
 
 		if(event->event[0].polygon.d < UNDOGlobal.vertex_length)
 		{
 			udg_get_vertex_pos(pos_b, event->event[0].polygon.d);
-			printf("vertex %f %f %f\n", pos_b[0], pos_b[1], pos_b[2]);
+//			printf("vertex %f %f %f\n", pos_b[0], pos_b[1], pos_b[2]);
 			la_pfx_create_dust_line(pos_c, pos_b);
 			la_pfx_create_dust_line(pos_a, pos_b);
 		}else

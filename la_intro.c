@@ -143,7 +143,10 @@ void la_intro_draw(void *user)
 	double r;
 
 	glPushMatrix();
-	t++;
+	if(betray_get_delta_time() < 1.0 / 60.0)
+		t += betray_get_delta_time() * 60.0;
+	else
+		t += 1;
 	spark++;
 //	sw_draw_background_square();
 	r = t - 400;

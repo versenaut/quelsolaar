@@ -375,7 +375,7 @@ void draw_persuade_surface(ENode *node)
 	static PMesh *mesh = NULL, *next = NULL;
 	static uint version;
 
-	if(old_node != NULL && old_node != node)
+	if(old_node != NULL && old_node != node && mesh != NULL)
 	{
 		p_rm_destroy(mesh);
 		mesh = NULL;
@@ -558,6 +558,9 @@ void draw_owerlay_tags(void)
 		glPushMatrix();
 	}
 }
+
+extern void test_draw();
+
 void draw_owerlay_surface(void)
 {
 	static uint version, draw;
@@ -766,6 +769,7 @@ void draw_owerlay_surface(void)
 	}
 	GlobalOverlay.surface_version = udg_get_version(TRUE, TRUE, FALSE, FALSE, FALSE);
 	draw_persuade_surface(e_ns_get_node(0, udg_get_modeling_node()));
+	test_draw();
 	glDisable(GL_DEPTH_TEST);
 /*	glEnable(GL_CULL_FACE);
 	if(GlobalOverlay.tri_count != 0)

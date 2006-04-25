@@ -93,3 +93,9 @@ extern void		la_t_slice(double *pos, double *vector, boolean del);
 
 extern void		la_t_center_geometry(void);
 extern void		la_t_center_manipulator(void);
+
+/* la_tool_neighbor.c */
+
+extern void la_t_poly_triangulate(void);
+extern void la_t_poly_auto_crease(void);
+extern void la_t_poly_find_quads(void);

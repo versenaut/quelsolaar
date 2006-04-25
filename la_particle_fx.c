@@ -5,6 +5,9 @@
 
 //#include "presuade.h"
 
+extern boolean	la_load_targa(char *file_name, uint8 *texture_id);
+extern uint		la_save_targa(char *file_name, float *data, unsigned int size);
+
 #define TEX_SPLIT 8
 
 #define BRIGHT_COUNT 12
@@ -296,28 +299,7 @@ void add_shade(int size, float *data, float *pos, float *color, float color_rand
 	}
 }
 
-uint create_particle_material(uint size, float *data)
-{
-	uint texture_id, i;
-	glEnable(GL_TEXTURE_2D);
-	glGenTextures(1, &texture_id);
-	glBindTexture(GL_TEXTURE_2D, texture_id);
-	for(i = 0; i < size * size * 3; i++)
-	{
-		if(data[i] < 0)
-			data[i] = 0;
-		if(data[i] > 1)
-			data[i] = 1;		
-	}
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size, size, 0, GL_RGB, GL_FLOAT, data);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glDisable(GL_TEXTURE_2D);
-	return texture_id;
-}
+
 uint create_def_material(void)
 {
 	uint texture_id, size = 256, i;
@@ -365,13 +347,24 @@ void la_pfx_init(uint particle_count, uint texture_size)
 	GlobalParticleData.bright_count = 0;
 	GlobalParticleData.bright_start = 0;
 	data = malloc((sizeof *data) * texture_size * texture_size * 3);
-	add_star(texture_size, data);
 
-	GlobalParticleData.star_material = create_particle_material(texture_size, data);
-	add_intro_flare(texture_size, data);
-	GlobalParticleData.intro_material = create_particle_material(texture_size, data);
-	add_flare(texture_size, data);
-	GlobalParticleData.flare_material = create_particle_material(texture_size, data);
+
+	if(!la_load_targa("la_tmp_star.tga", &GlobalParticleData.star_material))
+	{
+		add_star(texture_size / 2, data);
+		GlobalParticleData.star_material = la_save_targa("la_tmp_star.tga", data, texture_size / 2);
+	}
+	if(!la_load_targa("la_tmp_intro.tga", &GlobalParticleData.intro_material))
+	{
+		add_intro_flare(texture_size / 2, data);
+		GlobalParticleData.intro_material = la_save_targa("la_tmp_intro.tga", data, texture_size / 2);
+	}
+	if(!la_load_targa("la_tmp_flare.tga", &GlobalParticleData.flare_material))
+	{
+		add_flare(texture_size / 2, data);
+		GlobalParticleData.flare_material = la_save_targa("la_tmp_flare.tga", data, texture_size / 2);
+	}
+
 	GlobalParticleData.select_pos = malloc((sizeof *GlobalParticleData.select_pos) * 4 * SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 3);
 	GlobalParticleData.select_uv = malloc((sizeof *GlobalParticleData.select_pos) * 4 * SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 2);
 	for(i = 0; i < SELECT_FLARE_SPITT * SELECT_FLARE_SPITT; i++)
@@ -380,42 +373,50 @@ void la_pfx_init(uint particle_count, uint texture_size)
 		sui_draw_set_vec2(GlobalParticleData.select_uv, i * 4 + 1, (float)(i % SELECT_FLARE_SPITT) / SELECT_FLARE_SPITT, (float)(i / SELECT_FLARE_SPITT + 1) / SELECT_FLARE_SPITT);
 		sui_draw_set_vec2(GlobalParticleData.select_uv, i * 4 + 2, (float)(i % SELECT_FLARE_SPITT + 1) / SELECT_FLARE_SPITT, (float)(i / SELECT_FLARE_SPITT + 1) / SELECT_FLARE_SPITT);
 		sui_draw_set_vec2(GlobalParticleData.select_uv, i * 4 + 3, (float)(i % SELECT_FLARE_SPITT + 1) / SELECT_FLARE_SPITT, (float)(i / SELECT_FLARE_SPITT) / SELECT_FLARE_SPITT);
-		temp = i * 4 + 0;
-		temp = (temp<<13) ^ temp;
-		color[0] = (((temp * (temp * temp * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0) * 0.5;
-		color[2] = color[0];
-		color[1] = color[0] * color[0];
-		color[0] = color[0] * color[0] * color[0];
-		temp = i * 4 + 5;
-		temp = (temp<<13) ^ temp;
-		color[0] += (((temp * (temp * temp * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0) * 0.1;
-		temp = i * 4 + 6;
-		temp = (temp<<13) ^ temp;
-		color[1] += (((temp * (temp * temp * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0) * 0.1;
-		temp = i * 4 + 7;
-		temp = (temp<<13) ^ temp;
-		color[2] += (((temp * (temp * temp * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0) * 0.1;
-		color[0] *= 0.3;
-		color[1] *= 0.3;
-		color[2] *= 0.3;
-		add_point2(texture_size, texture_size / SELECT_FLARE_SPITT, &data[(((texture_size / SELECT_FLARE_SPITT) * (i % SELECT_FLARE_SPITT)) + ((texture_size * texture_size / SELECT_FLARE_SPITT) * (i / SELECT_FLARE_SPITT))) * 3], color);
 	}
 
-	GlobalParticleData.point_material = create_particle_material(texture_size, data/*, NGL_ADD*/);
+	if(!la_load_targa("la_tmp_points.tga", &GlobalParticleData.point_material))
+	{
+		for(i = 0; i < SELECT_FLARE_SPITT * SELECT_FLARE_SPITT; i++)
+		{
+			temp = i * 4 + 0;
+			temp = (temp<<13) ^ temp;
+			color[0] = (((temp * (temp * temp * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0) * 0.5;
+			color[2] = color[0];
+			color[1] = color[0] * color[0];
+			color[0] = color[0] * color[0] * color[0];
+			temp = i * 4 + 5;
+			temp = (temp<<13) ^ temp;
+			color[0] += (((temp * (temp * temp * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0) * 0.1;
+			temp = i * 4 + 6;
+			temp = (temp<<13) ^ temp;
+			color[1] += (((temp * (temp * temp * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0) * 0.1;
+			temp = i * 4 + 7;
+			temp = (temp<<13) ^ temp;
+			color[2] += (((temp * (temp * temp * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0) * 0.1;
+		/*	color[0] *= 0.3;
+			color[1] *= 0.3;
+			color[2] *= 0.3;*/
+			add_point2(texture_size, texture_size / SELECT_FLARE_SPITT, &data[(((texture_size / SELECT_FLARE_SPITT) * (i % SELECT_FLARE_SPITT)) + ((texture_size * texture_size / SELECT_FLARE_SPITT) * (i / SELECT_FLARE_SPITT))) * 3], color);
+		}
+		GlobalParticleData.point_material = la_save_targa("la_tmp_points.tga", data, texture_size);
+	}
+
+	if(!la_load_targa("la_tmp_surface.tga", &GlobalParticleData.surface_material))	
 	{
 		uint texture_id;
 		float light_color[3] = {0.2, 0.6, 1};
 		float light_pos[3] = {-0.2, 0.2, 0} , r;
 		for(i = 0; i < texture_size * texture_size * 3; i++)
 			data[i] = 0;
-		add_shade(texture_size, data, light_pos, light_color, -0.0, 0.03);
+		add_shade(texture_size / 2, data, light_pos, light_color, -0.0, 0.03);
 		light_color[2] = 1;
 		light_color[1] = 0.5;
 		light_color[0] = 0.3;
 		light_pos[0] = -0.3;
 		light_pos[1] = 0.3;
 		light_pos[2] = -1;
-		add_shade(texture_size, data, light_pos, light_color, -0.06, 0.02);
+		add_shade(texture_size / 2, data, light_pos, light_color, -0.06, 0.02);
 
 		light_color[0] = 0.2;
 		light_color[1] = -0.1;
@@ -423,21 +424,30 @@ void la_pfx_init(uint particle_count, uint texture_size)
 		light_pos[0] = 0.3;
 		light_pos[1] = -0.3;
 		light_pos[2] = -0.3;
-		add_shade(texture_size, data, light_pos, light_color, -0.06, 0.01);
-		GlobalParticleData.surface_material = create_particle_material(texture_size, data);
+		add_shade(texture_size / 2, data, light_pos, light_color, -0.06, 0.01);
+		GlobalParticleData.surface_material = la_save_targa("la_tmp_surface.tga", data, texture_size / 2);
 	}
-	add_video(texture_size, data);
-	GlobalParticleData.video_material = create_particle_material(texture_size, data);
-	color[0] = 0.163;
-	color[1] = 0.179;
-	color[2] = 0.185;
-	add_point(texture_size, data, color);
-	GlobalParticleData.soft_material = create_particle_material(texture_size, data);
-	color[0] = 0.085;
-	color[1] = 0.063;
-	color[2] = 0.179;
-	add_point(texture_size, data, color);
-	GlobalParticleData.soft_material2 = create_particle_material(texture_size, data);
+	if(!la_load_targa("la_tmp_video.tga", &GlobalParticleData.video_material))
+	{
+		add_video(texture_size, data);
+		GlobalParticleData.video_material = la_save_targa("la_tmp_video.tga", data, texture_size);
+	}
+	if(!la_load_targa("la_tmp_soft.tga", &GlobalParticleData.soft_material))
+	{
+		color[0] = 0.163;
+		color[1] = 0.179;
+		color[2] = 0.185;
+		add_point(texture_size / 4, data, color);
+		GlobalParticleData.soft_material = la_save_targa("la_tmp_soft.tga", data, texture_size / 4);
+	}
+	if(!la_load_targa("la_tmp_soft2.tga", &GlobalParticleData.soft_material2))	
+	{
+		color[0] = 0.085;
+		color[1] = 0.063;
+		color[2] = 0.179;
+		add_point(texture_size / 4, data, color);
+		GlobalParticleData.soft_material2 = la_save_targa("la_tmp_soft2.tga", data, texture_size / 4);
+	}
 	free(data);
 }
 
@@ -795,7 +805,7 @@ void la_pfx_select_vertex(void)
 			{
 				sui_set_blend_gl(GL_ONE, GL_ONE);
 				sui_set_texture2D_array_gl(GlobalParticleData.select_uv, SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 4, 2, GlobalParticleData.point_material);
-				sui_draw_gl(GL_QUADS, GlobalParticleData.select_pos, SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 4, 3, 1, 1, 1);	
+				sui_draw_gl(GL_QUADS, GlobalParticleData.select_pos, SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 4, 3, 0.3, 0.3, 0.3);	
 				j = 0;
 			}
 		}
@@ -806,7 +816,7 @@ void la_pfx_select_vertex(void)
 			sui_draw_set_vec3(GlobalParticleData.select_pos, j, 0, 0, -1);
 		sui_set_blend_gl(GL_ONE, GL_ONE);
 		sui_set_texture2D_array_gl(GlobalParticleData.select_uv, SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 4, 2, GlobalParticleData.point_material);
-		sui_draw_gl(GL_QUADS, GlobalParticleData.select_pos, SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 4, 3, 1, 1, 1);	
+		sui_draw_gl(GL_QUADS, GlobalParticleData.select_pos, SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 4, 3, 0.3, 0.3, 0.3);	
 	}
 	if(sui_get_setting_int("DISPLAY_SILLY_FLARES", TRUE))
 	{
