@@ -37,14 +37,13 @@ extern void la_edit_func(BInputState *input, void *user);
 
 int main(int argc, char **argv)
 {
-	betray_init(argc, argv, 1000, 750, FALSE, "Loq Airou");
+	betray_init(argc, argv, 1024, 768, FALSE, "Loq Airou");
 	sui_load_settings("settngs.cfg");
 	sui_init();
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);	
 	enough_init();
-
 	la_do_init();
 	p_init();
 	init_key_input();
@@ -53,14 +52,17 @@ int main(int argc, char **argv)
 	la_t_init_draw_line();
 	la_t_init_edge_connector();
 	la_t_tm_init();
-	la_pfx_init(sui_get_setting_int("PARTICLE_COUNT", 512), sui_get_setting_int("FLARE_TEXTURE_SIZE", 256));
+	la_pfx_init(sui_get_setting_int("PARTICLE_COUNT", 512), sui_get_setting_int("FLARE_TEXTURE_SIZE", 512));
 
 /*	p_op_lod_settings(sui_get_setting_int("MIN_TESS_LEVEL", 1),	sui_get_setting_double("GEOMETRY_COMPLEXITY", 40), sui_get_setting_double("LOD_TRESHOLD", 1.5), FALSE);
 	p_op_lod_set_tess_levels(limit, 5);
 	p_op_service_set_auto(TRUE); /* choosing to run enough lib in auto service mode */
-#if defined PERSUADE_H
-	persuade_init(2, betray_get_gl_proc_address());
+
+#ifdef PERSUADE_H
+	persuade_init(3, betray_get_gl_proc_address());
+	p_geo_set_sds_level(2);
 #endif
+
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);/*GL_AMBIENT_AND_DIFFUSE*/
 
 	deceive_set_intro_draw_func(la_intro_draw, NULL);
