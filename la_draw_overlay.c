@@ -559,7 +559,7 @@ void draw_owerlay_tags(void)
 	}
 }
 
-extern void test_draw();
+extern void test_draw(void);
 
 void draw_owerlay_surface(void)
 {

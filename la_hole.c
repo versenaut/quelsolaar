@@ -587,7 +587,7 @@ void create_test_draw(uint *ref, uint *group, uint ref_length, egreal *vertex)
 	test_length = ref_length * 3 + 60;
 }
 
-void update_points()
+void update_points(void)
 {
 	static uint rand = 0;
 	float vector[3], r;
@@ -654,7 +654,7 @@ void fps_move(float *pos, float *vec, float gravity, float stairs)
 	colision_point(pos, move, NULL, NULL, 0.01);
 }
 
-void test_fps()
+void test_fps(void)
 {
 	static float pos[3] = {0, 1, 0}, rot = 0;
 	float time, vector[3] = {0, 0, 0}, vertex[6];
@@ -688,7 +688,7 @@ void test_fps()
 
 }
 
-void test_draw()
+void test_draw(void)
 {
 	if(test_vertex_array == NULL)
 		return;
@@ -1018,7 +1018,7 @@ void close_all_holes(uint *triangles, uint *n, /*uint *group,*/ uint *length)
 	}
 }
 
-void print_volumes()
+void print_volumes(void)
 {
 	uint i, j;
 	printf("hulls used = %i\n", global_hulls_used);
@@ -1071,7 +1071,7 @@ void c_create_volumes(FILE *f, uint *ref, uint ref_count, uint vertex_count, egr
 }
 
 
-void la_close_all_holes()
+void la_close_all_holes(void)
 {
 	uint *ref, ref_count, vertex_count;
 	egreal *vertex;

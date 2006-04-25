@@ -151,7 +151,7 @@ typedef struct{
 
 
 #define MAX_NODE_DISPLAY_COUNT 16 
-extern void la_close_all_holes();
+extern void la_close_all_holes(void);
 
 boolean la_pu_empty(BInputState *input)
 {
