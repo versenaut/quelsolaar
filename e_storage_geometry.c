@@ -123,6 +123,13 @@ void polygon_append_array(ESGeometryNode	*node, uint32 id)
 						((egreal *)layer->data)[i] = layer->def_real;
 				}
 				break;
+				case VN_G_LAYER_POLYGON_FACE_UINT8 :
+				{
+					layer->data = realloc(layer->data, sizeof(uint8) * (id + GEOMETRY_ARRAY_CHUNK_SIZE));
+					for(i = node->polygon_length ; i < (id + GEOMETRY_ARRAY_CHUNK_SIZE); i++)
+						((uint8 *)layer->data)[i] = (uint8) layer->def_integer;
+				}
+				break;
 				case VN_G_LAYER_POLYGON_FACE_UINT32 :
 				{
 					layer->data  = realloc(layer->data, sizeof(uint32) * (id + GEOMETRY_ARRAY_CHUNK_SIZE));
