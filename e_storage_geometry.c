@@ -154,7 +154,6 @@ void * e_nsg_get_layer_data(ESGeometryNode *g_node, EGeoLayer *layer)
 	verse_send_g_layer_subscribe(g_node->head.node_id, layer->layer_id, E_GEOMETRY_SUBSCRIBE);
 	switch(layer->type)
 	{
-
 		case VN_G_LAYER_VERTEX_XYZ :
 		{
 			layer->data = malloc(sizeof(egreal) * g_node->vertex_length * 3);
@@ -188,6 +187,13 @@ void * e_nsg_get_layer_data(ESGeometryNode *g_node, EGeoLayer *layer)
 			layer->data = malloc(sizeof(egreal) * g_node->polygon_length * 4);
 			for(i = 0 ; i < g_node->polygon_length * 4; i++)
 				((egreal *)layer->data)[i] = layer->def_real;
+		}
+		break;
+		case VN_G_LAYER_POLYGON_FACE_UINT8 :
+		{
+			layer->data = malloc(sizeof(uint8) * g_node->polygon_length);
+			for(i = 0 ; i < g_node->polygon_length; i++)
+				((uint8 *)layer->data)[i] = (uint8) layer->def_integer;
 		}
 		break;
 		case VN_G_LAYER_POLYGON_FACE_UINT32 :
