@@ -138,7 +138,7 @@ void callback_send_m_fragment_create(void *user_data, VNodeID node_id, VNMFragme
 	uint i;
 	boolean	create = FALSE, data = FALSE;
 	node = e_create_m_node(node_id, 0);
-	if(frag_id < node->alocated)
+	if(frag_id >= node->alocated)
 	{
 		node->fragments = realloc(node->fragments, (sizeof *node->fragments) * (frag_id + 16));
 		for(i = node->alocated; i < frag_id + 16; i++)
