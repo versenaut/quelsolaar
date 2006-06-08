@@ -1,11 +1,11 @@
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
 #include "betray.h"
 
 #ifdef BETRAY_GLFW_SYSTEM_WRAPPER
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
 void b_glfw_reshape_func(int width, int height)
 {
@@ -163,5 +163,5 @@ void betray_launch_main_loop(void)
   }
 }
 
-#endif
+#endif /*BETRAY_GLFW_SYSTEM_WRAPPER*/
 
