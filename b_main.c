@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "betray.h"
-#include <sys/time.h>
+/*#include <sys/time.h>*/
 #include <time.h>
 #ifdef WIN32
 	#include <windows.h>
@@ -280,21 +280,21 @@ boolean betray_is_type_in(void)
 
 void betray_get_current_time(uint32 *seconds, uint32 *fractions)
 {
-	static LARGE_INTEGER freqency;
+	static LARGE_INTEGER frequency;
 	static boolean init = FALSE;
 	LARGE_INTEGER counter;
 
 	if(!init)
 	{
 		init = TRUE;
-		QueryPerformanceFrequency(&freqency);
+		QueryPerformanceFrequency(&frequency);
 	}
 
 	QueryPerformanceCounter(&counter);
 	if(seconds != NULL)
-		*seconds = counter.QuadPart / freqency.QuadPart;
+		*seconds = counter.QuadPart / frequency.QuadPart;
 	if(fractions != NULL)
-		*fractions = (uint32)((counter.QuadPart % freqency.QuadPart) * (0xffffffff / freqency.QuadPart));
+		*fractions = (uint32)((0xffffffffULL * (counter.QuadPart % frequency.QuadPart)) / frequency.QuadPart);
 }
 
 #else
