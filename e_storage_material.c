@@ -21,11 +21,11 @@ typedef struct {
 	VMatFrag		frag;
 	void			*user[E_CDC_COUNT];
 	boolean			mutex;
-}ESFragmen;
+}ESFragment;
 
 typedef struct{
 	ENodeHead		head;
-	ESFragmen		*fragments;
+	ESFragment		*fragments;
 	uint			alocated;
 	uint			count;
 	VNMFragmentID	output_color_front;
@@ -118,14 +118,10 @@ ENode *e_create_m_node(uint node_id, VNodeOwner owner)
 		node->fragments = malloc((sizeof *node->fragments) * node->alocated);
 		for(i = 0; i < node->alocated; i++)
 			node->fragments[i].type = VN_M_FT_OUTPUT + 1; 
-		node->output_color_front = (uint16)3200; 
-		node->output_color_back = (uint16)3200;
-		node->output_displacement = (uint16)3200;
-		node->output_particles = (uint16)3200;
-	//	node->output_color_front = (uint16)0; 
-	//	node->output_color_back = (uint16)0;
-	//	node->output_displacement = (uint16)0;
-	//	node->output_particles = (uint16)0;
+		node->output_color_front = (uint16)-1; 
+		node->output_color_back = (uint16)-1;
+		node->output_displacement = (uint16)-1;
+		node->output_particles = (uint16)-1;
 		node->count = 0;
 		e_ns_init_head((ENodeHead *)node, V_NT_MATERIAL, node_id, owner);
 	}
@@ -145,39 +141,62 @@ void callback_send_m_fragment_create(void *user_data, VNodeID node_id, VNMFragme
 			node->fragments[i].type = VN_M_FT_OUTPUT + 1;
 		node->alocated = frag_id + 16;
 	}
-	if(node->fragments[frag_id].type > VN_M_FT_OUTPUT)
-		create = TRUE;
 	if(node->fragments[frag_id].type == VN_M_FT_COLOR && type == VN_M_FT_COLOR)
 		data = TRUE;
 	if(node->fragments[frag_id].type == VN_M_FT_MATRIX && type == VN_M_FT_MATRIX && fragment->matrix.data == node->fragments[frag_id].frag.matrix.data)
 		data = TRUE;
+	if(node->fragments[frag_id].type != type)
+	{
+		for(i = 0; i < E_CDC_COUNT; i++)
+		{
+			if(storage_material_func[i] != NULL && node->fragments[frag_id].type <= VN_M_FT_OUTPUT)
+				storage_material_func[i](node, frag_id, E_CDC_DESTROY);
+			node->fragments[frag_id].user[i] = NULL;
+		}
+		create = TRUE;
+		if(node->fragments[frag_id].type <= VN_M_FT_OUTPUT)
+			node->count--;
+	}
 	node->fragments[frag_id].type = type;
-	node->fragments[frag_id].version++;
+	if(create)
+		node->fragments[frag_id].version = 0;
+	else
+		node->fragments[frag_id].version++;
 	node->fragments[frag_id].frag = *fragment;
 	node->fragments[frag_id].mutex = FALSE;
 	if(node->fragments[frag_id].type == VN_M_FT_OUTPUT)
 	{
-		if(strcmp(fragment->output.label, "color") == 0)
+		node->output_color_front = (uint16)-1;
+		node->output_color_back = (uint16)-1;
+		node->output_particles = (uint16)-1;
+		node->output_displacement = (uint16)-1;
+		for(i = 0; i < node->alocated; i++)
 		{
-			node->output_color_front = fragment->output.front;
-			node->output_color_back = fragment->output.back;
-		}
-		else if(strcmp(fragment->output.label, "particles") == 0)
-		{
-			if(fragment->output.front != (VNMFragmentID) ~0)
-				node->output_particles = fragment->output.front;
-			else
-				node->output_particles = fragment->output.back;
-		}
-		else if(strcmp(fragment->output.label, "displacement") == 0)
-		{
-			if(fragment->output.front != (VNMFragmentID) ~0)
-				node->output_displacement = fragment->output.front;
-			else
-				node->output_displacement = fragment->output.back;
+			if(node->fragments[i].type == VN_M_FT_OUTPUT)
+			{
+				if(strcmp(node->fragments[i].frag.output.label, "color") == 0)
+				{
+					node->output_color_front = node->fragments[i].frag.output.front;
+					node->output_color_back = node->fragments[i].frag.output.back;
+				}
+				else if(strcmp(node->fragments[i].frag.output.label, "particles") == 0)
+				{
+					if(node->fragments[i].frag.output.front != (VNMFragmentID) ~0)
+						node->output_particles = node->fragments[i].frag.output.front;
+					else
+						node->output_particles = node->fragments[i].frag.output.back;
+				}
+				else if(strcmp(node->fragments[i].frag.output.label, "displacement") == 0)
+				{
+					if(node->fragments[i].frag.output.front != (VNMFragmentID) ~0)
+						node->output_displacement = node->fragments[i].frag.output.front;
+					else
+						node->output_displacement = node->fragments[i].frag.output.back;
+				}
+			}
 		}
 	}
-	e_ns_update_node_version_data(node);
+	
 	if(create)
 	{
 		node->count++;
@@ -189,6 +208,7 @@ void callback_send_m_fragment_create(void *user_data, VNodeID node_id, VNMFragme
 		for(i = 0; i < E_CDC_COUNT; i++)
 			if(storage_material_func[i] != NULL)
 				storage_material_func[i](node, frag_id, E_CDC_DATA);
+		e_ns_update_node_version_data(node);
 		return;
 	}else
 		for(i = 0; i < E_CDC_COUNT; i++)
@@ -199,7 +219,7 @@ void callback_send_m_fragment_create(void *user_data, VNodeID node_id, VNMFragme
 
 void callback_send_m_fragment_destroy(void *user_data, VNodeID node_id, VNMFragmentID frag_id)
 {
-	ESMaterialNode		*node;
+	ESMaterialNode *node;
 	uint i;
 	if((node = (ESMaterialNode *)e_ns_get_node_networking(node_id)) == NULL)
 		return;
@@ -208,23 +228,44 @@ void callback_send_m_fragment_destroy(void *user_data, VNodeID node_id, VNMFragm
 	for(i = 0; i < E_CDC_COUNT; i++)
 		if(storage_material_func[i] != NULL)
 			storage_material_func[i](node, frag_id, E_CDC_DESTROY);
-	e_ns_update_node_version_data(node);
+//	e_ns_update_node_version_data(node);
 	e_ns_update_node_version_struct(node);
-	if(node->fragments[frag_id].type == VN_M_FT_OUTPUT)
-	{
-		if(strcmp(node->fragments[frag_id].frag.output.label, "color") == 0)
-		{
-			node->output_color_front = -1;
-			node->output_color_back = -1;
-		}
-		else if(strcmp(node->fragments[frag_id].frag.output.label, "particles") == 0)
-			node->output_particles = -1;
-		else if(strcmp(node->fragments[frag_id].frag.output.label, "displacement") == 0)
-			node->output_displacement = -1;
-	}
 	if(node->fragments[frag_id].type <= VN_M_FT_OUTPUT)
 		node->count--;
-	node->fragments[frag_id].type = VN_M_FT_OUTPUT + 1;
+	if(node->fragments[frag_id].type == VN_M_FT_OUTPUT)
+	{
+		node->fragments[frag_id].type = VN_M_FT_OUTPUT + 1;
+		node->output_color_front = (uint16)-1;
+		node->output_color_back = (uint16)-1;
+		node->output_particles = (uint16)-1;
+		node->output_displacement = (uint16)-1;
+		for(i = 0; i < node->alocated; i++)
+		{
+			if(node->fragments[i].type == VN_M_FT_OUTPUT)
+			{
+				if(strcmp(node->fragments[i].frag.output.label, "color") == 0)
+				{
+					node->output_color_front = node->fragments[i].frag.output.front;
+					node->output_color_back = node->fragments[i].frag.output.back;
+				}
+				else if(strcmp(node->fragments[i].frag.output.label, "particles") == 0)
+				{
+					if(node->fragments[i].frag.output.front != (VNMFragmentID) ~0)
+						node->output_particles = node->fragments[i].frag.output.front;
+					else
+						node->output_particles = node->fragments[i].frag.output.back;
+				}
+				else if(strcmp(node->fragments[i].frag.output.label, "displacement") == 0)
+				{
+					if(node->fragments[i].frag.output.front != (VNMFragmentID) ~0)
+						node->output_displacement = node->fragments[i].frag.output.front;
+					else
+						node->output_displacement = node->fragments[i].frag.output.back;
+				}
+			}
+		}
+	}else
+		node->fragments[frag_id].type = VN_M_FT_OUTPUT + 1;
 }
 
 uint e_nsm_get_fragment_count(ENode *node)
