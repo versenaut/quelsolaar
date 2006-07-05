@@ -10,6 +10,7 @@ extern VMatFrag *p_shader_get_param(ENode *node, uint nr);
 
 extern char	p_shader_get_source_vertex(ENode *node);
 extern char	p_shader_get_source_frag(ENode *node);
+extern boolean p_shader_transparancy(uint32 node_id);
 extern void p_shader_bind(uint32 node_id);
 extern void p_shader_unbind(uint32 node_id);
 
