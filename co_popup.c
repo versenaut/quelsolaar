@@ -1,4 +1,4 @@
-#include "st_matrix_operations.h"
+ #include "st_matrix_operations.h"
 #include "enough.h"
 #include "seduce.h"
 #include "deceive.h"
@@ -21,6 +21,34 @@ void co_pu_hide_all(void)
 	}
 }
 
+static boolean co_settings = FALSE;
+
+void sp_settings_pre(SUIViewElement *element);
+void sp_settings_post(SUIViewElement *element);
+
+void co_draw_settings(BInputState *input)
+{
+	if(co_settings == TRUE)
+	{
+		SUIViewElement element[10];
+		glPushMatrix();
+		glTranslatef(0, 0, -1);
+		sp_settings_pre(element);
+		glDisable(GL_DEPTH_TEST);
+		co_settings = !sui_draw_setting_view(input, 0, 0.3, 0.5, element, 10, "SETTINGS", 1.0);
+		glEnable(GL_DEPTH_TEST);
+		sp_settings_post(element);
+		glPopMatrix();
+		return TRUE;
+	}
+	return FALSE;
+}
+
+boolean co_get_settings()
+{
+	return co_settings;
+}
+
 extern boolean co_draw_3d_view_get(void);
 extern boolean co_draw_3d_persuade_get(void);
 extern void co_draw_3d_view_set(boolean set);
@@ -32,7 +60,7 @@ void co_pu_empty(BInputState *input)
 	static float x, y;
 	uint ring;
 	element[0].type = PU_T_ANGLE;
-	element[0].text = "";//"Settings";
+	element[0].text = "Settings";
 	element[0].data.angle[0] = -45;
 	element[0].data.angle[1] = +45;
 
@@ -75,6 +103,7 @@ void co_pu_empty(BInputState *input)
 	{
 		case 0 :
 	/*		co_pu_hide_all();*/
+			co_settings = TRUE;
 		break;
 		case 1 :
 			co_pu_hide_all();
