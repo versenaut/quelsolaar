@@ -99,7 +99,6 @@ boolean co_handle_text(BInputState *input, ENode *node)
 			y -= 0.05;
 			sui_draw_rounded_square(-0.3, y + 0.125, 1, -0.09, color_light, color_light, color_light);
 		}
-
 	}
 	y -= 0.05 + (y - pre_expander) * (1 - rot_buffer);
 	if(input->mode == BAM_DRAW)
