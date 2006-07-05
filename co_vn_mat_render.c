@@ -19,14 +19,25 @@
 
 #define TEXTURE_RESOLUTION 128
 
-extern boolean *co_material_get_recursive(ENode *node, VNMFragmentID id);
-
 void co_compute_vec(float *vec, float size, uint x, uint y)
 {
 	float f;
 	f = (float)size * 0.5;
 	vec[0] = (float)x / f - 1.0;
 	vec[1] = (float)y / f - 1.0;
+	f = (vec[0] * vec[0] + vec[1] * vec[1]);
+	if(f < 1)
+		vec[2] = sqrt(1 - f);
+	else
+		vec[2] = 0;
+}
+
+void co_compute_view_vec(float *vec, float size, uint x, uint y)
+{
+	float f;
+	f = (float)size * 0.5;
+	vec[0] = ((float)x / f - 1.0) * 0.2;
+	vec[1] = ((float)y / f - 1.0) * 0.2;
 	f = (vec[0] * vec[0] + vec[1] * vec[1]);
 	if(f < 1)
 		vec[2] = sqrt(1 - f);
@@ -114,7 +125,9 @@ void co_compute_reflect_hightlight(float *vec, float *color, float fall_off)
 void co_compute_reflect_vector(float *vec)
 {
 	float r;
-	vec[2] = ((vec[2] + 1) * 2) - 1;
+	vec[0] = 0 + vec[0] * 2.0 * vec[2];
+	vec[1] = 0 + vec[1] * 2.0 * vec[2];
+	vec[2] = 1 + vec[2] * 2.0 * vec[2];
 	r = sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]);
 	vec[0] = vec[0] / r;
 	vec[1] = vec[1] / r;
@@ -123,22 +136,102 @@ void co_compute_reflect_vector(float *vec)
 
 extern uint co_material_get_texture_id(ENode *node, VNMFragmentID id);
 
+float co_noise_function(float *vec, uint level)
+{
+	int i, j, k, iadd, jadd, kadd;
+	float fi, fj, fk, f, values[8]; 
+	fi = vec[0] * (egreal)level;
+	fj = vec[1] * (egreal)level;
+	fk = vec[2] * (egreal)level;
+	i = fi;
+	j = fj;
+	k = fk;
+	fi -= (egreal)i;
+	fj -= (egreal)j;
+	fk -= (egreal)k;
+
+	iadd = (i + 1) % level;
+	jadd = ((j + 1) % level) * level;
+	kadd = ((k + 1) % level) * level * level;
+	j = j * level;
+	k = k * level * level;
+	
+	values[0] = get_rand(i + j + k);
+	values[1] = get_rand(iadd + j + k);
+	values[2] = get_rand(i + jadd + k);
+	values[3] = get_rand(iadd + jadd + k);
+	values[4] = get_rand(i + j + kadd);
+	values[5] = get_rand(iadd + j + kadd);
+	values[6] = get_rand(i + jadd + kadd);
+	values[7] = get_rand(iadd + jadd + kadd);
+	f = 1.0 - fi;
+	values[0] = values[0] * f + values[1] * fi;
+	values[2] = values[2] * f + values[3] * fi;
+	values[4] = values[4] * f + values[5] * fi;
+	values[6] = values[6] * f + values[7] * fi;
+	f = 1.0 - fj;
+	values[0] = values[0] * f + values[2] * fj;
+	values[4] = values[4] * f + values[6] * fj;
+	f = 1.0 - fk;
+	return values[0] * f + values[4] * fk;
+}
+
+float co_noise_multi_function(float *vec)
+{
+	return co_noise_function(vec, 7) * 0.7 + co_noise_function(vec, 17) * 0.3 + co_noise_function(vec, 31) * 0.15;
+}
+
+#define CO_POINT_NOISE_LEVEL 100
+
+float co_noice_point_function(float *vec)
+{
+	int i, j, k, start, pos, found;
+	float fi, fj, fk, f, fbest = 100000, vector[3]; 
+	fi = vec[0];
+	fj = vec[1];
+	fk = vec[2];
+	i = fi;
+	j = fj;
+	k = fk;
+	fi -= (egreal)i;
+	fj -= (egreal)j;
+	fk -= (egreal)k;
+	start = i + j * CO_POINT_NOISE_LEVEL + k * CO_POINT_NOISE_LEVEL * CO_POINT_NOISE_LEVEL;
+	for(i = 0; i < 3; i++)
+	{
+		for(j = 0; j < 3; j++)
+		{
+			for(k = 0; k < 3; k++)
+			{
+				pos = start + i + j * CO_POINT_NOISE_LEVEL + k * CO_POINT_NOISE_LEVEL * CO_POINT_NOISE_LEVEL;
+				vector[0] = get_rand(pos * 3 + 0) + (float)i - (1.0 + fi);
+				vector[1] = get_rand(pos * 3 + 1) + (float)j - (1.0 + fj);
+				vector[2] = get_rand(pos * 3 + 2) + (float)k - (1.0 + fk);
+				f = vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2];	
+				if(f < fbest)
+				{
+					fbest = f;
+					found = pos;
+				}
+			}	
+		}
+	}
+	return get_rand(found);
+}
+
 void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float *buffer)
 {
 	uint i;
 	VMatFrag *frag;
-	boolean *recursive;
+
 	frag = e_nsm_get_fragment(node, id);
-	if(frag == NULL)
+	if(frag == NULL || !e_nsm_enter_fragment(node, id))
 	{
 		for(i = 0; i < size * 3; i++)
 			buffer[i] = 0;
 		return;
 	}
-	recursive = co_material_get_recursive(node, id);
-	if(*recursive == TRUE)
-		return;
-	*recursive = TRUE;
+
 	switch(e_nsm_get_fragment_type(node, id))
 	{	
 		case VN_M_FT_COLOR :
@@ -244,11 +337,20 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		case VN_M_FT_TRANSPARENCY :
 		{
 			uint j, k = 0, l;
-			float vec[3], normal[3], light[3];
+			float f, vec[3], normal[3], light[3];
 			for(i = 0; i < size; i++)
 			{
-				co_compute_vec(normal, size, line, i);
-				co_compute_reflect_vector(normal);
+				co_compute_vec(vec, size, line, i);
+				co_compute_view_vec(normal, size, line, i);
+				f = (vec[0] * normal[0] + vec[1] * normal[1] + vec[2] * normal[2]) * (frag->transparency.refraction_index - 1.0);
+				normal[0] -= vec[0] * f;
+				normal[1] -= vec[1] * f;
+				normal[2] -= vec[2] * f;
+				f = sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
+				normal[0] /= f;
+				normal[1] /= f;
+				normal[2] /= f;
+
 				light[0] = 0;
 				light[1] = 0;
 				light[2] = 0;
@@ -264,6 +366,73 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 			}
 			break;
 		}
+		case VN_M_FT_VOLUME :
+		{
+			uint k = 0, l;
+			float normal[3],  f, f2, light[3];
+			for(i = 0; i < size; i++)
+			{
+				co_compute_vec(normal, size, line, i);
+				light[0] = 0;
+				light[1] = 0;
+				light[2] = 0;
+
+				f = normal[0] * LIGHT_VEC_X + normal[1] * LIGHT_VEC_Y + normal[2] * -LIGHT_VEC_Z;
+				
+				f2 = (frag->volume.col_r + f) / (frag->volume.col_r + 1);
+				if(f2 > 0)
+					light[0] += f2 * 0.5;
+				f2 = (frag->volume.col_g + f) / (frag->volume.col_g + 1);
+				if(f2 > 0)
+					light[1] += f2 * 0.4;
+				f2 = (frag->volume.col_b + f) / (frag->volume.col_b + 1);
+				if(f2 > 0)
+					light[2] += f2 * 0.3;
+
+				f = normal[0] * -LIGHT_VEC_X + normal[1] * LIGHT_VEC_Y + normal[2] * -LIGHT_VEC_Z;
+
+				f2 = (frag->volume.col_r + f) / (frag->volume.col_r + 1);
+				if(f2 > 0)
+					light[0] += f2 * 0.6;
+				f2 = (frag->volume.col_g + f) / (frag->volume.col_g + 1);
+				if(f2 > 0)
+					light[1] += f2 * 0.8;
+				f2 = (frag->volume.col_b + f) / (frag->volume.col_b + 1);
+				if(f2 > 0)
+					light[2] += f2 * 1;
+
+				f = normal[0] * LIGHT_VEC_X + normal[1] * LIGHT_VEC_Y + normal[2] * LIGHT_VEC_Z;
+
+				f2 = (frag->volume.col_r + f) / (frag->volume.col_r + 1);
+				if(f2 > 0)
+					light[0] += f2 * 0.7;
+				f2 = (frag->volume.col_g + f) / (frag->volume.col_g + 1);
+				if(f2 > 0)
+					light[1] += f2 * 0.7;
+				f2 = (frag->volume.col_b + f) / (frag->volume.col_b + 1);
+				if(f2 > 0)
+					light[2] += f2 * 0.7;
+
+				buffer[k++] = light[0];
+				buffer[k++] = light[1];
+				buffer[k++] = light[2];
+			}
+			break;
+		}
+		case VN_M_FT_VIEW :
+		{
+			uint j, k = 0;
+			float vec[3], light;
+			for(i = 0; i < size; i++)
+			{
+				co_compute_vec(vec, size, line, i);
+				buffer[k++] = vec[0];
+				buffer[k++] = vec[1];
+				buffer[k++] = vec[2];
+			}
+			break;
+		}
+		break;
 		case VN_M_FT_GEOMETRY :
 		{
 			uint j, k = 0;
@@ -304,24 +473,46 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		{
 			uint k = 0;
 			float f;
-			if(frag->noise.type == VN_M_NOISE_PERLIN_ZERO_TO_ONE)
+			render_material(node, frag->noise.mapping, size, line, buffer);
+			switch(frag->noise.type)
 			{
-				for(i = 0; i < size; i++)
-				{
-					f = get_rand(line * size + i) * 0.5 + 0.5;
-					buffer[k++] = f;
-					buffer[k++] = f;
-					buffer[k++] = f;
-				}
-			}else
-			{
-				for(i = 0; i < size; i++)
-				{
-					f = get_rand(line * size + i);
-					buffer[k++] = f;
-					buffer[k++] = f;
-					buffer[k++] = f;
-				}
+				case VN_M_NOISE_PERLIN_ZERO_TO_ONE :
+					for(i = 0; i < size; i++)
+					{
+						f = co_noise_multi_function(&buffer[k]);
+						buffer[k++] = f;
+						buffer[k++] = f;
+						buffer[k++] = f;
+					}
+				break;
+				case VN_M_NOISE_PERLIN_MINUS_ONE_TO_ONE :
+					for(i = 0; i < size; i++)
+					{
+						f = co_noise_multi_function(&buffer[k]) * 2 - 1;
+						buffer[k++] = f;
+						buffer[k++] = f;
+						buffer[k++] = f;
+					}
+				break;
+				case VN_M_NOISE_POINT_ZERO_TO_ONE :
+					for(i = 0; i < size; i++)
+					{
+						f = co_noice_point_function(&buffer[k]);
+						buffer[k++] = f;
+						buffer[k++] = f;
+						buffer[k++] = f;
+					}
+				break;
+				case VN_M_NOISE_POINT_MINUS_ONE_TO_ONE :
+					for(i = 0; i < size; i++)
+					{
+						f = co_noice_point_function(&buffer[k]) * 2 - 1;
+						buffer[k++] = f;
+						buffer[k++] = f;
+						buffer[k++] = f;
+					}
+				break;
+
 			}
 			break;
 		}
@@ -357,17 +548,36 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 				for(i = 0; i < size * 3; i++)
 					buffer[i] /= buf[i];
 				break;
-				case VN_M_BLEND_DOT :
-				for(i = 0; i < size * 3; i += 3)
-				{
-					f = buffer[i] * buf[i] + buffer[i + 1] * buf[i + 1] + buffer[i + 2] * buf[i + 2];
-					buffer[i] = f;
-					buffer[i + 1] = f;
-					buffer[i + 2] = f;
-				}
-				break;
 			}
 			free(buf);
+		}
+		break;
+		case VN_M_FT_CLAMP :
+		{
+			render_material(node, frag->clamp.data, size, line, buffer);
+			if(frag->clamp.min)
+			{
+				for(i = 0; i < size * 3; i += 3)
+				{
+					if(buffer[i] > frag->clamp.red)
+						buffer[i] = frag->clamp.red;
+					if(buffer[i + 1] > frag->clamp.green)
+						buffer[i + 1] = frag->clamp.green;
+					if(buffer[i + 2] > frag->clamp.blue)
+						buffer[i + 2] = frag->clamp.blue;
+				}
+			}else
+			{
+				for(i = 0; i < size * 3; i += 3)
+				{
+					if(buffer[i] < frag->clamp.red)
+						buffer[i] = frag->clamp.red;
+					if(buffer[i + 1] < frag->clamp.green)
+						buffer[i + 1] = frag->clamp.green;
+					if(buffer[i + 2] < frag->clamp.blue)
+						buffer[i + 2] = frag->clamp.blue;
+				}
+			}			
 		}
 		break;
 		case VN_M_FT_MATRIX :
@@ -447,7 +657,6 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 			render_material(node, frag->output.front, size, line, buffer);
 		break;
 	}
-	*recursive = FALSE;
 	glBindTexture(GL_TEXTURE_2D, co_material_get_texture_id(node, id));
 	{
 		float *f;
@@ -464,6 +673,7 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, line, size, 1, GL_RGB, GL_FLOAT, f);
 		free(f);
 	}
+	e_nsm_leave_fragment(node, id);
 /*	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, line, size, 1, GL_RGB, GL_FLOAT, buffer);*/
 }
 
@@ -477,18 +687,14 @@ uint co_get_fragment_version(ENode *node, uint16 fragment)
 	uint i, output, *version;
 	VMatFrag *frag;
 	boolean *recursive;
-
 	frag = e_nsm_get_fragment(node, fragment);
 	if(frag == NULL)
 		return 0;
 
 	output = e_nsm_get_fragment_version(node, fragment);
 
-	recursive = co_material_get_recursive(node, fragment);
-	if(*recursive == TRUE)
-		return output;
-	*recursive = TRUE;	
-
+	if(!e_nsm_enter_fragment(node, fragment))
+		return 0;
 	switch(e_nsm_get_fragment_type(node, fragment))
 	{	
 		case VN_M_FT_TEXTURE :
@@ -503,6 +709,9 @@ uint co_get_fragment_version(ENode *node, uint16 fragment)
 			output += co_get_fragment_version(node, frag->blender.data_a);
 			output += co_get_fragment_version(node, frag->blender.data_b);
 			break;
+		case VN_M_FT_CLAMP :
+			output += co_get_fragment_version(node, frag->clamp.data);
+			break;
 		case VN_M_FT_MATRIX :
 			output += co_get_fragment_version(node, frag->matrix.data);
 			break;
@@ -515,9 +724,9 @@ uint co_get_fragment_version(ENode *node, uint16 fragment)
 			break;
 		case VN_M_FT_OUTPUT :
 			output += co_get_fragment_version(node, frag->output.front);
-		break;
+			break;
 	}
-	*recursive = FALSE;
+	e_nsm_leave_fragment(node, fragment);
 	co_material_set_version(node, fragment, output);
 	return output;
 }
@@ -529,10 +738,12 @@ VNMFragmentID co_get_compute_fragment(ENode *node)
 		if(e_nsm_get_fragment_type(node, id) == VN_M_FT_OUTPUT)
 			if(co_material_get_version(node, id) != co_get_fragment_version(node, id))
 				return id;
+
 	for(id = e_nsm_get_fragment_next(node, 0); id != (VNMFragmentID)-1; id = e_nsm_get_fragment_next(node, id + 1))
 		if(e_nsm_get_fragment_type(node, id) == VN_M_FT_BLENDER)
 			if(co_material_get_version(node, id) != co_get_fragment_version(node, id))
 				return id;
+
 	for(id = e_nsm_get_fragment_next(node, 0); id != (VNMFragmentID)-1; id = e_nsm_get_fragment_next(node, id + 1))
 		if( e_nsm_get_fragment_type(node, id) != VN_M_FT_LIGHT && e_nsm_get_fragment_type(node, id) != VN_M_FT_TRANSPARENCY && e_nsm_get_fragment_type(node, id) != VN_M_FT_REFLECTION)
 			if(co_material_get_version(node, id) != co_get_fragment_version(node, id))
@@ -542,7 +753,6 @@ VNMFragmentID co_get_compute_fragment(ENode *node)
 			if(co_material_get_version(node, id) != co_get_fragment_version(node, id))
 				return id;
 	return (VNMFragmentID)-1;
-
 }
 
 void co_material_compute(uint lines)
@@ -553,7 +763,6 @@ void co_material_compute(uint lines)
 	static uint line = 0;
 	ENode *node = NULL;
 	uint i;
-	
 	if((node = e_ns_get_node_next(node_id, 0, V_NT_MATERIAL)) == NULL)
 	{
 		node = e_ns_get_node_next(0, 0, V_NT_MATERIAL);
