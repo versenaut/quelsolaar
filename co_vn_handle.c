@@ -277,11 +277,11 @@ extern void co_draw_3d_view(float x, float y);
 extern boolean co_draw_3d_click_test_node(float x, float y);
 extern void co_draw_3d_summary(void);
 extern void co_draw_3d_node_lock(ENode *node);
-extern co_draw_3d_icon_pass();
+extern co_draw_3d_icon_pass(void);
 extern void co_pu_empty(BInputState *input);
 extern void update_bitmap_load(char *name);
 extern void co_draw_settings(BInputState *input);
-extern boolean co_get_settings();
+extern boolean co_get_settings(void);
 
 void co_input_handler(BInputState *input, void *user_pointer)
 {
