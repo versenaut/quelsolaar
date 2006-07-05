@@ -17,7 +17,6 @@ typedef unsigned int uint;
 #include <sys/types.h>
 #endif
 #if !defined(VERSE_TYPES)
-#define VERSE_TYPES
 typedef signed char int8;
 typedef unsigned char uint8;
 typedef signed short int16;
