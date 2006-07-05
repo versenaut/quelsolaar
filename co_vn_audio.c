@@ -51,7 +51,6 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 	float pos = 1, y, pre_expander, color, color_light;
 	uint i;
 
-	
 	y = co_handle_node_head(input, node, change_a_node_id != e_ns_get_node_id(node));
 
 	change_a_node_id = e_ns_get_node_id(node);
@@ -74,7 +73,7 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 		y -= 0.05;
 		if(NULL == e_nsa_get_buffer_next(node, 0))
 		{
-			sui_draw_text(-0.3, y - 0.1, SUI_T_SIZE, SUI_T_SPACE, "NO AUDIO LAYERS", color_light, color_light, color_light);
+			sui_draw_text(-0.3, y - 0.05, SUI_T_SIZE, SUI_T_SPACE, "NO AUDIO LAYERS", color_light, color_light, color_light);
 			y -= 0.05;
 		}
 
@@ -122,7 +121,7 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Frequency:", color_light, color_light, color_light);
 			frequency = e_nsa_get_buffer_frequency(buffer);
-			if(sui_type_number_double(input, 0.15, y, 0.5, SUI_T_SIZE, &frequency, buffer, color, color, color))
+			if(sui_type_number_double(input, 0.15, y, 0, 0.5, SUI_T_SIZE, &frequency, buffer, color, color, color))
 				verse_send_a_buffer_create(change_a_node_id, e_nsa_get_buffer_id(buffer), e_nsa_get_buffer_name(buffer), e_nsa_get_buffer_type(buffer), frequency);
 			y -= 0.05;
 			e = buffer_edit_id != e_nsa_get_buffer_id(buffer);
@@ -153,7 +152,7 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 		y -= 0.05;
 		if(NULL == e_nsa_get_stream_next(node, 0))
 		{
-			sui_draw_text(-0.3, y - 0.1, SUI_T_SIZE, SUI_T_SPACE, "NO AUDIO STREAMS", color_light, color_light, color_light);
+			sui_draw_text(-0.3, y - 0.05, SUI_T_SIZE, SUI_T_SPACE, "NO AUDIO STREAMS", color_light, color_light, color_light);
 			y -= 0.05;
 		}
 

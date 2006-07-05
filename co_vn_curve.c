@@ -57,7 +57,7 @@ void co_c_draw_section(ECurve *curve, float scroll, float stretch, float y_pos, 
 			for(k = 0; k < 24; k++)
 			{
 				compute_spline_pos(out, (double)(k + 1) / 24.0, pos, &pos[2], &pos[4], &pos[6]);
-				sui_draw_2d_line_gl(out[0], out[1], out_old[0], out_old[1], c[0], c[1], c[2]);
+				sui_draw_2d_line_gl(out[0], out[1], out_old[0], out_old[1], c[0], c[1], c[2], 1);
 				out_old[0] = out[0];
 				out_old[1] = out[1];
 			}
@@ -108,7 +108,7 @@ void sui_draw_symb_curve_point(float pos_x, float pos_y, float red, float green,
 	-0.008804, 0.011000, -0.008804, 0.011000, -0.008000, 0.014000, -0.014000, 0.020000, -0.011000, 0.019196, -0.011000, 0.019196, -0.008804, 0.017000, -0.008804, 0.017000, -0.008000, 0.014000, -0.018000, 0.014000, -0.010000, 0.014000, 0.016000, -0.012000, 0.012000, -0.016000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 124, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 124, 2, red, green, blue, 1);
 	glPopMatrix();
 }
 
@@ -120,10 +120,10 @@ void	sui_draw_symb_empty(float point_x, float point_y, float pos_x, float pos_y,
 	vec[0] = point_x - pos_x;
 	vec[1] = point_y - pos_y;
 	f = sqrt(vec[0] * vec[0] + vec[1] * vec[1]) * 60;
-	sui_draw_2d_line_gl(point_x - vec[0] / f, point_y - vec[1] / f, pos_x + vec[0] / f, pos_y + vec[1] / f, color_light, color_light, color_light);
+	sui_draw_2d_line_gl(point_x - vec[0] / f, point_y - vec[1] / f, pos_x + vec[0] / f, pos_y + vec[1] / f, color_light, color_light, color_light, 1);
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 8, 2, color, color, color);
+	sui_draw_gl(GL_LINES, array, 8, 2, color, color, color, 1);
 	glPopMatrix();
 }
 
@@ -143,8 +143,8 @@ void co_c_draw_point(BInputState *input, ENode *node, ECurve *curve, float *scro
 	scale /= (aspect - 0.1 + y_pos);
 	pan -= (y_pos - aspect + 0.1 - y_pos) * scale;
 				
-	sui_draw_2d_line_gl(-0.9, y_pos + 0.02, 0.9, y_pos + 0.02, color_light, color_light, color_light);
-	sui_draw_2d_line_gl(-0.9, -aspect + 0.08, 0.9, -aspect + 0.08, color_light, color_light, color_light);
+	sui_draw_2d_line_gl(-0.9, y_pos + 0.02, 0.9, y_pos + 0.02, color_light, color_light, color_light, 1);
+	sui_draw_2d_line_gl(-0.9, -aspect + 0.08, 0.9, -aspect + 0.08, color_light, color_light, color_light, 1);
 
 	if(input->mode == BAM_EVENT && input->mouse_button[0] != TRUE && input->last_mouse_button[0] == TRUE && grab_point == -1 && y_pos > y)
 	{
@@ -189,8 +189,8 @@ void co_c_draw_point(BInputState *input, ENode *node, ECurve *curve, float *scro
 
 				if(i == grab_dim && grab_point == point)
 				{
-					sui_draw_2d_line_gl(pos_x - 0.004, pos_y[i] + 0.024, pos_x - 0.024, pos_y[i] + 0.004, color, color, 1);
-					sui_draw_2d_line_gl(pos_x - 0.004, pos_y[i] + 0.004, pos_x - 0.024, pos_y[i] + 0.024, color, color, 1);
+					sui_draw_2d_line_gl(pos_x - 0.004, pos_y[i] + 0.024, pos_x - 0.024, pos_y[i] + 0.004, color, color, 1, 1);
+					sui_draw_2d_line_gl(pos_x - 0.004, pos_y[i] + 0.004, pos_x - 0.024, pos_y[i] + 0.024, color, color, 1, 1);
 				}
 			}else
 			{
@@ -332,7 +332,7 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 			y -= 0.05;
 			dim = e_nsc_get_curve_dimensions(curve);
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Dimensions:", color_light, color_light, color_light); 
-			if(sui_type_number_uint(input, 0.15, y, 0.5, SUI_T_SIZE, &dim, curve, color, color, color))
+			if(sui_type_number_uint(input, 0.15, y, 0, 0.5, SUI_T_SIZE, &dim, curve, color, color, color))
 				if(dim > 0 && dim < 5)
 					verse_send_c_curve_create(change_c_node_id, e_nsc_get_curve_id(curve), e_nsc_get_curve_name(curve), dim);
 			y -= 0.05;
@@ -412,17 +412,16 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 			e_nsg_get_bone_rot64(node, bone, &t[3]);
 			parent = e_nsg_get_bone_parent(node, bone);
 			sui_draw_text(-0.25, y, SUI_T_SIZE, SUI_T_SPACE, "RARENT", color_light, color_light, color_light);
-			if(sui_type_number_uint(input,0.15, y, 0.15, SUI_T_SIZE, &parent, e_nsg_get_bone_weight(node, bone), color, color, color);
+			if(sui_type_number_uint(input,0.15, y, 0, 0.15, SUI_T_SIZE, &parent, e_nsg_get_bone_weight(node, bone), color, color, color);
 				verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], t[3], t[4], t[5], t[6]);
 			y -= 0.05;
 			sui_draw_text(-0.25, y, SUI_T_SIZE, SUI_T_SPACE, "POSITION", color_light, color_light, color_light);
 			sui_draw_text(-0.25, y - 0.15, SUI_T_SIZE, SUI_T_SPACE, "ROTATION", color_light, color_light, color_light);
 
 
-
 			for(i = 0; i < 7; i++)
 			{	
-				sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, text[i], color_light, color_light, color_light);  
+				sui_draw_text(0.0, y, 0, SUI_T_SIZE, SUI_T_SPACE, text[i], color_light, color_light, color_light);  
 				if(sui_type_number_double(input, 0.15, y, 0.15, SUI_T_SIZE, &t[i], &ref[i], color, color, color))
 					verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], t[3], t[4], t[5], t[6]);
 				if(co_w_slider(input, 0.3, y, 0.35, &t[i], color, color, color))

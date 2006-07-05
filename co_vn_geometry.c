@@ -57,6 +57,10 @@ PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g, boolean fill, boolean s
 		ref_length = e_nsg_get_polygon_length(node);
 		g->quad_count = 0;
 		g->tri_count = 0;
+		if(g->tri != NULL)
+			free(g->tri);
+		if(g->quad != NULL)
+			free(g->quad);
 		for(i = 0; i < ref_length; i++)
 		{
 			if(ref[i * 4] < length && ref[i * 4 + 1] < length && ref[i * 4 + 2] < length && vertex[ref[i * 4] * 3] != V_REAL64_MAX && vertex[ref[i * 4 + 1] * 3] != V_REAL64_MAX && vertex[ref[i * 4 + 2] * 3] != V_REAL64_MAX)
@@ -183,9 +187,9 @@ PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g, boolean fill, boolean s
 	if(!fill)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if(g->tri_count != 0)
-		sui_draw_gl(GL_TRIANGLES, g->tri, g->tri_count * 3, 3, red, green, blue);
+		sui_draw_gl(GL_TRIANGLES, g->tri, g->tri_count * 3, 3, red, green, blue, 1);
 	if(g->quad_count != 0)
-		sui_draw_gl(GL_QUADS, g->quad, g->quad_count * 4,  3, red, green, blue);
+		sui_draw_gl(GL_QUADS, g->quad, g->quad_count * 4,  3, red, green, blue, 1);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	if(scale)
 		glPopMatrix();	
@@ -345,7 +349,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 		y -= 0.05;
 		sui_draw_text(-0.27, y, SUI_T_SIZE, SUI_T_SPACE, "vertex crease", color_light, color_light, color_light); 
 		sui_draw_text(0.0, y - 0.05, SUI_T_SIZE, SUI_T_SPACE, "Vertex", color_light, color_light, color_light);  
-/*		if(sui_type_number_double(input, 0.15, y - 0.05, 0.15, SUI_T_SIZE, &transform[0], &transform[0], color, color, color))
+/*		if(sui_type_number_double(input, 0.15, y - 0.05, 0, 0.15, SUI_T_SIZE, &transform[0], &transform[0], color, color, color))
 			verse_send_o_transform_pos_real64(e_ns_get_node_id(node), 0, transform, NULL, NULL, NULL, 0);
 		if(co_w_slider(input, 0.3, y - 0.05, 0.35, &transform[0], color, color, color))
 			verse_send_o_transform_pos_real64(e_ns_get_node_id(node), 0, transform, NULL, NULL, NULL, 0);
@@ -403,7 +407,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 			e_nsg_get_bone_rot64(node, bone, &rot);
 			parent = e_nsg_get_bone_parent(node, bone);
 			sui_draw_text(-0.25, y, SUI_T_SIZE, SUI_T_SPACE, "PARENT", color_light, color_light, color_light);
-			if(sui_type_number_uint(input,0.15, y, 0.15, SUI_T_SIZE, &parent, e_nsg_get_bone_weight(node, bone), color, color, color))
+			if(sui_type_number_uint(input,0.15, y, 0, 0.15, SUI_T_SIZE, &parent, e_nsg_get_bone_weight(node, bone), color, color, color))
 				verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], e_nsg_get_bone_rot_label(node, bone), &rot, e_nsg_get_bone_rot_label(node, bone));
 			y -= 0.05;
 			sui_draw_text(-0.25, y, SUI_T_SIZE, SUI_T_SPACE, "POSITION", color_light, color_light, color_light);
@@ -430,11 +434,11 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 					}
 				}
 				sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, text[i], color_light, color_light, color_light);  
-				if(sui_type_number_double(input, 0.15, y, 0.15, SUI_T_SIZE, edit, edit, color, color, color))
+				if(sui_type_number_double(input, 0.15, y, 0, 0.15, SUI_T_SIZE, edit, edit, color, color, color))
 					verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent,
 								 t[0], t[1], t[2], e_nsg_get_bone_pos_label(node, bone), &rot, 
 								 e_nsg_get_bone_rot_label(node, bone));
-				if(co_w_slider(input, 0.3, y, 0.35, edit, color, color, color))
+				if(co_w_slider(input, 0.3, y, 0.35, edit, 0, 1, color, color, color))
 					/*verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], &rot)*/;
 				y -= 0.05;
 			}
@@ -445,3 +449,4 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 	y -= 0.05 + (y - pre_expander) * (1 - rot_layer);
 	return co_handle_return(input);
 }
+

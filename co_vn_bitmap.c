@@ -20,7 +20,7 @@ void co_draw_bitmap(ENode *node)
 	PTextureHandle *h;
 	h = p_th_create_texture_handle(e_ns_get_node_id(node), "color_r", "color_g", "color_b");
 	sui_set_texture2D_array_gl(uv, 4, 2, p_th_get_texture_id(h));
-	sui_draw_gl(GL_QUADS, vertex, 4, 2, 1, 1, 1);
+	sui_draw_gl(GL_QUADS, vertex, 4, 2, 1, 1, 1, 1);
 	p_th_destroy_texture_handle(h);
 #endif
 }
@@ -65,18 +65,18 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 	{	
 		y -= 0.05;
 		sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Width:", color_light, color_light, color_light);  
-		if(sui_type_number_uint(input, 0.15, y, 0.5, SUI_T_SIZE, &create_size[0], &create_size[0], color, color, color) && create_size[0] * create_size[1] * create_size[2] != 0)
+		if(sui_type_number_uint(input, 0.15, y, 0, 0.5, SUI_T_SIZE, &create_size[0], &create_size[0], color, color, color) && create_size[0] * create_size[1] * create_size[2] != 0)
 			verse_send_b_dimensions_set(change_b_node_id, create_size[0], create_size[1], create_size[2]);
 		y -= 0.05;
 		sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Height:", color_light, color_light, color_light);  
-		if(sui_type_number_uint(input, 0.15, y, 0.5, SUI_T_SIZE, &create_size[1], &create_size[1], color, color, color) && create_size[0] * create_size[1] * create_size[2] != 0)
+		if(sui_type_number_uint(input, 0.15, y, 0, 0.5, SUI_T_SIZE, &create_size[1], &create_size[1], color, color, color) && create_size[0] * create_size[1] * create_size[2] != 0)
 			verse_send_b_dimensions_set(change_b_node_id, create_size[0], create_size[1], create_size[2]);
 		y -= 0.05;
 		sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Depth:", color_light, color_light, color_light);  
-		if(sui_type_number_uint(input, 0.15, y, 0.5, SUI_T_SIZE, &create_size[2], &create_size[2], color, color, color) && create_size[0] * create_size[1] * create_size[2] != 0)
+		if(sui_type_number_uint(input, 0.15, y, 0, 0.5, SUI_T_SIZE, &create_size[2], &create_size[2], color, color, color) && create_size[0] * create_size[1] * create_size[2] != 0)
 			verse_send_b_dimensions_set(change_b_node_id, create_size[0], create_size[1], create_size[2]);	
 	}
-	glPopMatrix();
+	glPopMatrix(); 
 	y -= 0.05 + (y - pre_expander) * (1 - rot_size);
 
 	co_vng_divider(input, 0.2, y, &rot_layer, &color, &color_light, &show_layer, "Layers");
