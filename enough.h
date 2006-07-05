@@ -106,15 +106,16 @@ extern VNodeID		e_nso_get_link_node(EObjLink *link);
 extern char *		e_nso_get_link_name(EObjLink *link);
 extern uint32		e_nso_get_link_target_id(EObjLink *link);
 
-extern void		e_nso_get_anim_time(EObjLink *link, uint32 *time_s, uint32 *time_f);
-extern double		e_nso_get_anim_pos(EObjLink *link);
-extern double		e_nso_get_anim_speed(EObjLink *link);
-extern double		e_nso_get_anim_accel(EObjLink *link);
-extern double		e_nso_get_anim_scale(EObjLink *link);
-extern double		e_nso_get_anim_scale_speed(EObjLink *link);
+extern void			e_nso_get_anim_time(EObjLink *link, uint32 *time_s, uint32 *time_f);
+
+extern void			e_nso_get_anim_pos(EObjLink *link, double *pos);
+extern void			e_nso_get_anim_speed(EObjLink *link, double *speed);
+extern void			e_nso_get_anim_accel(EObjLink *link, double *accel);
+extern void			e_nso_get_anim_scale(EObjLink *link, double *scale);
+extern void			e_nso_get_anim_scale_speed(EObjLink *link, double *scale_speed);
 extern boolean		e_nso_get_anim_active(EObjLink *link);
-extern double		e_nso_get_anim_evaluate_pos(EObjLink *link, uint32 time_s, uint32 time_f);
-extern double		e_nso_get_anim_evaluate_scale(EObjLink *link, uint32 time_s, uint32 time_f);
+extern void			e_nso_get_anim_evaluate_pos(EObjLink *link, double *pos, uint32 time_s, uint32 time_f);
+extern void			e_nso_get_anim_evaluate_scale(EObjLink *link, double *scale, uint32 time_s, uint32 time_f);
 
 
 extern char *		e_nso_get_method_group(ENode *node, uint16 group_id);
@@ -125,7 +126,7 @@ extern uint			e_nso_get_method_param_count(ENode *node, uint16 group_id, uint16 
 extern char **		e_nso_get_method_param_names(ENode *node, uint16 group_id, uint16 method_id);
 extern VNOParamType *	e_nso_get_method_param_types(ENode *node, uint16 group_id, uint16 method_id);
 
-
+extern boolean		e_nso_get_hide(ENode *node);
 /*
 extern double		e_nso_evaluate_anim_handle_single(EOAnimhandle *handle, uint seconds, uint fractions);
 extern double		e_nso_evaluate_anim_handle_mult(double *output, EOAnimhandle *handle, uint seconds, uint fractions);
