@@ -8,9 +8,7 @@
 //#include "co_storage.h"
 
 /* Disable hijacking of main() by SDL. */
-#if defined _WIN32 && defined BETRAY_SDL_SYSTEM_WRAPPER
-#undef main
-#endif
+
 
 #include "co_vn_handle.h"
 #include "co_vn_graphics.h"
@@ -26,18 +24,19 @@ extern void co_intro_init(void);
 
 int main(int argc, char **argv)
 {
-	betray_init(argc, argv, 1280, 1024, FALSE, "Connector");
+	betray_init(argc, argv, 1500, 1100, FALSE, "Connector");
+	deceive_set_arg(argc, argv);
 	sui_init();
 
 	p_init();
-	glClearColor(1, 1, 1, 0);
+	glClearColor(1, 1, 1, 1);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	sui_load_settings("co_config.cfg");
 	co_init_handle_verse_node();
 	enough_init();					/* initializing the Enough Lib, setting the max subdivision level to 3*/
 #ifdef PERSUADE_H
-	persuade_init(3, betray_get_gl_proc_address());
-	p_geo_set_sds_level(1);
+	persuade_init(4, betray_get_gl_proc_address());
+	p_geo_set_sds_level(4);
 #endif
 	co_vng_init();
 	co_intro_init();
@@ -48,8 +47,11 @@ int main(int argc, char **argv)
 	betray_set_action_func(deceive_intro_handler, co_input_handler);
 
 //	betray_set_action_func(co_intro_handler, NULL);
-//	betray_set_action_func(sui_symbol_editor_func, NULL);
+//	betray_set_action_func(sui_font_editor_func, NULL);
 //	printf("entering main loop\n");
+//	e_vc_set_auto_subscribe(V_NT_OBJECT, FALSE);
+//	e_vc_set_auto_subscribe(V_NT_GEOMETRY, FALSE);
+//	e_vc_set_auto_subscribe(V_NT_MATERIAL, FALSE);
 	betray_launch_main_loop();
 	return 0;
 }
