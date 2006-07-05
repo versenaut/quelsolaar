@@ -12,6 +12,8 @@
 #include "co_widgets.h"
 #include "co_projection.h"
 
+void draw_settings_test(BInputState *input);
+
 static float view_cam_pos[3] = {0, 0, 4};
 static float view_cam_pos_goal[3] = {0, 0, 4};
 static float view_cam_move_start[2];
@@ -36,7 +38,7 @@ void co_handle_view(BInputState *input, float *pos, boolean active)
 			view_cam_speed = 0.3;
 		}
 	}else if(active && input->mouse_button[0])
-	if(0.025 * 0.025 < (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
+	if(0.025 * 0.025 < (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y) && input->mode == BAM_EVENT)
 	{
 		if(input->click_pointer_x > 0.9 || input->click_pointer_x < -0.9)
 		{
@@ -85,7 +87,7 @@ COVerseNode *create_verse_node(ENode *node)
 	co_node->node_id = e_ns_get_node_id(node);
 	co_node->pos_x = co_get_pos_x(((float)e_ns_get_node_type(node) - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8);
 	co_node->pos_y = co_get_pos_y(0);
-	co_node->hidden = TRUE /*e_ns_get_node_owner(node) == VN_OWNER_MINE*/;
+	co_node->hidden = e_ns_get_node_owner(node) != VN_OWNER_MINE;
 	co_node->search = TRUE;
 	co_node->viewlock = FALSE;
 	co_node->persuade = NULL;
@@ -108,10 +110,11 @@ void co_draw_bitmap(ENode *node);
 void co_geometry_destroy(void *g);
 void *co_geometry_draw(ENode *node, void *g, boolean fill, boolean scale, float red, float green, float blue);
 
-void p_render_object(ENode *node);
+void p_render_object(ENode *node, boolean transparency);
 
 void co_search_clear(void);
 void co_search_update(char *search);
+
 
 void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 {
@@ -134,7 +137,7 @@ void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 				co_vng_sunrays();
 //				co_vng_color(245.0 / 255.0, 243.0 / 255.0, 170.0 / 255.0);
 #ifdef PERSUADE_H
-				if(node != NULL)	
+				if(node != NULL && FALSE)	
 				{
 					ENode *g_node;
 					EObjLink *link;
@@ -153,25 +156,6 @@ void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 							size = 0.7 / e_nsg_get_size(g_node);
 						}
 					}
-				/*	pos[0] = matrix[0] * pos_one[0] + matrix[1] * pos_one[1] + matrix[2] * pos_one[2] + matrix[3];
-					pos[1] = matrix[4] * pos_one[0] + matrix[5] * pos_one[1] + matrix[6] * pos_one[2] + matrix[7];
-					pos[2] = matrix[8] * pos_one[0] + matrix[9] * pos_one[1] + matrix[10] * pos_one[2] + matrix[11];
-					glEnable(GL_LIGHT0);
-					glLightfv(GL_LIGHT0, GL_POSITION, pos);
-					glLightfv(GL_LIGHT0, GL_DIFFUSE, col_one);
-					glEnable(GL_LIGHT1);
-					pos[0] = matrix[0] * pos_two[0] + matrix[1] * pos_two[1] + matrix[2] * pos_two[2] + matrix[3];
-					pos[1] = matrix[4] * pos_two[0] + matrix[5] * pos_two[1] + matrix[6] * pos_two[2] + matrix[7];
-					pos[2] = matrix[8] * pos_two[0] + matrix[9] * pos_two[1] + matrix[10] * pos_two[2] + matrix[11];
-					glLightfv(GL_LIGHT1, GL_POSITION, pos);
-					glLightfv(GL_LIGHT1, GL_DIFFUSE, col_two);
-					glEnable(GL_LIGHT2);
-					pos[0] = matrix[0] * pos_three[0] + matrix[1] * pos_three[1] + matrix[2] * pos_three[2] + matrix[3];
-					pos[1] = matrix[4] * pos_three[0] + matrix[5] * pos_three[1] + matrix[6] * pos_three[2] + matrix[7];
-					pos[2] = matrix[8] * pos_three[0] + matrix[9] * pos_three[1] + matrix[10] * pos_three[2] + matrix[11];
-					glLightfv(GL_LIGHT2, GL_POSITION, pos);
-					glLightfv(GL_LIGHT2, GL_DIFFUSE, col_three);
-				*/
 
 					pos[0] = matrix[0] * pos_one[0] + matrix[4] * pos_one[1] + matrix[8] * pos_one[2] + matrix[12];
 					pos[1] = matrix[1] * pos_one[0] + matrix[5] * pos_one[1] + matrix[9] * pos_one[2] + matrix[13];
@@ -199,8 +183,10 @@ void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 					glScalef(size, size, size);
 					glRotatef(time * 360, 0, 1, 0);
 					glTranslatef(-center[0], -center[1], -center[2]);
-					p_render_object(node);
-					glDisable(GL_LIGHTING);
+					p_render_object(node, FALSE);
+					glEnable(GL_BLEND);
+					p_render_object(node, TRUE);
+					glDisable(GL_BLEND);
 					glDisable(GL_NORMALIZE);
 					glPopMatrix();
 					glDisable(GL_DEPTH_TEST);
@@ -291,8 +277,11 @@ extern void co_draw_3d_view(float x, float y);
 extern boolean co_draw_3d_click_test_node(float x, float y);
 extern void co_draw_3d_summary(void);
 extern void co_draw_3d_node_lock(ENode *node);
+extern co_draw_3d_icon_pass();
 extern void co_pu_empty(BInputState *input);
-
+extern void update_bitmap_load(char *name);
+extern void co_draw_settings(BInputState *input);
+extern boolean co_get_settings();
 
 void co_input_handler(BInputState *input, void *user_pointer)
 {
@@ -302,6 +291,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 	static float clear_color = 1, create_move = 0, popup_move = 0, type_count, create_scroll = 0;
 	static char search[64];
 	static uint search_cursor = 0;
+
 //	char *names[7] = {"OBJECT", "GEOMETRY", "MATERIAL", "BITMAP", "TEXT", "PARTICLE", "CURVE"};
 	float create_length;
 	ENode *node;
@@ -309,28 +299,33 @@ void co_input_handler(BInputState *input, void *user_pointer)
 	VNodeType type;
 	float pos[3];
 
+//	update_bitmap_load("head3.tga");
 	if(input->mode == BAM_MAIN)
 	{
 		verse_callback_update(3000);
 		co_material_compute(1);
 		co_vng_update_time();
 #ifdef PERSUADE_H
-		p_task_compute(10);
+		p_task_compute(1);
 #endif
 		return;
 	}
-
 	if(input->mode == BAM_DRAW)
 	{
 		glDisable(GL_DEPTH_TEST);
-	//	glEnable(GL_LINE_SMOOTH);
+//		glEnable(GL_LINE_SMOOTH);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
 		glPushMatrix();
 		p_view_set();
 		co_draw_3d_view(input->pointer_x, input->pointer_y);
 		glPopMatrix();
-		co_draw_3d_summary();
+		if(mode == COIM_NONE)
+			co_draw_3d_summary();
+		co_draw_3d_icon_pass();
+	}else if(co_get_settings())
+	{
+		co_draw_settings(input);
+		return;
 	}
 
 	if(co_is_game_active())
@@ -353,6 +348,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		view_cam_pos[2] = 0;
 		view_cam_speed = 0.01;
 	}
+
 	co_handle_view(input, pos, mode == COIM_NONE);
 	
 
@@ -364,11 +360,6 @@ void co_input_handler(BInputState *input, void *user_pointer)
 			glTranslatef(pos[0] * (1 - popup_move) - popup_move * (co_node->pos_x + 1), pos[1] * (1 - popup_move) -  popup_move * co_node->pos_y, -pos[2] * (1 - popup_move) - popup_move);
 		else
 			glTranslatef(pos[0], pos[1], -pos[2]);
-//		co_w_scroll(input, 0.5, 10);
-
-#ifdef PERSUADE_H
-//		p_draw_scene();
-#endif
 	}
 
 	co_search_update(search);
@@ -382,6 +373,17 @@ void co_input_handler(BInputState *input, void *user_pointer)
 
 	create_length = create_scroll - 1;
 
+	node = deceive_get_edit_node();
+	if(node != NULL)
+	{
+		mode = COIM_OPEN;
+		active = e_ns_get_node_id(node);
+		co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
+		co_node->hidden = FALSE;
+		co_node->viewlock = FALSE;
+		co_node->pos_x = co_get_pos_x(0);
+		co_node->pos_y = co_get_pos_y(0);
+	}
 
 	for(type = 0; type < V_NT_NUM_TYPES; type++)
 	{
@@ -389,7 +391,6 @@ void co_input_handler(BInputState *input, void *user_pointer)
 
 		for(node = e_ns_get_node_next(0, 0, type); node != 0; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, type))
 		{
-			
 			if(mode != COIM_CREATE || co_search_node(node, search))
 			{
 				type_count++;
@@ -584,9 +585,18 @@ void co_input_handler(BInputState *input, void *user_pointer)
 	if(mode == COIM_CREATE)
 	{
 		clear_color = clear_color - 0.001;
-		create_move = create_move * 0.95 + 0.05;
+//		create_move = create_move * 0.95 + 0.05;
+		create_move += betray_get_delta_time() / 0.4;
+		if(create_move > 1.0)
+			create_move = 1.0;
+
 	}else
-		create_move = create_move * 0.95;
+	{
+//		create_move = create_move * 0.95;
+		create_move -= betray_get_delta_time() / 0.4;
+		if(create_move < 0.0)
+			create_move = 0.0;
+	}
 	if(mode == COIM_CREATE)
 	{
 		float x, y;
@@ -614,6 +624,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 					{
 						verse_send_node_create(-1, type, 0);
 						mode = COIM_NONE;
+						search[0] = 0;
 					}
 				}
 			}
@@ -650,6 +661,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 				{
 					betray_end_type_in_mode(TRUE);
 					mode = COIM_NONE;
+					search[0] = 0;
 				}
 			}
 		}
@@ -734,36 +746,48 @@ void co_input_handler(BInputState *input, void *user_pointer)
 	if(mode == COIM_OPEN)
 	{
 		clear_color = clear_color - 0.001;
-		popup_move = popup_move * 0.95 + 0.05;
-		if(input->mode == BAM_DRAW && (node = e_ns_get_node(0, active)) != NULL && (co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT)) != NULL)
-			glTranslatef(co_node->pos_x + 1, co_node->pos_y, 0);
+		popup_move += betray_get_delta_time() / 0.4;
+		if(popup_move > 1)
+			popup_move = 1;
 
+//		popup_move = popup_move * 0.95 + 0.05;
+		if(input->mode == BAM_DRAW && (node = e_ns_get_node(0, active)) != NULL && (co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT)) != NULL)
+		{
+			float box[8] = {-0.45, 10, 10, 10, 10, -10, -0.45, -10};
+			glTranslatef(co_node->pos_x + 1, co_node->pos_y, 0);
+			sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			sui_draw_gl(GL_QUADS, box, 4, 2, 1, 1, 1, popup_move * 0.7);
+		}
 		if((node = e_ns_get_node(0, active)) != NULL)
 		{
 			switch(e_ns_get_node_type(node))
 			{
 				case V_NT_OBJECT :
-					if(!co_handle_object(input, node))
+					if(!co_handle_object(input, node) && popup_move > 0.5)
 						mode = COIM_NONE;
 					break;
 				case V_NT_GEOMETRY :
-					if(!co_handle_geometry(input, node))
+					if(!co_handle_geometry(input, node) && popup_move > 0.5)
 						mode = COIM_NONE;
 					break;
 				case V_NT_MATERIAL :
-					if(!co_handle_material(input, node))
+					if(!co_handle_material(input, node) && popup_move > 0.5)
 						mode = COIM_NONE;
 					break;
 				case V_NT_BITMAP :
-					if(!co_handle_bitmap(input, node))
+					if(!co_handle_bitmap(input, node) && popup_move > 0.5)
 						mode = COIM_NONE;
 					break;
 				case V_NT_TEXT :
-					if(!co_handle_text(input, node))
+					if(!co_handle_text(input, node) && popup_move > 0.5)
 						mode = COIM_NONE;
 					break;
 				case V_NT_CURVE :
-					if(!co_handle_curve(input, node))
+					if(!co_handle_curve(input, node) && popup_move > 0.5)
+						mode = COIM_NONE;
+					break;
+				case V_NT_AUDIO :
+					if(!co_handle_audio(input, node) && popup_move > 0.5)
 						mode = COIM_NONE;
 					break;
 			}
@@ -771,7 +795,11 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		if(mode == COIM_NONE && betray_is_type_in())
 			betray_end_type_in_mode(TRUE);
 	}else
-		popup_move = popup_move * 0.95;
+	{
+		popup_move -= betray_get_delta_time() / 0.4;
+		if(popup_move < 0)
+			popup_move = 0;
+	}
 	if(input->mode == BAM_DRAW)
 		glPopMatrix();
 
@@ -782,26 +810,29 @@ void co_input_handler(BInputState *input, void *user_pointer)
 			search_cursor = 0;
 			betray_start_type_in(search, 64, NULL, &search_cursor, NULL);
 		}
-		if(search[0] != 0)
+		if(input->mode == BAM_DRAW)
 		{
-			float length;
-			static boolean state = TRUE;
-			static uint cursor;
+			if(search[0] != 0)
+			{
+				float length;
+				static boolean state = TRUE;
+				static uint cursor;
+				glPushMatrix();
+				glTranslatef(0, 0, -1);
+				length = sui_compute_text_length(SUI_T_SIZE * 2, SUI_T_SPACE, search);
+				sui_draw_text(length * -0.5, 0.0, SUI_T_SIZE * 2, SUI_T_SPACE, search, 0, 0, 0);
+				glPopMatrix();
+			}
 			glPushMatrix();
 			glTranslatef(0, 0, -1);
-			length = sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, search);
-			sui_draw_text(length * -0.5, 0.0, SUI_T_SIZE, SUI_T_SPACE, search, 0, 0, 0);
-		//	co_w_checkbox(input, length * -0.5, 0, &state, 0, 0, 0);
-			
+			create_scroll = co_w_scroll(input, create_scroll - (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2), create_length + 0.7) + (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2);
 			glPopMatrix();
 		}
-		glPushMatrix();
-		glTranslatef(0, 0, -1);
-		create_scroll = co_w_scroll(input, create_scroll - (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2), create_length + 0.7) + (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2);
-		glPopMatrix();
-		
 	}
-	glEnable(GL_DEPTH_TEST);
+
+	co_draw_settings(input);
+	if(input->mode == BAM_DRAW)
+		glEnable(GL_DEPTH_TEST);
 }
 
 void co_init_handle_verse_node(void)
