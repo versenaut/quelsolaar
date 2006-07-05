@@ -1,4 +1,4 @@
-
+ 
 #include "enough.h"
 
 #include "seduce.h"
@@ -7,12 +7,37 @@
 #include "p_sds_table.h"
 #include "p_sds_obj.h"
 #include "p_task.h"
+#include "v_util.h"
 
 #include <math.h>
 
 extern void p_pre_load_material_select(ENode *node);
 extern void p_get_tri_tess_index(uint *index, uint base_tess);
 extern void p_get_quad_tess_index(uint *index, uint base_tess);
+extern boolean p_lod_displacement_update_test(PMesh *mesh);
+
+uint p_sds_force_level = 0;
+float p_sds_mesh_factor = 10000;
+
+void p_geo_set_sds_force_level(uint level)
+{
+	p_sds_force_level = level;
+}
+
+uint p_geo_get_sds_force_level(void)
+{
+	return p_sds_force_level;
+}
+
+void p_geo_set_sds_mesh_factor(float factor)
+{
+	p_sds_mesh_factor = factor;
+}
+
+float p_geo_get_sds_mesh_factor(void)
+{
+	return p_sds_mesh_factor;
+}
 
 PMesh *p_rm_create(ENode *node)
 {
@@ -29,8 +54,8 @@ PMesh *p_rm_create(ENode *node)
 	mesh->sub_stages[1] = 0;
 	mesh->sub_stages[2] = 0;
 	mesh->sub_stages[3] = 0;
-	mesh->tess.force = 2;
-	mesh->tess.factor = 50;
+	mesh->tess.force = p_sds_force_level;
+	mesh->tess.factor = p_sds_force_level;
 	mesh->tess.edge_tess_func = p_sds_edge_tesselation_global_func;
 	mesh->temp = NULL;
 	mesh->next = NULL;
@@ -43,6 +68,7 @@ PMesh *p_rm_create(ENode *node)
 	mesh->render.normal_array = NULL;
 	mesh->render.reference = NULL;
 	mesh->render.mat = NULL;
+	mesh->render.shadows = TRUE;
 	mesh->depend.reference = NULL;
 	mesh->depend.weight = NULL;
 	mesh->depend.ref_count = NULL;
@@ -134,6 +160,31 @@ boolean p_rm_validate(PMesh *mesh)
 	return TRUE;
 }
 
+void p_sds_compute_eye_pos(ENode *node, PMesh *mesh, double *eay)
+{
+	double matrix[16], tmp[3];
+	static double t = 0;
+	mesh->tess.eay[0] = eay[0];
+	mesh->tess.eay[1] = eay[1];
+	mesh->tess.eay[2] = eay[2];
+	if(node != NULL)
+	{
+		e_nso_get_matrix(node, matrix, 0, 0);
+		e_nso_get_pos_time(node, tmp, 0, 0);
+		tmp[0] = -tmp[0] + mesh->tess.eay[0];
+		tmp[1] = -tmp[1] + mesh->tess.eay[1];
+		tmp[2] = -tmp[2] + mesh->tess.eay[2];
+
+		mesh->tess.eay[0] = tmp[0];
+		mesh->tess.eay[1] = tmp[1];
+		mesh->tess.eay[2] = tmp[2];		
+
+		mesh->tess.eay[0] = matrix[0] * tmp[0] + matrix[1] * tmp[1] + matrix[2] * tmp[2];
+		mesh->tess.eay[1] = matrix[4] * tmp[0] + matrix[5] * tmp[1] + matrix[6] * tmp[2];
+		mesh->tess.eay[2] = matrix[8] * tmp[0] + matrix[9] * tmp[1] + matrix[10] * tmp[2];
+	}
+}
+
 
 typedef enum{
 	POS_ALLOCATE,
@@ -184,29 +235,32 @@ uint p_rm_get_param_count(PMesh *mesh)
 #define P_QUAD_TESS_REF 7500
 
 boolean p_lod_material_test(PMesh *mesh, ENode *o_node);
+double *p_lod_get_view_pos();
 
 PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 {
 	ENode *g_node;
 	PMesh *store = NULL;
 	PTessTableElement *table;
+	VUtilTimer timer;
 	PPolyStore *smesh;
 	uint i, j, k, poly_size = 4;
+	double *eye;
 	uint32 seconds, fractions;
 	g_node = e_ns_get_node(0, mesh->geometry_id);
 	smesh = p_sds_get_mesh(g_node);
 
 	if(vertex == NULL)
 		vertex = e_nsg_get_layer_data(g_node, e_nsg_get_layer_by_id(g_node, 0));
+
 	if(smesh == NULL || e_ns_get_node_version_struct(g_node) != smesh->geometry_version)
 	{
 		p_pre_load_material_select(o_node);
 		return mesh;
 	}
 	verse_session_get_time(&seconds, &fractions);
-	if(mesh->stage == POS_DONE && mesh->next == NULL && (p_lod_compute_lod_update(o_node, g_node, seconds, fractions, mesh->tess.factor) || p_lod_material_test(mesh, o_node)))
+	if(mesh->stage == POS_DONE && mesh->next == NULL && (p_lod_compute_lod_update(o_node, g_node, seconds, fractions, mesh->tess.factor / p_sds_mesh_factor) || p_lod_material_test(mesh, o_node)))
 		mesh->geometry_version--;
-
 	if(smesh->geometry_version != mesh->geometry_version && mesh->next == NULL)
 	{
 		if(mesh->stage != POS_DONE)
@@ -218,6 +272,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 			mesh->next = p_rm_create(g_node);
 		}
 	}
+
 	if(mesh->next != NULL)
 	{
 		if(smesh->geometry_version != ((PMesh *)mesh->next)->geometry_version)
@@ -229,122 +284,95 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 		store = mesh;
 		mesh = mesh->next;
 	}
+
 	for(i = 1 ; i < smesh->level; i++)
 		poly_size *= 4;
-	switch(mesh->stage)
+	v_timer_start(&timer);
+	while(v_timer_elapsed(&timer) < 0.025)
 	{
-		case POS_ALLOCATE : /* clearing and allocating */
-			mesh->tess.tri_count = smesh->base_tri_count;
-			mesh->tess.quad_count = smesh->base_quad_count;
-			mesh->tess.tess = malloc((sizeof *mesh->tess.tess) * (mesh->tess.tri_count + mesh->tess.quad_count));
-			mesh->tess.factor = p_lod_compute_lod_level(o_node, g_node, seconds, fractions);
-			mesh->temp = NULL;
-			mesh->render.element_count = 0;
-			mesh->render.vertex_count = 0;
-			mesh->depend.length = 0;
-			mesh->anim.cv_count = e_nsg_get_vertex_length(g_node);
-			mesh->anim.cvs = malloc((sizeof *mesh->anim.cvs) * mesh->anim.cv_count * 3); 
-			mesh->anim.play.layers = TRUE;
-			mesh->anim.play.bones = TRUE;
-			mesh->anim.layers.data_version = 0;
-			mesh->anim.layers.layers = NULL;
-			mesh->anim.layers.layer_count = 0;
-			mesh->anim.bones.bonereference = NULL;
-			mesh->anim.bones.ref_count = NULL;
-			mesh->anim.bones.boneweight = NULL;
-			mesh->anim.scale[0] = 0;
-			mesh->anim.scale[1] = 0;
-			mesh->anim.scale[2] = 0;
-			mesh->sub_stages[0] = 0;
-			mesh->sub_stages[1] = 0;
-			mesh->sub_stages[2] = 0;
-			mesh->sub_stages[3] = 0;
-			mesh->stage++;
-			break;
-		case POS_FIND_HOLES_MAT_SORT : /* handle_materials */
-			p_lod_gap_count(g_node, smesh, mesh, o_node);
-			break;
-		case POS_TESS_SELECT : /* choosing quad split tesselation */
-
-			p_lod_select_tesselation(mesh, smesh, vertex);
-			break;
-		case POS_SECOND_ALLOCATE : /* allocating all the stuff */
-			mesh->render.vertex_array = malloc((sizeof *mesh->render.vertex_array) * mesh->render.vertex_count * 3);
-			mesh->render.normal_array = malloc((sizeof *mesh->render.normal_array) * mesh->render.vertex_count * 3);
-			mesh->normal.normal_ref = malloc((sizeof *mesh->normal.normal_ref) * mesh->render.vertex_count * 4);
-			mesh->render.reference = malloc((sizeof *mesh->render.reference) * mesh->render.element_count * 3);
-
-			mesh->displacement.displacement = NULL;
-
-			mesh->depend.reference = malloc((sizeof *mesh->depend.reference) * mesh->depend.length);
-			mesh->depend.weight = malloc((sizeof *mesh->depend.weight) * mesh->depend.length);
-			mesh->depend.ref_count = malloc((sizeof *mesh->depend.ref_count) * mesh->render.vertex_count);
-			mesh->render.element_count = 0;
-			mesh->render.vertex_count = 0;
-			mesh->depend.length = 0;
-			mesh->stage++;
-			break;
-		case POS_CREATE_REF : /* building reference */
-			for(; mesh->sub_stages[0] < mesh->tess.tri_count + mesh->tess.quad_count; mesh->sub_stages[0]++)
-			{
-				if(mesh->sub_stages[0] == mesh->render.mat[mesh->sub_stages[3]].tri_end)
-				{
-					mesh->render.mat[mesh->sub_stages[3]].render_end = mesh->render.element_count;
-					mesh->sub_stages[3]++;
-				}
-				table = mesh->tess.tess[mesh->sub_stages[0]];
-				for(j = 0; j < table->element_count;)
-				{
-					mesh->render.reference[mesh->render.element_count++] = table->index[j++] + mesh->sub_stages[1];
-					mesh->render.reference[mesh->render.element_count++] = table->index[j++] + mesh->sub_stages[1];
-					mesh->render.reference[mesh->render.element_count++] = table->index[j++] + mesh->sub_stages[1];
-				}
-				mesh->sub_stages[1] += table->vertex_count;
-			}
-			
-			if(mesh->sub_stages[0] == mesh->tess.tri_count + mesh->tess.quad_count)
-			{
-				mesh->render.mat[mesh->sub_stages[3]].render_end = mesh->render.element_count;
-				mesh->stage++;
+	
+		switch(mesh->stage)
+		{
+			case POS_ALLOCATE : /* clearing and allocating */
+				mesh->tess.tri_count = smesh->base_tri_count;
+				mesh->tess.quad_count = smesh->base_quad_count;
+				mesh->tess.tess = malloc((sizeof *mesh->tess.tess) * (mesh->tess.tri_count + mesh->tess.quad_count));
+				for(i = 0; i < (mesh->tess.tri_count + mesh->tess.quad_count); i++)
+					mesh->tess.tess[i] = NULL;
+				mesh->tess.factor = p_lod_compute_lod_level(o_node, g_node, seconds, fractions) * p_sds_mesh_factor;
+				p_sds_compute_eye_pos(o_node, mesh, p_lod_get_view_pos());
+				mesh->temp = NULL;
+				mesh->render.element_count = 0;
+				mesh->render.vertex_count = 0;
+				mesh->render.shadows = smesh->open_edges == 0;
+				mesh->depend.length = 0;
+				mesh->anim.cv_count = e_nsg_get_vertex_length(g_node);
+				mesh->anim.cvs = malloc((sizeof *mesh->anim.cvs) * mesh->anim.cv_count * 3); 
+				mesh->anim.play.layers = TRUE;
+				mesh->anim.play.bones = TRUE;
+				mesh->anim.layers.data_version = 0;
+				mesh->anim.layers.layers = NULL;
+				mesh->anim.layers.layer_count = 0;
+				mesh->anim.bones.bonereference = NULL;
+				mesh->anim.bones.ref_count = NULL;
+				mesh->anim.bones.boneweight = NULL;
+				mesh->anim.scale[0] = 1;
+				mesh->anim.scale[1] = 1;
+				mesh->anim.scale[2] = 1;
+				if(o_node != NULL)
+					p_lod_anim_scale_update_test(mesh, o_node);
 				mesh->sub_stages[0] = 0;
 				mesh->sub_stages[1] = 0;
 				mesh->sub_stages[2] = 0;
 				mesh->sub_stages[3] = 0;
-			}
-			break;
-		case POS_CREATE_DEPEND : /* building depend */
+				mesh->stage++;
+				break;
+			case POS_FIND_HOLES_MAT_SORT : /* handle_materials */
+				p_lod_gap_count(g_node, smesh, mesh, o_node);
+				break;
+			case POS_TESS_SELECT : /* choosing quad split tesselation */
 
-			{
-				PDepend *dep;
-				uint poly;
+				p_lod_select_tesselation(mesh, smesh, vertex);
+/*				for(i = 0; i < mesh->tess.tri_count + mesh->tess.quad_count; i++)
+					fprintf(stderr, "%p \n", mesh->tess.tess[i]);
+*/				break;
+			case POS_SECOND_ALLOCATE : /* allocating all the stuff */
+				mesh->render.vertex_array = malloc((sizeof *mesh->render.vertex_array) * mesh->render.vertex_count * 3);
+				mesh->render.normal_array = malloc((sizeof *mesh->render.normal_array) * mesh->render.vertex_count * 3);
+				mesh->normal.normal_ref = malloc((sizeof *mesh->normal.normal_ref) * mesh->render.vertex_count * 4);
+				mesh->render.reference = malloc((sizeof *mesh->render.reference) * mesh->render.element_count * 3);
+
+				mesh->displacement.displacement = NULL;
+
+				mesh->depend.reference = malloc((sizeof *mesh->depend.reference) * mesh->depend.length);
+				mesh->depend.weight = malloc((sizeof *mesh->depend.weight) * mesh->depend.length);
+				mesh->depend.ref_count = malloc((sizeof *mesh->depend.ref_count) * mesh->render.vertex_count);
+				mesh->render.element_count = 0;
+				mesh->render.vertex_count = 0;
+				mesh->depend.length = 0;
+				mesh->stage++;
+				break;
+			case POS_CREATE_REF : /* building reference */
 				for(; mesh->sub_stages[0] < mesh->tess.tri_count + mesh->tess.quad_count; mesh->sub_stages[0]++)
 				{
-					table = mesh->tess.tess[mesh->sub_stages[0]];
-
-					if(mesh->sub_stages[0] == mesh->render.mat[mesh->sub_stages[1]].tri_end)
-						mesh->sub_stages[1]++;
-					if(mesh->sub_stages[0] < mesh->render.mat[mesh->sub_stages[1]].quad_end)
-						poly = mesh->tess.order_temp_mesh[mesh->sub_stages[0]] * smesh->poly_per_base * 4;
-					else
-						poly = smesh->quad_length / 4 + mesh->tess.order_temp_mesh[mesh->sub_stages[0]] * smesh->poly_per_base * 3;
-
-					for(j = 0; j < table->vertex_count; j++)
+					if(mesh->sub_stages[0] == mesh->render.mat[mesh->sub_stages[3]].tri_end)
 					{
-						
-						dep = &smesh->vertex_dependency[smesh->ref[table->reference[j] + poly]];
-						mesh->depend.ref_count[mesh->render.vertex_count++] = dep->length;
-						for(k = 0; k < dep->length; k++)
-						{
-							mesh->depend.reference[mesh->depend.length] = dep->element[k].vertex * 3;
-							mesh->depend.weight[mesh->depend.length] = dep->element[k].value;
-							mesh->depend.length++;
-						}
+						mesh->render.mat[mesh->sub_stages[3]].render_end = mesh->render.element_count;
+						mesh->sub_stages[3]++;
 					}
-					mesh->tess.order_temp_poly_start[mesh->sub_stages[0]] = mesh->sub_stages[2];
-					mesh->sub_stages[2] += table->vertex_count;
+					table = mesh->tess.tess[mesh->sub_stages[0]];
+					for(j = 0; j < table->element_count;)
+					{
+						mesh->render.reference[mesh->render.element_count++] = table->index[j++] + mesh->sub_stages[1];
+						mesh->render.reference[mesh->render.element_count++] = table->index[j++] + mesh->sub_stages[1];
+						mesh->render.reference[mesh->render.element_count++] = table->index[j++] + mesh->sub_stages[1];
+					}
+					mesh->sub_stages[1] += table->vertex_count;
 				}
+				
 				if(mesh->sub_stages[0] == mesh->tess.tri_count + mesh->tess.quad_count)
 				{
+					mesh->render.mat[mesh->sub_stages[3]].render_end = mesh->render.element_count;
 					mesh->stage++;
 					mesh->sub_stages[0] = 0;
 					mesh->sub_stages[1] = 0;
@@ -352,101 +380,143 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 					mesh->sub_stages[3] = 0;
 				}
 				break;
-			}
-		case POS_CREATE_VERTEX_NORMAL :
-			p_lod_compute_vertex_normals(smesh, mesh);
-			mesh->stage++;
-			break;
-		case POS_CREATE_NORMAL_REF :
-			p_lod_create_normal_ref_and_shadow_skirts(smesh, mesh);
-			break;
-		case POS_CREATE_LAYER_PARAMS :
-			p_lod_create_layer_param(g_node, mesh);
-			break;
-		case POS_CREATE_DISPLACEMENT :
-			if(o_node != NULL)	
-			{
-				if(p_lod_displacement_update_test(mesh))
+			case POS_CREATE_DEPEND : /* building depend */
+
 				{
-					uint ii;
-					mesh->displacement.displacement = malloc((sizeof *mesh->displacement.displacement) * mesh->render.vertex_count);
-					p_lod_create_displacement_array(g_node, o_node, mesh, smesh->level);
-				//	for(ii = 0; ii < mesh->render.vertex_count; ii++)
-				//		mesh->displacement.displacement[ii] = 0;
-				}
-			}
-			else
-				mesh->stage++;
-			break;
-		case POS_CREATE_ANIM :
-			if(o_node != NULL)	
-			{
-				p_lod_anim_bones_update_test(mesh, o_node, g_node);
-				p_lod_anim_scale_update_test(mesh, o_node);
-				p_lod_anim_layer_update_test(mesh, o_node, g_node);
-			}
-			mesh->stage++;
-			break;
-		case POS_ANIMATE :
-	
-			if(o_node != NULL)	
-				p_lod_anim_vertex_array(mesh->anim.cvs, mesh->anim.cv_count, mesh, g_node);
-			mesh->stage++;
-			break;
-		case POS_CREATE_VERTICES :
-			j = 0;
-			for(i = 0; i < mesh->render.vertex_count; i++)
-				j += mesh->depend.ref_count[i];
-			if(o_node != NULL)	
-				p_lod_compute_vertex_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->depend.ref_count, mesh->depend.reference, mesh->depend.weight, mesh->anim.cvs);
-			else
-				p_lod_compute_vertex_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->depend.ref_count, mesh->depend.reference, mesh->depend.weight, vertex);
-			p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
-		//	if(o_node != NULL)	
-		//		p_lod_create_displacement_array(g_node, o_node, mesh, smesh->level);
-			if(mesh->displacement.displacement != NULL)
-			{
-				p_lod_compute_displacement_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->render.normal_array, mesh->displacement.displacement);
-				p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
-			}
-			mesh->stage++;
-			if(store != NULL)
-				p_rm_destroy(store);
-			store = NULL;
-			break;
-		case POS_DONE :
-			if(o_node != NULL)
-			{
-				boolean update = FALSE;
-				static double timer = 0;
-				timer += 0.1;
-				p_lod_update_layer_param(g_node, mesh);
-				if(p_lod_anim_bones_update_test(mesh, o_node, g_node))
-					update = TRUE;
-				if(p_lod_anim_scale_update_test(mesh, o_node))
-					update = TRUE;
-				if(p_lod_anim_layer_update_test(mesh, o_node, g_node))
-					update = TRUE;
-				if(p_lod_displacement_update_test(mesh))
-				{
-					uint ii;
-					p_lod_update_displacement_array(g_node, o_node, mesh, smesh->level);
-					update = TRUE;
-				}
-				if(update)
-				{
-					p_lod_anim_vertex_array(mesh->anim.cvs, mesh->anim.cv_count, mesh, g_node);
-					p_lod_compute_vertex_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->depend.ref_count, mesh->depend.reference, mesh->depend.weight, mesh->anim.cvs);
-					p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
-					if(mesh->displacement.displacement != NULL)
+					PDepend *dep;
+					uint poly;
+					for(; mesh->sub_stages[0] < mesh->tess.tri_count + mesh->tess.quad_count; mesh->sub_stages[0]++)
 					{
-						p_lod_compute_displacement_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->render.normal_array, mesh->displacement.displacement);
-						p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
+						table = mesh->tess.tess[mesh->sub_stages[0]];
+
+						if(mesh->sub_stages[0] == mesh->render.mat[mesh->sub_stages[1]].tri_end)
+							mesh->sub_stages[1]++;
+						if(mesh->sub_stages[0] < mesh->render.mat[mesh->sub_stages[1]].quad_end)
+							poly = mesh->tess.order_temp_mesh[mesh->sub_stages[0]] * smesh->poly_per_base * 4;
+						else
+							poly = smesh->quad_length / 4 + mesh->tess.order_temp_mesh[mesh->sub_stages[0]] * smesh->poly_per_base * 3;
+
+						for(j = 0; j < table->vertex_count; j++)
+						{
+							
+							dep = &smesh->vertex_dependency[smesh->ref[table->reference[j] + poly]];
+							mesh->depend.ref_count[mesh->render.vertex_count++] = dep->length;
+							for(k = 0; k < dep->length; k++)
+							{
+								mesh->depend.reference[mesh->depend.length] = dep->element[k].vertex * 3;
+								mesh->depend.weight[mesh->depend.length] = dep->element[k].value;
+								mesh->depend.length++;
+							}
+						}
+						mesh->tess.order_temp_poly_start[mesh->sub_stages[0]] = mesh->sub_stages[2];
+						mesh->sub_stages[2] += table->vertex_count;
+					}
+					if(mesh->sub_stages[0] == mesh->tess.tri_count + mesh->tess.quad_count)
+					{
+						mesh->stage++;
+						mesh->sub_stages[0] = 0;
+						mesh->sub_stages[1] = 0;
+						mesh->sub_stages[2] = 0;
+						mesh->sub_stages[3] = 0;
+					}
+					break;
+				}
+			case POS_CREATE_VERTEX_NORMAL :
+				p_lod_compute_vertex_normals(smesh, mesh);
+				mesh->stage++;
+				break;
+			case POS_CREATE_NORMAL_REF :
+				p_lod_create_normal_ref_and_shadow_skirts(smesh, mesh);
+				break;
+			case POS_CREATE_LAYER_PARAMS :
+				p_lod_create_layer_param(g_node, mesh);
+				break;
+			case POS_CREATE_DISPLACEMENT :
+				if(o_node != NULL)	
+				{
+					if(p_lod_displacement_update_test(mesh))
+					{
+						uint ii;
+						mesh->displacement.displacement = malloc((sizeof *mesh->displacement.displacement) * mesh->render.vertex_count);
+						p_lod_create_displacement_array(g_node, o_node, mesh, smesh->level);
+					//	for(ii = 0; ii < mesh->render.vertex_count; ii++)
+					//		mesh->displacement.displacement[ii] = 0;
 					}
 				}
+				else
+					mesh->stage++;
+				break;
+			case POS_CREATE_ANIM :
+				if(o_node != NULL)	
+				{
+					p_lod_anim_bones_update_test(mesh, o_node, g_node);
+					p_lod_anim_scale_update_test(mesh, o_node);
+					p_lod_anim_layer_update_test(mesh, o_node, g_node);
+				}
+				mesh->stage++;
+				break;
+			case POS_ANIMATE :
+		
+				if(o_node != NULL)	
+					p_lod_anim_vertex_array(mesh->anim.cvs, mesh->anim.cv_count, mesh, g_node);
+				mesh->stage++;
+				break;
+			case POS_CREATE_VERTICES :
+				j = 0;
+				for(i = 0; i < mesh->render.vertex_count; i++)
+					j += mesh->depend.ref_count[i];
+				if(o_node != NULL)	
+					p_lod_compute_vertex_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->depend.ref_count, mesh->depend.reference, mesh->depend.weight, mesh->anim.cvs);
+				else
+					p_lod_compute_vertex_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->depend.ref_count, mesh->depend.reference, mesh->depend.weight, vertex);
+				p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
+			//	if(o_node != NULL)	
+			//		p_lod_create_displacement_array(g_node, o_node, mesh, smesh->level);
+				if(mesh->displacement.displacement != NULL)
+				{
+					p_lod_compute_displacement_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->render.normal_array, mesh->displacement.displacement);
+					p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
+				}
+				mesh->stage++;
+				if(store != NULL)
+					p_rm_destroy(store);
+				store = NULL;
+				break;
+			case POS_DONE :
+				if(o_node != NULL)
+				{
+					boolean update = FALSE;
+					static double timer = 0;
+					timer += 0.1;
+					p_lod_update_shadow(g_node, mesh);
+					p_lod_update_layer_param(g_node, mesh);
+					if(p_lod_anim_bones_update_test(mesh, o_node, g_node))
+						update = TRUE;
+					if(p_lod_anim_scale_update_test(mesh, o_node))
+						update = TRUE;
+					if(p_lod_anim_layer_update_test(mesh, o_node, g_node))
+						update = TRUE;
+					if(p_lod_displacement_update_test(mesh))
+					{
+						uint ii;
+						p_lod_update_displacement_array(g_node, o_node, mesh, smesh->level);
+						update = TRUE;
+					}
+					if(update)
+					{
+						p_lod_anim_vertex_array(mesh->anim.cvs, mesh->anim.cv_count, mesh, g_node);
+						p_lod_compute_vertex_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->depend.ref_count, mesh->depend.reference, mesh->depend.weight, mesh->anim.cvs);
+						p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
+						if(mesh->displacement.displacement != NULL)
+						{
+							p_lod_compute_displacement_array(mesh->render.vertex_array, mesh->render.vertex_count, mesh->render.normal_array, mesh->displacement.displacement);
+							p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
+						}
+					}
 
-			}
-			break;
+				}
+				return mesh;	
+		}
 	}
 	if(store != NULL)
 		return store;
@@ -611,4 +681,9 @@ uint p_rm_get_material_range(PMesh *mesh, uint mat)
 uint p_rm_get_material(PMesh *mesh, uint mat)
 {
 	return mesh->render.mat[mat].material;
+}
+
+boolean p_rm_get_shadow(PMesh *mesh)
+{
+	return mesh->render.shadows;
 }
