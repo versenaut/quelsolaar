@@ -1,4 +1,4 @@
-
+ 
 #include "verse.h"
 #include "enough.h"
 #include "p_sds_geo.h"
@@ -17,7 +17,7 @@ uint p_sds_get_corner_next(PPolyStore *mesh, uint corner, int move)
 	}
 }
 
-void p_sds_add_polygon(PPolyStore *old_mesh, PDepend *dep, uint poly, egreal weight)
+void p_sds_add_edge_polygon(PPolyStore *old_mesh, PDepend *dep, uint poly, egreal weight)
 {
 	if(poly < old_mesh->quad_length)
 	{
@@ -30,12 +30,34 @@ void p_sds_add_polygon(PPolyStore *old_mesh, PDepend *dep, uint poly, egreal wei
 	}else
 	{
 		weight /= 3.0;	
+		weight *= 2;	
 		poly = old_mesh->quad_length + (((poly - old_mesh->quad_length) / 3) * 3);
 		p_sds_add_depend(dep, &old_mesh->vertex_dependency[old_mesh->ref[poly++]], weight);
 		p_sds_add_depend(dep, &old_mesh->vertex_dependency[old_mesh->ref[poly++]], weight);
 		p_sds_add_depend(dep, &old_mesh->vertex_dependency[old_mesh->ref[poly]], weight);		
 	}
 }
+
+void p_sds_add_vertex_polygon(PPolyStore *old_mesh, PDepend *dep, uint poly, egreal weight)
+{
+	if(poly < old_mesh->quad_length)
+	{
+		weight /= 4.0;
+		poly = (poly / 4) * 4;
+		p_sds_add_depend(dep, &old_mesh->vertex_dependency[old_mesh->ref[poly++]], weight);
+		p_sds_add_depend(dep, &old_mesh->vertex_dependency[old_mesh->ref[poly++]], weight);
+		p_sds_add_depend(dep, &old_mesh->vertex_dependency[old_mesh->ref[poly++]], weight);
+		p_sds_add_depend(dep, &old_mesh->vertex_dependency[old_mesh->ref[poly]], weight);			
+	}else
+	{
+		weight /= 4.0;	
+		poly = old_mesh->quad_length + (((poly - old_mesh->quad_length) / 3) * 3);
+		p_sds_add_depend(dep, &old_mesh->vertex_dependency[old_mesh->ref[poly++]], weight);
+		p_sds_add_depend(dep, &old_mesh->vertex_dependency[old_mesh->ref[poly++]], weight);
+		p_sds_add_depend(dep, &old_mesh->vertex_dependency[old_mesh->ref[poly]], weight);		
+	}
+}
+
 
 typedef struct{
 	uint	edge;
@@ -133,7 +155,7 @@ uint p_sds_get_vertex(PPolyStore *old_mesh, uint corner)
 			for(i = 0; i < vertex_count; i++)
 				p_sds_add_depend(dep, &old_mesh->vertex_dependency[vertex[i]], ((1 - second_best) + crease[i] * (1 - third_best)) / vertex_count);
 			for(i = 0; i < poly_count; i++)
-				p_sds_add_polygon(old_mesh, dep, polys[i], (1 - second_best) * (1 - third_best) / vertex_count);
+				p_sds_add_vertex_polygon(old_mesh, dep, polys[i], (1 - second_best) * (1 - third_best) / vertex_count);
 			p_sds_add_depend(dep, &old_mesh->vertex_dependency[old_mesh->ref[corner]], (vertex_count - 2) * (1 - second_best) + 2 * second_best);
 		}
 		/*
@@ -275,7 +297,7 @@ uint p_sds_get_middle(PPolyStore *old_mesh, uint poly)
 	PDepend *dep;
 	mesh = old_mesh->next;
 	dep = &mesh->vertex_dependency[mesh->vertex_count];
-	p_sds_add_polygon(old_mesh, dep, poly, 1);	
+	p_sds_add_vertex_polygon(old_mesh, dep, poly, 1);	
 	return mesh->vertex_count++;
 }
 
@@ -302,8 +324,8 @@ uint p_sds_get_edge(PPolyStore *old_mesh, uint edge)
 	p_sds_add_depend(&mesh->vertex_dependency[mesh->vertex_count], &old_mesh->vertex_dependency[old_mesh->ref[p_sds_get_corner_next(old_mesh, edge, 1)]], 1);
 	if(crease > 0.01 && old_mesh->neighbor[edge] != -1)
 	{
-		p_sds_add_polygon(old_mesh, &mesh->vertex_dependency[mesh->vertex_count], old_mesh->neighbor[edge], crease);
-		p_sds_add_polygon(old_mesh, &mesh->vertex_dependency[mesh->vertex_count], edge, crease);
+		p_sds_add_edge_polygon(old_mesh, &mesh->vertex_dependency[mesh->vertex_count], old_mesh->neighbor[edge], crease);
+		p_sds_add_edge_polygon(old_mesh, &mesh->vertex_dependency[mesh->vertex_count], edge, crease);
 	}
 	return mesh->vertex_count++;	
 }
