@@ -1,4 +1,4 @@
-
+ 
 #include "enough.h"
 #include "p_sds_geo.h"
 #include "p_sds_table.h"
@@ -728,10 +728,33 @@ void p_lod_update_material_param_count(ENode *g_node, PMesh *mesh)
 		free(mesh->param.version);
 		mesh->param.version = v;
 		for(i = mesh->param.array_count; i < found; i++)
+		{
+			mesh->param.array[i].length = 0;
 			p_ra_get_array_real(&mesh->param.array[i], mesh->render.vertex_count);
+		}
 		mesh->param.array_count = found;
 		mesh->param.data_version = -1;
 	}
+}
+
+boolean p_lod_update_shadow(ENode *g_node, PMesh *mesh)
+{
+	uint i;
+	if(mesh->render.shadows)
+	{
+		for(i = 0; i < mesh->render.mat_count; i++)
+		{
+			if(p_shader_transparancy(mesh->render.mat[i].material))
+				break;
+		}if(i == mesh->render.mat_count)
+			mesh->geometry_version--;
+	}else
+	{
+		for(i = 0; i < mesh->render.mat_count; i++)
+			if(p_shader_transparancy(mesh->render.mat[i].material))
+				mesh->geometry_version--;
+	}
+	return mesh->render.shadows;
 }
 
 boolean p_lod_update_layer_param(ENode *g_node, PMesh *mesh)
@@ -741,6 +764,9 @@ boolean p_lod_update_layer_param(ENode *g_node, PMesh *mesh)
 	VMatFrag *frag;
 	EGeoLayer *layer;
 	p_lod_update_material_param_count(g_node, mesh);
+
+
+
 	if(mesh->param.data_version == e_ns_get_node_version_data(g_node))
 		return FALSE;
 
