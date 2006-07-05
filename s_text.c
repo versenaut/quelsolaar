@@ -8,8 +8,8 @@ void sui_draw_text(float pos_x, float pos_y, float size, float spacing, const ch
 	uint i;
 	if(text == NULL || *text == '\0')
 		return;
-	glEnable(GL_LINE_SMOOTH);
-/*	glEnable(GL_BLEND);
+/*	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 */	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
@@ -22,8 +22,8 @@ void sui_draw_text(float pos_x, float pos_y, float size, float spacing, const ch
 		glTranslatef(sui_get_letter_size(text[i]) + spacing, 0, 0);
 	}
 	glPopMatrix();
-/*	glDisable(GL_BLEND);*/
-	glDisable(GL_LINE_SMOOTH);
+/*	glDisable(GL_BLEND);
+	glDisable(GL_LINE_SMOOTH);*/
 }
 
 float sui_compute_text_length(float size, float spacing, const char *text)
@@ -182,7 +182,7 @@ void sui_end_type_number_func(void *user, boolean cancel)
 }
 
 
-boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, float length, float size, double *number, void *id, float red, float green, float blue)
+boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, float center, float length, float size, double *number, void *id, float red, float green, float blue)
 {
 	int i;
 	float pos;
@@ -190,6 +190,7 @@ boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, flo
 	{
 		if(sui_type_in_number_text != NULL && sui_type_in_number_id == id)
 		{
+			pos_x -= sui_compute_text_length(size, SUI_T_SPACE, sui_type_in_number_text) * center;
 			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, sui_type_in_number_text, red, green, blue);
 			pos = pos_x;
 			for(i = 0; i < sui_type_in_cursor && sui_type_in_number_text[i] != 0; i++)
@@ -199,6 +200,7 @@ boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, flo
 		{
 			char nr[64];
 			sprintf(nr, "%.3f", *number);
+			pos_x -= sui_compute_text_length(size, SUI_T_SPACE, nr) * center;
 			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, nr, red, green, blue);
 		}
 	}
@@ -206,7 +208,7 @@ boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, flo
 	{
 		if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
 		{
-			if(sui_box_click_test(pos_x, pos_y - size, length, size * 3.0))
+			if(sui_box_click_test(pos_x - center * length, pos_y - size, length, size * 3.0))
 			{
 				pos = pos_x;
 				sui_type_in_number_text = malloc((sizeof *sui_type_in_number_text) * 64);
@@ -229,7 +231,7 @@ boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, flo
 	return FALSE;
 }
 
-boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float length, float size, uint32 *number, void *id, float red, float green, float blue)
+boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float center, float length, float size, uint32 *number, void *id, float red, float green, float blue)
 {
 	int i;
 	float pos;
@@ -237,6 +239,7 @@ boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float
 	{
 		if(sui_type_in_number_text != NULL && sui_type_in_number_id == id)
 		{
+			pos_x -= sui_compute_text_length(size, SUI_T_SPACE, sui_type_in_number_text) * center;
 			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, sui_type_in_number_text, red, green, blue);
 			pos = pos_x;
 			for(i = 0; i < sui_type_in_cursor && sui_type_in_number_text[i] != 0; i++)
@@ -246,6 +249,7 @@ boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float
 		{
 			char nr[64];
 			sprintf(nr, "%u", *number);
+			pos_x -= sui_compute_text_length(size, SUI_T_SPACE, nr) * center;
 			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, nr, red, green, blue);
 		}
 	}
@@ -253,7 +257,7 @@ boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float
 	{
 		if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
 		{
-			if(sui_box_click_test(pos_x, pos_y - size, length, size * 3.0))
+			if(sui_box_click_test(pos_x - center * length, pos_y - size, length, size * 3.0))
 			{
 				pos = pos_x;
 				sui_type_in_number_text = malloc((sizeof *sui_type_in_number_text) * 64);
