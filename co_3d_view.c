@@ -192,7 +192,7 @@ void co_draw_3d_view_pass(boolean fill, float color)
 static boolean draw_3d_view = TRUE;
 static boolean draw_3d_persuade = FALSE;
 
-void co_draw_3d_icon_pass()
+void co_draw_3d_icon_pass(void)
 {
 //	float star[3 * 6] = {0.02, 0, 0, -0.02, 0, 0, 0,  0.02, 0, 0, -0.02, 0, 0, 0, 0.02, 0, 0, -0.02};
 	float shine[2 * 16] = {0, 0.02, 0, 0.04, 0, -0.02, 0, -0.04, 0.02, 0, 0.04, 0, -0.02, 0, -0.04, 0, 0.014, 0.014, 0.028, 0.028, -0.014, 0.014, -0.028, 0.028, -0.014, -0.014, -0.028, -0.028, 0.014, -0.014, 0.028, -0.028};
