@@ -15,12 +15,13 @@ typedef struct{
 	char name[16]; 
 	uint32 target_id;
 	uint32	anim_time_s;
-	uint32	anim_time_f; 
-	double	anim_pos;
-	double	anim_speed; 
-	double	anim_accel; 
-	double	anim_scale; 
-	double	anim_scale_speed;
+	uint32	anim_time_f;
+	uint32  dimensions;
+	double	anim_pos[4];
+	double	anim_speed[4]; 
+	double	anim_accel[4]; 
+	double	anim_scale[4]; 
+	double	anim_scale_speed[4];
 }ESLink;
 
 typedef struct{
@@ -59,6 +60,7 @@ typedef struct{
 	ESObjectTrans	trans;	
 	uint			group_count;
 	ESMethodGroup	*groups;
+	boolean			hidden;
 }ESObjectNode;
 
 extern void		e_ns_update_node_version_struct(ESObjectNode *node);
@@ -105,6 +107,7 @@ ESObjectNode *e_create_o_node(VNodeID node_id, VNodeOwner owner)
 		node->trans.pos_time_f = 0;
 		node->group_count = 0;
 		node->groups = NULL;
+		node->hidden = FALSE;
 		e_ns_init_head((ENodeHead *)node, V_NT_OBJECT, node_id, owner);
 		verse_send_o_transform_subscribe(node_id, VN_FORMAT_REAL64);
 	}
@@ -413,10 +416,10 @@ void callback_send_o_link_set(void *user_data, VNodeID node_id, uint16 link_id, 
 	e_ns_update_node_version_struct(node);
 }
 
-void callback_send_o_anim_run(void *user_data, VNodeID node_id, uint16 link_id, uint32 time_s, uint32 time_f, real64 pos, real64 speed, real64 accel, real64 scale, real64 scale_speed)
+void callback_send_o_anim_run(void *user_data, VNodeID node_id, uint16 link_id, uint32 time_s, uint32 time_f, uint32 dimensions, real64 *pos, real64 *speed, real64 *accel, real64 *scale, real64 *scale_speed)
 {
 	ESObjectNode	*node;
-	uint i;
+	uint i, j;
 	node = e_create_o_node(node_id, 0);
 	if(node->link_count <= link_id)
 	{
@@ -427,12 +430,16 @@ void callback_send_o_anim_run(void *user_data, VNodeID node_id, uint16 link_id, 
 			node->links[i].name[0] = 0;
 	}
 	node->links[i].anim_time_s = time_s, 
-	node->links[i].anim_time_f = time_f; 
-	node->links[i].anim_pos = pos; 
-	node->links[i].anim_speed = speed; 
-	node->links[i].anim_accel = accel; 
-	node->links[i].anim_scale = scale; 
-	node->links[i].anim_scale_speed = scale_speed; 
+	node->links[i].anim_time_f = time_f;
+	node->links[i].dimensions = dimensions;
+	for(j = 0; j < dimensions; j++)
+	{
+		node->links[i].anim_pos[j] = pos[j]; 
+		node->links[i].anim_speed[j] = speed[j]; 
+		node->links[i].anim_accel[j] = accel[j]; 
+		node->links[i].anim_scale[j] = scale[j]; 
+		node->links[i].anim_scale_speed[j] = scale_speed[j]; 
+	}
 	e_ns_update_node_version_data(node);
 }
 
@@ -688,48 +695,74 @@ void e_nso_get_anim_time(ESLink *link, uint32 *time_s, uint32 *time_f)
 	*time_f = link->anim_time_f;
 }
 
-double e_nso_get_anim_pos(ESLink *link)
+void e_nso_get_anim_pos(ESLink *link, double *pos)
 {
-	return link->anim_pos;
+	uint i;
+	for(i = 0; i < link->dimensions; i++)
+		pos[i] = link->anim_pos[i];
 }
 
-double e_nso_get_anim_speed(ESLink *link)
+void e_nso_get_anim_speed(ESLink *link, double *speed)
 {
-	return link->anim_speed;
+	uint i;
+	for(i = 0; i < link->dimensions; i++)
+		speed[i] = link->anim_speed[i];
 }
 
-double e_nso_get_anim_accel(ESLink *link)
+void e_nso_get_anim_accel(ESLink *link, double *accel)
 {
-	return link->anim_accel;
+	uint i;
+	for(i = 0; i < link->dimensions; i++)
+		accel[i] = link->anim_accel[i];
 }
 
-double e_nso_get_anim_scale(ESLink *link)
+void e_nso_get_anim_scale(ESLink *link, double *scale)
 {
-	return link->anim_scale;
+	uint i;
+	for(i = 0; i < link->dimensions; i++)
+		scale[i] = link->anim_scale[i];
 }
 
-double e_nso_get_anim_scale_speed(ESLink *link)
+void e_nso_get_anim_scale_speed(ESLink *link, double *speed)
 {
-	return link->anim_scale_speed;
+	uint i;
+	for(i = 0; i < link->dimensions; i++)
+		speed[i] = link->anim_scale_speed[i];
 }
 
 boolean e_nso_get_anim_active(ESLink *link)
 {
-	return link->anim_scale_speed > 0.00001 || link->anim_scale_speed < 0.00001 || link->anim_scale > 0.00001 || link->anim_scale < 0.00001;
+	return link->dimensions != 0;
 }
 
-double e_nso_get_anim_evaluate_pos(ESLink *link, uint32 time_s, uint32 time_f)
+void e_nso_get_anim_evaluate_pos(ESLink *link, double *pos, uint32 time_s, uint32 time_f)
 {
 	double delta;
+	uint i;
 	delta = (double)(link->anim_time_s - time_s) + ((double)link->anim_time_f - (double)time_f) / (double) 0xffffffff;
-	return link->anim_pos + link->anim_speed * delta + link->anim_accel * delta * delta;
+	for(i = 0; i < link->dimensions; i++)
+		pos[i] = link->anim_pos[i] + link->anim_speed[i] * delta + link->anim_accel[i] * delta * delta;
 }
 
-double e_nso_get_anim_evaluate_scale(ESLink *link, uint32 time_s, uint32 time_f)
+void e_nso_get_anim_evaluate_scale(ESLink *link, double *pos, uint32 time_s, uint32 time_f)
 {
 	double delta;
+	uint i;
 	delta = (double)(link->anim_time_s - time_s) + ((double)link->anim_time_f - (double)time_f) / (double) 0xffffffff;
-	return link->anim_scale + link->anim_scale_speed * delta;
+	for(i = 0; i < link->dimensions; i++)
+		pos[i] = link->anim_scale[i] + link->anim_scale_speed[i] * delta;
+}
+
+void callback_send_o_hide(VNodeID node_id, uint8 hidden)
+{
+	ESObjectNode	*node;
+	node = e_create_o_node(node_id, 0);
+	node->hidden = hidden;
+}
+
+boolean e_nso_get_hide(ESObjectNode	*node)
+{
+	return node->hidden;
 }
 
 void es_object_init(void)
@@ -750,6 +783,7 @@ void es_object_init(void)
 	verse_callback_set(verse_send_o_method_group_create,	callback_send_o_method_group_create,	NULL);
 	verse_callback_set(verse_send_o_method_destroy,			callback_send_o_method_destroy,			NULL);
 	verse_callback_set(verse_send_o_method_create,			callback_send_o_method_create,			NULL);
+	verse_callback_set(verse_send_o_hide,					callback_send_o_hide,					NULL);
 }
 /*
 typedef struct{
