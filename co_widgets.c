@@ -59,7 +59,7 @@ void	sui_draw_line3(float pos_x, float pos_y, float dest_x, float dest_y, float 
 	array[45] = pos_y + -0.001768 * vec_y - -0.004268 * vec_x;
 	array[46] = pos_x - -0.002500 * vec_x - -0.002500 * vec_y;
 	array[47] = pos_y + -0.002500 * vec_y - -0.002500 * vec_x;
-	sui_draw_gl(GL_LINES, array, 24, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 24, 2, red, green, blue, 1);
 }
 
 void	sui_draw_line(float pos_x, float pos_y, float dest_x, float dest_y, float red, float green, float blue)
@@ -146,7 +146,7 @@ void	sui_draw_line(float pos_x, float pos_y, float dest_x, float dest_y, float r
 	array[73] = dest_y + -0.022500 * vec_y - -0.007500 * vec_x;
 	array[74] = pos_x - 0.022500 * vec_x - -0.007500 * vec_y;
 	array[75] = pos_y + 0.022500 * vec_y - -0.007500 * vec_x;
-	sui_draw_gl(GL_LINES, array, 38, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 38, 2, red, green, blue, 1);
 }
 
 void	sui_draw_slider_line(float pos_x, float pos_y, float red, float green, float blue)
@@ -154,7 +154,7 @@ void	sui_draw_slider_line(float pos_x, float pos_y, float red, float green, floa
 	static float array[] = {0.005000, 0.015000, 0.005000, 0.027500, -0.005000, 0.027500, -0.005000, 0.015000, -0.000000, 0.010000, 0.005000, 0.015000, -0.005000, -0.027500, -0.005000, -0.015000, 0.005000, -0.015000, 0.005000, -0.027500, -0.005000, -0.015000, -0.000000, -0.010000, 0.005000, -0.027500, -0.005000, -0.027500, -0.000000, -0.010000, 0.005000, -0.015000, 0.005000, 0.027500, -0.005000, 0.027500, -0.005000, 0.015000, -0.000000, 0.010000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 20, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 20, 2, red, green, blue, 1);
 	glPopMatrix();
 }
 
@@ -163,7 +163,7 @@ void sui_draw_check_box_unchecked(float pos_x, float pos_y, float red, float gre
 	static float array[] = {-0.010000, -0.017500, 0.010000, -0.017500, 0.017500, 0.012500, 0.017500, -0.010000, -0.017500, 0.010000, -0.017500, -0.010000, 0.027500, 0.032500, -0.000000, 0.005000, -0.010000, -0.017500, -0.013750, -0.016495, -0.013750, -0.016495, -0.016495, -0.013750, -0.016495, -0.013750, -0.017500, -0.010000, -0.010000, 0.012500, -0.015000, 0.005000, 0.027500, 0.032500, 0.005000, -0.012500, 0.012500, 0.017500, -0.010000, 0.017500, -0.000000, 0.005000, -0.010000, 0.012500, -0.005000, -0.012500, -0.015000, 0.005000, -0.010000, 0.017500, -0.013750, 0.016495, -0.013750, 0.016495, -0.016495, 0.013750, -0.016495, 0.013750, -0.017500, 0.010000, 0.010000, -0.017500, 0.013750, -0.016495, 0.013750, -0.016495, 0.016495, -0.013750, 0.016495, -0.013750, 0.017500, -0.010000, 0.005000, -0.012500, -0.005000, -0.012500};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 38, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 38, 2, red, green, blue, 1);
 	glPopMatrix();
 }
 
@@ -172,7 +172,7 @@ void sui_draw_check_box_checked(float pos_x, float pos_y, float red, float green
 	static float array[] = {-0.017500, 0.010000, -0.017500, -0.010000, -0.010000, 0.017500, -0.013750, 0.016495, -0.013750, 0.016495, -0.016495, 0.013750, -0.016495, 0.013750, -0.017500, 0.010000, -0.010000, -0.017500, -0.013750, -0.016495, -0.013750, -0.016495, -0.016495, -0.013750, -0.016495, -0.013750, -0.017500, -0.010000, 0.010000, -0.017500, 0.013750, -0.016495, 0.013750, -0.016495, 0.016495, -0.013750, 0.016495, -0.013750, 0.017500, -0.010000, 0.010000, 0.017500, 0.013750, 0.016495, 0.013750, 0.016495, 0.016495, 0.013750, 0.016495, 0.013750, 0.017500, 0.010000, -0.010000, 0.017500, 0.010000, 0.017500, 0.017500, 0.010000, 0.017500, -0.010000, 0.010000, -0.017500, -0.010000, -0.017500};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 32, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 32, 2, red, green, blue, 1);
 	glPopMatrix();
 }
 
@@ -201,7 +201,7 @@ void	sui_draw_symb_slider(float pos_x, float pos_y, float red, float green, floa
 	static float array[] = {-0.010000, -0.030000, -0.000000, -0.020000, -0.000000, 0.020000, -0.010000, 0.030000, -0.000000, 0.020000, 0.010000, 0.030000, -0.010000, 0.060000, 0.010000, 0.060000, -0.010000, -0.060000, -0.010000, -0.030000, -0.000000, -0.020000, 0.010000, -0.030000, 0.010000, -0.030000, 0.010000, -0.060000, 0.010000, -0.060000, -0.010000, -0.060000, -0.010000, 0.060000, -0.010000, 0.030000, 0.010000, 0.060000, 0.010000, 0.030000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 20, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 20, 2, red, green, blue, 1);
 	glPopMatrix();
 }
 
@@ -289,7 +289,7 @@ void	co_draw_type_in(float pos_x, float pos_y, float dest_x, float dest_y, float
 	array[73] = dest_y + -0.090000 * vec_y - -0.030000 * vec_x;
 	array[74] = pos_x - 0.090000 * vec_x - -0.030000 * vec_y;
 	array[75] = pos_y + 0.090000 * vec_y - -0.030000 * vec_x;
-	sui_draw_gl(GL_LINES, array, 38, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 38, 2, red, green, blue, 1);
 }
 
 
@@ -401,17 +401,17 @@ void	sui_draw_line_char_254(float pos_x, float pos_y, float dest_x, float dest_y
 	array[97] = pos_y + 0.230000 * vec_y - 0.030000 * vec_x;
 	array[98] = pos_x - 0.030000 * vec_x - 0.030000 * vec_y;
 	array[99] = pos_y + 0.030000 * vec_y - 0.030000 * vec_x;
-	sui_draw_gl(GL_LINES, array, 50, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 50, 2, red, green, blue, 1);
 }
 
 
-boolean co_w_slider(BInputState *input, float pos_x, float pos_y, float length, double *nr, float red, float green, float blue)
+boolean co_w_slider(BInputState *input, float pos_x, float pos_y, float length, double *nr, double min, double max, float red, float green, float blue)
 {
 	if(input->mode == BAM_DRAW)
 	{
 		float f;
 		sui_draw_line3(pos_x, pos_y + 0.01, pos_x + length, pos_y + 0.01, red, green, blue);
-		f = *nr;
+		f = (*nr - min) / (max - min);
 		if(f > 1)
 			f = 1;
 		if(f < 0)
@@ -428,11 +428,11 @@ boolean co_w_slider(BInputState *input, float pos_x, float pos_y, float length, 
 		if(drag == nr)
 		{
 			if(input->pointer_x < pos_x)
-				*nr = 0;
+				*nr = min;
 			else if(input->pointer_x > pos_x + length)
-				*nr = 1;
+				*nr = max;
 			else
-				*nr = (input->pointer_x - pos_x) / length;
+				*nr = min + ((input->pointer_x - pos_x) / length) * (max - min);
 			return TRUE;
 		}
 	}
@@ -444,7 +444,7 @@ boolean co_w_slider(BInputState *input, float pos_x, float pos_y, float length, 
 boolean co_w_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size, void (*done_func)(void *user, char *text), void* user, float text_color, float line_color)
 {
 	if(input->mode == BAM_DRAW)
-		sui_draw_2d_line_gl(pos_x, pos_y - size * 0.25, pos_x + length, pos_y - size * 0.25,line_color, line_color, line_color);
+		sui_draw_2d_line_gl(pos_x, pos_y - size * 0.25, pos_x + length, pos_y - size * 0.25,line_color, line_color, line_color, 1);
 	return sui_type_in(input, pos_x, pos_y, length, size, text, buffer_size, done_func, user, text_color, text_color, text_color);
 }
 
@@ -517,7 +517,7 @@ void sui_draw_rounded_square(float pos_x, float pos_y, float size_x, float size_
 	array[61] = size_y + 0.002500;
 	array[62] = pos_x + -0.000000;
 	array[63] = size_y + 0.005000;
-	sui_draw_gl(GL_LINES, array, 32, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 32, 2, red, green, blue, 1);
 }
 
 
@@ -527,7 +527,7 @@ void	sui_draw_symb_close(float pos_x, float pos_y, float red, float green, float
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
 	glScalef(0.5, 0.5, 0.5);
-	sui_draw_gl(GL_LINES, array, 48, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 48, 2, red, green, blue, 1);
 	glPopMatrix();
 }
 
@@ -556,9 +556,9 @@ float co_w_scroll(BInputState *input, float pos, float size)
 	size /= aspect;*/
 	if(input->mode == BAM_DRAW)
 	{
-		sui_draw_2d_line_gl(0.98, p, 0.98, p - 5.0 / (size * aspect), 0.5, 0.5, 0.5);
-		sui_draw_2d_line_gl(0.97, p, 0.97, p - 5.0 / (size * aspect), 0.5, 0.5, 0.5);
-		sui_draw_2d_line_gl(0.96, p, 0.96, p - 5.0 / (size * aspect), 0.5, 0.5, 0.5);
+		sui_draw_2d_line_gl(0.98, p, 0.98, p - 5.0 / (size * aspect), 0.5, 0.5, 0.5, 1);
+		sui_draw_2d_line_gl(0.97, p, 0.97, p - 5.0 / (size * aspect), 0.5, 0.5, 0.5, 1);
+		sui_draw_2d_line_gl(0.96, p, 0.96, p - 5.0 / (size * aspect), 0.5, 0.5, 0.5, 1);
 	}
 	else
 	{
