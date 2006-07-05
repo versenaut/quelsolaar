@@ -56,6 +56,9 @@ extern uint p_get_max_tess_level(void);
 extern PTessTableElement *get_dynamic_table_tri(uint base_level, uint *edge);
 extern PTessTableElement *get_dynamic_table_quad(uint base_level, uint *edge);
 
+extern uint get_dynamic_table_tri_level(uint base_level, PTessTableElement *table, uint edge);
+extern uint get_dynamic_table_quad_level(uint base_level, PTessTableElement *table, uint edge);
+
 void p_geo_table_sort_edges(PTessTableElement *t, uint *edges, uint corners);
 void p_geo_table_edge_count(PTessTableElement *t, uint *edges, uint corners);
 
