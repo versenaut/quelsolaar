@@ -1,4 +1,4 @@
-/*
+ /*
  * 
 */
 
@@ -31,7 +31,7 @@ typedef struct{
 	uint			version;
 }PMatFallBack;
 
-
+extern uint p_th_get_texture_dimentions(PTextureHandle *handle);
 extern PMatFallBack *p_shader_compute_fallback(ENode *node, PMatFallBack *fallback);
 
 void p_shader_fallback_func(ENode *node, ECustomDataCommand command)
@@ -133,6 +133,9 @@ void p_shader_fallback_parse(ENode *node, PMatFallBack *fallback, uint16 frag_id
 		case VN_M_FT_BLENDER :
 			p_shader_fallback_parse(node, fallback, f->blender.data_a);
 			p_shader_fallback_parse(node, fallback, f->blender.data_b);
+		break;
+		case VN_M_FT_CLAMP :
+			p_shader_fallback_parse(node, fallback, f->clamp.data);
 		break;
 		case VN_M_FT_MATRIX :
 			p_shader_fallback_parse(node, fallback, f->matrix.data);
