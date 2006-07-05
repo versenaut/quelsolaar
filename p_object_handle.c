@@ -17,6 +17,8 @@
 #include "p_object.h"
 #include "st_types.h"
 
+extern void p_init_impostor(PObjImpostor *imp);
+
 void p_object_func(ENode *node, ECustomDataCommand command)
 {	
 	PObject *o;
@@ -36,6 +38,7 @@ void p_object_func(ENode *node, ECustomDataCommand command)
 			o->light.lightfade = 1;
 			o->environment = p_env_compute(NULL);
 			o->version = -1;
+			p_init_impostor(&o->impostor);
 			break;
 		case E_CDC_DESTROY :
 			o = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
