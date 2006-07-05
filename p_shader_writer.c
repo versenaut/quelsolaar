@@ -1,4 +1,4 @@
-#include <stdio.h>
+ #include <stdio.h>
 #include <stdlib.h>
 
 #ifdef _WIN32
@@ -49,18 +49,7 @@ uint16 p_shader_choose_alternative(ENode *node, VMatFrag *frag)
 		return frag->alternative.alt_a;
 	else
 		return frag->alternative.alt_b;
-
 }
-
-/*
-		p_shader_extend_code(f_c, ", light");
-	if(ambient)
-		p_shader_extend_code(f_c, ", ambient");
-	if(back_direct)
-		p_shader_extend_code(f_c, ", b_light");
-	if(back_ambient)
-		p_shader_extend_code(f_c, ", b_ambient");
-*/
 
 void p_shader_get_name(ENode *node, char *frag_name, uint fragment)
 {
@@ -79,8 +68,11 @@ void p_shader_get_name(ENode *node, char *frag_name, uint fragment)
 		case VN_M_FT_TRANSPARENCY :
 			sprintf(frag_name, "transparency_%u", fragment);
 			return;
+		case VN_M_FT_VIEW :
+			sprintf(frag_name, "view_%u", fragment);
+			return;
 		case VN_M_FT_VOLUME :
-			sprintf(frag_name, "geometry_%u", fragment);
+			sprintf(frag_name, "volume_%u", fragment);
 			return;
 		case VN_M_FT_GEOMETRY :
 			sprintf(frag_name, "geometry_%u", fragment);
@@ -93,6 +85,9 @@ void p_shader_get_name(ENode *node, char *frag_name, uint fragment)
 			return;
 		case VN_M_FT_BLENDER :
 			sprintf(frag_name, "blender_%u", fragment);
+			return;
+		case VN_M_FT_CLAMP :
+			sprintf(frag_name, "clamp_%u", fragment);
 			return;
 		case VN_M_FT_MATRIX :
 			sprintf(frag_name, "matrix_%u", fragment);
@@ -120,6 +115,7 @@ uint p_shader_write_pre_compute(ENode *node, PSExeCode *v_c, PSExeCode *f_c)
 	uint count = 0;
 	VNMFragmentType type;
 	char temp[256];
+	boolean reflection = FALSE;
 
 	for(fragment = e_nsm_get_fragment_next(node, 0); fragment != (uint16)-1; fragment = e_nsm_get_fragment_next(node, fragment + 1))
 	{
@@ -141,6 +137,13 @@ uint p_shader_write_pre_compute(ENode *node, PSExeCode *v_c, PSExeCode *f_c)
 			sprintf(temp, "uniform sampler2D texture_%u;\n", fragment);
 		if(type == VN_M_FT_RAMP)	
 			sprintf(temp, "uniform sampler1D ramp_%u;\n", fragment);
+		if((type == VN_M_FT_REFLECTION || type == VN_M_FT_LIGHT) && reflection == FALSE)
+		{
+			sprintf(temp, "attribute mat3 r_matrix;\n");
+			p_shader_extend_code(v_c, temp);
+			sprintf(temp, "varying vec3 r_normal;\n");
+			reflection = TRUE;
+		}
 		p_shader_extend_code(f_c, temp);
 		p_shader_extend_code(v_c, temp);
 		count++;
@@ -148,13 +151,12 @@ uint p_shader_write_pre_compute(ENode *node, PSExeCode *v_c, PSExeCode *f_c)
 	return count;
 }
 
-void p_shader_write_lights(ENode *node, PSExeCode *f_c)
+void p_shader_write_lights(ENode *node, PSExeCode *f_c, uint lights)
 {
 	uint16 fragment, count = 0;
 	VMatFrag *frag;
 	VNMFragmentType type;
-	boolean direct = FALSE, ambient = FALSE, back_direct = FALSE, back_ambient = FALSE;
-	frag = e_nsm_get_fragment(node, fragment);
+	boolean direct = FALSE, ambient = FALSE, back_direct = FALSE, back_ambient = FALSE, volume = FALSE;
 	for(fragment = e_nsm_get_fragment_next(node, 0); fragment != (uint16)-1; fragment = e_nsm_get_fragment_next(node, fragment + 1))
 	{
 		if(e_nsm_get_fragment_type(node, fragment) == VN_M_FT_LIGHT)
@@ -182,10 +184,13 @@ void p_shader_write_lights(ENode *node, PSExeCode *f_c)
 				back_direct = TRUE;
 				back_ambient = TRUE;
 				break;
-
 			}
 		}
+		if(e_nsm_get_fragment_type(node, fragment) == VN_M_FT_VOLUME)
+			volume = TRUE;
 	}
+	if(direct == FALSE && ambient == FALSE && back_direct == FALSE && back_ambient == FALSE && volume == FALSE)
+		return;
 
 	p_shader_extend_code(f_c, "\tvec3 v");
 	if(direct)
@@ -199,28 +204,82 @@ void p_shader_write_lights(ENode *node, PSExeCode *f_c)
 	p_shader_extend_code(f_c, ";\n");
 
 
-	if(direct == FALSE && ambient == FALSE && back_direct == FALSE && back_ambient == FALSE)
-		return;
+
+
+	if(direct || back_direct || volume)
+		p_shader_extend_code(f_c, "\tfloat f, dist;\n");
+
+	for(fragment = e_nsm_get_fragment_next(node, 0); fragment != (uint16)-1; fragment = e_nsm_get_fragment_next(node, fragment + 1))
+	{
+		if(e_nsm_get_fragment_type(node, fragment) == VN_M_FT_VOLUME)
+		{
+			char code[1024];
+			frag = e_nsm_get_fragment(node, fragment);
+			sprintf(code,
+				"\tv = gl_LightSource[0].position.xyz - pixel_pos.xyz;\n"
+				"\tdist = length(v);\n"
+				"\tv = normalize(v);\n"
+				"\tf = dot(normal, v);\n"
+				"\tvolume_%u += vec4(gl_LightSource[0].diffuse.rgb * max(vec3(0, 0, 0), (vec3(f, f, f) + vec3(%f, %f, %f)) / vec3(%f, %f, %f)) / vec3(dist, dist, dist), 0.0);\n"
+				"\tv = gl_LightSource[1].position.xyz - pixel_pos.xyz;\n"
+				"\tdist = length(v);\n"
+				"\tv = normalize(v);\n"
+				"\tf = dot(normal, v);\n"
+				"\tvolume_%u += vec4(gl_LightSource[1].diffuse.rgb * max(vec3(0, 0, 0), (vec3(f, f, f) + vec3(%f, %f, %f)) / vec3(%f, %f, %f)) / vec3(dist, dist, dist), 0.0);\n"
+				"\tv = gl_LightSource[2].position.xyz - pixel_pos.xyz;\n"
+				"\tdist = length(v);\n"
+				"\tv = normalize(v);\n"
+				"\tf = dot(normal, v);\n"
+				"\tvolume_%u += vec4(gl_LightSource[2].diffuse.rgb * max(vec3(0, 0, 0), (vec3(f, f, f) + vec3(%f, %f, %f)) / vec3(%f, %f, %f)) / vec3(dist, dist, dist), 0.0);\n",
+				(uint)fragment, frag->volume.col_r, frag->volume.col_g, frag->volume.col_b, frag->volume.col_r + 1.0, frag->volume.col_g + 1.0, frag->volume.col_b + 1.0,
+				(uint)fragment, frag->volume.col_r, frag->volume.col_g, frag->volume.col_b, frag->volume.col_r + 1.0, frag->volume.col_g + 1.0, frag->volume.col_b + 1.0,
+				(uint)fragment, frag->volume.col_r, frag->volume.col_g, frag->volume.col_b, frag->volume.col_r + 1.0, frag->volume.col_g + 1.0, frag->volume.col_b + 1.0);
+			p_shader_extend_code(f_c, code);
+		}
+	}
 
 	if(direct || back_direct)
-		p_shader_extend_code(f_c, "\tfloat f, dist;\n"
-					"\tint i;\n"
-					"\tfor(i = 0; i < 3; i++)\n"
-					"\t{\n"
-					"\t\tv = gl_LightSource[0].position.xyz - pixel_pos.xyz;\n"
-					"\t\tdist = length(v);\n"
-//					"\t\tdist *= dist;\n"
-					"\t\tv = normalize(v);\n");
+		p_shader_extend_code(f_c, "\tv = gl_LightSource[0].position.xyz - pixel_pos.xyz;\n"
+									"\tdist = length(v);\n"
+									"\tv = normalize(v);\n");
 	if(direct)
-		p_shader_extend_code(f_c, "\t\tf = max(0.0, dot(normal, v)) / dist;\n"
-					"\t\tlight += gl_LightSource[0].diffuse.rgb * vec3(f, f, f);\n");
+		p_shader_extend_code(f_c, "\tf = max(0.0, dot(normal, v)) / dist;\n"
+					"\tlight += gl_LightSource[0].diffuse.rgb * vec3(f, f, f);\n");
 
 	if(back_direct)
-		p_shader_extend_code(f_c, "\t\tf = max(0.0, dot(normal, vec3(0.0, 0.0, 0.0) - v)) / dist;\n"
-					"\t\tlight += gl_LightSource[0].diffuse.rgb * vec3(f, f, f);\n");
-	if(direct || back_direct)				
-		p_shader_extend_code(f_c, "\t}\n");
+		p_shader_extend_code(f_c, "\tf = max(0.0, dot(normal, vec3(0.0, 0.0, 0.0) - v)) / dist;\n"
+					"\tlight += gl_LightSource[0].diffuse.rgb * vec3(f, f, f);\n");
 
+
+	if(lights > 1)
+	{
+		if(direct || back_direct)
+			p_shader_extend_code(f_c, "\tv = gl_LightSource[1].position.xyz - pixel_pos.xyz;\n"
+										"\tdist = length(v);\n"
+										"\tv = normalize(v);\n");
+		if(direct)
+			p_shader_extend_code(f_c, "\tf = max(0.0, dot(normal, v)) / dist;\n"
+						"\tlight += gl_LightSource[1].diffuse.rgb * vec3(f, f, f);\n");
+
+		if(back_direct)
+			p_shader_extend_code(f_c, "\tf = max(0.0, dot(normal, vec3(0.0, 0.0, 0.0) - v)) / dist;\n"
+						"\tlight += gl_LightSource[1].diffuse.rgb * vec3(f, f, f);\n");
+
+	}
+	if(lights > 2)
+	{
+		if(direct || back_direct)
+			p_shader_extend_code(f_c, "\tv = gl_LightSource[2].position.xyz - pixel_pos.xyz;\n"
+										"\tdist = length(v);\n"
+										"\tv = normalize(v);\n");
+		if(direct)
+			p_shader_extend_code(f_c, "\tf = max(0.0, dot(normal, v)) / dist;\n"
+						"\tlight += gl_LightSource[2].diffuse.rgb * vec3(f, f, f);\n");
+
+		if(back_direct)
+			p_shader_extend_code(f_c, "\tf = max(0.0, dot(normal, vec3(0.0, 0.0, 0.0) - v)) / dist;\n"
+						"\tlight += gl_LightSource[2].diffuse.rgb * vec3(f, f, f);\n");
+	}
 
 	if(ambient)
 		p_shader_extend_code(f_c, "\tambient = textureCube(diffuse_environment, reflect(pixel_pos.xyz, normal.xyz)).xyz;\n");
@@ -255,16 +314,21 @@ void p_shader_write_types(ENode *node, uint16 fragment, uint row_length, PSExeCo
 
 	if(!e_nsm_enter_fragment(node, fragment))
 		return;
-
-	if(type == VN_M_FT_MATRIX || type == VN_M_FT_BLENDER || type == VN_M_FT_NOISE || type == VN_M_FT_TEXTURE || type == VN_M_FT_RAMP || type == VN_M_FT_ALTERNATIVE)
+//p_shader_get_name(ENode *node, char *frag_name, uint fragment)
+	if(type == VN_M_FT_MATRIX || type == VN_M_FT_BLENDER || type == VN_M_FT_CLAMP || type == VN_M_FT_NOISE || type == VN_M_FT_TEXTURE || type == VN_M_FT_RAMP || type == VN_M_FT_ALTERNATIVE || type == VN_M_FT_VOLUME)
 	{
-		if(row_length > 5)
+		if(type == VN_M_FT_VOLUME)
+		{
+			char temp[256], temp2[256];
+			p_shader_get_name(node, temp, fragment);
+			sprintf(temp2, "\tvec4 %s = vec4(0.0, 0.0, 0.0, 0.0);\n", temp);
+			p_shader_extend_code(c, temp2);
+		}else if(row_length > 5)
 		{
 			char temp[256], temp2[256];
 			p_shader_get_name(node, temp, fragment);
 			sprintf(temp2, "\tvec4 t_%s;\n", temp);
 			p_shader_extend_code(c, temp2);
-
 			row_length = 0;
 		}
 		if(type == VN_M_FT_TEXTURE)
@@ -283,8 +347,9 @@ void p_shader_write_types(ENode *node, uint16 fragment, uint row_length, PSExeCo
 				p_shader_write_types(node, frag->blender.control, ++row_length, c, passed, count);
 			}
 		}
+		if(type == VN_M_FT_CLAMP)
+			p_shader_write_types(node, frag->clamp.data, ++row_length, c, passed, count);
 		if(type == VN_M_FT_RAMP)
-			p_shader_write_types(node, frag->ramp.mapping, ++row_length, c, passed, count);
 			p_shader_write_types(node, frag->ramp.mapping, ++row_length, c, passed, count);
 		if(type == VN_M_FT_ALTERNATIVE)
 			p_shader_write_types(node, frag->noise.mapping, row_length, c, passed, count);
@@ -303,7 +368,7 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 	
 	if(frag == NULL || !e_nsm_enter_fragment(node, fragment))
 	{
-		sprintf(code, "vec4(0.0, 0.0, 0.0, 0.0)");
+		sprintf(code, "vec4(0.0, 1.0, 0.0, 0.0)");
 		return;
 	}
 	for(i = 0; passed[i * 2] != fragment; i++);
@@ -344,23 +409,24 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 				}
 				break;
 			case VN_M_FT_REFLECTION :
-				{
-					char input[2560];
-			//		p_shader_write_math(node, fragment, input, c, passed, count);
-					sprintf(code, "vec4(textureCube(environment, normal).xyz, 1)");
-					break;
-				}
+				sprintf(code, "vec4(textureCube(environment, reflect(pixel_pos.xyz, normal.xyz) * gl_NormalMatrix).xyz, 1)");
+				break;
 			case VN_M_FT_TRANSPARENCY :
-				sprintf(code, "vec4(textureCube(environment, normal).xyz), 1)");
-				break;;
+				sprintf(code, "vec4(textureCube(environment, (normalize(pixel_pos.xyz) - normal * vec3(%f, %f, %f)) * gl_NormalMatrix).xyz, 1)", frag->transparency.refraction_index - 1.0, frag->transparency.refraction_index - 1.0, frag->transparency.refraction_index - 1.0);
+				break;
+			case VN_M_FT_VIEW :
+				sprintf(code, "vec4(normal.xyz, 1)");
+				break;
+			case VN_M_FT_VOLUME :
+				sprintf(code, "volume_%u", fragment);
+				break;
 			case VN_M_FT_GEOMETRY :
 				sprintf(code, "geometry_%u", fragment);
-//				sprintf(code, "pixel_pos");
 				splitabel = FALSE;
 				break;
 			case VN_M_FT_TEXTURE :
 				{
-					char input[2560];
+					char input[5120];
 					p_shader_write_math(node, frag->texture.mapping, input, c, passed, count);
 					sprintf(code, "texture2D(texture_%u, %s.xy)", fragment, input);
 				}
@@ -371,7 +437,7 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 				break;
 			case VN_M_FT_NOISE :
 				{
-					char input[2560];
+					char input[5120];
 					p_shader_write_math(node, frag->noise.mapping, input, c, passed, count);
 					sprintf(code, "vec4(noise1((%s.xy * vec2(10.0))) + 0.5)", input);
 
@@ -379,12 +445,11 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 				break;
 			case VN_M_FT_BLENDER :
 				{
-			//		sprintf(code, "temp");
 					switch(frag->blender.type)
 					{
 						case VN_M_BLEND_FADE :
 						{
-							char data_a[2560], data_b[2560], control[2560];
+							char data_a[5120], data_b[5120], control[5120];
 							p_shader_write_math(node, frag->blender.control, control, c, passed, count);
 							p_shader_write_math(node, frag->blender.data_a, data_a, c, passed, count);
 							p_shader_write_math(node, frag->blender.data_b, data_b, c, passed, count);
@@ -393,7 +458,7 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 						break;
 						case VN_M_BLEND_ADD:
 						{
-							char data_a[2560], data_b[2560];
+							char data_a[5120], data_b[5120];
 							p_shader_write_math(node, frag->blender.data_a, data_a, c, passed, count);
 							p_shader_write_math(node, frag->blender.data_b, data_b, c, passed, count);
 							sprintf(code, "(%s + %s)", data_a, data_b);
@@ -401,7 +466,7 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 						break;
 						case VN_M_BLEND_SUBTRACT:
 						{
-							char data_a[2560], data_b[2560];
+							char data_a[5120], data_b[5120];
 							p_shader_write_math(node, frag->blender.data_a, data_a, c, passed, count);
 							p_shader_write_math(node, frag->blender.data_b, data_b, c, passed, count);
 							sprintf(code, "(%s - %s)", data_a, data_b);
@@ -409,7 +474,7 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 						break;
 						case VN_M_BLEND_MULTIPLY:
 						{
-							char data_a[2560], data_b[2560];
+							char data_a[5120], data_b[5120];
 							p_shader_write_math(node, frag->blender.data_a, data_a, c, passed, count);
 							p_shader_write_math(node, frag->blender.data_b, data_b, c, passed, count);
 							sprintf(code, "(%s * %s)", data_a, data_b);
@@ -417,26 +482,29 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 						break;
 						case VN_M_BLEND_DIVIDE:
 						{
-							char data_a[2560], data_b[256];
+							char data_a[5120], data_b[5120];
 							p_shader_write_math(node, frag->blender.data_a, data_a, c, passed, count);
 							p_shader_write_math(node, frag->blender.data_b, data_b, c, passed, count);
 							sprintf(code, " (%s * %s)", data_a, data_b);
 						}
 						break;
-						case VN_M_BLEND_DOT:
-						{
-							char data_a[2560], data_b[2560];
-							p_shader_write_math(node, frag->blender.data_a, data_a, c, passed, count);
-							p_shader_write_math(node, frag->blender.data_b, data_b, c, passed, count);
-							sprintf(code, "dot(%s, %s)", data_a, data_b);
-						}
-						break;
 					}
+				}
+				break;
+			case VN_M_FT_CLAMP :
+				{
+					char input[5120];
+					p_shader_write_math(node, frag->clamp.data, input, c, passed, count);
+					if(frag->clamp.min)
+						sprintf(code, "min(vec4(%f, %f, %f, 1.0), %s)", frag->clamp.red, frag->clamp.green, frag->clamp.blue, input);
+					else
+						sprintf(code, "max(vec4(%f, %f, %f, 1.0), %s)", frag->clamp.red, frag->clamp.green, frag->clamp.blue, input);
+					splitabel = FALSE;
 				}
 				break;
 			case VN_M_FT_MATRIX :
 				{
-					char input[2560];
+					char input[5120];
 					p_shader_write_math(node, frag->matrix.data, input, c, passed, count);
 					sprintf(code, "(matrix_%u * %s)", fragment, input);
 					splitabel = FALSE;
@@ -444,36 +512,37 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 				break;
 			case VN_M_FT_RAMP :
 				{
-					char input[2560];
+					char input[5120];
 					p_shader_write_math(node, frag->ramp.mapping, input, c, passed, count);
 
 					if(frag->ramp.channel == VN_M_RAMP_RED)
-						sprintf(code, "(texture1d(%d + (%s).r * %d))", frag->ramp.ramp[0].pos, input, frag->ramp.ramp[0].pos - frag->ramp.ramp[frag->ramp.point_count - 1].pos);
+						sprintf(code, "(texture1D(ramp_%u, ((%s).r - %f) / %f))", (uint)fragment, input, frag->ramp.ramp[0].pos, frag->ramp.ramp[frag->ramp.point_count - 1].pos - frag->ramp.ramp[0].pos);
 					else if(frag->ramp.channel == VN_M_RAMP_GREEN)
-						sprintf(code, "(texture1d(%d + (%s).g * %d))", frag->ramp.ramp[0].pos, input, frag->ramp.ramp[0].pos - frag->ramp.ramp[frag->ramp.point_count - 1].pos);
+						sprintf(code, "(texture1D(ramp_%u, ((%s).g - %f) / %f))", (uint)fragment, input, frag->ramp.ramp[0].pos, frag->ramp.ramp[frag->ramp.point_count - 1].pos - frag->ramp.ramp[0].pos);
 					else
-						sprintf(code, "(texture1d(%d + (%s).b * %d))", frag->ramp.ramp[0].pos, input, frag->ramp.ramp[0].pos - frag->ramp.ramp[frag->ramp.point_count - 1].pos);
+						sprintf(code, "(texture1D(ramp_%u, ((%s).b - %f) / %f))", (uint)fragment, input, frag->ramp.ramp[0].pos, frag->ramp.ramp[frag->ramp.point_count - 1].pos - frag->ramp.ramp[0].pos);
 				}
+
 				break;
 			case VN_M_FT_ALTERNATIVE :
 				{
-					char input[2560];
+					char input[5120];
 					p_shader_write_math(node, frag->alternative.alt_a, input, c, passed, count);
-					sprintf(code, "%s", /*fragment,*/ input);
+					sprintf(code, "%s", input);
 				}
 				break;
 			case VN_M_FT_OUTPUT :
 				{
-					char input[2560];
+					char input[5120];
 					p_shader_write_math(node, frag->output.front, input, c, passed, count);
-					sprintf(code, "%s", /*fragment,*/ input);
+					sprintf(code, "%s", input);
 				}
 				break;
 		}
 	}
 	if(passed[i * 2 + 1] == 1 && splitabel)
 	{
-		char temp[256], name[256];
+		char temp[5120], name[5120];
 		p_shader_get_name(node, name, fragment);
 		sprintf(temp, "\tt_%s = %s;\n\n", name, code);
 		p_shader_extend_code(c, temp);
@@ -481,7 +550,7 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 	}
 	if(passed[i * 2 + 1] > 1)
 	{
-		char name[256];
+		char name[5120];
 		p_shader_get_name(node, name, fragment);
 		sprintf(code, "t_%s", name);
 
@@ -489,19 +558,96 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 	e_nsm_leave_fragment(node, fragment);
 }
 
+VNMFragmentID p_shader_compute_get_fragment_color_front(ENode *node, uint *dest, uint *src)
+{
+	VMatFrag *frag;
+	VNMFragmentID fragment, a, b;
+	VNMFragmentType ta, tb;
+	VNMBlendType type;
+	*dest = GL_ZERO;
+	*src = GL_ONE;
+	fragment = e_nsm_get_fragment_color_front(node);
+	if(fragment != (uint16)-1)
+	{
+		if(e_nsm_get_fragment_type(node, fragment) == VN_M_FT_BLENDER)
+		{
+			frag = e_nsm_get_fragment(node, fragment);
+			a = frag->blender.data_a;
+			b = frag->blender.data_b;
+			type = frag->blender.type;
+			ta = e_nsm_get_fragment_type(node, a);
+			tb = e_nsm_get_fragment_type(node, b);
+			if(ta == VN_M_FT_TRANSPARENCY && tb == VN_M_FT_TRANSPARENCY)
+			{
+				if(type == VN_M_BLEND_MULTIPLY)
+				{
+					*dest = GL_SRC_COLOR;
+					*src = GL_ZERO;
+				}
+				if(type == VN_M_BLEND_ADD)
+				{
+					*dest = GL_ONE;
+					*src = GL_ONE;
+				}
+				if(type == VN_M_BLEND_SUBTRACT)
+				{
+					*dest = GL_ZERO;
+					*src = GL_ZERO;
+				}
+				if(type == VN_M_BLEND_DIVIDE)
+				{
+					*dest = GL_ZERO;
+					*src = GL_ONE;
+				}
+				if(type == VN_M_BLEND_FADE)
+				{
+					*dest = GL_ONE;
+					*src = GL_ZERO;
+				}
+				return -1;
+			}
+			if(ta == VN_M_FT_TRANSPARENCY || tb == VN_M_FT_TRANSPARENCY)
+			{
+					printf("p_shader_compute_get_fragment_color_front F\n");
+				if(frag->blender.type == VN_M_BLEND_MULTIPLY)
+				{
+					*dest = GL_SRC_COLOR;
+					*src = GL_ZERO;
+				}
+				if(frag->blender.type == VN_M_BLEND_ADD)
+				{
+					*dest = GL_ONE;
+					*src = GL_ONE;
+				}
+				if(ta == VN_M_FT_TRANSPARENCY)
+				{
+					return b;
+				}else
+				{
+					return a;
+				}
+			}
+
+		}
+	}
+	return fragment;
+}
+
 typedef struct{
 	PSExeCode	f_c;
 	PSExeCode	v_c;
 	uint		count; 
 	uint		*data;
-	uint		stage; 
+	uint		stage;
+	VNMFragmentID start;
 }PCodeGenTemp;
 
-void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, uint *f_length, PCodeGenTemp *t)
+void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, uint *f_length, uint *dest, uint *src, PCodeGenTemp *t)
 {
 	uint i, count, *data;
 	uint16 fragment;
-	char code[2560], temp[2560], *c;
+	char code[5120], temp[5120], *c;
+	boolean reflection = FALSE;
 
 	if(e_nsm_get_fragment(node, e_nsm_get_fragment_color_front(node)) != NULL)
 	{
@@ -516,6 +662,7 @@ void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, 
 			p_shader_extend_code(&t->f_c, "varying vec4 pixel_pos;\nvarying vec3 normal;\n");
 			p_shader_extend_code(&t->f_c, "uniform samplerCube environment;\n");
 			p_shader_extend_code(&t->f_c, "uniform samplerCube diffuse_environment;\n");
+			t->start = p_shader_compute_get_fragment_color_front(node, dest, src);
 		}else
 		{
 			switch(t->stage)
@@ -531,13 +678,13 @@ void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, 
 					t->count = 0;
 					break;
 				case 1 :
-					p_shader_write_types(node, e_nsm_get_fragment_color_front(node), 1, &t->f_c, t->data, &t->count);
-					p_shader_write_lights(node, &t->f_c);
+					p_shader_write_types(node, t->start, 1, &t->f_c, t->data, &t->count);
+					p_shader_write_lights(node, &t->f_c, 1);
 					p_shader_extend_code(&t->v_c, "\n\tnormal = normalize(gl_NormalMatrix * gl_Normal);\n");
 					break;
 				case 2 :
-					p_shader_write_math(node, e_nsm_get_fragment_color_front(node), temp, &t->f_c, t->data, &t->count);
-					sprintf(code, "\tgl_FragColor = %s;\n", temp);
+					p_shader_write_math(node, t->start, temp, &t->f_c, t->data, &t->count);
+					sprintf(code, "\tgl_FragColor = vec4(vec3((%s).rgb), 1.0);\n", temp);
 					p_shader_extend_code(&t->f_c, code);
 					break;
 				case 3 :
@@ -548,6 +695,12 @@ void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, 
 							sprintf(temp, "\tgeometry_%u = attrib_geometry_%u;\n", fragment, fragment);
 							p_shader_extend_code(&t->v_c, temp);
 						}
+						if(e_nsm_get_fragment_type(node, fragment) == VN_M_FT_REFLECTION && reflection == FALSE)
+						{
+							p_shader_extend_code(&t->v_c, "\tr_normal = normalize(r_matrix * gl_Normal);\n");
+							reflection = TRUE;
+						}
+						
 					}
 
 					p_shader_extend_code(&t->v_c, "\tpixel_pos = gl_ModelViewMatrix * gl_Vertex;\n\n");
