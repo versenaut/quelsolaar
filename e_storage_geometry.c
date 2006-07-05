@@ -123,18 +123,18 @@ void polygon_append_array(ESGeometryNode	*node, uint32 id)
 						((egreal *)layer->data)[i] = layer->def_real;
 				}
 				break;
-				case VN_G_LAYER_POLYGON_FACE_UINT8 :
-				{
-					layer->data = realloc(layer->data, sizeof(uint8) * (id + GEOMETRY_ARRAY_CHUNK_SIZE));
-					for(i = node->polygon_length ; i < (id + GEOMETRY_ARRAY_CHUNK_SIZE); i++)
-						((uint8 *)layer->data)[i] = (uint8) layer->def_integer;
-				}
-				break;
 				case VN_G_LAYER_POLYGON_FACE_UINT32 :
 				{
 					layer->data  = realloc(layer->data, sizeof(uint32) * (id + GEOMETRY_ARRAY_CHUNK_SIZE));
 					for(i =  node->polygon_length ; i < (id + GEOMETRY_ARRAY_CHUNK_SIZE); i++)
 						((uint32 *)layer->data)[i] = layer->def_integer;
+				}
+				break;
+				case VN_G_LAYER_POLYGON_FACE_UINT8 :
+				{
+					layer->data = realloc(layer->data, sizeof(uint8) * (id + GEOMETRY_ARRAY_CHUNK_SIZE));
+					for(i =  node->polygon_length ; i < (id + GEOMETRY_ARRAY_CHUNK_SIZE); i++)
+						((uint8 *)layer->data)[i] = layer->def_integer;
 				}
 				break;
 				case VN_G_LAYER_POLYGON_FACE_REAL :
@@ -196,18 +196,18 @@ void * e_nsg_get_layer_data(ESGeometryNode *g_node, EGeoLayer *layer)
 				((egreal *)layer->data)[i] = layer->def_real;
 		}
 		break;
-		case VN_G_LAYER_POLYGON_FACE_UINT8 :
-		{
-			layer->data = malloc(sizeof(uint8) * g_node->polygon_length);
-			for(i = 0 ; i < g_node->polygon_length; i++)
-				((uint8 *)layer->data)[i] = (uint8) layer->def_integer;
-		}
-		break;
 		case VN_G_LAYER_POLYGON_FACE_UINT32 :
 		{
 			layer->data = malloc(sizeof(uint32) * g_node->polygon_length);
 			for(i = 0 ; i < g_node->polygon_length; i++)
 				((uint32 *)layer->data)[i] = layer->def_integer;
+		}
+		break;
+		case VN_G_LAYER_POLYGON_FACE_UINT8 :
+		{
+			layer->data = malloc(sizeof(uint8) * g_node->polygon_length);
+			for(i = 0 ; i < g_node->polygon_length; i++)
+				((uint8 *)layer->data)[i] = layer->def_integer;
 		}
 		break;
 		case VN_G_LAYER_POLYGON_FACE_REAL :
@@ -381,6 +381,25 @@ void callback_send_g_polygon_set_face_uint32(void *user_data, VNodeID node_id, V
 	e_ns_update_node_version_data(node);
 }
 
+
+void callback_send_g_polygon_set_face_uint8(void *user_data, VNodeID node_id, VLayerID layer_id, uint32 polygon_id, uint8 value)
+{
+	ESGeometryNode	*node;
+	uint8			*write;
+	EGeoLayer		*layer;
+	node = (ESGeometryNode *)e_ns_get_node_networking(node_id);
+	if(layer_id >= node->layer_allocated || node->layers[layer_id].name[0] == 0 || node->layers[layer_id].type != VN_G_LAYER_POLYGON_FACE_UINT8)
+		return;
+	layer = &node->layers[layer_id];
+	layer->version++;
+	polygon_append_array(node, polygon_id);
+	write = e_nsg_get_layer_data(node, layer);
+	write += polygon_id;
+	*write = value;
+	e_ns_update_node_version_data(node);
+}
+
+
 void callback_send_g_polygon_set_face_real(void *user_data, VNodeID node_id, VLayerID layer_id, uint32 polygon_id, egreal value)
 {
 	ESGeometryNode	*node;
@@ -425,22 +444,12 @@ void callback_send_g_vertex_set_real_xyz(void *user_data, VNodeID node_id, VLaye
 		if(x > node->space[i])
 			node->space[i] = x;
 		else if(node->space[i] == write[vertex_id * 3 + i / 2] || node->vertex_length < GEOMETRY_ARRAY_CHUNK_SIZE + 2)
-		{
-			node->space[i] = x;
-			for(j = 0; j < node->vertex_length; j++)
-				if(write[j * 3] == E_REAL_MAX && write[j * 3 + i / 2] > node->space[i])
-					node->space[i] = write[j * 3 + i / 2];
-		}
+			node->space_recompute = TRUE;
 		i++;
 		if(x < node->space[i])
 			node->space[i] = x;
 		else if(node->space[i] == write[vertex_id * 3 + i / 2] || node->vertex_length < GEOMETRY_ARRAY_CHUNK_SIZE + 2)
-		{
-			node->space[i] = x;
-			for(j = 0; j < node->vertex_length; j++)
-				if(write[j * 3] == E_REAL_MAX && write[j * 3 + i / 2] < node->space[i])
-					node->space[i] = write[j * 3 + i / 2];
-		}
+			node->space_recompute = TRUE;
 	}
 
 	write += vertex_id * 3;
@@ -509,10 +518,19 @@ void callback_send_g_layer_create(void *user_data, VNodeID node_id, VLayerID lay
 		for(;node->layer_allocated < layer_id + 8; node->layer_allocated++)
 		{
 			node->layers[node->layer_allocated].name[0] = 0;
+			node->layers[node->layer_allocated].type = -1;
 			node->layers[node->layer_allocated].data = NULL;
 		}
 	}
 	layer = &node->layers[layer_id];
+	if(type != layer->type)
+	{
+		if(layer->data != NULL)
+		{
+			free(layer->data);
+			layer->data = NULL;
+		}
+	}
 	layer->layer_id = layer_id;
 	layer->def_integer = def_integer;
 	if(layer_id == 1)
@@ -520,7 +538,6 @@ void callback_send_g_layer_create(void *user_data, VNodeID node_id, VLayerID lay
 	layer->def_real = def_real;
 	layer->type = type;
 	layer->version = 0;
-	layer->data = NULL;
 	if(layer->name[0] == 0 || layer->type != type)
 	{
 		if(layer->name[0] != 0)
@@ -714,13 +731,13 @@ void e_nsg_re_compute_space(ESGeometryNode *node)
 	EGeoLayer	*end, *layer;
 	if(node->space_recompute != TRUE)
 		return;
-	node->space_recompute = FALSE;
 
 	layer = node->layers;
 	for(i = 0; i < node->vertex_length * 3 && ((egreal *)layer->data)[i] == E_REAL_MAX; i += 3)
 		;
 	if(i == node->vertex_length * 3)
 		return;
+	node->space_recompute = FALSE;
 	node->space[0] = ((egreal *)layer->data)[i];
 	node->space[1] = ((egreal *)layer->data)[i];
 	i++;
@@ -775,17 +792,17 @@ void e_nsg_get_center(ESGeometryNode *node, egreal *center)
 void e_nsg_get_bounding_box(ESGeometryNode *node, egreal *high_x, egreal *low_x, egreal *high_y, egreal *low_y, egreal *high_z, egreal *low_z)
 {
 	e_nsg_re_compute_space(node);
-	if(high_x == NULL)
+	if(high_x != NULL)
 		*high_x = node->space[0];
-	if(low_x == NULL)
+	if(low_x != NULL)
 		*low_x = node->space[1];
-	if(high_y == NULL)
+	if(high_y != NULL)
 		*high_y = node->space[2];
-	if(low_y == NULL)
+	if(low_y != NULL)
 		*low_y = node->space[3];
-	if(high_z == NULL)
+	if(high_z != NULL)
 		*high_z = node->space[4];
-	if(low_z == NULL)
+	if(low_z != NULL)
 		*low_z = node->space[5];
 }
 
@@ -1071,6 +1088,7 @@ void es_geometry_init(void)
 
 	verse_callback_set(verse_send_g_polygon_set_corner_uint32,		callback_send_g_polygon_set_corner_uint32,		NULL);
 	verse_callback_set(verse_send_g_polygon_set_face_uint32,		callback_send_g_polygon_set_face_uint32,		NULL);
+	verse_callback_set(verse_send_g_polygon_set_face_uint8,			callback_send_g_polygon_set_face_uint8, 		NULL);
 	verse_callback_set(verse_send_g_polygon_delete,					callback_send_g_polygon_delete,					NULL);
 
 	verse_callback_set(verse_send_g_crease_set_vertex,				callback_send_g_crease_set_vertex,				NULL);
