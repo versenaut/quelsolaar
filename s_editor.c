@@ -49,14 +49,12 @@ float se_grid_compute(float pos)
 	return (float)((int)((pos - 2.0) * SE_GRID_POINTS * 0.5 - 0.5)) / (SE_GRID_POINTS * 0.5) + 2;
 }
 
-extern void sui_draw_gl(uint draw_type, const float *array, uint length, uint dimensions, float red, float green, float blue);
-
 void sui_draw_symb_trach(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {0.025000, 0.030000, 0.030000, 0.030000, 0.030000, 0.030000, 0.030000, 0.025000, 0.030000, 0.025000, 0.025000, 0.025000, 0.025000, 0.025000, 0.020000, -0.030000, 0.020000, -0.030000, -0.020000, -0.030000, -0.020000, -0.030000, -0.025000, 0.025000, -0.025000, 0.025000, -0.030000, 0.025000, -0.030000, 0.025000, -0.030000, 0.030000, -0.030000, 0.030000, -0.025000, 0.030000, -0.025000, 0.030000, -0.000000, 0.040000, -0.000000, 0.040000, 0.025000, 0.030000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 22, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 22, 2, red, green, blue, 1.0);
 	glPopMatrix();
 }
 
@@ -65,7 +63,7 @@ void sui_draw_symb_lines(float pos_x, float pos_y, float red, float green, float
 	static float array[] = {0.020000, 0.020000, 0.020000, -0.020000, 0.020000, -0.020000, -0.020000, -0.020000, 0.015000, 0.015000, -0.015000, -0.015000, -0.020000, 0.020000, 0.020000, 0.020000, -0.020000, 0.020000, -0.020000, -0.020000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 10, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 10, 2, red, green, blue, 1.0);
 	glPopMatrix();
 }
 
@@ -75,7 +73,7 @@ void sui_draw_symb_arcs(float pos_x, float pos_y, float red, float green, float 
 	static float array[] = {0.020000, 0.020000, 0.020000, -0.020000, 0.020000, -0.020000, -0.020000, -0.020000, -0.020000, 0.020000, -0.020000, -0.020000, -0.020000, 0.020000, 0.020000, 0.020000, -0.015000, -0.015000, -0.012059, -0.014856, -0.012059, -0.014856, -0.009147, -0.014424, -0.009147, -0.014424, -0.006291, -0.013708, -0.006291, -0.013708, -0.003519, -0.012716, -0.003519, -0.012716, -0.000858, -0.011458, -0.000858, -0.011458, 0.001667, -0.009944, 0.001667, -0.009944, 0.004032, -0.008190, 0.004032, -0.008190, 0.006213, -0.006213, 0.006213, -0.006213, 0.008190, -0.004032, 0.008190, -0.004032, 0.009944, -0.001667, 0.009944, -0.001667, 0.011458, 0.000858, 0.011458, 0.000858, 0.012716, 0.003519, 0.012716, 0.003519, 0.013708, 0.006291, 0.013708, 0.006291, 0.014424, 0.009147, 0.014424, 0.009147, 0.014856, 0.012059, 0.014856, 0.012059, 0.015000, 0.015000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 40, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 40, 2, red, green, blue, 1.0f);
 	glPopMatrix();
 }
 
@@ -86,7 +84,7 @@ void sui_draw_symb_next(float pos_x, float pos_y, float red, float green, float 
 	static float array[] = {0.020000, 0.020000, 0.020000, -0.020000, 0.020000, -0.020000, -0.020000, -0.020000, -0.020000, 0.020000, -0.020000, -0.020000, -0.020000, 0.020000, 0.020000, 0.020000, 0.015000, 0.000000, -0.000000, -0.015000, -0.000000, -0.015000, -0.000000, -0.010000, -0.000000, -0.010000, -0.015000, -0.010000, -0.015000, -0.010000, -0.015000, 0.010000, -0.015000, 0.010000, -0.000000, 0.010000, -0.000000, 0.010000, -0.000000, 0.015000, -0.000000, 0.015000, 0.015000, 0.000000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 22, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 22, 2, red, green, blue, 1.0f);
 	glPopMatrix();
 }
 
@@ -95,7 +93,7 @@ void sui_draw_symb_prev(float pos_x, float pos_y, float red, float green, float 
 	static float array[] = {0.020000, 0.020000, 0.020000, -0.020000, 0.020000, -0.020000, -0.020000, -0.020000, -0.020000, 0.020000, -0.020000, -0.020000, -0.020000, 0.020000, 0.020000, 0.020000, -0.000000, 0.015000, -0.015000, 0.000000, -0.015000, 0.000000, -0.000000, -0.015000, -0.000000, -0.015000, -0.000000, -0.010000, -0.000000, -0.010000, 0.015000, -0.010000, 0.015000, -0.010000, 0.015000, 0.010000, 0.015000, 0.010000, -0.000000, 0.010000, -0.000000, 0.010000, -0.000000, 0.015000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 22, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 22, 2, red, green, blue, 1.0f);
 	glPopMatrix();
 }
 
@@ -104,7 +102,7 @@ void sui_draw_symb_del(float pos_x, float pos_y, float red, float green, float b
 	static float array[] = {0.020000, 0.020000, 0.020000, -0.020000, 0.020000, -0.020000, -0.020000, -0.020000, -0.020000, 0.020000, -0.020000, -0.020000, -0.020000, 0.020000, 0.020000, 0.020000, -0.010000, 0.015000, -0.015000, 0.010000, -0.015000, 0.010000, -0.005000, 0.000000, -0.005000, 0.000000, -0.015000, -0.010000, -0.015000, -0.010000, -0.010000, -0.015000, -0.010000, -0.015000, -0.000000, -0.005000, -0.000000, -0.005000, 0.010000, -0.015000, 0.010000, -0.015000, 0.015000, -0.010000, 0.015000, -0.010000, 0.005000, 0.000000, 0.005000, 0.000000, 0.015000, 0.010000, 0.015000, 0.010000, 0.010000, 0.015000, 0.010000, 0.015000, -0.000000, 0.005000, -0.000000, 0.005000, -0.010000, 0.015000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 32, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 32, 2, red, green, blue, 1.0f);
 	glPopMatrix();
 }
 
@@ -113,7 +111,7 @@ void sui_draw_symb_font(float pos_x, float pos_y, float red, float green, float 
 	static float array[] = {0.200000, 0.420000, 0.208901, 0.418997, 0.208901, 0.418997, 0.217355, 0.416039, 0.217355, 0.416039, 0.224940, 0.411273, 0.224940, 0.411273, 0.231273, 0.404940, 0.231273, 0.404940, 0.236039, 0.397355, 0.236039, 0.397355, 0.238997, 0.388901, 0.238997, 0.388901, 0.240000, 0.380000, 0.040000, -0.320000, 0.031099, -0.318997, 0.031099, -0.318997, 0.022645, -0.316039, 0.022645, -0.316039, 0.015060, -0.311273, 0.015060, -0.311273, 0.008727, -0.304940, 0.008727, -0.304940, 0.003961, -0.297355, 0.003961, -0.297355, 0.001003, -0.288901, 0.001003, -0.288901, -0.000000, -0.280000, 0.020000, 0.000000, 0.220000, 0.000000, 0.200000, -0.320000, 0.208901, -0.318997, 0.208901, -0.318997, 0.217355, -0.316039, 0.217355, -0.316039, 0.224940, -0.311273, 0.224940, -0.311273, 0.231273, -0.304940, 0.231273, -0.304940, 0.236039, -0.297355, 0.236039, -0.297355, 0.238997, -0.288901, 0.238997, -0.288901, 0.240000, -0.280000, 0.040000, 0.420000, 0.031099, 0.418997, 0.031099, 0.418997, 0.022645, 0.416039, 0.022645, 0.416039, 0.015060, 0.411273, 0.015060, 0.411273, 0.008727, 0.404940, 0.008727, 0.404940, 0.003961, 0.397355, 0.003961, 0.397355, 0.001003, 0.388901, 0.001003, 0.388901, -0.000000, 0.380000, 0.040000, -0.320000, 0.200000, -0.320000, 0.040000, 0.420000, 0.200000, 0.420000, 0.240000, 0.380000, 0.240000, -0.280000, -0.000000, -0.280000, -0.000000, 0.380000, 0.020000, 0.240000, 0.220000, 0.240000, 0.260000, 0.000000, 0.280000, 0.000000, -0.020000, 0.000000, -0.040000, 0.000000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 72, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 72, 2, red, green, blue, 1.0f);
 	glPopMatrix();
 }
 
@@ -229,7 +227,7 @@ void	sui_draw_line_empty(float pos_x, float pos_y, float size_x, float size_y, f
 	array[97] = pos_y + 0.120000;
 	array[98] = size_x + -0.020000;
 	array[99] = pos_y + 0.120000;
-	sui_draw_gl(GL_LINES, array, 50, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 50, 2, red, green, blue, 1.0f);
 }
 
 void se_draw(SDrawing *e, boolean points, boolean mid)
@@ -255,18 +253,18 @@ void se_draw(SDrawing *e, boolean points, boolean mid)
 		{
 			glPushMatrix();
 			glTranslatef(l->pos_one[0], l->pos_one[1], 0);
-			sui_draw_gl(GL_LINES, circle, 64, 2, 0.2, 0.8, 1);
+			sui_draw_gl(GL_LINES, circle, 64, 2, 0.2, 0.8, 1, 1.0);
 			glPopMatrix();
 			glPushMatrix();
 			glTranslatef(l->pos_two[0], l->pos_two[1], 0);
-			sui_draw_gl(GL_LINES, circle, 64, 2, 0.2, 0.8, 1);
+			sui_draw_gl(GL_LINES, circle, 64, 2, 0.2, 0.8, 1, 1.0);
 			glPopMatrix();
 		}
 		if(mid)
 		{
 			glPushMatrix();
 			glTranslatef((l->pos_one[0] + l->pos_two[0]) * 0.5, (l->pos_one[1] + l->pos_two[1]) * 0.5, 0);
-			sui_draw_gl(GL_LINES, circle, 64, 2, 1, 0.6, 0.2);
+			sui_draw_gl(GL_LINES, circle, 64, 2, 1, 0.6, 0.2, 1.0f);
 			glPopMatrix();
 		}
 		switch(l->type)
@@ -278,7 +276,7 @@ void se_draw(SDrawing *e, boolean points, boolean mid)
 				glPushMatrix();
 				glTranslatef(l->pos_one[0], l->pos_one[1], 0);
 				glScalef(l->pos_two[0] - l->pos_one[0], l->pos_two[1] - l->pos_one[1], 0);
-				sui_draw_gl(GL_LINES, curve, 64, 2, 1, 1, 1);
+				sui_draw_gl(GL_LINES, curve, 64, 2, 1, 1, 1, 1.0f);
 				glPopMatrix();
 			break;
 		}
@@ -310,9 +308,9 @@ void se_draw_grid(boolean grid, boolean line)
 		sui_draw_set_vec2(lines, 11, 0.6, 0.2);
 	}
 	if(line)
-		sui_draw_gl(GL_LINES, lines, 12, 2, 0.2, 0.6, 1);
+		sui_draw_gl(GL_LINES, lines, 12, 2, 0.2, 0.6, 1, 1.0f);
 	if(grid)
-		sui_draw_gl(GL_POINTS, points, SE_GRID_POINTS * SE_GRID_POINTS, 2, 0.2, 0.6, 1);
+		sui_draw_gl(GL_POINTS, points, SE_GRID_POINTS * SE_GRID_POINTS, 2, 0.2, 0.6, 1, 1.0f);
 }
 
 void se_new_drawing(char *name)
@@ -452,7 +450,7 @@ void se_save_symbols(char *file_name)
 			fprintf(file, "};\n");
 			fprintf(file, "\tglPushMatrix();\n");
 			fprintf(file, "\tglTranslatef(pos_x, pos_y, 0);\n");
-			fprintf(file, "\tsui_draw_gl(GL_LINES, array, %u, 2, red, green, blue);\n", line_count / 2);
+			fprintf(file, "\tsui_draw_gl(GL_LINES, array, %u, 2, red, green, blue, 1.0f);\n", line_count / 2);
 			fprintf(file, "\tglPopMatrix();\n");
 			fprintf(file, "}\n\n");
 			break;
@@ -476,7 +474,7 @@ void se_save_symbols(char *file_name)
 					fprintf(file, "\tarray[%u] = dest_y + %f * vec_y - %f * vec_x;\n", j + 1, (buf[j] - 0.6) * SE_OUTPUT_SCALE, (buf[j + 1] - 0.2) * SE_OUTPUT_SCALE);
 				}
 			}
-			fprintf(file, "\tsui_draw_gl(GL_LINES, array, %u, 2, red, green, blue);\n", line_count / 2);
+			fprintf(file, "\tsui_draw_gl(GL_LINES, array, %u, 2, red, green, blue, 1.0f);\n", line_count / 2);
 			fprintf(file, "}\n\n");
 			break;
 		case SE_FT_SQUARE :
@@ -496,7 +494,7 @@ void se_save_symbols(char *file_name)
 					fprintf(file, "\tarray[%u] = size_y + %f;\n", j, (buf[j] + 0.6) * SE_OUTPUT_SCALE);
 
 			}
-			fprintf(file, "\tsui_draw_gl(GL_LINES, array, %u, 2, red, green, blue);\n", line_count / 2);
+			fprintf(file, "\tsui_draw_gl(GL_LINES, array, %u, 2, red, green, blue, 1.0f);\n", line_count / 2);
 			fprintf(file, "}\n\n");
 			break;
 		}
@@ -556,7 +554,7 @@ void se_save_font(char *file_name)
 		if(SEditor.drawings[i].line_count > 0)
 			fprintf(file, "\t\tfont_array[%u] = font_%u;\n", i, i);
 	fprintf(file, "\t}\n\tif(font_size[letter] != 0)\n");
-	fprintf(file, "\t\tsui_draw_gl(GL_LINES, font_array[letter], font_size[letter], 2, red, green, blue);\n}\n\n");
+	fprintf(file, "\t\tsui_draw_gl(GL_LINES, font_array[letter], font_size[letter], 2, red, green, blue, 1.0f);\n}\n\n");
 	fprintf(file, "float sui_get_letter_size(unsigned char letter)\n{\n");
 		fprintf(file, "\tstatic const float font_width[] = {%f", width[0]);
 	for(i = 1; i < 256; i++)
