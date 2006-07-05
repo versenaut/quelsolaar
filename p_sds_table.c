@@ -254,11 +254,45 @@ boolean p_init_table(uint tess_level)
 
 PTessTableElement *get_dynamic_table_tri(uint base_level, uint *edge)
 {
-	return &global_tess_table_tri[base_level][edge[0] + (edge[1] * (base_level + 1))  + (edge[2] * (base_level + 1) * (base_level + 1) )];
+	base_level++;
+	return &global_tess_table_tri[base_level - 1][edge[0] + (edge[1] * base_level) + (edge[2] * base_level * base_level)];
 }
 
 
 PTessTableElement *get_dynamic_table_quad(uint base_level, uint *edge)
 {
-	return &global_tess_table_quad[base_level][edge[0] + (edge[1] * (base_level + 1))  + (edge[2] * (base_level + 1) * (base_level + 1))+ (edge[3] * (base_level + 1) * (base_level + 1) * (base_level + 1))];
+	base_level++;
+	return &global_tess_table_quad[base_level - 1][edge[0] + (edge[1] * base_level) + (edge[2] * base_level * base_level) + (edge[3] * base_level * base_level * base_level)];
 }
+
+uint get_dynamic_table_tri_level(uint base_level, PTessTableElement *table, uint edge)
+{
+	uint i;
+	i = table - global_tess_table_tri[base_level];
+	base_level++;
+	if(edge == 0)
+		return i % base_level;
+	if(edge == 1)
+		return (i / base_level) % base_level;
+	if(edge == 2)
+		return (i / (base_level * base_level)) % base_level;
+	return 0;
+}
+
+
+uint get_dynamic_table_quad_level(uint base_level, PTessTableElement *table, uint edge)
+{
+	uint i;
+	i = table - global_tess_table_quad[base_level];
+	base_level++;
+	if(edge == 0)
+		return i % base_level;
+	if(edge == 1)
+		return (i / base_level) % base_level;
+	if(edge == 2)
+		return (i / (base_level * base_level)) % base_level;
+	if(edge == 3)
+		return (i / (base_level * base_level * base_level)) % base_level;
+	return 0;
+}
+
