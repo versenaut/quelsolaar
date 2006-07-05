@@ -142,7 +142,7 @@ void draw_star(float time, float *color)
 		glRotatef(50 * (1 - time), 1, 0, 0);
 //		nglDrawArray(NGL_TRIANGLES_FILLED, GlobalIntro.star_id, &color, 1, GlobalIntro.star_m_id, GlobalIntro.star_ref);
 		sui_set_color_array_gl(color, 35, 4);
-		sui_draw_elements_gl(GL_TRIANGLES, GlobalIntro.star_id, GlobalIntro.star_ref, 34 * 3, 2, 0, 0, 0);
+		sui_draw_elements_gl(GL_TRIANGLES, GlobalIntro.star_id, GlobalIntro.star_ref, 34 * 3, 2, 0, 0, 0, 0);
 		glPopMatrix();
 	}
 }
@@ -174,7 +174,7 @@ void draw_pointer(float time, float *color)
 		glRotatef(60 * i, 0, 0, 1);
 	//	nglDrawArray(NGL_TRIANGLES_FILLED, GlobalIntro.star_id, &GlobalIntro.star_color, 1, GlobalIntro.star_add_id, GlobalIntro.star_ref);
 		sui_set_color_array_gl(color, 35, 4);
-		sui_draw_elements_gl(GL_TRIANGLES, GlobalIntro.star_id, GlobalIntro.star_ref, 34 * 3, 2, 0, 0, 0);
+		sui_draw_elements_gl(GL_TRIANGLES, GlobalIntro.star_id, GlobalIntro.star_ref, 34 * 3, 2, 0, 0, 0, 0);
 		glPopMatrix();
 	}
 	glPopMatrix();
@@ -263,7 +263,7 @@ boolean qs_intro_draw(void)
 		GlobalIntro.intro_t +=  0.025 * betray_get_delta_time();
 	glPushMatrix();
 //	glTranslatef(0, 0, -1);
-	sui_draw_gl(GL_QUADS, border, 8, 2, 0, 0, 0);
+	sui_draw_gl(GL_QUADS, border, 8, 2, 0, 0, 0, 0);
 	glPopMatrix();
 	return TRUE;
 }
