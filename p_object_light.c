@@ -120,15 +120,19 @@ uint current_shadow_light = -1;
 
 void p_set_enable_shadow(uint id)
 {
-	double color[3];
+	double color[3], f, best = 0;
 	ENode *node;
 	if(id != -1)
 	{
 		for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 		{
 			e_nso_get_light(node, color);
-			if(color[0] > 0.1)
+			f = color[0] + color[1] + color[2]; 
+			if(f > best)
+			{
+				best = f;
 				current_shadow_light = e_ns_get_node_id(node);
+			}
 		}
 	}else
 		current_shadow_light = id;
@@ -193,9 +197,9 @@ void p_set_light(PObjLight *light, uint light_count, uint32 time_s, uint32 time_
 			f_pos[0] = (float)pos[0];
 			f_pos[1] = (float)pos[1];
 			f_pos[2] = (float)pos[2];
-			f_color[0] = (float)color[0] * mult * 0.3;
-			f_color[1] = (float)color[1] * mult * 0.3;
-			f_color[2] = (float)color[2] * mult * 0.3;
+			f_color[0] = (float)color[0] * mult;
+			f_color[1] = (float)color[1] * mult;
+			f_color[2] = (float)color[2] * mult;
 //			printf("good %f %f %f\n", color[0], color[1], color[2]);
 			glLightfv(GL_LIGHT0 + i, GL_POSITION, f_pos);
 			glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, f_color);
