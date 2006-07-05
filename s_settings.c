@@ -24,7 +24,7 @@ static void init_setting(void)
 	if(init)
 		return;
 	init = TRUE;
-	SUIGlobalSettings.array = malloc((sizeof *SUIGlobalSettings.array) * 32);
+	SUIGlobalSettings.array = malloc((sizeof *SUIGlobalSettings.array) * 128);
 	SUIGlobalSettings.count = 0;
 	SUIGlobalSettings.version = 345;
 }
@@ -171,13 +171,13 @@ void sui_load_settings(const char *file_name)
 	init_setting();
 	if((settings = fopen(file_name, "r")) != NULL)
 	{
-/*		uint i;
+		uint i;
 		for(i = 0; i < 512; i++)
 			line[i] = 0;
 		while((fgets(line, sizeof line, settings)) != NULL)
 		{
 
-			if(sscanf(line, "%s%s", key, value) == 2)
+			if(sscanf(line, "%s %s", key, value) == 2)
 			{
 				printf("key %s\n", key);
 				if(sscanf(value, "%f", &r) == 1)
@@ -191,7 +191,7 @@ void sui_load_settings(const char *file_name)
 					sui_set_setting_text(key, value);
 				}
 			}
-		}*/
+		}
 		fclose(settings);
 	}
 }
