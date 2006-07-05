@@ -4,6 +4,7 @@
 #include "betray.h"
 #include "seduce.h"
 #include "deceive.h"
+#include "persuade.h"
 
 extern void clear_matrix(double *matrix);
 /*
@@ -230,11 +231,18 @@ void p_get_model_matrix(double *matrix)
 void p_view_set(void)
 {
 	static float rotate = 0;
+	double cam_pos[3];
 	rotate++;
 
 	ProjectionData.position[0] = ProjectionData.target[0] * (1 - ProjectionData.speed) + ProjectionData.position[0] * ProjectionData.speed;
 	ProjectionData.position[1] = ProjectionData.target[1] * (1 - ProjectionData.speed) + ProjectionData.position[1] * ProjectionData.speed;
 	ProjectionData.position[2] = ProjectionData.target[2] * (1 - ProjectionData.speed) + ProjectionData.position[2] * ProjectionData.speed;
+	cam_pos[0] = ProjectionData.position[0] + ProjectionData.model[2] * ProjectionData.distance;
+	cam_pos[1] = ProjectionData.position[1] + ProjectionData.model[6] * ProjectionData.distance;
+	cam_pos[2] = ProjectionData.position[2] + ProjectionData.model[10] * ProjectionData.distance;
+#ifdef PERSUADE_H
+	p_lod_set_view_pos(cam_pos);
+#endif
 	ProjectionData.pitch = ProjectionData.pitch_target * (1 - ProjectionData.speed) + ProjectionData.pitch * ProjectionData.speed;
 	ProjectionData.yaw = ProjectionData.yaw_target * (1 - ProjectionData.speed) + ProjectionData.yaw * ProjectionData.speed;
 	ProjectionData.distance = ProjectionData.distance_target * (1 - ProjectionData.speed) + ProjectionData.distance * ProjectionData.speed;
