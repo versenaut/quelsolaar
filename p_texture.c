@@ -38,6 +38,7 @@ typedef struct{
 	uint	node_version;
 	uint	size[3];
 	uint	update_position;
+	uint	update_left;
 	uint	users;
 	uint	dead;
 }PTextureHandle;
@@ -81,6 +82,7 @@ uint p_th_create_std_texture(void)
 		} 
 	}
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, STD_TEXTURE_SIZE, STD_TEXTURE_SIZE, 0, GL_RGB, GL_FLOAT, buf);
+	free(buf);
 	return texture;
 }
 
@@ -239,6 +241,7 @@ PTextureHandle *p_th_create_texture_handle(uint node_id, char *layer_r, char *la
 	h->size[0] = 0;
 	h->size[1] = 0;
 	h->size[2] = 0;
+	h->update_left = 0;
 	h->update_position = 0;
 	for(i = 0; i < 3; i++)
 		h->layer_version[i] = -1;
@@ -247,7 +250,8 @@ PTextureHandle *p_th_create_texture_handle(uint node_id, char *layer_r, char *la
 	return h;
 }
 
-void p_th_destroy_texture_handle(PTextureHandle *handle){
+void p_th_destroy_texture_handle(PTextureHandle *handle)
+{
 	handle->users--;
 }
 
@@ -282,7 +286,6 @@ void p_th_update_texture(PTextureHandle *handle)
 	EBMHandle *h;
 	uint i, size;
 	size = PIXELS_PER_UPDATE / handle->size[0];
-	printf("p_th_update_texture\n");
 	if(size == 0)
 		size = 1;
 	if(size > handle->size[1] - handle->update_position)
@@ -302,6 +305,11 @@ void p_th_update_texture(PTextureHandle *handle)
 //lTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, handle->size[0], handle->size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, buf);
 	free(buf);
 	e_nsb_destroy_image_handle(h);
+	
+/*	if(size > handle->update_left)
+		handle->update_left = 0;
+	else
+		handle->update_left -= size;*/
 	handle->update_position += size;
 	if(handle->update_position >= handle->size[1])
 		handle->update_position = 0;
@@ -350,7 +358,6 @@ boolean p_th_service_handle(PTextureHandle **pointer)
 		p_th_create_new_texture(node, handle);
 		return TRUE;
 	}
-//printf("serv 4\n");
 	/* if the texture size has changed fix it! */
 
 	if(handle->size_version != p_th_compute_size_check_sum(value))
@@ -359,13 +366,11 @@ boolean p_th_service_handle(PTextureHandle **pointer)
 		p_th_create_new_texture(node, handle);
 		return TRUE;
 	}
-//printf("serv 5\n");
-	if(handle->update_position != 0)
+	if(handle->update_left != 0)
 	{
 		p_th_update_texture(handle);
 		return TRUE;
 	}
-//printf("serv 6\n");
 	if((layer = e_nsb_get_layer_by_name(node, handle->layer_r)) != NULL) /* Do we need to update the image */
 		value[0] = e_nsb_get_layer_version(layer);
 	else
@@ -378,16 +383,15 @@ boolean p_th_service_handle(PTextureHandle **pointer)
 		value[2] = e_nsb_get_layer_version(layer);
 	else
 		value[2] = -1;
-//printf("serv 7\n");
 	if(value[0] != handle->layer_version[0] || value[0] != handle->layer_version[0] || value[0] != handle->layer_version[0])
 	{
+		handle->update_left = handle->size[1];
 		p_th_update_texture(handle);
 		handle->layer_version[0] = value[0];
 		handle->layer_version[1] = value[1];
 		handle->layer_version[2] = value[2];
 		return TRUE;
 	}
-//printf("serv 8\n");
 	return FALSE;
 }
 
@@ -404,7 +408,8 @@ boolean p_texture_compute(uint dummy)
 			return FALSE;
 	}
 	th_in_service = FALSE;
-	return TRUE;
+//	return TRUE;
+	return FALSE;
 }
 
 void p_texture_func(ENode *node, ECustomDataCommand command)
