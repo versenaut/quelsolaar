@@ -1,6 +1,6 @@
 
-#define MAX_COUNT_STAGE_LOOPS 1000000
-#define MAX_CLEAN_STAGE_LOOPS 1000000
+#define MAX_COUNT_STAGE_LOOPS 100000
+#define MAX_CLEAN_STAGE_LOOPS 100000
 
 
 typedef struct{
@@ -40,7 +40,7 @@ typedef struct{
 }PPolyStore;
 
 extern PPolyStore	*p_sds_create(uint *ref, uint ref_count, egreal *vertex, uint vertex_count, uint version);
-extern float		p_sds_stage_count_poly(PPolyStore *mesh, uint *ref, uint ref_count, egreal *vertex, uint vertex_count);
+extern float		p_sds_stage_count_poly(PPolyStore *mesh, uint *ref, uint ref_count, egreal *vertex, uint vertex_count, egreal default_crease);
 extern float		p_sds_stage_clean_poly(PPolyStore *mesh, uint *ref, uint ref_count, egreal *vertex, uint vertex_count);
 extern float		p_sds_stage_clean_poly_cerease(PPolyStore *mesh, uint *ref, uint ref_count, egreal *vertex, uint vertex_count, uint *crease);
 extern float		p_sds_compute_neighbor(PPolyStore *mesh);
