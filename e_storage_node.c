@@ -200,7 +200,7 @@ void callback_send_connect_accept(void *user, uint32 avatar, void *address)
 	uint i, mask = 0;
 	ENSGlobal.connected = TRUE;
 	for(i = 0; i < V_NT_NUM_TYPES; i++)
-		if(ENSGlobal.auto_subscribe[i] == TRUE || TRUE)
+		if(ENSGlobal.auto_subscribe[i] == TRUE)
 			mask = mask | (1 << i);
 	ENSGlobal.context[ENSGlobal.curent_net_connection].avatar = avatar;
 	ENSGlobal.context[ENSGlobal.curent_net_connection].accepted = TRUE;
@@ -347,7 +347,9 @@ void enough_init(void)
 ENodeHead *e_ns_get_node_next(uint id, uint connection, VNodeType type)
 {
 	ENodeHead *node;
-	for(node = get_next_dlut(&ENSGlobal.context[connection].look_up_table, id); node != NULL && node->node_type != type; node = get_next_dlut(&ENSGlobal.context[connection].look_up_table, node->node_id + 1));
+	for(node = get_next_dlut(&ENSGlobal.context[connection].look_up_table, id);
+	    node != NULL && node->node_type != type;
+	    node = get_next_dlut(&ENSGlobal.context[connection].look_up_table, node->node_id + 1));
 	return node;
 }
 
