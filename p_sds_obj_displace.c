@@ -1,4 +1,4 @@
-
+ 
 
 #include "enough.h"
 #include "p_sds_geo.h"
@@ -19,8 +19,9 @@ typedef struct{
 	boolean quad;
 }PDispalacemetParam;
 
-void create_param_polygon(ENode *g_node, egreal *output, PTessTableElement *table, EGeoLayer *layer, uint32 *ref, uint channel, uint polygon, boolean quad);
-
+extern void create_param_polygon(ENode *g_node, egreal *output, PTessTableElement *table, EGeoLayer *layer, uint32 *ref, uint channel, uint polygon, boolean quad);
+extern egreal p_noise_multi_function(egreal *vec);
+extern egreal p_noise_point_function(egreal *vec);
 
 void displacement_func(PDispalacemetParam *param, egreal *output, uint16 id)
 {
@@ -68,6 +69,14 @@ void displacement_func(PDispalacemetParam *param, egreal *output, uint16 id)
 				output[i++] = 0;	
 			}
 		break;
+		case VN_M_FT_VIEW :
+			for(i = 0; i < length;)
+			{
+				output[i++] = 0;
+				output[i++] = 0;
+				output[i++] = 0;	
+			}
+		break;
 		case VN_M_FT_VOLUME :
 			for(i = 0; i < length;)
 			{
@@ -99,13 +108,45 @@ void displacement_func(PDispalacemetParam *param, egreal *output, uint16 id)
 		break;
 		case VN_M_FT_NOISE :
 			displacement_func(param, output, frag->noise.mapping);
-			for(i = 0; i < length;)
+			switch(frag->noise.type)
 			{
-				f = get_rand((int)(output[i] * 1000) + (int)(output[i + 1] * 1000) * 1000 + (int)(output[i + 2] * 1000) * 1000000);
-				output[i++] = f;
-				output[i++] = f;
-				output[i++] = f;	
-			}	
+			case VN_M_NOISE_PERLIN_ZERO_TO_ONE :
+				for(i = 0; i < length;)
+				{
+					f = p_noise_multi_function(&output[i]);
+					output[i++] = f;
+					output[i++] = f;
+					output[i++] = f;	
+				}
+			break;
+			case VN_M_NOISE_PERLIN_MINUS_ONE_TO_ONE :
+				for(i = 0; i < length;)
+				{
+					f = p_noise_multi_function(&output[i]) * 2.0 - 1.0;
+					output[i++] = f;
+					output[i++] = f;
+					output[i++] = f;	
+				}
+			break;
+			case VN_M_NOISE_POINT_ZERO_TO_ONE :
+				for(i = 0; i < length;)
+				{
+					f = p_noise_point_function(&output[i]);
+					output[i++] = f;
+					output[i++] = f;
+					output[i++] = f;	
+				}
+			break;
+			case VN_M_NOISE_POINT_MINUS_ONE_TO_ONE : 
+				for(i = 0; i < length;)
+				{
+					f = p_noise_point_function(&output[i]) * 2.0 - 1.0;
+					output[i++] = f;
+					output[i++] = f;
+					output[i++] = f;	
+				}
+			break;
+			}
 		break;
 		case VN_M_FT_BLENDER :
 		{
@@ -174,21 +215,45 @@ void displacement_func(PDispalacemetParam *param, egreal *output, uint16 id)
 						i++;
 					}
 				break;
-				case VN_M_BLEND_DOT :
-					for(i = 0; i < length;)
-					{
-						output[i] = a[i] * b[i] + a[i + 1] * b[i + 1] + a[i + 2] * b[i + 2];
-						output[i + 1] = output[i];
-						output[i + 2] = output[i];	
-						i += 3;
-					}
-				break;
 			}
 
 			free(a);
 			free(b);
 		}
 		break;
+		case VN_M_FT_CLAMP :
+		{
+			displacement_func(param, output, frag->clamp.data);
+			if(frag->clamp.min)
+			{
+				for(i = 0; i < length;)
+				{
+					if(output[i] > frag->clamp.red)
+						output[i] = frag->clamp.red;
+					i++;
+					if(output[i] > frag->clamp.green)
+						output[i] = frag->clamp.green;
+					i++;
+					if(output[i] > frag->clamp.blue)
+						output[i] = frag->clamp.blue;	
+					i++;
+				}
+			}else
+			{
+				for(i = 0; i < length;)
+				{
+					if(output[i] < frag->clamp.red)
+						output[i] = frag->clamp.red;
+					i++;
+					if(output[i] < frag->clamp.green)
+						output[i] = frag->clamp.green;
+					i++;
+					if(output[i] < frag->clamp.blue)
+						output[i] = frag->clamp.blue;	
+					i++;
+				}
+			}
+		}
 		case VN_M_FT_MATRIX :
 		{
 			egreal tmp[3];
@@ -284,6 +349,8 @@ boolean p_lod_displacement_version(ENode *m_node, ENode *g_node, uint16 id, uint
 		output = TRUE;
 		case VN_M_FT_TRANSPARENCY :
 		output = TRUE;
+		case VN_M_FT_VIEW :
+		output = TRUE;
 		case VN_M_FT_VOLUME :
 		output = TRUE;
 		case VN_M_FT_GEOMETRY :
@@ -311,6 +378,9 @@ boolean p_lod_displacement_version(ENode *m_node, ENode *g_node, uint16 id, uint
 			if(frag->blender.type == VN_M_BLEND_FADE)
 				output = p_lod_displacement_version(m_node, g_node, frag->blender.control, version);
 		}
+		break;
+		case VN_M_FT_CLAMP :
+			output = p_lod_displacement_version(m_node, g_node, frag->clamp.data, version);
 		break;
 		case VN_M_FT_MATRIX :
 			output = p_lod_displacement_version(m_node, g_node, frag->matrix.data, version);
