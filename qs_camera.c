@@ -214,6 +214,8 @@ void qs_compute_camera(BInputState *input, float delta_time)
 		memcpy(old_pos, GView.pos, sizeof old_pos);
 	}
 
+	p_lod_set_view_pos(GView.pos);
+	p_lod_set_view_matrix(GView.matrix);
 	if(!input->mouse_button[0] && !input->last_mouse_button[0])
 		betray_set_mouse_warp(FALSE);
 }
