@@ -7,9 +7,6 @@
 extern double get_rand(uint32 index);
 
 
-#define MAX_COUNT_STAGE_LOOPS 1000000
-#define MAX_CLEAN_STAGE_LOOPS 1000000
-
 void p_sds_add_depend(PDepend *dep, PDepend *add, egreal mult)
 {
 	uint i, j, k;
@@ -49,10 +46,9 @@ PDepend *p_sds_allocate_depend_first(uint length)
 	PDependElement *e;
 	PDepend *d;
 	uint i;
+	length++;
 	e = malloc((sizeof *e) * length);
-
 	d = malloc((sizeof *d) * length);
-	d[0].length = -1;
 	for(i = 0; i < length; i++)
 	{
 		d[i].sum = 1;
@@ -61,6 +57,7 @@ PDepend *p_sds_allocate_depend_first(uint length)
 		e[i].value = 1;
 		e[i].vertex = i;
 	}
+	d[length - 1].length = (unsigned short)~0;
 	return d;
 }
 
@@ -68,6 +65,7 @@ PDepend *p_sds_allocate_depend(uint length)
 {
 	PDepend *d;
 	uint i;
+	length++;
 	d = malloc((sizeof *d) * length);
 	for(i = 0; i < length; i++)
 	{
@@ -82,7 +80,7 @@ PDepend *p_sds_allocate_depend(uint length)
 void p_sds_free_depend(PDepend *dep, uint length)
 {
 	uint i;
-	if(dep[0].length != (unsigned short) ~0)
+	if(dep[length].length != (unsigned short) ~0)
 	{
 		for(i = 0; i < length; i++)
 			if(dep[i].element != NULL);
@@ -358,18 +356,17 @@ void p_sds_free(PPolyStore *mesh, boolean limited)
 		}
 		else
 			free(mesh->vertex_dependency->element);
-/*		free(mesh->vertex_dependency);*/
+		free(mesh->vertex_dependency);
 	}
 	free(mesh);
-
 }
 
 
-float p_sds_stage_count_poly(PPolyStore *mesh, uint *ref, uint ref_count, egreal *vertex, uint vertex_count)
+float p_sds_stage_count_poly(PPolyStore *mesh, uint *ref, uint ref_count, egreal *vertex, uint vertex_count, egreal default_crease)
 {
-	uint stage;
+	uint stage, i = 0;
 	ref_count *= 4;
-	for(stage = mesh->stage[1]; stage < ref_count && stage < MAX_COUNT_STAGE_LOOPS ; stage += 4)
+	for(stage = mesh->stage[1]; stage < ref_count && i < MAX_COUNT_STAGE_LOOPS ; stage += 4)
 	{
 //		printf("ref%u = %u %u %u %u\n", stage / 4, ref[stage], ref[stage + 1], ref[stage + 2], ref[stage + 3]);
 		if(ref[stage] < vertex_count && ref[stage + 1] < vertex_count &&  ref[stage + 2] < vertex_count && vertex[ref[stage] * 3] != E_REAL_MAX && vertex[ref[stage + 1] * 3] != E_REAL_MAX && vertex[ref[stage + 2] * 3] != E_REAL_MAX)
@@ -379,13 +376,14 @@ float p_sds_stage_count_poly(PPolyStore *mesh, uint *ref, uint ref_count, egreal
 			else
 				mesh->base_tri_count++;				
 		}
+		i++;
 	}
 	if(stage == ref_count)
 	{
 		mesh->ref = malloc((sizeof *mesh->ref) * (3 * mesh->base_tri_count + 4 * mesh->base_quad_count));
 		mesh->crease = malloc((sizeof *mesh->crease) * (3 * mesh->base_tri_count + 4 * mesh->base_quad_count));
 		for(stage = 0; stage < (3 * mesh->base_tri_count + 4 * mesh->base_quad_count); stage++)
-			mesh->crease[stage] = 1;
+			mesh->crease[stage] = default_crease;
 		mesh->stage[1] = 0;
 		mesh->stage[0]++;
 	}else
@@ -395,10 +393,10 @@ float p_sds_stage_count_poly(PPolyStore *mesh, uint *ref, uint ref_count, egreal
 
 float p_sds_stage_clean_poly(PPolyStore *mesh, uint *ref, uint ref_count, egreal *vertex, uint vertex_count)
 {
-	uint stage;
+	uint stage, i = 0;
 	mesh->base_quad_count *= 4;
 	ref_count *= 4;
-	for(stage = mesh->stage[1]; stage < ref_count && stage < MAX_CLEAN_STAGE_LOOPS ; stage += 4)
+	for(stage = mesh->stage[1]; stage < ref_count && i < MAX_CLEAN_STAGE_LOOPS ; stage += 4)
 	{
 		if(ref[stage] < vertex_count && ref[stage + 1] < vertex_count &&  ref[stage + 2] < vertex_count && vertex[ref[stage] * 3] != E_REAL_MAX && vertex[ref[stage + 1] * 3] != E_REAL_MAX && vertex[ref[stage + 2] * 3] != E_REAL_MAX)
 		{
@@ -416,6 +414,7 @@ float p_sds_stage_clean_poly(PPolyStore *mesh, uint *ref, uint ref_count, egreal
 				mesh->ref[mesh->base_quad_count + mesh->tri_length++] = ref[stage + 2];												
 			}					
 		}
+		i++;
 	}
 	mesh->base_quad_count /= 4;	
 	if(stage == ref_count)
@@ -429,10 +428,10 @@ float p_sds_stage_clean_poly(PPolyStore *mesh, uint *ref, uint ref_count, egreal
 
 float p_sds_stage_clean_poly_cerease(PPolyStore *mesh, uint *ref, uint ref_count, egreal *vertex, uint vertex_count, uint *crease)
 {
-	uint stage;
+	uint stage, i = 0;
 	ref_count *= 4;
 	mesh->base_quad_count *= 4;
-	for(stage = mesh->stage[1]; stage < ref_count && stage < MAX_CLEAN_STAGE_LOOPS ; stage += 4)
+	for(stage = mesh->stage[1]; stage < ref_count && i < MAX_CLEAN_STAGE_LOOPS ; stage += 4)
 	{
 		if(ref[stage] < vertex_count && ref[stage + 1] < vertex_count &&  ref[stage + 2] < vertex_count && vertex[ref[stage] * 3] != E_REAL_MAX && vertex[ref[stage + 1] * 3] != E_REAL_MAX && vertex[ref[stage + 2] * 3] != E_REAL_MAX)
 		{
@@ -466,6 +465,7 @@ float p_sds_stage_clean_poly_cerease(PPolyStore *mesh, uint *ref, uint ref_count
 					1 - ((egreal)crease[stage + 2] / 4294967295.0));	
 */			}					
 		}
+		i++;
 	}
 	mesh->base_quad_count /= 4;	
 	if(stage == ref_count)
@@ -504,157 +504,6 @@ egreal p_sds_get_crease(PPolyStore *mesh, uint edge)
 //		return mesh->crease[edge / mesh->poly_per_base + (edge - mesh->quad_length * mesh->poly_per_base) % 3];
 
 
-void sds_test_draw(PPolyStore *s, egreal *vertex)
-{
-	float array[16];
-	uint i = 0, j, color;
-	for(i = 0; i < 4 * s->base_quad_count; i += 4)
-	{
-		array[0] = (vertex[s->ref[i] * 3] + vertex[s->ref[i + 1] * 3] + vertex[s->ref[i + 2] * 3] + vertex[s->ref[i + 3] * 3]) / 4.0;
-		array[1] = (vertex[s->ref[i] * 3 + 1] + vertex[s->ref[i + 1] * 3 + 1] + vertex[s->ref[i + 2] * 3 + 1] + vertex[s->ref[i + 3] * 3 + 1]) / 4.0;
-		array[2] = (vertex[s->ref[i] * 3 + 2] + vertex[s->ref[i + 1] * 3 + 2] + vertex[s->ref[i + 2] * 3 + 2] + vertex[s->ref[i + 3] * 3 + 2]) / 4.0;
-		for(j = 0; j < 4; j++)
-		{	
-			array[3] = vertex[s->ref[i + j] * 3] * 0.9 + array[0] * 0.1;	
-			array[4] = vertex[s->ref[i + j] * 3 + 1] * 0.9 + array[1] * 0.1;	
-			array[5] = vertex[s->ref[i + j] * 3 + 2] * 0.9 + array[2] * 0.1;
-			array[6] = vertex[s->ref[i + (j + 1) % 4] * 3] * 0.9 + array[0] * 0.1;	
-			array[7] = vertex[s->ref[i + (j + 1) % 4] * 3 + 1] * 0.9 + array[1] * 0.1;	
-			array[8] = vertex[s->ref[i + (j + 1) % 4] * 3 + 2] * 0.9 + array[2] * 0.1;
-			color = i + j;
-	//		printf("s->base_neighbor[color] %u\n", s->base_neighbor[color]);
-			if(s->base_neighbor[color] < color)
-				color = s->base_neighbor[color];
-
-			if(s->base_neighbor[color] == -1)
-				sui_draw_gl(GL_TRIANGLES, array, 3, 3, 0, 0, 1);		
-			else
-				sui_draw_gl(GL_TRIANGLES, array, 3, 3, get_rand(color), get_rand(color + 1), 0);
-		}
-
-	}
-	for(; i < 3 * s->base_tri_count + 4 * s->base_quad_count; i += 3)
-	{
-		array[0] = (vertex[s->ref[i] * 3] + vertex[s->ref[i + 1] * 3] + vertex[s->ref[i + 2] * 3]) / 3.0;
-		array[1] = (vertex[s->ref[i] * 3 + 1] + vertex[s->ref[i + 1] * 3 + 1] + vertex[s->ref[i + 2] * 3 + 1]) / 3.0;
-		array[2] = (vertex[s->ref[i] * 3 + 2] + vertex[s->ref[i + 1] * 3 + 2] + vertex[s->ref[i + 2] * 3 + 2]) / 3.0;
-		for(j = 0; j < 3; j++)
-		{	
-			array[3] = vertex[s->ref[i + j] * 3] * 0.9 + array[0] * 0.1;	
-			array[4] = vertex[s->ref[i + j] * 3 + 1] * 0.9 + array[1] * 0.1;	
-			array[5] = vertex[s->ref[i + j] * 3 + 2] * 0.9 + array[2] * 0.1;
-			array[6] = vertex[s->ref[i + (j + 1) % 3] * 3] * 0.9 + array[0] * 0.1;	
-			array[7] = vertex[s->ref[i + (j + 1) % 3] * 3 + 1] * 0.9 + array[1] * 0.1;	
-			array[8] = vertex[s->ref[i + (j + 1) % 3] * 3 + 2] * 0.9 + array[2] * 0.1;
-			color = i + j;
-	//		printf("s->base_neighbor[color] %u\n", s->base_neighbor[color]);
-			if(s->base_neighbor[color] < color)
-				color = s->base_neighbor[color];
-			if(s->base_neighbor[color] == -1)
-				sui_draw_gl(GL_TRIANGLES, array, 3, 3, 0, 0, 1);		
-			else
-			sui_draw_gl(GL_TRIANGLES, array, 3, 3, get_rand(color), get_rand(color + 1), 0);
-		}
-	}
-//	printf("count prim = %u %u\n", s->base_tri_count, s->base_quad_count);
-
-}
-
-
-void sds_test_draw_2(PPolyStore *s, egreal *vertex)
-{
-	static float t = 0;
-	float array[12], center[3];
-	PDepend *dep;
-	uint i = 0, j, k, color, pos;
-//	vertex[4] = sin(t++ * 0.1) * 0.001;
-//	vertex[4] -= 0.001;
-	for(i = 0; i < s->quad_length; i += 4)
-	{
-		for(j = 0; j < 4 * 3; j++)
-			array[j] = 0;
-		for(j = 0; j < 4; j++)
-		{	
-			dep = &s->vertex_dependency[s->ref[i + j]];
-			for(k = 0; k < dep->length; k++)
-			{
-				if(dep->element[k].vertex != -1)
-				{
-
-					array[j * 3 + 0] += vertex[3 * dep->element[k].vertex] * dep->element[k].value / dep->sum;
-					array[j * 3 + 1] += vertex[3 * dep->element[k].vertex + 1] * dep->element[k].value / dep->sum;
-					array[j * 3 + 2] += vertex[3 * dep->element[k].vertex + 2] * dep->element[k].value / dep->sum;
-				}
-			}
-		}
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		sui_draw_gl(GL_QUADS, array, 4, 3, 0.3, 0.3, 0.3);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		{
-			float array2[12], color[12];
-			for(j = 0; j < 4; j++)
-			{
-				array2[j * 3 + 0] = (array[j * 3 + 0] + array[((j + 1) % 4) * 3 + 0]) * 0.5;
-				array2[j * 3 + 1] = (array[j * 3 + 1] + array[((j + 1) % 4) * 3 + 1]) * 0.5;
-				array2[j * 3 + 2] = (array[j * 3 + 2] + array[((j + 1) % 4) * 3 + 2]) * 0.5;
-				
-				k = i + j;
-				if(s->neighbor[i + j] < k)
-					k = s->neighbor[k];
-
-				color[j * 3 + 0] = get_rand(k);
-				color[j * 3 + 1] = get_rand(k + 1);
-				color[j * 3 + 2] = get_rand(k + 2);
-			}
-
-			sui_set_color_array_gl(color, 4, 3);
-			sui_draw_gl(GL_QUADS, array2, 4, 3, get_rand(i), get_rand(i + 1), get_rand(i + 2));
-		}
-	}
-//	printf("s->base_tri_count = %u\n", s->base_tri_count);
-	for(; i < s->tri_length + s->quad_length; i += 3)
-	{
-		for(j = 0; j < 3 * 3; j++)
-			array[j] = 0;
-		for(j = 0; j < 3; j++)
-		{	
-			dep = &s->vertex_dependency[s->ref[i + j]];
-			for(k = 0; k < dep->length; k++)
-			{
-				if(dep->element[k].vertex != -1)
-				{
-
-					array[j * 3 + 0] += vertex[3 * dep->element[k].vertex] * dep->element[k].value / dep->sum;
-					array[j * 3 + 1] += vertex[3 * dep->element[k].vertex + 1] * dep->element[k].value / dep->sum;
-					array[j * 3 + 2] += vertex[3 * dep->element[k].vertex + 2] * dep->element[k].value / dep->sum;
-				}
-			}
-		}
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		sui_draw_gl(GL_TRIANGLES, array, 3, 3, 0.3, 0.3, 0.3);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		{
-			float array2[12], color[12];
-			for(j = 0; j < 3; j++)
-			{
-				array2[j * 3 + 0] = (array[j * 3 + 0] + array[((j + 1) % 3) * 3 + 0]) * 0.5;
-				array2[j * 3 + 1] = (array[j * 3 + 1] + array[((j + 1) % 3) * 3 + 1]) * 0.5;
-				array2[j * 3 + 2] = (array[j * 3 + 2] + array[((j + 1) % 3) * 3 + 2]) * 0.5;
-				
-				k = i + j;
-				if(s->neighbor[i + j] < k)
-					k = s->neighbor[k];
-
-				color[j * 3 + 0] = get_rand(k);
-				color[j * 3 + 1] = get_rand(k + 1);
-				color[j * 3 + 2] = get_rand(k + 2);
-			}
-
-			sui_set_color_array_gl(color, 3, 3);
-			sui_draw_gl(GL_TRIANGLES, array2, 3, 3, get_rand(i), get_rand(i + 1), get_rand(i + 2));
-		}
-	}
-}
 
 void p_sds_final_clean(PPolyStore *mesh)
 {
