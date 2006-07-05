@@ -21,11 +21,7 @@ typedef unsigned int GLhandleARB;
 #define GL_FRAGMENT_SHADER_ARB                      0x8B30
 #define GL_TEXTURE0_ARB								0x84C0
 
-GLhandleARB 
-(APIENTRY 
-		 *p_glCreateShaderObjectARB)
-(GLenum 
- shaderType);
+GLhandleARB (APIENTRY *p_glCreateShaderObjectARB)(GLenum  shaderType);
 GLvoid      (APIENTRY *p_glDeleteObjectARB)(GLhandleARB obj);
 GLhandleARB (APIENTRY *p_glCreateProgramObjectARB)(GLvoid);
 GLvoid      (APIENTRY *p_glAttachObjectARB)(GLhandleARB containerObj, GLhandleARB obj);
@@ -54,6 +50,7 @@ extern void p_shader_bind_fallback(uint32 node_id);
 typedef struct{
 	uint			fragment;
 	PTextureHandle	*handle;
+	uint			texture;
 	uint			location;
 }PShaderTexture;
 
@@ -71,6 +68,9 @@ typedef struct{
 	uint		g_f_count;
 	uint		environment[2];
 	void		*temp;
+	uint		dest;
+	uint		src;
+	boolean		volume;
 }PShader;
 
 typedef struct{
@@ -93,17 +93,26 @@ char p_standard_fragment_shader_code[2048] =
 "	vec4 t_color_1;"
 "	vec3 v, light = vec3(0, 0, 0), ambient;"
 "	float f, dist;"
-"	int i;"
-"	for(i = 0; i < 3; i++)"
-"	{"
-"		v = gl_LightSource[0].position.xyz - pixel_pos.xyz;"
-"		dist = length(v);"
-"		v = normalize(v);"
-"		f = max(0.0, dot(normal, v)) / dist;"
-"		light += gl_LightSource[0].diffuse.rgb * vec3(f, f, f);"
-"	}"
-"	ambient = textureCube(diffuse_environment, reflect(pixel_pos.xyz, normal.xyz)).xyz;"
-"	gl_FragColor = (vec4(0.4, 0.8, 1.4, 0.0) * vec4(light + ambient, 0));"
+"	v = gl_LightSource[0].position.xyz - pixel_pos.xyz;"
+"	dist = length(v);"
+"	v = normalize(v);"
+"	f = max(0.0, dot(normal, v)) / dist;"
+"	light += gl_LightSource[0].diffuse.rgb * vec3(f, f, f);"
+
+"	v = gl_LightSource[1].position.xyz - pixel_pos.xyz;"
+"	dist = length(v);"
+"	v = normalize(v);"
+"	f = max(0.0, dot(normal, v)) / dist;"
+"	light += gl_LightSource[1].diffuse.rgb * vec3(f, f, f);"
+
+"	v = gl_LightSource[2].position.xyz - pixel_pos.xyz;"
+"	dist = length(v);"
+"	v = normalize(v);"
+"	f = max(0.0, dot(normal, v)) / dist;"
+"	light += gl_LightSource[2].diffuse.rgb * vec3(f, f, f);"
+
+"	ambient = textureCube(diffuse_environment, gl_NormalMatrix * reflect(pixel_pos.xyz, normal.xyz)).xyz;"
+"	gl_FragColor = vec4(light + ambient, 0);"
 "}";
 
 char p_standard_vertex_shader_code[256] = 
@@ -123,9 +132,9 @@ PShader *p_shader_allocate(void)
 {
 	PShader *s;
 	s = malloc(sizeof *s);
-    s->prog_obj = p_glCreateProgramObjectARB();
+	s->prog_obj = p_glCreateProgramObjectARB();
 	s->vertex_obj = p_glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-    s->fragment_obj = p_glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+	s->fragment_obj = p_glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
 	p_glAttachObjectARB(s->prog_obj, s->vertex_obj);
 	p_glAttachObjectARB(s->prog_obj, s->fragment_obj);
 	s->uniforms_fragments = NULL;
@@ -137,6 +146,7 @@ PShader *p_shader_allocate(void)
 	s->data_version = 0;
 	s->struct_version = 0;
 	s->temp = 0;
+	s->volume = FALSE;
 	return s;
 }
 
@@ -201,6 +211,9 @@ void p_shader_init(void)
 				p_glGetInfoLogARB(p_standard_shader->prog_obj, 2000, &length, buf);
 				printf("3STD Errors:\n%s\n", buf);
 			}
+			p_standard_shader->src = GL_ONE;
+			p_standard_shader->dest = GL_ZERO;
+		
 	}else
 	{
 		p_programmable_shaders_supported = FALSE;
@@ -239,12 +252,13 @@ void p_shader_uniform_add(PShader *s, uint fragment_id, uint locator_id)
 	s->u_f_count++;
 }
 
-void p_shader_texture_add(PShader *s, uint fragment_id, uint locator_id, PTextureHandle *handle)
+void p_shader_texture_add(PShader *s, uint fragment_id, uint locator_id, PTextureHandle *handle, uint texture_id)
 {
 	if(s->t_f_count % 16 == 0)
 		s->texture_fragments = realloc(s->texture_fragments, (sizeof *s->texture_fragments) * (s->t_f_count + 16));
 	s->texture_fragments[s->t_f_count].fragment = fragment_id;
 	s->texture_fragments[s->t_f_count].handle = handle;
+	s->texture_fragments[s->t_f_count].texture = texture_id;
 	s->texture_fragments[s->t_f_count].location = locator_id;
 	s->t_f_count++;
 }
@@ -258,8 +272,11 @@ void p_shader_geometry_add(PShader *s, uint fragment_id, uint locator_id)
 	s->g_f_count++;
 }
 
+extern uint p_shader_ramp_texture_create(uint texture_size, VMatFrag *frag);
+
 void p_shader_uniform_locate(PShader *s, ENode *node)
 {
+	PTextureHandle *handle;
 	uint16 frag;
 	VMatFrag *f;
 	char frag_name[64];
@@ -287,36 +304,21 @@ void p_shader_uniform_locate(PShader *s, ENode *node)
 				sprintf(frag_name, "attrib_geometry_%u", frag);
 				p_shader_geometry_add(s, frag, p_glGetAttribLocationARB(s->prog_obj, frag_name));
 				break;
+			case VN_M_FT_RAMP :
+				f = e_nsm_get_fragment(node, frag);
+				p_shader_texture_add(s, frag, p_glGetUniformLocationARB(s->prog_obj, frag_name), NULL, p_shader_ramp_texture_create(256, f));
+				break;
 			case VN_M_FT_TEXTURE :
 				f = e_nsm_get_fragment(node, frag);
+				handle = p_th_create_texture_handle(f->texture.bitmap, f->texture.layer_r, f->texture.layer_g, f->texture.layer_b);
 				sprintf(frag_name, "texture_%u", frag);
-				p_shader_texture_add(s, frag, p_glGetUniformLocationARB(s->prog_obj, frag_name), 
-					p_th_create_texture_handle(f->texture.bitmap, f->texture.layer_r, f->texture.layer_g, f->texture.layer_b));
+				p_shader_texture_add(s, frag, p_glGetUniformLocationARB(s->prog_obj, frag_name), handle, p_th_get_texture_id(handle));
 				break;
 		}
 	}
 	s->environment[0] = p_glGetUniformLocationARB(s->prog_obj, "environment");
 	s->environment[1] = p_glGetUniformLocationARB(s->prog_obj, "diffuse_environment");
 }
-	/*
-extern PTextureHandle *p_th_create_texture_handle(uint node_id, char *layer_r, char *layer_g, char *layer_b);
-extern void		p_th_destroy_texture_handle(PTextureHandle *handle);
-extern uint		p_th_get_texture_id(PTextureHandle *handle);
-
-
-int my_vec3_location = glGetAttribLocationARB(my_program, “my_3d_vector”);
-
-glBegin(GL_TRIANGLES);
-	glVertexAttrib3f(my_vec3_location, 4.0f, 2.0f, 7.0f);
------------------
-int my_sampler_uniform_location = glGetUniformLocationARB(my_program, “my_color_texture”);
-
-glActiveTexture(GL_TEXTURE0 + i);
-glBindTexture(GL_TEXTURE_2D, my_texture_object);
-
-glUniform1iARB(my_sampler_uniform_location, i);
-
-*/
 
 #define GL_TEXTURE_CUBE_MAP_EXT             0x8513 
 
@@ -356,7 +358,10 @@ void p_shader_param_load(ENode *parent, uint32 node_id, PRenderArray *array, uin
 	{
 		p_glActiveTextureARB(GL_TEXTURE0_ARB + i);
 		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, p_th_get_texture_id(s->texture_fragments[i].handle));
+		if(s->texture_fragments[i].handle != NULL)
+			glBindTexture(GL_TEXTURE_2D, p_th_get_texture_id(s->texture_fragments[i].handle));
+		else
+			glBindTexture(GL_TEXTURE_1D, s->texture_fragments[i].texture);
 		p_glUniform1iARB(s->texture_fragments[i].location, i);
 	}
 	p_glActiveTextureARB(GL_TEXTURE0_ARB + i);
@@ -395,6 +400,22 @@ VMatFrag *p_shader_get_param(ENode *node, uint nr)
 }
 
 
+boolean p_shader_transparancy(uint32 node_id)
+{
+	if(p_programmable_shaders_supported)
+	{
+		PShader *s;
+		ENode *node;
+		node = e_ns_get_node(0, node_id);
+		if(node != NULL)
+		{
+			s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
+			return s->dest != GL_ZERO || s->volume;
+		}
+	}
+	return FALSE;
+}
+
 void p_shader_bind(uint32 node_id)
 {
 	if(p_programmable_shaders_supported)
@@ -404,11 +425,15 @@ void p_shader_bind(uint32 node_id)
 		s = p_standard_shader;
 		node = e_ns_get_node(0, node_id);
 		if(node != NULL && V_NT_MATERIAL == e_ns_get_node_type(node))
+		{
 			s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
-		p_glUseProgramObjectARB(s->prog_obj);
+			glBlendFunc(s->src, s->dest);
+			p_glUseProgramObjectARB(s->prog_obj);
+		}
 	}else
 		p_shader_bind_fallback(node_id);
 }
+
 void p_shader_unbind(uint32 node_id)
 {
 	if(p_programmable_shaders_supported)
@@ -441,7 +466,7 @@ void p_shader_unbind(uint32 node_id)
 
 
 
-extern void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, uint *f_length, void *t);
+extern void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, uint *f_length, uint *dest, uint *src, void *t);
 extern void p_shader_write_destroy_temp(void *t);
 
 boolean p_shader_compute(uint node_id)
@@ -449,6 +474,7 @@ boolean p_shader_compute(uint node_id)
 	PShaderGenTemp *t;
 	PShader *shader;
 	ENode *node;
+	VNMFragmentID fragment;
 	if((node = e_ns_get_node(0, node_id)) == NULL || V_NT_MATERIAL != e_ns_get_node_type(node))
 		return TRUE;
 
@@ -468,6 +494,10 @@ boolean p_shader_compute(uint node_id)
 		shader = malloc(sizeof *shader);
 		*shader = *p_standard_shader;
 		e_ns_set_custom_data(node, P_ENOUGH_SLOT, shader);
+		if(t->v_shader != NULL)
+			free(t->v_shader);
+		if(t->f_shader != NULL)
+			free(t->f_shader);
 		free(t);
 		return TRUE;
 	}
@@ -477,6 +507,9 @@ boolean p_shader_compute(uint node_id)
 		case 0 :
 			t->s = p_shader_allocate();
 			t->s->struct_version = e_ns_get_node_version_struct(node);
+			for(fragment = e_nsm_get_fragment_next(node, 0); fragment != (uint16)-1 && VN_M_FT_VOLUME != e_nsm_get_fragment_type(node, fragment); fragment = e_nsm_get_fragment_next(node, fragment + 1));
+			if(fragment != (uint16)-1)
+				t->s->volume = TRUE;
 			t->stage = 1;
 		break;
 		case 1 :
@@ -484,9 +517,12 @@ boolean p_shader_compute(uint node_id)
 			{
 				t->s->struct_version = e_ns_get_node_version_struct(node);
 				p_shader_write_destroy_temp(t->writer_temp);
+				for(fragment = e_nsm_get_fragment_next(node, 0); fragment != (uint16)-1 && VN_M_FT_VOLUME != e_nsm_get_fragment_type(node, fragment); fragment = e_nsm_get_fragment_next(node, fragment + 1));
+				if(fragment != (uint16)-1)
+					t->s->volume = TRUE;
 				t->writer_temp = NULL;
 			}
-			t->writer_temp = p_shader_write(node, &t->v_shader, &t->v_length, &t->f_shader, &t->f_length, t->writer_temp);
+			t->writer_temp = p_shader_write(node, &t->v_shader, &t->v_length, &t->f_shader, &t->f_length, &t->s->dest, &t->s->src, t->writer_temp);
 			if(t->writer_temp == NULL)
 				t->stage = 2;
 
@@ -540,6 +576,8 @@ boolean p_shader_compute(uint node_id)
 		case 6 :
 			p_shader_destroy(shader);
 			e_ns_set_custom_data(node, P_ENOUGH_SLOT, t->s);
+			free(t->v_shader);
+			free(t->f_shader);
 			free(t);
 		return TRUE;
 	}
@@ -562,6 +600,8 @@ void p_shader_func(ENode *node, ECustomDataCommand command)
 			if(s->temp == NULL)
 			{
 				t = malloc(sizeof *t);
+				t->v_shader = NULL;
+				t->f_shader = NULL;
 				t->writer_temp = NULL;
 				t->stage = 0;
 				s->temp = t;
@@ -575,24 +615,7 @@ void p_shader_func(ENode *node, ECustomDataCommand command)
 }
 
 uint shadow_prog_obj = -1;
-/*
-vec3 vector;
-vec3 normal;
-vec4 position;
 
-void main()
-{
-	poition = gl_ModelViewMatrix * gl_Vertex;
-	vector = gl_LightSource[0].position.xyz - position.xyz;
-	normal = normalize(gl_NormalMatrix * gl_Normal);
-	if(dot(vector, normal) < 0.0)
-	{
-		vector = normalize(vector);
-		gl_Position = gl_ProjectionMatrix * vec4((position - vector), 0.0);
-	}else
-		gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-}
-*/
 void p_shader_init_shadow(void)
 {
 	uint vertex_obj, fragment_obj;
@@ -611,21 +634,14 @@ void p_shader_init_shadow(void)
 	"\t{\n"
 	"\t\tvector = normalize(vector);\n"
 	"\t\tgl_Position = gl_ProjectionMatrix * vec4((position.xyz - vector * vec3(100.0, 100.0, 100.0)), 1.0);\n"
-//	"\t\tgl_Position = gl_ProjectionMatrix * vec4(position.xyz, 0.0);\n"
 	"\t}else\n"
 	"\t\tgl_Position = gl_ProjectionMatrix * vec4((position.xyz - vector * vec3(0.01, 0.01, 0.01)), 1.0);\n"
-	
-//	"\t\tgl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
-
 	"}\n";
-
 	char *f_shader = "void main()\n{\n\tgl_FragColor = vec4(1.0, 1.0, 1.0, 0.0);\n}\n";
-
-
 
 	shadow_prog_obj = p_glCreateProgramObjectARB();
 	vertex_obj = p_glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-    fragment_obj = p_glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+	fragment_obj = p_glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
 	p_glAttachObjectARB(shadow_prog_obj, vertex_obj);
 	p_glAttachObjectARB(shadow_prog_obj, fragment_obj);
 	for(i = 0; v_shader[i] != 0; i++);
@@ -652,4 +668,75 @@ boolean p_shader_shadow_bind(void)
 	if(p_programmable_shaders_supported)
 		p_glUseProgramObjectARB(shadow_prog_obj);
 	return p_programmable_shaders_supported;
+}/*
+
+varying vec4 pixel_pos;
+varying vec3 normal;
+uniform samplerCube environment;
+uniform samplerCube diffuse_environment;
+varying vec3 r_normal;
+uniform sampler2D texture_4;
+uniform sampler2D texture_5;
+
+void main()
+{
+	vec3 v, light = vec3(0, 0, 0), ambient;
+	float f, dist;
+	v = gl_LightSource[0].position.xyz - pixel_pos.xyz;
+	dist = length(v);
+	v = normalize(v);
+	f = max(0.0, dot(normal, v)) / dist;
+	light += gl_LightSource[0].diffuse.rgb * vec3(f, f, f);
+	v = gl_LightSource[1].position.xyz - pixel_pos.xyz;
+	dist = length(v);
+	v = normalize(v);
+	f = max(0.0, dot(normal, v)) / dist;
+	light += gl_LightSource[1].diffuse.rgb * vec3(f, f, f);
+	v = gl_LightSource[2].position.xyz - pixel_pos.xyz;
+	dist = length(v);
+	v = normalize(v);
+	f = max(0.0, dot(normal, v)) / dist;
+	light += gl_LightSource[2].diffuse.rgb * vec3(f, f, f);
+	ambient = textureCube(diffuse_environment, normalize(pixel_pos.xyz) + vec4(0.0, 0.0, 0.0, 0.0)).xyz;
+	gl_FragColor = vec4(vec3(((vec4(light + ambient, 0) + (texture2D(texture_4, vec4(0.0, 0.0, 0.0, 0.0).xy) + texture2D(texture_5, vec4(0.0, 0.0, 0.0, 0.0).xy)))).rgb), 1.0);
+}
+
+*/
+
+void p_shader_init_blur_cube(void)
+{
+	uint vertex_obj, fragment_obj;
+	uint i;
+	char buf[2000];
+	char *v_shader =
+	"varying vec4 pixel_pos;"
+	"varying vec3 normal;"
+	"void main()"
+	"{"
+	"	normal = normalize(gl_NormalMatrix * gl_Normal);"	
+	"	pixel_pos = gl_ModelViewMatrix * gl_Vertex;"
+	"	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;"
+	"}";
+	char *f_shader = "void main()\n{\n\tgl_FragColor = vec4(1.0, 1.0, 1.0, 0.0);\n}\n";
+
+	shadow_prog_obj = p_glCreateProgramObjectARB();
+	vertex_obj = p_glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+	fragment_obj = p_glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+	p_glAttachObjectARB(shadow_prog_obj, vertex_obj);
+	p_glAttachObjectARB(shadow_prog_obj, fragment_obj);
+	for(i = 0; v_shader[i] != 0; i++);
+	p_glShaderSourceARB(vertex_obj, 1, &v_shader, &i);
+	p_glCompileShaderARB(vertex_obj);
+
+	p_glGetInfoLogARB(vertex_obj, 2000, &i, buf);
+	printf("%s\n", v_shader);
+	printf("Shadow Errors:\n%s\n", buf);
+	for(i = 0; f_shader[i] != 0; i++);
+	p_glShaderSourceARB(fragment_obj, 1, &f_shader, &i);
+	p_glCompileShaderARB(fragment_obj);
+	p_glGetInfoLogARB(fragment_obj, 2000, &i, buf);
+	printf("%s\n", f_shader);
+	printf("Shadow Errors:\n%s\n", buf);
+
+	p_glLinkProgramARB(shadow_prog_obj);
 }
