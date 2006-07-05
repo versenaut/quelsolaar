@@ -1,4 +1,4 @@
-
+ 
 #include "seduce.h"
 
 void sui_set_blend_gl(uint source, uint destination)
@@ -7,9 +7,9 @@ void sui_set_blend_gl(uint source, uint destination)
 	glEnable(GL_BLEND);
 }
 
-void sui_draw_gl(uint draw_type, const float *array, uint length, uint dimensions, float red, float green, float blue)
+void sui_draw_gl(uint draw_type, const float *array, uint length, uint dimensions, float red, float green, float blue, float alpha)
 {
-	glColor4f(red, green, blue, 0);	
+	glColor4f(red, green, blue, alpha);	
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(dimensions, GL_FLOAT , 0, array);
 	glDrawArrays(draw_type, 0, length);
@@ -21,17 +21,17 @@ void sui_draw_gl(uint draw_type, const float *array, uint length, uint dimension
 }
 
 
-void sui_draw_2d_line_gl(float start_x, float start_y, float end_x, float end_y, float red, float green, float blue)
+void sui_draw_2d_line_gl(float start_x, float start_y, float end_x, float end_y, float red, float green, float blue, float alpha)
 {
 	float array[4];
 	array[0] = start_x;
 	array[1] = start_y;
 	array[2] = end_x;
 	array[3] = end_y;
-	sui_draw_gl(GL_LINES, array, 2, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 2, 2, red, green, blue, alpha);
 }
 
-void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end_x, float end_y, float end_z, float red, float green, float blue)
+void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end_x, float end_y, float end_z, float red, float green, float blue, float alpha)
 {
 	float array[6];
 	array[0] = start_x;
@@ -40,18 +40,19 @@ void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end
 	array[3] = end_x;
 	array[4] = end_y;
 	array[5] = end_z;
-	sui_draw_gl(GL_LINES, array, 2, 3, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 2, 3, red, green, blue, alpha);
 }
 
-void sui_draw_elements_gl(uint draw_type, float *array, uint *reference, uint length, uint dimensions, float red, float green, float blue)
+void sui_draw_elements_gl(uint draw_type, float *array, uint *reference, uint length, uint dimensions, float red, float green, float blue, float alpha)
 {
-	glColor3f(red, green, blue);
+	glColor4f(red, green, blue, alpha);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(dimensions, GL_FLOAT, 0, array);
 	glDrawElements(draw_type, length, GL_UNSIGNED_INT, reference);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_BLEND);
 }
