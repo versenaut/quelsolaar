@@ -94,7 +94,7 @@ void p_render_object_shadow(ENode *node)
 	for(i = 0; i < o->mesh_count && o->meshes[i] != NULL; i++)
 	{
 		mesh = o->meshes[i];
-		if(p_rm_drawable(mesh))
+		if(p_rm_drawable(mesh) && p_rm_get_shadow(mesh))
 		{
 			#ifdef E_GEOMETRY_REAL_PRECISION_64_BIT
 			glVertexPointer(3, GL_DOUBLE, 0, p_rm_get_vertex(mesh));
@@ -112,12 +112,12 @@ void p_render_object_shadow(ENode *node)
 	glPopMatrix();
 }
 
-void p_render_object(ENode *node)
+void p_render_object(ENode *node, boolean transparency)
 {
 	double matrix[16], scale[3];
 	PMesh *mesh;
 	PObject *o;
-	uint32 i, j = 0, count, range, *ref;
+	uint32 i, j = 0, count, range, *ref, mat;
 	o = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
 
 	if(!o->task)
@@ -136,7 +136,6 @@ void p_render_object(ENode *node)
 			#endif
 			#ifdef E_GEOMETRY_REAL_PRECISION_32_BIT
 			glVertexPointer(3, GL_FLOAT, 0, p_rm_get_vertex(mesh));
-
 			glNormalPointer(GL_FLOAT, 0 , p_rm_get_normal(mesh));
 			#endif
 			count = p_rm_get_mat_count(mesh);
@@ -144,17 +143,21 @@ void p_render_object(ENode *node)
 			range = 0;
 			for(j = 0; j < count; j++)
 			{
-				p_shader_bind(p_rm_get_material(mesh, j));
-				p_shader_param_load(node, p_rm_get_material(mesh, j), p_rm_get_param(mesh), p_rm_get_param_count(mesh), p_env_get_environment(o->environment), p_env_get_diffuse(o->environment));
-				glDrawElements(GL_TRIANGLES, p_rm_get_material_range(mesh, j) - range, GL_UNSIGNED_INT, &ref[range]);
-				range = p_rm_get_material_range(mesh, j);
-				p_shader_unbind(p_rm_get_material(mesh, j));
+				mat = p_rm_get_material(mesh, j);
+				if(transparency == p_shader_transparancy(mat))
+				{
+					p_shader_bind(mat);
+					p_shader_param_load(node, mat, p_rm_get_param(mesh), p_rm_get_param_count(mesh), /*p_env_get_environment(o->environment)*/o->impostor.environment, p_env_get_diffuse(o->environment));
+					glDrawElements(GL_TRIANGLES, p_rm_get_material_range(mesh, j) - range, GL_UNSIGNED_INT, &ref[range]);
+					range = p_rm_get_material_range(mesh, j);
+					p_shader_unbind(mat);
+				}
 			}
 		}	
 	}
 }
 
-void p_render_lit_and_transformed_object(ENode *node)
+void p_render_lit_and_transformed_object(ENode *node, boolean transparency)
 {
 	double matrix[16], scale[3];
 	PMesh *mesh;
@@ -163,29 +166,56 @@ void p_render_lit_and_transformed_object(ENode *node)
 	o = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
 	p_set_light(&o->light, 3, 0, 0);
 
-
 	glPushMatrix();
 	p_render_set_transform(node);
-	p_render_object(node);
-
+	p_render_object(node, transparency);
 	glPopMatrix();
 }
 
-void p_draw_scene(void)
+boolean p_render_with_shadows = TRUE;
+boolean p_render_wireframe = FALSE;
+
+void p_render_set_shadows(boolean shadows)
+{
+	p_render_with_shadows = shadows;
+}
+
+boolean p_render_get_shadows(void)
+{
+	return p_render_with_shadows;
+}
+
+void p_render_set_wireframe(boolean wireframe)
+{
+	p_render_wireframe = wireframe;
+}
+
+boolean p_render_get_wireframe(void)
+{
+	return p_render_wireframe;
+}
+
+void p_draw_all_impostors();
+void p_draw_object_impostor(ENode *node);
+void p_update_object_impostors();
+boolean p_draw_object_as_impostor(ENode *node);
+void p_set_enable_shadow(uint id);
+
+void p_draw_scene()
 {
 	ENode *node;
-//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glCullFace(GL_FRONT);
-	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_VERTEX_ARRAY);
-/*	if(p_shaders_supported())
+	if(p_shaders_supported() && p_render_with_shadows && !p_render_wireframe)
 	{
+		glCullFace(GL_FRONT);
+		glEnable(GL_CULL_FACE);
 		p_set_enable_shadow(1);
 		for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
-			p_render_lit_and_transformed_object(node);
+			if(!p_draw_object_as_impostor(node))
+				p_render_lit_and_transformed_object(node, FALSE);
 		glClearStencil(0);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glEnable(GL_DEPTH_TEST);
@@ -220,17 +250,39 @@ void p_draw_scene(void)
 		glEnable(GL_STENCIL_TEST);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 		glStencilFunc(GL_EQUAL, 0, 0xFF);
-	}*/
-
+	}
+/*	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_NORMALIZE);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glPopMatrix();
+	return;*/
+	if(p_render_wireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glEnable(GL_BLEND);
 	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
-		p_render_lit_and_transformed_object(node);
+	{
+		if(!p_draw_object_as_impostor(node))
+			p_render_lit_and_transformed_object(node, FALSE);
+	}
 	if(p_shaders_supported())
 		glDisable(GL_STENCIL_TEST);
-
-	glDisableClientState(GL_VERTEX_ARRAY);
+	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
+	{
+		if(!p_draw_object_as_impostor(node))
+			p_render_lit_and_transformed_object(node, TRUE);
+	}
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.9);
 	glDisableClientState(GL_NORMAL_ARRAY);
-//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-//	p_shader_unbind(set->material);
-	glDisable(GL_DEPTH_TEST);
+	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
+	{
+		if(p_draw_object_as_impostor(node))
+			p_draw_object_impostor(node);
+	}
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glDisable(GL_ALPHA_TEST);
+	glPopMatrix();
+	p_set_enable_shadow(-1);
+	p_update_object_impostors();
 	glDisable(GL_LIGHTING);
 }
