@@ -1,4 +1,4 @@
-
+ 
 #include <stdlib.h>
 
 #define WIDGET_DEFENITION
@@ -196,7 +196,7 @@ void sui_init_background(void)
 	sui_draw_set_vec4(SBackgroundData.window_color, 19, 0, 0, 0, 0.1);
 }
 
-#define SUI_SHADOW 0.3
+#define SUI_SHADOW 0.22
 
 void sui_create_shadow_edge(float size, uint count, float *shadow, float *color, float *square)
 {
@@ -237,11 +237,11 @@ void sw_draw_background_square(void)
 	glPushMatrix();
 	glScaled(1, 1.0 / 2.34, 1);
 	sui_set_color_array_gl(SBackgroundData.square_color, BACK_SEGMENTS * 6, 4);
-	sui_draw_gl(GL_TRIANGLES, SBackgroundData.square, BACK_SEGMENTS * 6, 3, 1, 1, 1);
+	sui_draw_gl(GL_TRIANGLES, SBackgroundData.square, BACK_SEGMENTS * 6, 3, 1, 1, 1, 1);
 	glPopMatrix();
 }
 
-void sw_draw_background_ring(float pos_x, float pos_y, float color)
+void sui_draw_background_ring(float pos_x, float pos_y, float color)
 {
 	static float last_color = 1;
 
@@ -261,7 +261,7 @@ void sw_draw_background_ring(float pos_x, float pos_y, float color)
 	glTranslatef(pos_x, pos_y, 0);
 	sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	sui_set_color_array_gl(SBackgroundData.transparency_ring_color, IRIS_SEGMENTS * 4, 4);
-	sui_draw_gl(GL_QUADS, SBackgroundData.transparency_ring, IRIS_SEGMENTS * 4, 3, 1, 1, 1);
+	sui_draw_gl(GL_QUADS, SBackgroundData.transparency_ring, IRIS_SEGMENTS * 4, 3, 1, 1, 1, 1);
 	glPopMatrix();
 }
 
@@ -271,10 +271,10 @@ void sw_draw_background_point(float *pos)
 	glTranslatef(pos[0], pos[1], pos[2]);
 //	glScaled(0.8, 0.8, 1);
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
-	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
+	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1, 1);
 	glScaled(-1, 1, 1);
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
-	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
+	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1, 1);
 	glPopMatrix();
 
 }
@@ -285,10 +285,10 @@ void sw_draw_background_dot(float *pos)
 	glTranslatef(pos[0], pos[1], pos[2]);
 	glScaled(0.6, 0.6, 1);
 	sui_set_color_array_gl(SBackgroundData.point_color, BUTTON_SEGMENTS * 9, 4);
-	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
+	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1, 1);
 	glScaled(-1, 1, 1);
 	sui_set_color_array_gl(SBackgroundData.point_color, BUTTON_SEGMENTS * 9, 4);
-	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
+	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1, 1);
 	glPopMatrix();
 
 }
@@ -297,14 +297,14 @@ void sw_draw_background_line(float length)
 {
 	glPushMatrix();
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
-	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
+	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1, 1);
 	glTranslatef(length, 0, 0);
 	glScalef(-1, 1, 1);
 	sui_set_color_array_gl(SBackgroundData.button_color, BUTTON_SEGMENTS * 9, 4);
-	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1);
+	sui_draw_gl(GL_TRIANGLES, SBackgroundData.button, BUTTON_SEGMENTS * 9, 3, 1, 1, 1, 1);
 	glScalef(length, 1, 1);
 	sui_set_color_array_gl(SBackgroundData.line_color, 12, 4);
-	sui_draw_gl(GL_QUADS, SBackgroundData.line, 12, 2, 1, 1, 1);
+	sui_draw_gl(GL_QUADS, SBackgroundData.line, 12, 2, 1, 1, 1, 1);
 	glPopMatrix();
 }
 
@@ -333,7 +333,7 @@ void sw_draw_window(float x_pos, float y_pos, float x_size, float y_size, float 
 	sui_draw_set_vec2(vertex, 19, x_pos, y_pos);
 	sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	sui_set_color_array_gl(SBackgroundData.window_color, 20, 4);
-	sui_draw_gl(GL_QUADS, vertex, 20, 2, 1, 0.1, 1);
+	sui_draw_gl(GL_QUADS, vertex, 20, 2, 1, 0.1, 1, 1);
 }
 
 
@@ -362,5 +362,5 @@ void sw_draw_window2(float x_pos, float y_pos, float x_size, float y_size, float
 	sui_draw_set_vec2(vertex, 19, x_pos - x_size, y_pos - y_size);
 
 	sui_set_color_array_gl(SBackgroundData.window_color, 20, 4);
-	sui_draw_gl(GL_TRIANGLES, vertex, 20, 2, 1, 1, 1);
+	sui_draw_gl(GL_TRIANGLES, vertex, 20, 2, 1, 1, 1, 1);
 }
