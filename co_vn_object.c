@@ -99,8 +99,8 @@ extern float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 boolean co_handle_object(BInputState *input, ENode *node)
 {
 	float y, color, color_light, y_meth, y_group, pre_expander;
-	static float rot_meth = 0, rot_light = 0, rot_trans = 0, rot_link = 0;
-	static boolean show_meth = TRUE, show_light = TRUE, show_trans = TRUE, show_link = TRUE;
+	static float rot_meth = 0, rot_light = 0, rot_trans = 0, rot_link = 0, rot_hide = 0;
+	static boolean show_meth = TRUE, show_light = TRUE, show_trans = TRUE, show_link = TRUE, show_hide = TRUE;
 	static double light[3], transform[6], data = 0;
 	VNQuat64	rot;
 	uint16 m_group, method;
@@ -117,21 +117,21 @@ boolean co_handle_object(BInputState *input, ENode *node)
 		e_nso_get_light(node, light);
 
 		sui_draw_text(0.0, y - 0.05, SUI_T_SIZE, SUI_T_SPACE, "Red:", color_light, color_light, color_light);  
-		if(sui_type_number_double(input, 0.15, y - 0.05, 0.15, SUI_T_SIZE, &light[0], &light[0], color, color, color))
+		if(sui_type_number_double(input, 0.15, y - 0.05, 0, 0.15, SUI_T_SIZE, &light[0], &light[0], color, color, color))
 			verse_send_o_light_set(e_ns_get_node_id(node), light[0], light[1], light[2]);
-		if(co_w_slider(input, 0.3, y - 0.05, 0.35, &light[0], color, color, color))
+		if(co_w_slider(input, 0.3, y - 0.05, 0.35, &light[0], 0, 10, color, color, color))
 			verse_send_o_light_set(e_ns_get_node_id(node), light[0], light[1], light[2]);
 
 		sui_draw_text(0.0, y - 0.10, SUI_T_SIZE, SUI_T_SPACE, "Green:", color_light, color_light, color_light);  
-		if(sui_type_number_double(input, 0.15, y - 0.1, 0.15, SUI_T_SIZE, &light[1], &light[1], color, color, color))
+		if(sui_type_number_double(input, 0.15, y - 0.1, 0, 0.15, SUI_T_SIZE, &light[1], &light[1], color, color, color))
 			verse_send_o_light_set(e_ns_get_node_id(node), light[0], light[1], light[2]);
-		if(co_w_slider(input, 0.3, y - 0.10, 0.35, &light[1], color, color, color))
+		if(co_w_slider(input, 0.3, y - 0.10, 0.35, &light[1], 0, 10, color, color, color))
 			verse_send_o_light_set(e_ns_get_node_id(node), light[0], light[1], light[2]);
 
 		sui_draw_text(0.0, y - 0.15, SUI_T_SIZE, SUI_T_SPACE, "Blue:", color_light, color_light, color_light);  
-		if(sui_type_number_double(input, 0.15, y - 0.15, 0.15, SUI_T_SIZE, &light[2], &light[2], color, color, color))
+		if(sui_type_number_double(input, 0.15, y - 0.15, 0, 0.15, SUI_T_SIZE, &light[2], &light[2], color, color, color))
 			verse_send_o_light_set(e_ns_get_node_id(node), light[0], light[1], light[2]);
-		if(co_w_slider(input, 0.3, y - 0.15, 0.35, &light[2], color, color, color))
+		if(co_w_slider(input, 0.3, y - 0.15, 0.35, &light[2], 0, 10, color, color, color))
 			verse_send_o_light_set(e_ns_get_node_id(node), light[0], light[1], light[2]);
 	}
 	glPopMatrix();
@@ -205,7 +205,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 					char *type_names[] = {"INT8", "INT16", "INT32", "UINT8", "UINT16", "UINT32", "REAL32", "REAL64", "REAL32_VEC2", "REAL32_VEC3", "REAL32_VEC4", "REAL64_VEC2", "REAL64_VEC3", "REAL64_VEC4", "REAL32_MAT4", "REAL32_MAT9", "REAL32_MAT16", "REAL64_MAT4", "REAL64_MAT9", "REAL64_MAT16", "STRING", "NODE", "LAYER"};
 					static uint pu_g = -1, pu_m = -1, pu_p = 0;
 					y_meth -= 0.05;
-					sui_draw_2d_line_gl(0.05, y_meth + 0.03, 0.65, y_meth + 0.03, color_light, color_light, color_light);
+					sui_draw_2d_line_gl(0.05, y_meth + 0.03, 0.65, y_meth + 0.03, color_light, color_light, color_light, 1);
 					sui_draw_text(0.0, y_meth, SUI_T_SIZE, SUI_T_SPACE, "Param:", color_light, color_light, color_light);
 
 					if(co_w_close_button(input, 0.635, y_meth, color, color, color))
@@ -303,79 +303,97 @@ boolean co_handle_object(BInputState *input, ENode *node)
 		sui_draw_text(-0.3, y - 0.05, SUI_T_SIZE, SUI_T_SPACE, "POSITION", color_light, color_light, color_light);
 
 		sui_draw_text(0.0, y - 0.05, SUI_T_SIZE, SUI_T_SPACE, "X:", color_light, color_light, color_light);  
-		if(sui_type_number_double(input, 0.15, y - 0.05, 0.15, SUI_T_SIZE, &transform[0], &transform[0], color, color, color))
+		if(sui_type_number_double(input, 0.15, y - 0.05, 0, 0.15, SUI_T_SIZE, &transform[0], &transform[0], color, color, color))
 			verse_send_o_transform_pos_real64(e_ns_get_node_id(node), seconds, fractions, transform, NULL, NULL, NULL, 0);
-		if(co_w_slider(input, 0.3, y - 0.05, 0.35, &transform[0], color, color, color))
+		if(co_w_slider(input, 0.3, y - 0.05, 0.35, &transform[0], -10, 10, color, color, color))
 			verse_send_o_transform_pos_real64(e_ns_get_node_id(node), seconds, fractions, transform, NULL, NULL, NULL, 0);
 
 		sui_draw_text(0.0, y - 0.10, SUI_T_SIZE, SUI_T_SPACE, "Y:", color_light, color_light, color_light);  
-		if(sui_type_number_double(input, 0.15, y - 0.1, 0.15, SUI_T_SIZE, &transform[1], &transform[1], color, color, color))
+		if(sui_type_number_double(input, 0.15, y - 0.1, 0, 0.15, SUI_T_SIZE, &transform[1], &transform[1], color, color, color))
 			verse_send_o_transform_pos_real64(e_ns_get_node_id(node), seconds, fractions, transform, NULL, NULL, NULL, 0);		
-		if(co_w_slider(input, 0.3, y - 0.10, 0.35, &transform[1], color, color, color))
+		if(co_w_slider(input, 0.3, y - 0.10, 0.35, &transform[1], -10, 10, color, color, color))
 			verse_send_o_transform_pos_real64(e_ns_get_node_id(node), seconds, fractions, transform, NULL, NULL, NULL, 0);
 
 		sui_draw_text(0.0, y - 0.15, SUI_T_SIZE, SUI_T_SPACE, "Z:", color_light, color_light, color_light);  
-		if(sui_type_number_double(input, 0.15, y - 0.15, 0.15, SUI_T_SIZE, &transform[2], &transform[2], color, color, color))
+		if(sui_type_number_double(input, 0.15, y - 0.15, 0, 0.15, SUI_T_SIZE, &transform[2], &transform[2], color, color, color))
 			verse_send_o_transform_pos_real64(e_ns_get_node_id(node), seconds, fractions, transform, NULL, NULL, NULL, 0);
-		if(co_w_slider(input, 0.3, y - 0.15, 0.35, &transform[2], color, color, color))
+		if(co_w_slider(input, 0.3, y - 0.15, 0.35, &transform[2], -10, 10, color, color, color))
 			verse_send_o_transform_pos_real64(e_ns_get_node_id(node), seconds, fractions, transform, NULL, NULL, NULL, 0);
 
-		sui_draw_2d_line_gl(-0.25, y - 0.20, 0.65, y - 0.20, color_light, color_light, color_light);
+		sui_draw_2d_line_gl(-0.25, y - 0.20, 0.65, y - 0.20, color_light, color_light, color_light, 1);
 
 		/* Rotation. A quaternion. */
 		e_nso_get_rot(node, &rot, NULL, NULL, NULL, NULL, NULL);
 		sui_draw_text(-0.3, y - 0.25, SUI_T_SIZE, SUI_T_SPACE, "ROTATION", color_light, color_light, color_light);
 
 		sui_draw_text(0.0, y - 0.25, SUI_T_SIZE, SUI_T_SPACE, "X:", color_light, color_light, color_light);  
-		if(sui_type_number_double(input, 0.15, y - 0.25, 0.15, SUI_T_SIZE, &rot.x, &rot.x, color, color, color))
+		if(sui_type_number_double(input, 0.15, y - 0.25, 0, 0.15, SUI_T_SIZE, &rot.x, &rot.x, color, color, color))
 			verse_send_o_transform_rot_real64(e_ns_get_node_id(node), seconds, fractions, &rot, NULL, NULL, NULL, 0);
-		if(co_w_slider(input, 0.3, y - 0.25, 0.35, &rot.x, color, color, color))
+		if(co_w_slider(input, 0.3, y - 0.25, 0.35, &rot.x, 0, 1, color, color, color))
 			verse_send_o_transform_rot_real64(e_ns_get_node_id(node), seconds, fractions, &rot, NULL, NULL, NULL, 0);
 
 		sui_draw_text(0.0, y - 0.30, SUI_T_SIZE, SUI_T_SPACE, "Y:", color_light, color_light, color_light);  
-		if(sui_type_number_double(input, 0.15, y - 0.30, 0.15, SUI_T_SIZE, &rot.y, &rot.y, color, color, color))
+		if(sui_type_number_double(input, 0.15, y - 0.30, 0, 0.15, SUI_T_SIZE, &rot.y, &rot.y, color, color, color))
 			verse_send_o_transform_rot_real64(e_ns_get_node_id(node), seconds, fractions, &rot, NULL, NULL, NULL, 0);		
-		if(co_w_slider(input, 0.3, y - 0.30, 0.35, &rot.y, color, color, color))
+		if(co_w_slider(input, 0.3, y - 0.30, 0.35, &rot.y, 0, 1, color, color, color))
 			verse_send_o_transform_rot_real64(e_ns_get_node_id(node), seconds, fractions, &rot, NULL, NULL, NULL, 0);
 
 		sui_draw_text(0.0, y - 0.35, SUI_T_SIZE, SUI_T_SPACE, "Z:", color_light, color_light, color_light);  
-		if(sui_type_number_double(input, 0.15, y - 0.35, 0.15, SUI_T_SIZE, &rot.z, &rot.z, color, color, color))
+		if(sui_type_number_double(input, 0.15, y - 0.35, 0, 0.15, SUI_T_SIZE, &rot.z, &rot.z, color, color, color))
 			verse_send_o_transform_rot_real64(e_ns_get_node_id(node), seconds, fractions, &rot, NULL, NULL, NULL, 0);
-		if(co_w_slider(input, 0.3, y - 0.35, 0.35, &rot.z, color, color, color))
+		if(co_w_slider(input, 0.3, y - 0.35, 0.35, &rot.z, 0, 1, color, color, color))
 			verse_send_o_transform_rot_real64(e_ns_get_node_id(node), seconds, fractions, &rot, NULL, NULL, NULL, 0);
 
 		sui_draw_text(0.0, y - 0.40, SUI_T_SIZE, SUI_T_SPACE, "W:", color_light, color_light, color_light);  
-		if(sui_type_number_double(input, 0.15, y - 0.40, 0.15, SUI_T_SIZE, &rot.w, &rot.w, color, color, color))
+		if(sui_type_number_double(input, 0.15, y - 0.40, 0, 0.15, SUI_T_SIZE, &rot.w, &rot.w, color, color, color))
 			verse_send_o_transform_rot_real64(e_ns_get_node_id(node), seconds, fractions, &rot, NULL, NULL, NULL, 0);
-		if(co_w_slider(input, 0.3, y - 0.40, 0.35, &rot.w, color, color, color))
+		if(co_w_slider(input, 0.3, y - 0.40, 0.35, &rot.w, 0, 1, color, color, color))
 			verse_send_o_transform_rot_real64(e_ns_get_node_id(node), seconds, fractions, &rot, NULL, NULL, NULL, 0);
 
-		sui_draw_2d_line_gl(-0.25, y - 0.45, 0.65, y - 0.45, color_light, color_light, color_light);
+		sui_draw_2d_line_gl(-0.25, y - 0.45, 0.65, y - 0.45, color_light, color_light, color_light, 1);
 
 		/* Scale. */
 		e_nso_get_scale(node, &transform[3]);
 		sui_draw_text(-0.3, y - 0.50, SUI_T_SIZE, SUI_T_SPACE, "SCALE", color_light, color_light, color_light);
 
 		sui_draw_text(0.0, y - 0.50, SUI_T_SIZE, SUI_T_SPACE, "X:", color_light, color_light, color_light);  
-		if(sui_type_number_double(input, 0.15, y - 0.50, 0.15, SUI_T_SIZE, &transform[3], &transform[3], color, color, color))
+		if(sui_type_number_double(input, 0.15, y - 0.50, 0, 0.15, SUI_T_SIZE, &transform[3], &transform[3], color, color, color))
 			verse_send_o_transform_scale_real64(e_ns_get_node_id(node), transform[3], transform[4], transform[5]);
-		if(co_w_slider(input, 0.3, y - 0.50, 0.35, &transform[3], color, color, color))
+		if(co_w_slider(input, 0.3, y - 0.50, 0.35, &transform[3], 0, 10, color, color, color))
 			verse_send_o_transform_scale_real64(e_ns_get_node_id(node), transform[3], transform[4], transform[5]);
 
 		sui_draw_text(0.0, y - 0.55, SUI_T_SIZE, SUI_T_SPACE, "Y:", color_light, color_light, color_light);  
-		if(sui_type_number_double(input, 0.15, y - 0.55, 0.15, SUI_T_SIZE, &transform[4], &transform[4], color, color, color))
+		if(sui_type_number_double(input, 0.15, y - 0.55, 0, 0.15, SUI_T_SIZE, &transform[4], &transform[4], color, color, color))
 			verse_send_o_transform_scale_real64(e_ns_get_node_id(node), transform[3], transform[4], transform[5]);		
-		if(co_w_slider(input, 0.3, y - 0.55, 0.35, &transform[4], color, color, color))
+		if(co_w_slider(input, 0.3, y - 0.55, 0.35, &transform[4], 0, 10, color, color, color))
 			verse_send_o_transform_scale_real64(e_ns_get_node_id(node), transform[3], transform[4], transform[5]);
 
 		sui_draw_text(0.0, y - 0.60, SUI_T_SIZE, SUI_T_SPACE, "Z:", color_light, color_light, color_light);  
-		if(sui_type_number_double(input, 0.15, y - 0.60, 0.15, SUI_T_SIZE, &transform[5], &transform[5], color, color, color))
+		if(sui_type_number_double(input, 0.15, y - 0.60, 0, 0.15, SUI_T_SIZE, &transform[5], &transform[5], color, color, color))
 			verse_send_o_transform_scale_real64(e_ns_get_node_id(node), transform[3], transform[4], transform[5]);
-		if(co_w_slider(input, 0.3, y - 0.60, 0.35, &transform[5], color, color, color))
+		if(co_w_slider(input, 0.3, y - 0.60, 0.35, &transform[5], 0, 10, color, color, color))
 			verse_send_o_transform_scale_real64(e_ns_get_node_id(node), transform[3], transform[4], transform[5]);
 	}
 	glPopMatrix();
 	y -= 0.05 + 0.6 * rot_trans;
+
+	co_vng_divider(input, 0.2, y, &rot_hide, &color, &color_light, &show_hide, "Hide");
+	y -= 0.05;	
+	if(rot_hide > 0.001)
+	{
+		static uint trams = 0;
+		boolean state = TRUE;
+		sui_draw_text(-0.27, y, SUI_T_SIZE, SUI_T_SPACE, "Hidden:", color, color, color); 
+		state = e_nso_get_hide(node);
+		if(co_w_checkbox(input, 0.17, y, &state, color, color, color))
+		{
+			trams++;
+			verse_send_o_hide(e_ns_get_node_id(node), trams % 2);
+		}
+		y -= 0.05 * rot_hide;
+	}
+	glPopMatrix();
+
 	co_vng_divider(input, 0.2, y, &rot_link, &color, &color_light, &show_link, "Links");
 	y -= 0.05;	
 	if(rot_link > 0.001)
@@ -396,7 +414,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Node ID:", color_light, color_light, color_light);  
 			link_id = e_nso_get_link_node(link);
-			if(sui_type_number_uint(input, 0.15, y, 0.5, SUI_T_SIZE, &link_id, link, color, color, color))
+			if(sui_type_number_uint(input, 0.15, y, 0.5, 0, SUI_T_SIZE, &link_id, link, color, color, color))
 				verse_send_o_link_set(rename_o_node_id, e_nso_get_link_id(link), link_id, e_nso_get_link_name(link), e_nso_get_link_target_id(link));
 			
 			if(input->mode == BAM_DRAW && (l_node = e_ns_get_node(0, link_id)) != NULL)
@@ -414,12 +432,15 @@ boolean co_handle_object(BInputState *input, ENode *node)
 
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Target ID:", color_light, color_light, color_light);  
 			target = e_nso_get_link_target_id(link);
-			if(sui_type_number_uint(input, 0.15, y, 0.5, SUI_T_SIZE, &target, ((uint8 *)link) + 1, color, color, color))
+			if(sui_type_number_uint(input, 0.15, y, 0, 0.5, SUI_T_SIZE, &target, ((uint8 *)link) + 1, color, color, color))
 				verse_send_o_link_set(rename_o_node_id, e_nso_get_link_id(link), e_nso_get_link_node(link), e_nso_get_link_name(link), target);
 			sui_draw_rounded_square(-0.3, y + 0.125, 1, -0.15, color_light, color_light, color_light);
 			y -= 0.075;
 		}
 	}
+
 	glPopMatrix();
+
+
 	return co_handle_return(input);
 }
