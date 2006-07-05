@@ -37,7 +37,7 @@
         
 
 GLuint texture_id, texture_id2, sphere_map;
-#define TEX_SIZE 16 
+#define TEX_SIZE 128 
 
 uint p_env_cube_threw_qube(float *vector_cube, float *input, float *output, unsigned int size, unsigned int pos)
 {
@@ -250,7 +250,7 @@ void p_env_create_sky(float *vector, float *data, float light, unsigned int size
 
 uint p_std_environment_id = -1;
 uint p_std_diffuse_environment_id = -1;
-uint p_std_env_size = 4;
+uint p_std_env_size = 128;
 float *p_vec_buffer = NULL;
 
 typedef struct{
