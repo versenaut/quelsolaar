@@ -181,7 +181,7 @@ void co_draw_summary(ENode *node, float x, float y)
 {
 	glPushMatrix();
 	glTranslatef(-x, -y, -1);
-	sui_draw_2d_line_gl(0.03, 0.015, 0.18, 0.09, SUMMARY_COLOR, SUMMARY_COLOR, SUMMARY_COLOR);
+	sui_draw_2d_line_gl(0.03, 0.015, 0.18, 0.09, SUMMARY_COLOR, SUMMARY_COLOR, SUMMARY_COLOR, 1);
 	co_draw_node_summary(node, 0.2, 0.1, 10);
 	glPopMatrix();
 }

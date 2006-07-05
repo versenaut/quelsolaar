@@ -104,24 +104,24 @@ void co_intro_symbol(float color)
 {
 	glPushMatrix();
 
-sui_draw_gl(GL_QUADS, COIntroData.ring, LOGO_RING_SPLIT * 4, 2, color, color, color);
+sui_draw_gl(GL_QUADS, COIntroData.ring, LOGO_RING_SPLIT * 4, 2, color, color, color, 1);
 
 
 sui_set_color_array_gl(COIntroData.lens_color, LOGO_SMALL_RING_SPLIT * 3, 4);
-sui_draw_gl(GL_TRIANGLES, COIntroData.lens_vertex, LOGO_SMALL_RING_SPLIT * 3, 2, color, color, color);
-sui_draw_gl(GL_QUADS, COIntroData.small_rings, LOGO_SMALL_RING_SPLIT * 4, 2, color, color, color);
+sui_draw_gl(GL_TRIANGLES, COIntroData.lens_vertex, LOGO_SMALL_RING_SPLIT * 3, 2, color, color, color, 1);
+sui_draw_gl(GL_QUADS, COIntroData.small_rings, LOGO_SMALL_RING_SPLIT * 4, 2, color, color, color, 1);
 
 	glRotated(135, 0, 0, 1);
 
 sui_set_color_array_gl(COIntroData.lens_color, LOGO_SMALL_RING_SPLIT * 3, 4);
-sui_draw_gl(GL_TRIANGLES, COIntroData.lens_vertex, LOGO_SMALL_RING_SPLIT * 3, 2, color, color, color);
-sui_draw_gl(GL_QUADS, COIntroData.small_rings, LOGO_SMALL_RING_SPLIT * 4, 2, color, color, color);
+sui_draw_gl(GL_TRIANGLES, COIntroData.lens_vertex, LOGO_SMALL_RING_SPLIT * 3, 2, color, color, color, 1);
+sui_draw_gl(GL_QUADS, COIntroData.small_rings, LOGO_SMALL_RING_SPLIT * 4, 2, color, color, color, 1);
 
 	glRotated(-135 - 60, 0, 0, 1);
 
 sui_set_color_array_gl(COIntroData.lens_color, LOGO_SMALL_RING_SPLIT * 3, 4);
-sui_draw_gl(GL_TRIANGLES, COIntroData.lens_vertex, LOGO_SMALL_RING_SPLIT * 3, 2, color, color, color);
-sui_draw_gl(GL_QUADS, COIntroData.larger_ring, LOGO_SMALL_RING_SPLIT * 4, 2, color, color, color);
+sui_draw_gl(GL_TRIANGLES, COIntroData.lens_vertex, LOGO_SMALL_RING_SPLIT * 3, 2, color, color, color, 1);
+sui_draw_gl(GL_QUADS, COIntroData.larger_ring, LOGO_SMALL_RING_SPLIT * 4, 2, color, color, color, 1);
 	glPopMatrix();
 
 
@@ -196,7 +196,7 @@ void co_intro_draw(void *user)
 	if(timer < 1)
 		co_intro_symbol(timer * timer);
 	sui_set_blend_gl(GL_ZERO, GL_SRC_COLOR);
-	sui_draw_gl(GL_LINES, COIntroData.dust, CO_INIT_DUST_COUNT, 3, color, color, color);
+	sui_draw_gl(GL_LINES, COIntroData.dust, CO_INIT_DUST_COUNT, 3, color, color, color, 1);
 	glPopMatrix();
 
 	glPushMatrix();
@@ -225,5 +225,5 @@ void co_intro_draw(void *user)
 	co_vng_gas_planet();
 	co_vng_ring();
 	glPopMatrix();
-	sui_draw_gl(GL_QUADS, border, 8, 2, 0, 0, 0);
+	sui_draw_gl(GL_QUADS, border, 8, 2, 0, 0, 0, 1);
 }
