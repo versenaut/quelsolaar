@@ -16,7 +16,7 @@ void sui_draw_popup_top_bottom(float pos_x, float pos_y, float scale, float colo
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
 	glScalef(1, scale, 1);
-	sui_draw_gl(GL_LINES, array, 44, 2, color, color, color);
+	sui_draw_gl(GL_LINES, array, 44, 2, color, color, color, 1);
 	glPopMatrix();
 }
 
@@ -61,21 +61,21 @@ void sui_draw_popup_angle_line(float x, float y, float angle)
 
 	glPushMatrix();
 	glTranslatef(x, y, 0);
-	glRotatef(angle - 90, 0, 0, 1);
+	glRotatef(angle + 90, 0, 0, 1);
 	glTranslatef(0.1, 0, 0);
-	sui_draw_gl(GL_QUADS, end_sides, S_POPUP_ANGLE_END_SECTIONS * 4, 2, 0, 0, 0);
-	sui_draw_gl(GL_TRIANGLES, end_mid, S_POPUP_ANGLE_END_SECTIONS * 3, 2, 1, 1, 1);
+	sui_draw_gl(GL_QUADS, end_sides, S_POPUP_ANGLE_END_SECTIONS * 4, 2, 0, 0, 0, 1);
+	sui_draw_gl(GL_TRIANGLES, end_mid, S_POPUP_ANGLE_END_SECTIONS * 3, 2, 1, 1, 1, 1);
 	glPushMatrix();
 
 	
 	glScalef(0.15, 1, 1);
-	sui_draw_gl(GL_QUADS, length_sides, 8, 2, 0, 0, 0);
-	sui_draw_gl(GL_QUADS, length_mid, 4, 2, 1, 1, 1);
+	sui_draw_gl(GL_QUADS, length_sides, 8, 2, 0, 0, 0, 1);
+	sui_draw_gl(GL_QUADS, length_mid, 4, 2, 1, 1, 1, 1);
 	glPopMatrix();
 	glTranslatef(0.15, 0, 0);
 	glScalef(-1, 1, 1);
-	sui_draw_gl(GL_QUADS, end_sides, S_POPUP_ANGLE_END_SECTIONS * 4, 2, 0, 0, 0);
-	sui_draw_gl(GL_TRIANGLES, end_mid, S_POPUP_ANGLE_END_SECTIONS * 3, 2, 1, 1, 1);
+	sui_draw_gl(GL_QUADS, end_sides, S_POPUP_ANGLE_END_SECTIONS * 4, 2, 0, 0, 0, 1);
+	sui_draw_gl(GL_TRIANGLES, end_mid, S_POPUP_ANGLE_END_SECTIONS * 3, 2, 1, 1, 1, 1);
 
 	glPopMatrix();
 
@@ -102,7 +102,7 @@ void sui_draw_popup_square(float pos_x, float pos_y, float size_x, float size_y,
 	array[7] = pos_y + size_y;
 	sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	sui_set_color_array_gl(color_array, 8, 4);
-	sui_draw_gl(GL_QUADS, array, 4, 2, color, color, color);
+	sui_draw_gl(GL_QUADS, array, 4, 2, color, color, color, 1);
 }
 
 
@@ -152,7 +152,7 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 		back_color = 1 - back_color;
 		for(i = 0; i < element_count && element[i].type != PU_T_ANGLE; i++);
 		if(i < element_count)
-			sw_draw_background_ring(pos_x, pos_y, 0);
+			sui_draw_background_ring(pos_x, pos_y, 0);
 
 		for(i = 0; i < element_count; i++)
 			if(element[i].type == PU_T_TOP)
