@@ -1,4 +1,4 @@
-
+ 
 #include "enough.h"
 #include "p_sds_geo.h"
 #include "p_sds_table.h"
@@ -35,7 +35,7 @@ void p_lod_compute_vertex_normals(PPolyStore *smesh, PMesh *mesh)
 
 	mesh->temp = corner_normals = malloc((sizeof *corner_normals) * length * 2);
 
-	for(i = 0; i < length * 2; i += 2)
+	for(i = 0; i < length * 2; i++)
 		corner_normals[i] = -1;
 
 	for(i = 0; i < length; i++)
@@ -114,8 +114,7 @@ void p_lod_compute_vertex_normals(PPolyStore *smesh, PMesh *mesh)
 	for(i = 0; i < length * 2; i++)
 		if(corner_normals[i] == -1)
 			corner_normals[i] = 0;
-/*
-	for(i = 0; i < length * 2; i++)
+/*	for(i = 0; i < length * 2; i++)
 	{
 		j = mesh->tess.order_temp_mesh_rev[i];
 		if(corner_normals[i] < mesh->base_quad_count * 4)
@@ -124,12 +123,7 @@ void p_lod_compute_vertex_normals(PPolyStore *smesh, PMesh *mesh)
 	}*/
 }
 
-
-
 /*
-
-
-
 uint p_lod_get_rev_corner(PPolyStore *mesh, uint corner)
 {
 	if(corner < mesh->base_quad_count * 4)
@@ -145,13 +139,7 @@ uint p_lod_get_rev_corner(PPolyStore *mesh, uint corner)
 	poly = mesh->tess.order_temp_mesh_rev[poly];
 	return poly 
 }
-
-
 */
-
-
-
-
 
 uint p_lod_edge_shadow_length_quad(PPolyStore *smesh, PMesh *mesh, uint poly, uint edge, uint *crease, egreal def)
 {
@@ -304,6 +292,12 @@ void p_lod_create_normal_ref_and_shadow_skirts(PPolyStore *smesh, PMesh *mesh)
 	PTessTableElement *table;
 	uint i, j, start, corners/*, *vertex_normals*/;
 //	vertex_normals = mesh->temp;
+
+	
+	for(i = 0; i < mesh->render.vertex_count * 4; i++)
+		mesh->normal.normal_ref[i] = 0 /*mesh->render.vertex_count + 1*/;
+//if(FALSE)
+//{
 	for(; mesh->sub_stages[0] < mesh->tess.tri_count + mesh->tess.quad_count; mesh->sub_stages[0]++)
 	{
 		if(mesh->sub_stages[0] == mesh->render.mat[mesh->sub_stages[2]].tri_end)
@@ -319,10 +313,8 @@ void p_lod_create_normal_ref_and_shadow_skirts(PPolyStore *smesh, PMesh *mesh)
 		{
 			for(i = 0; i < 4; i++) /* quads */
 			{
-
 				p_rm_create_vertex_normals(&mesh->normal.normal_ref[mesh->sub_stages[1]], mesh, mesh->sub_stages[0], i);
 				mesh->sub_stages[1] += 4;
-
 				if(!p_lod_handle_edge(smesh, mesh, mesh->sub_stages[0], i))
 				{
 					for(j = table->edges[i] + 1; j < table->edges[i + 1]; j++)
@@ -340,12 +332,7 @@ void p_lod_create_normal_ref_and_shadow_skirts(PPolyStore *smesh, PMesh *mesh)
 			{
 				p_rm_create_vertex_normals(&mesh->normal.normal_ref[mesh->sub_stages[1]], mesh, mesh->sub_stages[0], i);
 				mesh->sub_stages[1] += 4;
-/*
-				mesh->normal.normal_ref[mesh->sub_stages[1]++] = start + table->normals[table->edges[i] * 4];
-				mesh->normal.normal_ref[mesh->sub_stages[1]++] = start + table->normals[table->edges[i] * 4 + 1];
-				mesh->normal.normal_ref[mesh->sub_stages[1]++] = start + table->normals[table->edges[i] * 4 + 2];
-				mesh->normal.normal_ref[mesh->sub_stages[1]++] = start + table->normals[table->edges[i] * 4 + 3];
-				*/
+
 				if(!p_lod_handle_edge(smesh, mesh, mesh->sub_stages[0], i))
 				{
 					for(j = table->edges[i] + 1; j < table->edges[i + 1]; j++)
@@ -366,14 +353,9 @@ void p_lod_create_normal_ref_and_shadow_skirts(PPolyStore *smesh, PMesh *mesh)
 			mesh->normal.normal_ref[mesh->sub_stages[1]++] = start + table->normals[j * 4 + 3];
 		}
 	}
+
 	if(mesh->sub_stages[0] == mesh->tess.tri_count + mesh->tess.quad_count)
 	{
-		{
-			uint k;
-			for(k = 0; k < mesh->sub_stages[1]; k++)
-				if(mesh->normal.normal_ref[k] > 100000)
-					mesh->normal.normal_ref[k] = 0;
-		}
 		mesh->stage++;
 		free(mesh->temp);
 		mesh->temp = NULL;
