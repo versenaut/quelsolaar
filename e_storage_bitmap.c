@@ -99,25 +99,29 @@ void *e_nsb_get_layer_data(ESBitmapNode *node, ESBitmapLayer *layer)
 		{
 			layer->data = malloc(sizeof(uint8) * node->size_x * node->size_y * node->size_z);
 			for(i = 0; i < node->size_x * node->size_y * node->size_z; i++)
-				((uint8 *)layer->data)[i] = ((layer->layer_id + i) % 3) * 127;
+				((uint8 *)layer->data)[i] = 0;
+//				((uint8 *)layer->data)[i] = ((layer->layer_id + i) % 3) * 127;
 		}
 		else if(layer->type == VN_B_LAYER_UINT16)
 		{
 			layer->data = malloc(sizeof(uint16) * node->size_x * node->size_y * node->size_z);
 			for(i = 0; i < node->size_x * node->size_y * node->size_z; i++)
-				((uint16 *)layer->data)[i] = ((layer->layer_id + i) % 3) * 127 * 256;
+				((uint16 *)layer->data)[i] = 0;
+//				((uint16 *)layer->data)[i] = ((layer->layer_id + i) % 3) * 127 * 256;
 		}
 		else if(layer->type == VN_B_LAYER_REAL32)
 		{
 			layer->data = malloc(sizeof(float) * node->size_x * node->size_y * node->size_z);
 			for(i = 0; i < node->size_x * node->size_y * node->size_z; i++)
-				((float *)layer->data)[i] = (float)((layer->layer_id + i) % 3) * 0.5;
+				((float *)layer->data)[i] = 0;
+//				((float *)layer->data)[i] = (float)((layer->layer_id + i) % 3) * 0.5;
 		}
 		else
 		{
 			layer->data = malloc(sizeof(double) * node->size_x * node->size_y * node->size_z);
 			for(i = 0; i < node->size_x * node->size_y * node->size_z; i++)
-				((double *)layer->data)[i] = (double)((layer->layer_id + i) % 3) * 0.5;
+				((double *)layer->data)[i] = 0;
+//				((double *)layer->data)[i] = (double)((layer->layer_id + i) % 3) * 0.5;
 		}
 		verse_send_b_layer_subscribe(node->head.node_id, layer->layer_id, 0);
 	}
