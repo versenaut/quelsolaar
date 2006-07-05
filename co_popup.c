@@ -26,7 +26,7 @@ static boolean co_settings = FALSE;
 void sp_settings_pre(SUIViewElement *element);
 void sp_settings_post(SUIViewElement *element);
 
-void co_draw_settings(BInputState *input)
+boolean co_draw_settings(BInputState *input)
 {
 	if(co_settings == TRUE)
 	{
