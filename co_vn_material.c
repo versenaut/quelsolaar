@@ -100,7 +100,7 @@ void rename_m_fragment(void *user, char *text)
 
 void clear_new_frag(VMatFrag *frag, uint type)
 {
-	char *color = "color", *name = "name", *group = "group", *color_r = "color_r", *color_g = "color_g", *color_b = "col_b";
+	char *color = "color", *name = "name", *group = "group", *color_r = "color_r", *color_g = "color_g", *color_b = "col_b", *vertex = "vertex";
 	uint i;
 	switch(type)
 	{	
@@ -129,18 +129,17 @@ void clear_new_frag(VMatFrag *frag, uint type)
 			frag->volume.col_r = 0.5;
 			frag->volume.col_g = 0.5;
 			frag->volume.col_b = 0.5;
-			frag->volume.color = -1;
 			break;
 		case VN_M_FT_GEOMETRY :
-			for(i = 0; color_r[i] != 0; i++)
-				frag->geometry.layer_r[i] = color_r[i]; 
+			for(i = 0; vertex[i] != 0; i++)
+				frag->geometry.layer_r[i] = vertex[i]; 
 			frag->geometry.layer_r[i] = 0; 
-			for(i = 0; color_g[i] != 0; i++)
-				frag->geometry.layer_g[i] = color_g[i]; 
-			frag->geometry.layer_g[0] = 0; 
-			for(i = 0; color_b[i] != 0; i++)
-				frag->geometry.layer_b[i] = color_b[i]; 
-			frag->geometry.layer_b[0] = 0; 
+			for(i = 0; vertex[i] != 0; i++)
+				frag->geometry.layer_g[i] = vertex[i]; 
+			frag->geometry.layer_g[i] = 0; 
+			for(i = 0; vertex[i] != 0; i++)
+				frag->geometry.layer_b[i] = vertex[i]; 
+			frag->geometry.layer_b[i] = 0; 
 			break;
 		case VN_M_FT_TEXTURE :
 			frag->texture.bitmap = -1;
@@ -150,10 +149,11 @@ void clear_new_frag(VMatFrag *frag, uint type)
 			frag->texture.layer_r[i] = 0; 
 			for(i = 0; color_g[i] != 0; i++)
 				frag->texture.layer_g[i] = color_g[i]; 
-			frag->texture.layer_g[0] = 0; 
+			frag->texture.layer_g[i] = 0; 
 			for(i = 0; color_b[i] != 0; i++)
 				frag->texture.layer_b[i] = color_b[i]; 
-			frag->texture.layer_b[0] = 0; 
+			frag->texture.layer_b[i] = 0; 
+			frag->texture.filtered = TRUE;
 			break;
 		case VN_M_FT_NOISE :
 			frag->noise.mapping = -1;
@@ -164,6 +164,13 @@ void clear_new_frag(VMatFrag *frag, uint type)
 			frag->blender.data_a = -1;
 			frag->blender.data_b = -1;
 			frag->blender.type = VN_M_BLEND_ADD;
+			break;
+		case VN_M_FT_CLAMP :
+			frag->clamp.min = TRUE;
+			frag->clamp.red = 0.5;
+			frag->clamp.green = 0.5;
+			frag->clamp.blue = 0.5;
+			frag->clamp.data = -1;
 			break;
 		case VN_M_FT_MATRIX :
 			frag->matrix.data = -1;
@@ -252,6 +259,8 @@ void co_m_place_frag(ENode *node, uint16 id, float pos_x, float vec, uint gen)
 				co_m_place_frag(node, frag->blender.data_a, pos_x, vec - 0.1, gen + 1);
 				co_m_place_frag(node, frag->blender.data_b, pos_x, vec, gen + 1);
 				co_m_place_frag(node, frag->blender.control, pos_x, vec + 0.1, gen + 1);
+			case VN_M_FT_CLAMP :
+				co_m_place_frag(node, frag->clamp.data, pos_x, vec, gen + 1);
 				break;
 			case VN_M_FT_MATRIX :
 				co_m_place_frag(node, frag->matrix.data, pos_x, vec, gen + 1);
@@ -282,7 +291,7 @@ void co_place_all_fragments(ENode *node)
 		if(e_nsm_get_fragment_type(node, id) == VN_M_FT_BLENDER && (pos = e_nsm_get_custom_data(node, id, CO_ENOUGH_NODE_SLOT)) != NULL && pos->placed != TRUE)
 			co_m_place_frag(node, id, pos_x++ * 0.05, 0, 0);
 	for(id = e_nsm_get_fragment_next(node, 0); id != (VNMFragmentID)-1; id = e_nsm_get_fragment_next(node, id + 1))
-		if((e_nsm_get_fragment_type(node, id) != VN_M_FT_TEXTURE && e_nsm_get_fragment_type(node, id) != VN_M_FT_NOISE && e_nsm_get_fragment_type(node, id) != VN_M_FT_MATRIX && e_nsm_get_fragment_type(node, id) != VN_M_FT_RAMP && e_nsm_get_fragment_type(node, id) != VN_M_FT_ALTERNATIVE) && (pos = e_nsm_get_custom_data(node, id, CO_ENOUGH_NODE_SLOT)) != NULL && pos->placed != TRUE)
+		if((e_nsm_get_fragment_type(node, id) != VN_M_FT_TEXTURE && e_nsm_get_fragment_type(node, id) != VN_M_FT_CLAMP && e_nsm_get_fragment_type(node, id) != VN_M_FT_NOISE && e_nsm_get_fragment_type(node, id) != VN_M_FT_MATRIX && e_nsm_get_fragment_type(node, id) != VN_M_FT_RAMP && e_nsm_get_fragment_type(node, id) != VN_M_FT_ALTERNATIVE) && (pos = e_nsm_get_custom_data(node, id, CO_ENOUGH_NODE_SLOT)) != NULL && pos->placed != TRUE)
 			co_m_place_frag(node, id, pos_x++ * 0.05, 0, 0);
 	for(id = e_nsm_get_fragment_next(node, 0); id != (VNMFragmentID)-1; id = e_nsm_get_fragment_next(node, id + 1))
 		if((pos = e_nsm_get_custom_data(node, id, CO_ENOUGH_NODE_SLOT)) != NULL && pos->placed != TRUE)
@@ -301,7 +310,7 @@ void draw_spline(float x0, float y0, float x1, float y1, float x2, float y2, flo
 	uint i;
 	for(i = 0; i < LINK_SECTIONS; i++)
 		sui_draw_set_vec2(vertex, i, compute_spline((float)((i + 1) / 2) / (float)LINK_SECTIONS / 0.5, x0, x1, x2, x3), compute_spline((float)((i + 1) / 2) / (float)LINK_SECTIONS / 0.5, y0, y1, y2, y3));
-	sui_draw_gl(GL_LINES, vertex, LINK_SECTIONS, 2, color, color, color);
+	sui_draw_gl(GL_LINES, vertex, LINK_SECTIONS, 2, color, color, color, 1);
 }
 
 void draw_frag_link(float x, float y, float rot, float color)
@@ -319,7 +328,7 @@ void draw_frag_link(float x, float y, float rot, float color)
 	glPushMatrix();
 	glTranslatef(x, y, 0);
 	glRotatef(-rot, 0, 0, 1);
-	sui_draw_gl(GL_LINES, vertex, 64, 2, color, color, color);
+	sui_draw_gl(GL_LINES, vertex, 64, 2, color, color, color, 1);
 	glPopMatrix();
 }
 
@@ -332,10 +341,6 @@ void set_out_link(ENode *node, uint16 id, uint16 link)
 	f = *frag;
 	switch(e_nsm_get_fragment_type(node, id))
 	{
-		case VN_M_FT_VOLUME :
-			f.volume.color = link;
-			verse_send_m_fragment_create(e_ns_get_node_id(node), id, VN_M_FT_VOLUME, &f);
-		break;
 		case VN_M_FT_TEXTURE :
 			f.texture.mapping = link;
 			verse_send_m_fragment_create(e_ns_get_node_id(node), id, VN_M_FT_TEXTURE, &f);
@@ -354,6 +359,10 @@ void set_out_link(ENode *node, uint16 id, uint16 link)
 			else
 				f.blender.data_a = link;
 			verse_send_m_fragment_create(e_ns_get_node_id(node), id, VN_M_FT_BLENDER, &f);
+		break;
+		case VN_M_FT_CLAMP :
+			f.clamp.data = link;
+			verse_send_m_fragment_create(e_ns_get_node_id(node), id, VN_M_FT_CLAMP, &f);
 		break;
 		case VN_M_FT_MATRIX :
 			f.matrix.data = link;
@@ -493,7 +502,7 @@ void co_draw_param_text(float x, float y, uint count, char **text, float color)
 	for(i = 0; i < count; i++)
 	{
 		sui_draw_2d_line_gl(x - 0.17, y - 0.1 + SUI_T_SIZE - 0.05 * (float)i, 
-						x - 0.27, y - 0.125 + SUI_T_SIZE - 0.1 * ((float)i - 0.25 * (float)count), color, color, color);
+						x - 0.27, y - 0.125 + SUI_T_SIZE - 0.1 * ((float)i - 0.25 * (float)count), color, color, color, 1);
 		sui_draw_text(x - 0.3 - sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, text[i]), y - 0.125 + SUI_T_SIZE - 0.1 * ((float)i - 0.25 * (float)count), SUI_T_SIZE, SUI_T_SPACE, text[i], color, color, color);  
 	}
 }
@@ -508,6 +517,7 @@ void material_func(ENode *node, VNMFragmentID frag, ECustomDataCommand command)
 		float *buf;
 		uint i;
 		data = malloc(sizeof *data);
+		printf("created fragment data at %p for fragment %u\n", data, frag);
 		data->pos[0] = 0.45 - 0.1 * (float)(frag % 10);
 		data->pos[1] = -0.1 * (float)(frag % 10 + frag / 10);
 		data->version = 56756;
@@ -531,8 +541,8 @@ void material_func(ENode *node, VNMFragmentID frag, ECustomDataCommand command)
 	}
 	if(command == E_CDC_DESTROY && (data = e_ns_get_custom_data(node, CO_ENOUGH_NODE_SLOT)) != NULL)
 	{
-		free(data);
 		glDeleteTextures(1, &data->texture_id);
+		free(data);
 		e_nsm_set_custom_data(node, frag, CO_ENOUGH_NODE_SLOT, NULL);
 	}
 }
@@ -544,18 +554,13 @@ uint co_material_get_texture_id(ENode *node, VNMFragmentID id)
 	return mat->texture_id;
 }
 
-boolean *co_material_get_recursive(ENode *node, VNMFragmentID id)
-{
-	COVNMaterial *mat;
-	mat = e_nsm_get_custom_data(node, id, CO_ENOUGH_NODE_SLOT);	
-	return &mat->recursive;
-}
-
 uint co_material_get_version(ENode *node, VNMFragmentID id)
 {
 	COVNMaterial *mat;
-	mat = e_nsm_get_custom_data(node, id, CO_ENOUGH_NODE_SLOT);	
-	return mat->version;
+	mat = e_nsm_get_custom_data(node, id, CO_ENOUGH_NODE_SLOT);
+/*	printf("got fragment at %p, fragment %u\n", mat, id);
+	printf("id = %u co_material_get_version %p %u\n", id, mat, mat->version);
+*/	return mat->version;
 }
 
 void co_material_set_version(ENode *node, VNMFragmentID id, uint version)
@@ -589,7 +594,7 @@ void co_draw_material_texture(COVNMaterial *mat, float x, float y)
 	glTranslatef(x, y, 0);
 	sui_set_texture2D_array_gl(uv, 65, 2, mat->texture_id);
 //	sui_draw_gl(GL_TRIANGLES, vertex, 65, 2, 0, 0, 0);
-	sui_draw_elements_gl(GL_TRIANGLES, vertex, ref, 64 * 3, 2, 1, 1, 1);
+	sui_draw_elements_gl(GL_TRIANGLES, vertex, ref, 64 * 3, 2, 1, 1, 1, 1);
 	glPopMatrix();
 }
 
@@ -620,7 +625,10 @@ boolean co_material_click_test(BInputState *input, COVNMaterial *mat, VNMFragmen
 	
 	if(mat->expand)
 	{
-		mat->size = 0.1 + mat->size * 0.9;
+		mat->size += betray_get_delta_time() / 0.2;
+		if(mat->size > 1.0)
+			mat->size = 1.0;
+
 		if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
 		{
 			if(sui_box_click_test(pos_x - 0.15, pos_y - 0.025, 0.3, 0.045))
@@ -655,7 +663,9 @@ boolean co_material_click_test(BInputState *input, COVNMaterial *mat, VNMFragmen
 		if(*move == id && input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE)
 			if(0.005 * 0.005 > (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
 				mat->expand = TRUE;
-		mat->size = 0.002 + mat->size * 0.98;
+		mat->size -= betray_get_delta_time() / 0.2;
+		if(mat->size < 0.1)
+			mat->size = 0.1;
 	}
 	
 	if(*move == id)
@@ -674,7 +684,7 @@ void co_draw_lable(COVNMaterial *mat, float y, float color, char *lable)
 	glPushMatrix();
 	glTranslatef(mat->pos[0], mat->pos[1] + y, 0);
 	glScalef(1 / mat->size, 1 / mat->size, 1);
-	sui_draw_2d_line_gl(mat->size * 0.2, -0.015, mat->size * 0.2 + 0.04, 0, color, color, color);
+	sui_draw_2d_line_gl(mat->size * 0.2, -0.015, mat->size * 0.2 + 0.04, 0, color, color, color, 1);
 	sui_draw_text(mat->size * 0.2 + 0.04, 0, SUI_T_SIZE, SUI_T_SPACE, lable, color, color, color);  		
 	glPopMatrix();
 }
@@ -683,7 +693,7 @@ extern float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 
 boolean co_handle_material(BInputState *input, ENode *node)
 {
-	static char *material_type_names[] = {"COLOR", "LIGHT", "REFLECTION", "TRANSPARENCY", "VOLUME", "GEOMETRY", "TEXTURE",  "NOISE", "BLENDER", "MATRIX", "RAMP", "ANIMATION", "ALTERNATIVE", "OUTPUT"};
+	static char *material_type_names[] = {"COLOR", "LIGHT", "REFLECTION", "TRANSPARENCY", "VOLUME", "VIEW", "GEOMETRY", "TEXTURE",  "NOISE", "BLENDER", "CLAMP", "MATRIX", "RAMP", "ANIMATION", "ALTERNATIVE", "OUTPUT"};
 	static boolean show_tree = TRUE;
 	static VNMFragmentID move = -1;
 	static float rot_tree = 1;
@@ -698,7 +708,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 	y = co_handle_node_head(input, node, change_m_node_id != e_ns_get_node_id(node));
 	change_m_node_id = e_ns_get_node_id(node);
 
-	co_vng_divider(input, 0.2, y, &rot_tree, &color, &color_light, &show_tree, "LIGHT");
+	co_vng_divider(input, 0.2, y, &rot_tree, &color, &color_light, &show_tree, "FRAGMENT TREE");
 	pre_expander = y;
 
 	if(rot_tree > 0.001)
@@ -737,25 +747,25 @@ boolean co_handle_material(BInputState *input, ENode *node)
 						{
 							co_draw_param_text(place[0], place[1], 3, text, color_light);
 
-							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.1, 0.12, SUI_T_SIZE, &f.color.red, &frag->color.red, color, color, color))
+							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.1, 0, 0.12, SUI_T_SIZE, &f.color.red, &frag->color.red, color, color, color))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_COLOR, &f);
-							if(co_w_slider(input, place[0], place[1] - 0.1, 0.12, &frag->color.red, color, color, color))
+							if(co_w_slider(input, place[0], place[1] - 0.1, 0.12, &frag->color.red, 0, 1, color, color, color))
 							{
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_COLOR, frag);
 								frag->color.red = f.color.red;
 							}
 
-							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.15, 0.12, SUI_T_SIZE, &f.color.green, &frag->color.green, color, color, color))
+							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.15, 0, 0.12, SUI_T_SIZE, &f.color.green, &frag->color.green, color, color, color))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_COLOR, &f);
-							if(co_w_slider(input, place[0], place[1] - 0.15, 0.12, &frag->color.green, color, color, color))
+							if(co_w_slider(input, place[0], place[1] - 0.15, 0.12, &frag->color.green, 0, 1, color, color, color))
 							{
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_COLOR, frag);
 								frag->color.green = f.color.green;
 							}
 
-							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.2, 0.12, SUI_T_SIZE, &f.color.blue, &frag->color.blue, color, color, color))
+							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.2, 0, 0.12, SUI_T_SIZE, &f.color.blue, &frag->color.blue, color, color, color))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_COLOR, &f);
-							if(co_w_slider(input, place[0], place[1] - 0.2, 0.12, &frag->color.blue, color, color, color))
+							if(co_w_slider(input, place[0], place[1] - 0.2, 0.12, &frag->color.blue, 0, 1, color, color, color))
 							{
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_COLOR, frag);
 								frag->color.blue = f.color.blue;
@@ -805,9 +815,9 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							if(input->last_mouse_button[0] == FALSE && input->mouse_button[0] == FALSE)
 								active = -1;
 		
-							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.15, 0.12, SUI_T_SIZE, &f.light.normal_falloff, &frag->light.normal_falloff, color, color, color))
+							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.15, 0, 0.12, SUI_T_SIZE, &f.light.normal_falloff, &frag->light.normal_falloff, color, color, color))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_LIGHT, &f);
-							if(co_w_slider(input, place[0], place[1] - 0.15, 0.12, &frag->light.normal_falloff, color, color, color))
+							if(co_w_slider(input, place[0], place[1] - 0.15, 0.12, &frag->light.normal_falloff, 0, 1, color, color, color))
 							{
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_LIGHT, frag);
 								frag->light.normal_falloff = f.light.normal_falloff;
@@ -838,9 +848,9 @@ boolean co_handle_material(BInputState *input, ENode *node)
 						if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 						{
 							co_draw_param_text(place[0], place[1], 1, text, color_light);
-							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.1, 0.12, SUI_T_SIZE, &f.reflection.normal_falloff, &frag->reflection.normal_falloff, color, color, color))
+							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.1, 0, 0.12, SUI_T_SIZE, &f.reflection.normal_falloff, &frag->reflection.normal_falloff, color, color, color))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_REFLECTION, &f);
-							if(co_w_slider(input, place[0], place[1] - 0.1, 0.12, &frag->reflection.normal_falloff, color, color, color))
+							if(co_w_slider(input, place[0], place[1] - 0.1, 0.12, &frag->reflection.normal_falloff, 0, 1, color, color, color))
 							{
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_REFLECTION, frag);
 								frag->reflection.normal_falloff = f.reflection.normal_falloff;
@@ -860,16 +870,16 @@ boolean co_handle_material(BInputState *input, ENode *node)
 						if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 						{
 							co_draw_param_text(place[0], place[1], 2, text, color_light);
-							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.1, 0.12, SUI_T_SIZE, &f.transparency.normal_falloff, &frag->transparency.normal_falloff, color, color, color))
+							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.1, 0, 0.12, SUI_T_SIZE, &f.transparency.normal_falloff, &frag->transparency.normal_falloff, color, color, color))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_TRANSPARENCY, &f);
-							if(co_w_slider(input, place[0], place[1] - 0.1, 0.12, &frag->transparency.normal_falloff, color, color, color))
+							if(co_w_slider(input, place[0], place[1] - 0.1, 0.12, &frag->transparency.normal_falloff, 0, 1, color, color, color))
 							{
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_TRANSPARENCY, frag);
 								frag->transparency.normal_falloff = f.transparency.normal_falloff;
 							}
-							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.15, 0.12, SUI_T_SIZE, &f.transparency.refraction_index, &frag->transparency.refraction_index, color, color, color))
+							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.15, 0, 0.12, SUI_T_SIZE, &f.transparency.refraction_index, &frag->transparency.refraction_index, color, color, color))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_TRANSPARENCY, &f);
-							if(co_w_slider(input, place[0], place[1] - 0.15, 0.12, &frag->transparency.refraction_index, color, color, color))
+							if(co_w_slider(input, place[0], place[1] - 0.15, 0.12, &frag->transparency.refraction_index, 0, 2, color, color, color))
 							{
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_TRANSPARENCY, frag);
 								frag->transparency.refraction_index = f.transparency.refraction_index;
@@ -889,41 +899,46 @@ boolean co_handle_material(BInputState *input, ENode *node)
 						if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 						{
 							co_draw_param_text(place[0], place[1], 4, text, color_light);
-							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.1, 0.12, SUI_T_SIZE, &f.volume.diffusion, &frag->volume.diffusion, color, color, color))
+							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.1, 0, 0.12, SUI_T_SIZE, &f.volume.diffusion, &frag->volume.diffusion, color, color, color))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_VOLUME, &f);
-							if(co_w_slider(input, place[0], place[1] - 0.1, 0.12, &frag->volume.diffusion, color, color, color))
+							if(co_w_slider(input, place[0], place[1] - 0.1, 0.12, &frag->volume.diffusion, 0, 1, color, color, color))
 							{
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_VOLUME, frag);
 								frag->volume.diffusion = f.volume.diffusion;
 							}
-							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.15, 0.12, SUI_T_SIZE, &f.volume.col_r, &frag->volume.col_r, color, color, color))
+							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.15, 0, 0.12, SUI_T_SIZE, &f.volume.col_r, &frag->volume.col_r, color, color, color))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_VOLUME, &f);
-							if(co_w_slider(input, place[0], place[1] - 0.15, 0.12, &frag->volume.col_r, color, color, color))
+							if(co_w_slider(input, place[0], place[1] - 0.15, 0.12, &frag->volume.col_r, 0, 1, color, color, color))
 							{
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_VOLUME, frag);
 								frag->volume.col_r = f.volume.col_r;
 							}
-							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.2, 0.12, SUI_T_SIZE, &f.volume.col_g, &frag->volume.col_g, color, color, color))
+							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.2, 0, 0.12, SUI_T_SIZE, &f.volume.col_g, &frag->volume.col_g, color, color, color))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_VOLUME, &f);
-							if(co_w_slider(input, place[0], place[1] - 0.2, 0.12, &frag->volume.col_g, color, color, color))
+							if(co_w_slider(input, place[0], place[1] - 0.2, 0.12, &frag->volume.col_g, 0, 1, color, color, color))
 							{
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_VOLUME, frag);
 								frag->volume.col_g = f.volume.col_g;
 							}
-							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.25, 0.12, SUI_T_SIZE, &f.volume.col_b, &frag->volume.col_b, color, color, color))
+							if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.25, 0, 0.12, SUI_T_SIZE, &f.volume.col_b, &frag->volume.col_b, color, color, color))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_VOLUME, &f);
-							if(co_w_slider(input, place[0], place[1] - 0.25, 0.12, &frag->volume.col_b, color, color, color))
+							if(co_w_slider(input, place[0], place[1] - 0.25, 0.12, &frag->volume.col_b, 0, 1, color, color, color))
 							{
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_VOLUME, frag);
 								frag->volume.col_b = f.volume.col_b;
 							}
 						}if(input->mode == BAM_DRAW)
 							co_draw_lable(mat_pos, y, color_light, "Volume");
-						if(handle_link(input, node, &frag->volume.color, "Color", i, 0, y, expand, color, move))
-						{
-							verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_VOLUME, frag);
-							*frag = f;
-						}
+					}
+					break;
+					case VN_M_FT_VIEW :
+					{
+						place[0] = mat_pos->pos[0];
+						place[1] = mat_pos->pos[1] + y;
+						co_vng_fragment(place[0], place[1], 0.2, color);
+						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.2);
+						if(!co_material_click_test(input, mat_pos, i, place[0], place[1], 0.2, &move) && input->mode == BAM_DRAW)
+							co_draw_lable(mat_pos, y, color_light, "View");
 					}
 					break;
 					case VN_M_FT_GEOMETRY :
@@ -975,8 +990,8 @@ boolean co_handle_material(BInputState *input, ENode *node)
 						{	
 							static uint active = FALSE;
 							char *text[1] = {"Type"};
-							char *noise_types[] = {"PERLIN 0 - 1", "PERLIN -1 - 1"};
-							char *noise_labels[] = {"Perlin 0 - 1 Noice", "Perlin -1 - 1 Noice"};
+							char *noise_types[] = {"PERLIN 0 - 1", "PERLIN -1 - 1", "POINT 0 - 1", "POINT -1 - 1"};
+							char *noise_labels[] = {"Perlin 0 - 1 Noice", "Perlin -1 - 1 Noice", "Point 0 - 1 Noice", "Point -1 - 1 Noice"};
 							expand = 0.2 + 0.05 * mat_pos->size;
 							place[0] = mat_pos->pos[0];
 							place[1] = mat_pos->pos[1] + y;
@@ -989,22 +1004,22 @@ boolean co_handle_material(BInputState *input, ENode *node)
 									active = i;
 								if(active == i)
 								{
-									SUIPUElement e[2];
+									SUIPUElement e[4];
 									uint output;
-									for(j = 0; j < 2; j++)
+									for(j = 0; j < 4; j++)
 									{
 										e[j].text = noise_types[j];
 										e[j].type = PU_T_SQUARE;
 										e[j].data.square.draw_func = NULL;
-										e[j].data.square.square[0] = 0.3;
-										e[j].data.square.square[1] = 0.15 * (float)j;
+										e[j].data.square.square[0] = 0.3 + (float)((j) / 2) * 0.25;
+										e[j].data.square.square[1] = 0.15 * ((float)((j) % 2) - 0.66666);
 										e[j].data.square.square[2] = 0.2;
 										e[j].data.square.square[3] = -0.1;
 									}
-									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 2, 0, 0.9);
-									if(output < 2 && output != frag->noise.type)
+									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 4, 0, 0.9);
+									if(output < 4 && output != frag->noise.type)
 									{
-										frag->noise.type = output;
+										f.noise.type = output;
 										verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_NOISE, &f);
 									}
 								}
@@ -1069,6 +1084,77 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							*frag = f;
 						}
 						break;
+					case VN_M_FT_CLAMP :
+						{	
+							static uint active = FALSE;
+							char *text[4] = {"Direction", "Red", "Green", "Blue"};
+							char *clap_direction[] = {"Max", "Min"};
+							expand = 0.2 + 0.2 * mat_pos->size;
+							place[0] = mat_pos->pos[0];
+							place[1] = mat_pos->pos[1] + y;
+							co_vng_fragment(place[0], place[1], expand, color);
+							co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - expand);
+							if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
+							{
+								co_draw_param_text(place[0], place[1], 4, text, color_light);
+								if(sw_text_button(input, place[0] - 0.12, place[1] - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, clap_direction[f.clamp.min], color, color, color))
+									active = i;
+								if(active == i)
+								{
+									SUIPUElement e[2];
+									uint output;
+									for(j = 0; j < 2; j++)
+									{
+										e[j].text = clap_direction[j];
+										e[j].type = PU_T_SQUARE;
+										e[j].data.square.draw_func = NULL;
+										e[j].data.square.square[0] = 0.3 + (float)((j) / 3) * 0.25;
+										e[j].data.square.square[1] = 0.15 * ((float)((j) % 3) - 0.66666);
+										e[j].data.square.square[2] = 0.2;
+										e[j].data.square.square[3] = -0.1;
+									}
+									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 6, 0, 0.9);
+									if(output < 2 && output != f.clamp.min)
+									{
+										f.clamp.min = output;
+										verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_CLAMP, &f);
+									}
+								}
+
+								if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.15, 0, 0.12, SUI_T_SIZE, &f.clamp.red, &frag->clamp.red, color, color, color))
+									verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_CLAMP, &f);
+								if(co_w_slider(input, place[0], place[1] - 0.15, 0.12, &frag->clamp.red, 0, 1, color, color, color))
+								{
+									verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_CLAMP, frag);
+									frag->clamp.red = f.clamp.red;
+								}
+
+								if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.2, 0, 0.12, SUI_T_SIZE, &f.clamp.green, &frag->clamp.green, color, color, color))
+									verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_CLAMP, &f);
+								if(co_w_slider(input, place[0], place[1] - 0.2, 0.12, &frag->clamp.green, 0, 1, color, color, color))
+								{
+									verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_CLAMP, frag);
+									frag->clamp.green = f.clamp.green;
+								}
+
+								if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.25, 0, 0.12, SUI_T_SIZE, &f.clamp.blue, &frag->clamp.blue, color, color, color))
+									verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_CLAMP, &f);
+								if(co_w_slider(input, place[0], place[1] - 0.25, 0.12, &frag->clamp.blue, 0, 1, color, color, color))
+								{
+									verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_CLAMP, frag);
+									frag->clamp.blue = f.clamp.blue;
+								}
+								if(input->last_mouse_button[0] == FALSE && input->mouse_button[0] == FALSE)
+									active = -1;
+							}/*else if(input->mode == BAM_DRAW)
+								co_draw_lable(mat_pos, y, color_light, blender_labels[frag->blender.type]);*/
+
+							if(handle_link(input, node, &frag->clamp.data, "Input", i, 0, y, expand, color, move))
+								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_CLAMP, frag);
+
+							*frag = f;
+						}
+						break;
 					case VN_M_FT_MATRIX :
 						{	
 							static uint mode = 2, active = -1;
@@ -1124,40 +1210,40 @@ boolean co_handle_material(BInputState *input, ENode *node)
 									{
 										char *text[] = {"Type", "Reset", "Matrix"};
 										co_draw_param_text(place[0], place[1], 3, text, color_light);
-										if(sui_type_number_double(input, place[0] - 0.13, place[1] - 0.2, 0.12, SUI_T_SIZE, &f.matrix.matrix[0], &frag->matrix.matrix[0], color, color, color))
+										if(sui_type_number_double(input, place[0] - 0.13, place[1] - 0.2, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[0], &frag->matrix.matrix[0], color, color, color))
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
-										if(sui_type_number_double(input, place[0] - 0.06, place[1] - 0.2, 0.12, SUI_T_SIZE, &f.matrix.matrix[1], &frag->matrix.matrix[1], color, color, color))
+										if(sui_type_number_double(input, place[0] - 0.06, place[1] - 0.2, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[1], &frag->matrix.matrix[1], color, color, color))
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
-										if(sui_type_number_double(input, place[0] + 0.01, place[1] - 0.2, 0.12, SUI_T_SIZE, &f.matrix.matrix[2], &frag->matrix.matrix[2], color, color, color))
+										if(sui_type_number_double(input, place[0] + 0.01, place[1] - 0.2, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[2], &frag->matrix.matrix[2], color, color, color))
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
-										if(sui_type_number_double(input, place[0] + 0.08, place[1] - 0.2, 0.12, SUI_T_SIZE, &f.matrix.matrix[3], &frag->matrix.matrix[3], color, color, color))
-											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
-
-										if(sui_type_number_double(input, place[0] - 0.13, place[1] - 0.25, 0.12, SUI_T_SIZE, &f.matrix.matrix[4], &frag->matrix.matrix[4], color, color, color))
-											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
-										if(sui_type_number_double(input, place[0] - 0.06, place[1] - 0.25, 0.12, SUI_T_SIZE, &f.matrix.matrix[5], &frag->matrix.matrix[5], color, color, color))
-											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
-										if(sui_type_number_double(input, place[0] + 0.01, place[1] - 0.25, 0.12, SUI_T_SIZE, &f.matrix.matrix[6], &frag->matrix.matrix[6], color, color, color))
-											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
-										if(sui_type_number_double(input, place[0] + 0.08, place[1] - 0.25, 0.12, SUI_T_SIZE, &f.matrix.matrix[7], &frag->matrix.matrix[7], color, color, color))
+										if(sui_type_number_double(input, place[0] + 0.08, place[1] - 0.2, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[3], &frag->matrix.matrix[3], color, color, color))
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
 
-										if(sui_type_number_double(input, place[0] - 0.13, place[1] - 0.3, 0.12, SUI_T_SIZE, &f.matrix.matrix[8], &frag->matrix.matrix[8], color, color, color))
+										if(sui_type_number_double(input, place[0] - 0.13, place[1] - 0.25, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[4], &frag->matrix.matrix[4], color, color, color))
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
-										if(sui_type_number_double(input, place[0] - 0.06, place[1] - 0.3, 0.12, SUI_T_SIZE, &f.matrix.matrix[9], &frag->matrix.matrix[9], color, color, color))
+										if(sui_type_number_double(input, place[0] - 0.06, place[1] - 0.25, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[5], &frag->matrix.matrix[5], color, color, color))
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
-										if(sui_type_number_double(input, place[0] + 0.01, place[1] - 0.3, 0.12, SUI_T_SIZE, &f.matrix.matrix[10], &frag->matrix.matrix[10], color, color, color))
+										if(sui_type_number_double(input, place[0] + 0.01, place[1] - 0.25, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[6], &frag->matrix.matrix[6], color, color, color))
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
-										if(sui_type_number_double(input, place[0] + 0.08, place[1] - 0.3, 0.12, SUI_T_SIZE, &f.matrix.matrix[11], &frag->matrix.matrix[11], color, color, color))
+										if(sui_type_number_double(input, place[0] + 0.08, place[1] - 0.25, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[7], &frag->matrix.matrix[7], color, color, color))
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
 
-										if(sui_type_number_double(input, place[0] - 0.13, place[1] - 0.35, 0.12, SUI_T_SIZE, &f.matrix.matrix[12], &frag->matrix.matrix[12], color, color, color))
+										if(sui_type_number_double(input, place[0] - 0.13, place[1] - 0.3, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[8], &frag->matrix.matrix[8], color, color, color))
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
-										if(sui_type_number_double(input, place[0] - 0.06, place[1] - 0.35, 0.12, SUI_T_SIZE, &f.matrix.matrix[13], &frag->matrix.matrix[13], color, color, color))
+										if(sui_type_number_double(input, place[0] - 0.06, place[1] - 0.3, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[9], &frag->matrix.matrix[9], color, color, color))
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
-										if(sui_type_number_double(input, place[0] + 0.01, place[1] - 0.35, 0.12, SUI_T_SIZE, &f.matrix.matrix[14], &frag->matrix.matrix[14], color, color, color))
+										if(sui_type_number_double(input, place[0] + 0.01, place[1] - 0.3, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[10], &frag->matrix.matrix[10], color, color, color))
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
-										if(sui_type_number_double(input, place[0] + 0.08, place[1] - 0.35, 0.12, SUI_T_SIZE, &f.matrix.matrix[15], &frag->matrix.matrix[15], color, color, color))
+										if(sui_type_number_double(input, place[0] + 0.08, place[1] - 0.3, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[11], &frag->matrix.matrix[11], color, color, color))
+											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
+
+										if(sui_type_number_double(input, place[0] - 0.13, place[1] - 0.35, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[12], &frag->matrix.matrix[12], color, color, color))
+											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
+										if(sui_type_number_double(input, place[0] - 0.06, place[1] - 0.35, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[13], &frag->matrix.matrix[13], color, color, color))
+											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
+										if(sui_type_number_double(input, place[0] + 0.01, place[1] - 0.35, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[14], &frag->matrix.matrix[14], color, color, color))
+											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
+										if(sui_type_number_double(input, place[0] + 0.08, place[1] - 0.35, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[15], &frag->matrix.matrix[15], color, color, color))
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
 									}
 									break;
@@ -1167,7 +1253,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 										double pre, value;
 										co_draw_param_text(place[0], place[1], 4, text, color_light);
 										value = pre = (f.matrix.matrix[0] + f.matrix.matrix[5] + f.matrix.matrix[10]) / 3;
-										if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.2, 0.12, SUI_T_SIZE, &value, &frag->matrix.matrix[0], color, color, color))
+										if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.2, 0, 0.12, SUI_T_SIZE, &value, &frag->matrix.matrix[0], color, color, color))
 										{
 											f.matrix.matrix[0] *= value / pre;
 											f.matrix.matrix[5] *= value / pre;
@@ -1175,7 +1261,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
 										}
 										frag->matrix.matrix[1] = value / 3;
-										if(co_w_slider(input, place[0], place[1] - 0.2, 0.12, &frag->matrix.matrix[1], color, color, color))
+										if(co_w_slider(input, place[0], place[1] - 0.2, 0.12, &frag->matrix.matrix[1], 0, 1, color, color, color))
 										{
 											frag->matrix.matrix[0] *= frag->matrix.matrix[1] / pre * 3;
 											frag->matrix.matrix[5] *= frag->matrix.matrix[1] / pre * 3;
@@ -1190,30 +1276,30 @@ boolean co_handle_material(BInputState *input, ENode *node)
 										char *text[] = {"Type", "Reset", "Red", "Green", "Blue"};
 										co_draw_param_text(place[0], place[1], 5, text, color_light);
 
-										if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.2, 0.12, SUI_T_SIZE, &f.matrix.matrix[0], &frag->matrix.matrix[0], color, color, color))
+										if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.2, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[0], &frag->matrix.matrix[0], color, color, color))
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
 										frag->matrix.matrix[0] *= 0.25;
-										if(co_w_slider(input, place[0], place[1] - 0.2, 0.12, &frag->matrix.matrix[0], color, color, color))
+										if(co_w_slider(input, place[0], place[1] - 0.2, 0.12, &frag->matrix.matrix[0], 0, 1, color, color, color))
 										{
 											frag->matrix.matrix[0] /= 0.25;
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, frag);
 											frag->matrix.matrix[0] = f.matrix.matrix[0];
 										}
 
-										if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.25, 0.12, SUI_T_SIZE, &f.matrix.matrix[5], &frag->matrix.matrix[5], color, color, color))
+										if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.25, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[5], &frag->matrix.matrix[5], color, color, color))
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
 										frag->matrix.matrix[5] *= 0.25;
-										if(co_w_slider(input, place[0], place[1] - 0.25, 0.12, &frag->matrix.matrix[5], color, color, color))
+										if(co_w_slider(input, place[0], place[1] - 0.25, 0.12, &frag->matrix.matrix[5], 0, 1, color, color, color))
 										{
 											frag->matrix.matrix[5] /= 0.25;
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, frag);
 											frag->matrix.matrix[5] = f.matrix.matrix[5];
 										}
 
-										if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.3, 0.12, SUI_T_SIZE, &f.matrix.matrix[10], &frag->matrix.matrix[10], color, color, color))
+										if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.3, 0, 0.12, SUI_T_SIZE, &f.matrix.matrix[10], &frag->matrix.matrix[10], color, color, color))
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, &f);
 										frag->matrix.matrix[10] *= 0.25;
-										if(co_w_slider(input, place[0], place[1] - 0.3, 0.12, &frag->matrix.matrix[10], color, color, color))
+										if(co_w_slider(input, place[0], place[1] - 0.3, 0.12, &frag->matrix.matrix[10], 0, 1, color, color, color))
 										{
 											frag->matrix.matrix[10] /= 0.25;
 											verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, frag);
@@ -1224,9 +1310,10 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								}
 							}else if(input->mode == BAM_DRAW)
 								co_draw_lable(mat_pos, y, color_light, "Matrix");
-							co_vng_fragment(place[0] - 0.015, place[1] - 0.015, expand, color);
+				//			co_vng_fragment(place[0] - 0.015, place[1] - 0.015, expand, color);
+							co_vng_fragment(place[0], place[1], expand + 0.015, color);
 							co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - expand);
-							if(handle_link(input, node, &frag->matrix.data, "Input", i, 0, y, expand, color, move))
+							if(handle_link(input, node, &frag->matrix.data, "Input", i, 0, y, expand + 0.015, color, move))
 								verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_MATRIX, frag);
 							*frag = f;
 						}
@@ -1238,11 +1325,11 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							static uint segment = 0, drag = -1, drag_frag = -1;
 							static char *ramp_types[] = {"SQUARE", "LINEAR", "SMOOTH"};
 							static char *ramp_channels[] = {"RED", "GREEN", "BLUE"};
-							char *text[] = {"Channel", "Type", "Delete", "Ramp", "Red", "Green", "Blue"};
+							char *text[] = {"Channel", "Type", "Delete", "Ramp", "Pos", "Red", "Green", "Blue"};
 							double col[3], start, end, last;
 							float col_range[12], vertex[8];
 							uint mode;
-							expand = 0.2 + 0.35 * mat_pos->size;
+							expand = 0.2 + 0.4 * mat_pos->size;
 							place[0] = mat_pos->pos[0];
 							place[1] = mat_pos->pos[1] + y;
 							co_vng_fragment(place[0], place[1], expand, color);
@@ -1250,7 +1337,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							f = *frag;
 							if(co_material_click_test(input, mat_pos, i, place[0], place[1], expand, &move))
 							{
-								co_draw_param_text(place[0], place[1], 7, text, color_light);
+								co_draw_param_text(place[0], place[1], 8, text, color_light);
 								if(sw_text_button(input, place[0] - 0.12, place[1] - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, ramp_channels[frag->ramp.channel], color, color, color))
 									active_channel = i;
 								if(active_channel == i)
@@ -1310,18 +1397,18 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								{
 									if(segment == 0)
 									{
-										sui_draw_2d_line_gl(place[0] - 0.125, place[1]- 0.2, place[0] - 0.125, place[1] - 0.22, color, color, color);
-										sui_draw_2d_line_gl(place[0] - 0.125, place[1]- 0.135, place[0] - 0.125, place[1] - 0.15, color, color, color);
+										sui_draw_2d_line_gl(place[0] - 0.125, place[1]- 0.2, place[0] - 0.125, place[1] - 0.22, color, color, color, 1);
+										sui_draw_2d_line_gl(place[0] - 0.125, place[1]- 0.135, place[0] - 0.125, place[1] - 0.15, color, color, color, 1);
 									}else
 									{
-										sui_draw_2d_line_gl(place[0] - 0.125, place[1]- 0.2, place[0] - 0.125, place[1] - 0.21, color, color, color);
-										sui_draw_2d_line_gl(place[0] - 0.125, place[1]- 0.145, place[0] - 0.125, place[1] - 0.15, color, color, color);
+										sui_draw_2d_line_gl(place[0] - 0.125, place[1]- 0.2, place[0] - 0.125, place[1] - 0.21, color, color, color, 1);
+										sui_draw_2d_line_gl(place[0] - 0.125, place[1]- 0.145, place[0] - 0.125, place[1] - 0.15, color, color, color, 1);
 									}
 								}
 								if(drag != -1)
 								{
-									sui_draw_2d_line_gl(input->pointer_x, place[1]- 0.2, input->pointer_x, place[1] - 0.22, color, color, color);
-									sui_draw_2d_line_gl(input->pointer_x, place[1]- 0.135, input->pointer_x, place[1] - 0.15, color, color, color);
+									sui_draw_2d_line_gl(input->pointer_x, place[1]- 0.2, input->pointer_x, place[1] - 0.22, color, color, color, 1);
+									sui_draw_2d_line_gl(input->pointer_x, place[1]- 0.135, input->pointer_x, place[1] - 0.15, color, color, color, 1);
 								}
 								for(j = 0; j < frag->ramp.point_count; j++)
 								{
@@ -1348,16 +1435,16 @@ boolean co_handle_material(BInputState *input, ENode *node)
 											{
 												if(segment != j)
 												{
-													sui_draw_2d_line_gl(last, -0.2, last, -0.21, color, color, color);
-													sui_draw_2d_line_gl(last, -0.15, last, -0.145, color, color, color);
+													sui_draw_2d_line_gl(last, -0.2, last, -0.21, color, color, color, 1);
+													sui_draw_2d_line_gl(last, -0.15, last, -0.145, color, color, color, 1);
 												}else
 												{
-													sui_draw_2d_line_gl(last, -0.2, last, -0.22, color, color, color);
-													sui_draw_2d_line_gl(last, -0.15, last, -0.135, color, color, color);
+													sui_draw_2d_line_gl(last, -0.2, last, -0.22, color, color, color, 1);
+													sui_draw_2d_line_gl(last, -0.15, last, -0.135, color, color, color, 1);
 												}
 											}
 											sui_set_color_array_gl(col_range, 4, 3);
-											sui_draw_gl(GL_QUADS, vertex, 4, 2, 0, 0, 0);
+											sui_draw_gl(GL_QUADS, vertex, 4, 2, 0, 0, 0, 1);
 										}
 										glPopMatrix();
 									}else
@@ -1437,28 +1524,37 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								}
 								if(segment < frag->ramp.point_count)
 								{
-									if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.25, 0.12, SUI_T_SIZE, &f.ramp.ramp[segment].red, &frag->ramp.ramp[segment].red, color, color, color))
+									if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.25, 0, 0.12, SUI_T_SIZE, &f.ramp.ramp[segment].pos, &frag->ramp.ramp[segment].red, color, color, color))
 										verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_RAMP, &f);
-									if(co_w_slider(input, place[0], place[1] - 0.25, 0.12, &frag->ramp.ramp[segment].red, color, color, color))
+									if(co_w_slider(input, place[0], place[1] - 0.25, 0.12, &frag->ramp.ramp[segment].pos, 0, 1, color, color, color))
 									{
 										verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_RAMP, frag);
-										frag->color.red = f.color.red;
+										frag->ramp.ramp[segment].pos = f.ramp.ramp[segment].pos;
 									}
 
-									if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.3, 0.12, SUI_T_SIZE, &f.ramp.ramp[segment].green, &frag->ramp.ramp[segment].green, color, color, color))
+
+									if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.3, 0, 0.12, SUI_T_SIZE, &f.ramp.ramp[segment].red, &frag->ramp.ramp[segment].red, color, color, color))
 										verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_RAMP, &f);
-									if(co_w_slider(input, place[0], place[1] - 0.3, 0.12, &frag->ramp.ramp[segment].green, color, color, color))
+									if(co_w_slider(input, place[0], place[1] - 0.3, 0.12, &frag->ramp.ramp[segment].red, 0, 1, color, color, color))
 									{
 										verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_RAMP, frag);
-										frag->color.green = f.color.green;
+										frag->ramp.ramp[segment].red = f.ramp.ramp[segment].red;
 									}
 
-									if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.35, 0.12, SUI_T_SIZE, &f.ramp.ramp[segment].blue, &frag->ramp.ramp[segment].blue, color, color, color))
+									if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.35, 0, 0.12, SUI_T_SIZE, &f.ramp.ramp[segment].green, &frag->ramp.ramp[segment].green, color, color, color))
 										verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_RAMP, &f);
-									if(co_w_slider(input, place[0], place[1] - 0.35, 0.12, &frag->ramp.ramp[segment].blue, color, color, color))
+									if(co_w_slider(input, place[0], place[1] - 0.35, 0.12, &frag->ramp.ramp[segment].green, 0, 1, color, color, color))
 									{
 										verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_RAMP, frag);
-										frag->color.blue = f.color.blue;
+										frag->ramp.ramp[segment].green = f.ramp.ramp[segment].green;
+									}
+
+									if(sui_type_number_double(input, place[0] - 0.12, place[1] - 0.4, 0, 0.12, SUI_T_SIZE, &f.ramp.ramp[segment].blue, &frag->ramp.ramp[segment].blue, color, color, color))
+										verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_RAMP, &f);
+									if(co_w_slider(input, place[0], place[1] - 0.4, 0.12, &frag->ramp.ramp[segment].blue, 0, 1, color, color, color))
+									{
+										verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_RAMP, frag);
+										frag->ramp.ramp[segment].blue = f.ramp.ramp[segment].blue;
 									}
 								}
 							}else if(input->mode == BAM_DRAW)
