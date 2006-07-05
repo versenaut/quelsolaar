@@ -79,8 +79,8 @@ void co_draw_3d_node_lock(ENode *node)
 ENode *co_draw_3d_test(float x, float y)
 {
 	uint seconds, fractions;
-	ENode *node, *found_node = NULL;
-	double pos[3], output[3], f, best = 0.001;
+	ENode *node, *g_node, *found_node = NULL;
+	double pos[3], output[3], light[3], f, best = 0.001;
 	EObjLink *link;
 	VNQuat64 rot;
 	double matrix[16];
@@ -92,22 +92,29 @@ ENode *co_draw_3d_test(float x, float y)
 		co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
 		if(co_node->search == TRUE)
 		{
-			e_nso_get_pos_time(node, pos, seconds, fractions);
-			p_get_projection_screen(output, pos[0], pos[1], pos[2]);
-			output[0] += x;
-			output[1] += y;
-			f = output[0] * output[0] + output[1] * output[1];
-			if(output[2] < 0)
+			for(link = e_nso_get_next_link(node, 0); link != NULL; link = e_nso_get_next_link(node, e_nso_get_link_id(link) + 1))
+				if((g_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL && V_NT_GEOMETRY == e_ns_get_node_type(g_node))
+					break;
+			e_nso_get_light(node, light);
+			if(link != NULL || light[0] + light[1] + light[2] > 0.00001)
 			{
-				if(f < best)
+				e_nso_get_pos_time(node, pos, seconds, fractions);
+				p_get_projection_screen(output, pos[0], pos[1], pos[2]);
+				output[0] += x;
+				output[1] += y;
+				f = output[0] * output[0] + output[1] * output[1];
+				if(output[2] < 0)
 				{
-					best = f;
-					found_node = node;
-				}
-				if(!co_node->hidden && co_node->viewlock == TRUE)
-				{
-					co_node->pos_x = co_get_pos_x(x - output[0]);
-					co_node->pos_y = co_get_pos_y(y - output[1]);
+					if(f < best)
+					{
+						best = f;
+						found_node = node;
+					}
+					if(!co_node->hidden && co_node->viewlock == TRUE)
+					{
+						co_node->pos_x = co_get_pos_x(x - output[0]);
+						co_node->pos_y = co_get_pos_y(y - output[1]);
+					}
 				}
 			}
 		}
@@ -123,7 +130,7 @@ ENode *co_draw_3d_test(float x, float y)
 
 void co_draw_3d_view_pass(boolean fill, float color)
 {
-	float star[3 * 6] = {0.02, 0, 0, -0.02, 0, 0, 0,  0.02, 0, 0, -0.02, 0, 0, 0, 0.02, 0, 0, -0.02};
+
 	uint seconds, fractions;
 	ENode *node, *g_node;
 	double pos[3], scale[3];
@@ -137,7 +144,7 @@ void co_draw_3d_view_pass(boolean fill, float color)
 	{
 		co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
 
-		if(co_node->search == TRUE)
+		if(co_node->search == TRUE && !(fill && e_nso_get_hide(node)))
 		{
 			draw = FALSE;
 			for(link = e_nso_get_next_link(node, 0); link != NULL; link = e_nso_get_next_link(node, e_nso_get_link_id(link) + 1))
@@ -155,7 +162,6 @@ void co_draw_3d_view_pass(boolean fill, float color)
 					glMultMatrixd(matrix);
 
 					co_g_node = e_ns_get_custom_data(g_node, CONNECTOR_ENOUGH_SLOT);
-			
 					if((!co_node->hidden || select_node == e_ns_get_node_id(node)) && !fill)
 						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, FALSE, 0, 0, 0);
 					else if(!co_g_node->hidden && !fill)
@@ -166,7 +172,7 @@ void co_draw_3d_view_pass(boolean fill, float color)
 					draw = TRUE;
 				}
 			}
-			if(!draw)
+		/*	if(!draw)
 			{
 				e_nso_get_pos_time(node, pos, seconds, fractions);
 				glPushMatrix();
@@ -178,10 +184,59 @@ void co_draw_3d_view_pass(boolean fill, float color)
 				else
 					sui_draw_gl(GL_LINES, star, 6,  3, 0, 0, 0);
 				glPopMatrix();
+			}*/
+		}
+	}
+}
+
+static boolean draw_3d_view = TRUE;
+static boolean draw_3d_persuade = FALSE;
+
+void co_draw_3d_icon_pass()
+{
+//	float star[3 * 6] = {0.02, 0, 0, -0.02, 0, 0, 0,  0.02, 0, 0, -0.02, 0, 0, 0, 0.02, 0, 0, -0.02};
+	float shine[2 * 16] = {0, 0.02, 0, 0.04, 0, -0.02, 0, -0.04, 0.02, 0, 0.04, 0, -0.02, 0, -0.04, 0, 0.014, 0.014, 0.028, 0.028, -0.014, 0.014, -0.028, 0.028, -0.014, -0.014, -0.028, -0.028, 0.014, -0.014, 0.028, -0.028};
+	float sun[2 * 16] = {0, 0.01, 0.007, 0.007, 0.01, 0, 0.007, 0.007, 0, -0.01, 0.007, -0.007, 0.01, 0, 0.007, -0.007, 0, -0.01, -0.007, -0.007, -0.01, 0, -0.007, -0.007, 0, 0.01, -0.007, 0.007, -0.01, 0, -0.007, 0.007};
+	uint seconds, fractions;
+	ENode *node;
+	double light[3], pos[3], f;
+	COVerseNode *co_node;
+	boolean draw;
+	if(!draw_3d_view)
+		return;
+	verse_session_get_time(&seconds, &fractions);
+	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
+	{
+		co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
+		if(co_node->search == TRUE)
+		{
+			e_nso_get_light(node, light);
+			if(light[0] + light[1] + light[2] > 0.00001)
+			{
+				e_nso_get_pos_time(node, pos, seconds, fractions);
+				p_get_projection_screen(pos, pos[0], pos[1], pos[2]);
+				if(pos[2] < 0)
+				{
+					f = light[0];
+					if(light[1] > f)
+						f = light[1];
+					if(light[2] > f)
+						f = light[2];
+					f *= 1.1;
+					glPushMatrix();
+					glTranslatef(-pos[0], -pos[1], -1);
+					sui_draw_gl(GL_LINES, shine, 16, 2, light[0] / f, light[1] / f, light[2] / f, 0);
+					if(!co_node->hidden)
+						sui_draw_gl(GL_LINES, sun, 16, 2, 0, 0, 0, 0);
+					else
+						sui_draw_gl(GL_LINES, sun, 16, 2, 0.7, 0.7, 0.7, 0);
+					glPopMatrix();
+				}
 			}
 		}
 	}
 }
+
 /*
 void co_draw_3d_view_persuade()
 {
@@ -218,8 +273,6 @@ void co_draw_3d_view_persuade()
 }
 */
 
-static boolean draw_3d_view = TRUE;
-static boolean draw_3d_persuade = FALSE;
 
 boolean co_draw_3d_view_get(void)
 {
@@ -245,28 +298,35 @@ void co_draw_3d_persuade_set(boolean set)
 
 void co_draw_3d_view(float x, float y)
 {
+
 	if(!draw_3d_view)
 		return;
 	co_draw_3d_test(x, y);
 	glEnable(GL_DEPTH_TEST);
-	
-//	co_draw_3d_view_persuade();
-	glEnable(GL_POLYGON_OFFSET_FILL);
-	glDepthRange(0.5, 1.0);
 	if(draw_3d_persuade)
 	{
 #if defined PERSUADE_ENABLED
+		glClearColor(0.0, 0.0, 0.0, 0);
 		p_draw_scene();
+		{
+			uint x, y;
+			betray_get_screen_mode(&x, &y, NULL);
+			betray_reshape_view(x, y);
+		}
+		glClearColor(1.0, 1.0, 1.0, 0);
+		glPushMatrix();
 #endif
 	}
 	else
 	{
+		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
-/*		co_draw_3d_view_pass(TRUE, 0.99);*/
+		co_draw_3d_view_pass(TRUE, 0.99);
 		glPolygonOffset(0, 0);
 		co_draw_3d_view_pass(FALSE, 0.9);
+		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
-	glDepthRange(0.0, 0.5);
+//	glDepthRange(0.0, 0.5);
 	glDisable(GL_DEPTH_TEST);
 	
 }
