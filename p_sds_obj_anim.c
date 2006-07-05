@@ -1,4 +1,4 @@
-#include "enough.h"
+ #include "enough.h"
 #include "p_sds_geo.h"
 #include "p_sds_obj.h"
 //extern ESObjectNode *e_ns_get_node(uint connection, uint node_id);
@@ -7,7 +7,7 @@
 
 double p_anim_evaluate_anim(ENode *o_node, double *output, uint seconds, uint fractions, char *name, double default_value)
 {
-	double write[4], tmp[4], scale, pos;
+	double write[4], tmp[4], scale[4], pos[4];
 	ENode *c_node;
 	EObjLink *link;
 	ECurve *curve;
@@ -26,18 +26,18 @@ double p_anim_evaluate_anim(ENode *o_node, double *output, uint seconds, uint fr
 		{
 			if(e_nso_get_anim_active(link))
 			{
-				pos = e_nso_get_anim_evaluate_pos(link, seconds, fractions);
-				scale =	e_nso_get_anim_evaluate_scale(link, seconds, fractions);
+				e_nso_get_anim_evaluate_pos(link, pos, seconds, fractions);
+				e_nso_get_anim_evaluate_scale(link, scale, seconds, fractions);
 				if((curve = e_nsc_get_curve_by_name(c_node, name)) != NULL)
 				{
 					if(!found)
 						output[0] = 0;
 					found = TRUE;
-					e_nsc_evaluate_curve(curve, write, pos);
-					output[0] += write[0] * scale;
-					output[1] += write[1] * scale;
-					output[2] += write[2] * scale;
-					output[3] += write[3] * scale;
+					e_nsc_evaluate_curve(curve, write, pos[0]);
+					output[0] += write[0] * scale[0];
+					output[1] += write[1] * scale[0];
+					output[2] += write[2] * scale[0];
+					output[3] += write[3] * scale[0];
 				}
 			}
 		}
