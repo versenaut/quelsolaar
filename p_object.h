@@ -1,16 +1,19 @@
 
 #define LIGHTS_PER_OBJECT 8
-/*
+
 typedef struct{
-	uint32	id;
-	uint32	material;
-	uint32	target;
-	uint	vertex_version;
-	PMesh	*draw;	
-	PMesh	*progress;
-	void	*param;
-}PRenderSets;
-*/
+	boolean impostor;
+	uint version;
+	uint texture;
+	float vectror[3];
+	float length;
+	float timer;
+	float priority;
+	double matrix[16];
+	double size;
+	float vertex_array[12];
+	uint environment;
+}PObjImpostor;
 
 typedef struct{
 	uint32		node_id;
@@ -25,6 +28,7 @@ typedef struct{
 	uint		version;
 	PObjLight	light;
 	void		*environment;
+	PObjImpostor impostor;
 	boolean		task;
 }PObject;
 
