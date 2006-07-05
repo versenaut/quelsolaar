@@ -6,6 +6,8 @@
 #include "enough.h"
 #include "p_sds_geo.h"
 #include "p_task.h"
+#include "v_util.h"
+#include "p_sds_table.h"
 
 typedef enum{
 	PGS_COUNT,
@@ -24,7 +26,13 @@ float p_sds_compute_timer = 1000;
 
 void p_geo_set_sds_level(uint level)
 {
-	p_sds_level = level;
+
+	if(level < 1)
+		level = 1;
+	else if(level > p_get_max_tess_level())
+		p_sds_level = p_get_max_tess_level();
+	else
+		p_sds_level = level;
 }
 
 uint p_geo_get_sds_level(void)
@@ -60,9 +68,12 @@ boolean p_geo_sds_compute_func(uint id)
 	PPolyStore *old = NULL;
 	ENode *node;
 	EGeoLayer *p, *v, *e;
+	VUtilTimer ttimer;
 	float timer = 0;
 	if((node = e_ns_get_node(0, id)) == NULL || e_ns_get_node_type(node) != V_NT_GEOMETRY)
 		return TRUE;
+
+
 
 	p = e_nsg_get_layer_by_id(node,  1);
 	v = e_nsg_get_layer_by_id(node,  0);
@@ -76,7 +87,9 @@ boolean p_geo_sds_compute_func(uint id)
 	if(mesh != NULL)
 	{
 		if(mesh->version == version && mesh->stage[0] == PGS_READY)
+		{
 			return TRUE;
+		}
 		if(mesh->version != version/* && mesh->stage[0] != PGS_READY*/)
 		{
 			p_sds_free(mesh, FALSE);
@@ -92,13 +105,23 @@ boolean p_geo_sds_compute_func(uint id)
 	if(mesh == NULL)
 		mesh = p_sds_create(ref, ref_count, vertex, vertex_count, version);
 
-//	for(timer = 0; TRUE || timer < 2000;)
+
+	v_timer_start(&ttimer);
+
+	while(v_timer_elapsed(&ttimer) < 0.05)
 	{
 		switch(mesh->stage[0])
 		{
 			case PGS_COUNT :
 
-				timer += p_sds_stage_count_poly(mesh, ref, ref_count, vertex, vertex_count);
+				timer += p_sds_stage_count_poly(mesh, ref, ref_count, vertex, vertex_count, 1.0 - ((egreal)e_nsg_get_layer_crease_edge_value(node) / 4294967295.0));
+				
+				if(mesh->base_quad_count + mesh->base_tri_count == 0)
+				{
+					p_sds_free(mesh, FALSE);
+					e_ns_set_custom_data(node, P_ENOUGH_SLOT, NULL);
+					return TRUE;
+				}
 				break;
 			case PGS_CLEAN :
 				if(edge_crease == NULL)
@@ -148,7 +171,7 @@ void p_geometry_func(ENode *node, ECustomDataCommand command)
 	{
 		case E_CDC_STRUCT :
 			geometry = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
-			if(geometry == NULL || geometry->stage[0] == PGS_READY)
+			if(geometry != NULL && geometry->stage[0] == PGS_READY)
 				p_task_add(e_ns_get_node_id(node), 1, p_geo_sds_compute_func);
 		break;
 		case E_CDC_DESTROY :
