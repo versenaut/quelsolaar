@@ -21,10 +21,10 @@ void *sui_font_editor_func(BInputState *input, void *user_pointer);
 
 /* GL draw helpers */
 
-extern void sui_draw_gl(uint draw_type, const float *array, uint length, uint dimentions, float red, float green, float blue);
-extern void sui_draw_2d_line_gl(float start_x, float start_y, float end_x, float end_y, float red, float green, float blue);
-extern void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end_x, float end_y, float end_z, float red, float green, float blue);
-extern void sui_draw_elements_gl(uint draw_type, float *array, uint *reference, uint length, uint dimentions, float red, float green, float blue);
+extern void sui_draw_gl(uint draw_type, const float *array, uint length, uint dimentions, float red, float green, float blue, float alpha);
+extern void sui_draw_2d_line_gl(float start_x, float start_y, float end_x, float end_y, float red, float green, float blue, float alpha);
+extern void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end_x, float end_y, float end_z, float red, float green, float blue, float alpha);
+extern void sui_draw_elements_gl(uint draw_type, float *array, uint *reference, uint length, uint dimentions, float red, float green, float blue, float alpha);
 
 extern void sui_set_blend_gl(uint source, uint destination);
 
@@ -41,8 +41,12 @@ extern void sui_draw_set_ivec3(uint *array, uint pos, uint a, uint b, uint c);
 extern void sui_draw_set_ivec4(uint *array, uint pos, uint a, uint b, uint c, uint d);
 
 /* text drawing and handeling */
-
+/*
 #define SUI_T_SIZE 0.01
+#define SUI_T_SPACE 0.3
+*/
+
+#define SUI_T_SIZE 0.0125
 #define SUI_T_SPACE 0.3
 
 extern void		sui_draw_letter(uint8 letter, float red, float green, float blue);
@@ -53,8 +57,8 @@ extern float	sui_compute_text_length(float size, float spacing, const char *text
 
 extern boolean	sw_text_button(BInputState *input, float pos_x, float pos_y, float center, float size, float spacing, const char *text, float red, float green, float blue);
 
-extern boolean	sui_type_number_double(BInputState *input, float pos_x, float pos_y, float length, float size, double *number, void *id, float red, float green, float blue);
-extern boolean	sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float length, float size, uint32 *number, void *id, float red, float green, float blue);
+extern boolean	sui_type_number_double(BInputState *input, float pos_x, float pos_y, float center, float length, float size, double *number, void *id, float red, float green, float blue);
+extern boolean	sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float center, float length, float size, uint32 *number, void *id, float red, float green, float blue);
 
 extern boolean	sui_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size, void (*done_func)(void *user, char *text), void* user, float red, float green, float blue);
 
@@ -125,10 +129,54 @@ typedef struct{
 	}data;
 }SUIPUElement;
 
-uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *element, uint element_count, uint button, float back_color);
+extern uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *element, uint element_count, uint button, float back_color);
+extern void	sui_draw_background_ring(float pos_x, float pos_y, float color);
 
-/**/
+typedef enum{
+	S_VET_SPLIT,
+	S_VET_SPLIT_MULTI,
+	S_VET_BOOLEAN,
+	S_VET_INTEGER,
+	S_VET_REAL,
+	S_VET_SLIDER,
+	S_VET_TEXT,
+	S_VET_COLOR,
+	S_VET_SELECT,
+	S_VET_CUSTOM
+}SUIViewElementType;
 
-extern void sw_draw_bakground_ring(float pos_x, float pos_y, float color);
+
+typedef struct{
+	SUIViewElementType type;
+	char *text;
+	union{
+		boolean checkbox; 
+		uint	integer;
+		double	real;
+		double	slider;
+		struct{
+			char	*text;
+			uint	length;
+		}text;
+		double	color[3];
+		struct{
+			char	*text[10];
+			uint	select;
+		}select;
+		struct{
+			uint	current;
+			uint	count;
+			boolean	add;
+			boolean	del;
+		}split_multi;
+		struct{
+			void (*func)(void *user, double x_pos, double y_pos, double width, double length);
+			void *user;
+			double length;
+		}custom;
+	}param;
+}SUIViewElement;
+
+extern boolean sui_draw_setting_view(BInputState *input, double x_pos, double y_pos, double width, SUIViewElement *element, uint element_count, char *title, float back_color);
 
 #endif
