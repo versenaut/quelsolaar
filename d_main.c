@@ -14,7 +14,7 @@ typedef struct{
 DLoginLink *d_login_list = NULL;
 uint d_login_list_length = 0;
 
-void deceve_add_login(const char *address, const char *name, const char *pass)
+void deceve_add_login(char *address, char *name, char *pass)
 {
 	uint i, j;
 	for(i = 0; i < d_login_list_length; i++)
@@ -39,49 +39,92 @@ void deceve_add_login(const char *address, const char *name, const char *pass)
 	d_login_list_length++;
 }
 
-static char deceive_select_node[64] = { 0 };
+char deceive_select_node[64] = {0};
 
 void deceive_set_arg(int argc, char **argv)
 {
 	char address[64] = {0}, name[64] = {0}, pass[64] = {0}, node[64] = {0}, *input;
-	uint i, j;
-	if(argc < 2)
-		return;
-	input = argv[1];
-
-	for(i = 0; input[i] != '@' && input[i] != 0; i++)
-	if(input[i] == '@')
+	uint i, j, k;
+	if(argc > 1)
 	{
-		for(i = 0; input[i] != '@' && input[i] != ':'; i++)
-			name[i] = input[i];
-		name[i] = 0;
-		if(input[i] == ':')
+		printf("Command line usage:\n");
+		printf("%s <address>\n", argv[0]);
+		printf("Alt:\n");
+		printf("%s <name>:<password>@<address>/<selected_node_name>\n", argv[0]);
+		printf("Alt:\n");
+		printf("-a <adress>\n");
+		printf("-n <name>\n");
+		printf("-p <pass>\n");
+		printf("-s <selected_node_name>\n");
+	}
+	for(k = 1; k < argc; k++)
+	{
+		input = argv[k];
+		i = 0;
+		if(input[0] == '-' && input[1] == 'a' && input[2] == 0)
 		{
+			if(++k < argc)
+				for(; argv[k][i] != 0; i++)
+					address[i] = argv[k][i];
+			address[i] = 0;
+
+		}else if(input[0] == '-' && input[1] == 'n' && input[2] == 0)
+		{
+			if(++k < argc)
+				for(; argv[k][i] != 0; i++)
+					name[i] = argv[k][i];
+			name[i] = 0;
+		}else if(input[0] == '-' && input[1] == 'p' && input[2] == 0)
+		{
+			if(++k < argc)
+				for(; argv[k][i] != 0; i++)
+					pass[i] = argv[k][i];
+			pass[i] = 0;
+		}else if(input[0] == '-' && input[1] == 's' && input[2] == 0)
+		{
+			if(++k < argc)
+				for(; argv[k][i] != 0; i++)
+					deceive_select_node[i] = argv[k][i];
+			deceive_select_node[i] = 0;
+		}else
+		{
+			for(; input[i] != '@' && input[i] != 0; i++);
+			if(input[i] == '@')
+			{
+				for(i = 0; input[i] != '@' && input[i] != ':' && input[i] != 0; i++)
+					name[i] = input[i];
+				name[i] = 0;
+				if(input[i] == ':')
+				{
+					j = 0;
+					for(i++; input[i] != '@'; i++)
+						pass[j++] = input[i];
+					pass[j] = 0;
+				}
+				i++;
+			}else
+				i = 0;
+			for(j = 0; input[i] != '/' && input[i] != '\\' && input[i] != 0; i++)
+				address[j++] = input[i];
+			address[j] = 0;
 			j = 0;
-			for(i++; input[i] != '@'; i++)
-				pass[j++] = input[i];
-			pass[j] = 0;
+			if(input[i] != 0)
+				for(i++; input[i] != 0; i++)
+					deceive_select_node[j++] = input[i];
+			deceive_select_node[j] = 0;
 		}
 	}
-	i++;
-	for(j = 0; input[i] != '/' && input[i] != 0; i++)
-		address[j++] = input[i];
-	address[j] = 0;
-	j = 0;
-	if(input[i] == '/')
-		for(i++; input[i] != 0; i++)
-			deceive_select_node[j++] = input[i];
-	deceive_select_node[j] = 0;
 	deceve_add_login(address, name, pass);
-	e_vc_connect(address, name, pass, NULL);
+	printf("Address %s Name %s Pass %s Node %s\n", address, name, pass, deceive_select_node);
+	if(address[0] != 0)
+		e_vc_connect(address, name, pass, NULL);
 }
 
 
-void deceive_save_bookmarks(const char *file_name)
+void deceive_save_bookmarks(char *file_name)
 {
 	FILE *bookmarks;
 	uint i;
-
 	if(file_name == NULL)
 		file_name = "bookmarks.dbm";
 	bookmarks = fopen(file_name, "w");
@@ -95,11 +138,10 @@ void deceive_save_bookmarks(const char *file_name)
 	fclose(bookmarks);
 }
 
-void deceive_load_bookmarks(const char *file_name)
+void deceive_load_bookmarks(char *file_name)
 {
 	char line[256], address[256], name[256], pass[256];
 	FILE *bookmarks;
-
 	if(file_name == NULL)
 		file_name = "bookmarks.dbm";
 	if((bookmarks = fopen(file_name, "r")) != NULL)
@@ -111,7 +153,7 @@ void deceive_load_bookmarks(const char *file_name)
 	}
 }
 
-ENode * deceive_get_edit_node(void)
+ENode *deceive_get_edit_node()
 {
 	ENode *node;
 	char *name;
@@ -140,7 +182,7 @@ void deceive_draw_symb_close(float pos_x, float pos_y)
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
 	glScalef(0.5, 0.5, 0.5);
-	sui_draw_gl(GL_LINES, array, 48, 2, 0, 0, 0);
+	sui_draw_gl(GL_LINES, array, 48, 2, 0, 0, 0, 0);
 	glPopMatrix();
 }
 
@@ -289,11 +331,11 @@ void deceive_intro_handler(BInputState *input, void *application_handler_func)
 			if(link != NULL)
 				sui_draw_text(-0.2, -0.2, SUI_T_SIZE, SUI_T_SPACE, link->address, 0.8, 0.8, 0.8);
 			sui_type_in(input, -0.2, -0.2, 0.4, SUI_T_SIZE, address, 64, NULL, NULL, color, color, color);
-			sui_draw_2d_line_gl(-0.2, -0.2, 0.2, -0.2, color, color, color);
+			sui_draw_2d_line_gl(-0.2, -0.2, 0.2, -0.2, color, color, color, 0);
 			sui_type_in(input, -0.2, -0.25, 0.4, SUI_T_SIZE, name, 64, NULL, NULL, color, color, color);
-			sui_draw_2d_line_gl(-0.2, -0.25, 0.2, -0.25, color, color, color);
+			sui_draw_2d_line_gl(-0.2, -0.25, 0.2, -0.25, color, color, color, 0);
 			hidden_type_in(input, -0.2, -0.3, 0.4, SUI_T_SIZE, pass, 64, color, color, color);
-			sui_draw_2d_line_gl(-0.2, -0.3, 0.2, -0.3, color, color, color);
+			sui_draw_2d_line_gl(-0.2, -0.3, 0.2, -0.3, color, color, color, 0);
 
 
 			if(sw_text_button(input, -0.2, -0.325 - 2 * 0.02, 0, 0.02, 0.3, "OK", color, color, color))
@@ -350,7 +392,7 @@ void deceive_intro_handler(BInputState *input, void *application_handler_func)
 	if(input->mode == BAM_DRAW)
 	{
 		float border[16] = {-1, 10, 1, 10, 1, 0.45, -1, 0.45, -1, -10, 1, -10, 1, -0.45, -1, -0.45};
-		sui_draw_gl(GL_QUADS, border, 8, 2, 0, 0, 0);
+		sui_draw_gl(GL_QUADS, border, 8, 2, 0, 0, 0, 1);
 		glEnable(GL_DEPTH_TEST);
 		glPopMatrix();
 		glPushMatrix();
