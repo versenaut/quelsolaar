@@ -59,6 +59,7 @@ typedef struct{
 		uint32 element_count; /* the length of the reference array */
 		PMeshMaterial *mat; /*the materials and their ranges */
 		uint mat_count; /* number of ranges */
+		boolean shadows;
 	}render;
 	struct{
 		uint32	*reference;
@@ -143,6 +144,8 @@ extern void		p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cv
 
 extern void		p_lod_create_layer_param(ENode *g_node, PMesh *mesh);
 extern boolean	p_lod_update_layer_param(ENode *g_node, PMesh *mesh);
+
+extern boolean p_lod_update_shadow(ENode *g_node, PMesh *mesh);
 
 /* p_sds_obj_edge_normal.c */
 
