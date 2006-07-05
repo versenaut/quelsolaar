@@ -1,9 +1,9 @@
-
 #include "enough.h"
 #include "p_sds_geo.h"
 #include "p_sds_table.h"
 #include "p_sds_obj.h"
 
+extern boolean p_shader_transparancy(uint32 node_id);
 extern uint p_shader_get_param_count(ENode *node);
 
 boolean p_lod_material_test(PMesh *mesh, ENode *o_node)
@@ -83,6 +83,8 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 								mat[mesh->render.mat_count].layer = e_nsg_get_layer_id(layer);
 							else
 								mat[mesh->render.mat_count].layer = -1;
+							if(p_shader_transparancy(mat[mesh->render.mat_count].material))
+								mesh->render.shadows = FALSE;
 							mesh->render.mat_count++;
 						}
 					}
@@ -183,7 +185,7 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 		{
 			j = 0;
 		//	k = geometry->base_quad_count;
-			for(stage = mesh->sub_stages[1]; stage < ref_count && stage < MAX_COUNT_STAGE_LOOPS ; stage += 4)
+			for(stage = mesh->sub_stages[1]; stage < ref_count /*&& stage < MAX_COUNT_STAGE_LOOPS*/ ; stage += 4)
 			{
 				if(ref[stage] < vertex_count && ref[stage + 1] < vertex_count &&  ref[stage + 2] < vertex_count && v[ref[stage] * 3] != E_REAL_MAX && v[ref[stage + 1] * 3] != E_REAL_MAX && v[ref[stage + 2] * 3] != E_REAL_MAX)
 				{
@@ -200,7 +202,7 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 				}
 			}
 			mesh->render.mat[i].quad_end = mesh->sub_stages[2];
-			for(stage = mesh->sub_stages[1]; stage < ref_count && stage < MAX_COUNT_STAGE_LOOPS ; stage += 4)
+			for(stage = mesh->sub_stages[1]; stage < ref_count /*&& stage < MAX_COUNT_STAGE_LOOPS*/ ; stage += 4)
 			{
 				if(ref[stage] < vertex_count && ref[stage + 1] < vertex_count &&  ref[stage + 2] < vertex_count && v[ref[stage] * 3] != E_REAL_MAX && v[ref[stage + 1] * 3] != E_REAL_MAX && v[ref[stage + 2] * 3] != E_REAL_MAX)
 				{
@@ -217,6 +219,16 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 				}
 			}
 			mesh->render.mat[i].tri_end = mesh->sub_stages[2];
+		}
+		if(mesh->render.mat[i - 1].tri_end != mesh->tess.tri_count + mesh->tess.quad_count)
+		{
+//			printf("error: %u %u - %u %u\n", mesh->render.mat[i - 1].tri_end, mesh->tess.tri_count + mesh->tess.quad_count, mesh->tess.tri_count, mesh->tess.quad_count);
+		//	error: 7 10 - 0 10
+				   {
+					   int *a = NULL;
+					   a[0] = 0;
+				   }
+			exit(0);
 		}
 	//	if(mesh->render.mat_count > 1)
 	//		exit(0);
@@ -243,88 +255,3 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 		free(buf);
 	}
 }
-
-/*
-
-void p_sds_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh)
-{
-	PMeshMaterial *mat;
-	egreal *v;
-	uint32 *ref, stage, ref_count, vertex_count;
-	v = e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node, 0));
-	ref = e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node, 1));
-	ref_count = e_nsg_get_polygon_length(node);
-	vertex_count = e_nsg_get_vertex_length(node);
-
-	if(mesh->sub_stages[0] == 0)
-	{
-		mesh->tess.order = malloc((sizeof *mesh->tess.order) * (geometry->base_quad_count + geometry->base_tri_count));
-		mesh->tess.order_geo = malloc((sizeof *mesh->tess.order_geo) * ref_count);
-		mesh->tess.quad_count = 0;
-		mesh->tess.tri_count = geometry->base_quad_count;
-		mesh->sub_stages[0]++;
-		mesh->sub_stages[1] = 0;
-		mesh->sub_stages[2] = 0;
-		mesh->sub_stages[3] = geometry->base_quad_count;
-		mesh->render.mat = malloc(sizeof *mesh->render.mat);
-		mesh->render.mat_count = 1;
-		mesh->render.mat->material;
-		mesh->render.mat->end;
-		mesh->render.mat->id;
-		mesh->render.mat->layer;
-	}
-	if(mesh->sub_stages[0] == 1) 
-	{
-		for(stage = mesh->sub_stages[1]; stage < ref_count && stage < MAX_COUNT_STAGE_LOOPS ; stage += 4)
-		{
-			if(ref[stage] < vertex_count && ref[stage + 1] < vertex_count &&  ref[stage + 2] < vertex_count && v[ref[stage] * 3] != E_REAL_MAX && v[ref[stage + 1] * 3] != E_REAL_MAX && v[ref[stage + 2] * 3] != E_REAL_MAX)
-			{
-				if(ref[stage + 3] < vertex_count && v[ref[stage + 3] * 3] != E_REAL_MAX)
-				{
-					mesh->tess.order[mesh->sub_stages[2]] = stage / 4;
-					mesh->tess.order_geo[stage / 4] = mesh->sub_stages[2]++;
-				}else
-				{
-					mesh->tess.order[mesh->sub_stages[3]] = stage / 4;
-					mesh->tess.order_geo[stage / 4] = mesh->sub_stages[3]++;
-				}
-			}else
-				mesh->tess.order_geo[stage / 4] = -1;
-		}
-		mesh->sub_stages[1] = stage;
-		if(stage == ref_count)
-		{
-			mesh->sub_stages[0]++;
-			mesh->sub_stages[1] = 0;
-			mesh->sub_stages[2] = 0;
-			mesh->sub_stages[3] = 0;
-			mesh->stage++;
-		}
-	}
-	
-/*	if(mesh->sub_stages[0] == 1)
-	{
-		for(stage = mesh->sub_stages[1]; stage < ref_count && stage < MAX_COUNT_STAGE_LOOPS ; stage += 4)
-		{
-			if(ref[stage] < vertex_count && ref[stage + 1] < vertex_count &&  ref[stage + 2] < vertex_count && v[ref[stage] * 3] != E_REAL_MAX && v[ref[stage + 1] * 3] != E_REAL_MAX && v[ref[stage + 2] * 3] != E_REAL_MAX)
-			{
-				if(ref[stage + 3] < vertex_count && v[ref[stage + 3] * 3] != E_REAL_MAX)
-					sort[mesh->tess.quad_count++] = stage / 4;
-				else
-					sort[mesh->tess.tri_count++] = stage / 4;	
-			}
-		}
-		mesh->sub_stages[1] = stage
-		if(stage == ref_count)
-		{
-		}
-
-	}
-	if(stage < MAX_COUNT_STAGE_LOOPS)
-	{
-		mesh->tess.tri_count -= mesh->tess.quad_count;
-		mesh->stage++;
-		mesh->sub_stages[0] = 0;
-	}
-}*/
-
