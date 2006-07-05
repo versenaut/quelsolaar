@@ -272,7 +272,7 @@ void se_draw(SDrawing *e, boolean points, boolean mid)
 		switch(l->type)
 		{
 			case SE_LT_LINE :
-				sui_draw_2d_line_gl(l->pos_one[0], l->pos_one[1], l->pos_two[0], l->pos_two[1], 1, 1, 1);
+				sui_draw_2d_line_gl(l->pos_one[0], l->pos_one[1], l->pos_two[0], l->pos_two[1], 1, 1, 1, 1);
 			break;
 			case SE_LT_CURVE : 
 				glPushMatrix();
@@ -719,7 +719,7 @@ void se_editor(BInputState *input, SEEdtorMode ed_mode)
 	if(input->mode == BAM_DRAW)
 	{
 		glPushMatrix();
-		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 		glClearColor(0.1, 0.1, 0.1, 0);
 		glTranslatef(0, 0, -1);	
 /*		glTranslatef(4, 4, 0);*/
