@@ -365,3 +365,39 @@ void create_matrix_normalized_b(double *matrix, double *origo, double *point_x, 
 	matrix[11] = origo[2];
 	matrix[15] = 1;
 }
+
+void create_matrix_normalized_c(double *matrix, double *origo, double *point_a, double *point_b)
+{
+	double r;
+	point_a[0] -= origo[0];
+	point_a[1] -= origo[1];
+	point_a[2] -= origo[2];
+	r = sqrt(point_a[0] * point_a[0] + point_a[1] * point_a[1] + point_a[2] * point_a[2]);
+	matrix[8] = point_a[0] / r;
+	matrix[9] = point_a[1] / r;
+	matrix[10] = point_a[2] / r;
+	matrix[12] = origo[0];
+	matrix[13] = origo[1];
+	matrix[14] = origo[2];
+	point_b[0] -= origo[0];
+	point_b[1] -= origo[1];
+	point_b[2] -= origo[2];
+	matrix[0] = matrix[9] * point_b[2] - matrix[10] * point_b[1];
+	matrix[1] = matrix[10] * point_b[0] - matrix[8] * point_b[2];
+	matrix[2] = matrix[8] * point_b[1] - matrix[9] * point_b[0];
+	r = sqrt(matrix[0] * matrix[0] + matrix[1] * matrix[1] + matrix[2] * matrix[2]);
+	matrix[0] = matrix[0] / r;
+	matrix[1] = matrix[1] / r;
+	matrix[2] = matrix[2] / r;
+	matrix[4] = matrix[9] * matrix[2] - matrix[10] * matrix[1];
+	matrix[5] = matrix[10] * matrix[0] - matrix[8] * matrix[2];
+	matrix[6] = matrix[8] * matrix[1] - matrix[9] * matrix[0];
+	r = sqrt(matrix[4] * matrix[4] + matrix[5] * matrix[5] + matrix[6] * matrix[6]);
+	matrix[4] = matrix[4] / r;
+	matrix[5] = matrix[5] / r;
+	matrix[6] = matrix[6] / r;
+	matrix[3] = 0;
+	matrix[7] = 0;
+	matrix[11] = 0;
+	matrix[15] = 1;
+}
