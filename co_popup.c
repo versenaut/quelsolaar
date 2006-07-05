@@ -44,7 +44,7 @@ boolean co_draw_settings(BInputState *input)
 	return FALSE;
 }
 
-boolean co_get_settings()
+boolean co_get_settings(void)
 {
 	return co_settings;
 }
