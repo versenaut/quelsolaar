@@ -3,14 +3,10 @@
 #include "enough.h"
 #include "seduce.h"
 #include "persuade.h"
+#include "deceive.h"
 
 //#include "co_func_repository.h"
 //#include "co_storage.h"
-
-/* Disable hijacking of main() by SDL. */
-#if defined _WIN32 && defined BETRAY_SDL_SYSTEM_WRAPPER
-#undef main
-#endif
 
 void connect_type_in_func(void *user, char *text)
 {
@@ -26,16 +22,16 @@ extern void sds_2_test(void);
 void draw_table_debuging(void);
 void p_status_print(void);
 
-extern void callback_send_g_vertex_set_real_xyz(void *user_data, VNodeID node_id, VLayerID layer_id, uint32 vertex_id, egreal x, egreal y, egreal z);
-
-extern void	qs_camera_init(void);
+extern void		qs_camera_init(void);
 extern float	*qs_get_cam_matrix(void);
 extern float	*qs_get_cam_pos(void);
-extern void	qs_set_camera(void);
-extern void	qs_compute_camera(BInputState *input, float delta_time);
+extern void		qs_set_camera(void);
+extern void		qs_compute_camera(BInputState *input, float delta_time);
+extern void		qs_settings_get_bacground_color(float *color);
 
 void qs_draw_handler(BInputState *input, void *user)
 {
+	static boolean settings = FALSE;
 
 	if(input->mode == BAM_MAIN)
 	{
@@ -43,47 +39,36 @@ void qs_draw_handler(BInputState *input, void *user)
 		p_task_compute(8);
 		return;
 	}
-/*	{
-		static float time = 0;
-		ENode *node;
-		time += 0.01;
-		node = e_ns_get_node_next(0, 0, V_NT_GEOMETRY);
-		if(node != NULL)
-			callback_send_g_vertex_set_real_xyz(NULL, e_ns_get_node_id(node), 0, 0, sin(time), sin(time * 0.87), sin(time * 0.27));
-	}
-*/	if(input->mode == BAM_DRAW)
+	if(input->mode == BAM_DRAW)
 	{
-		glClearColor(0.2, 0.2, 0.2, 0);
+		double pos[3] = {0, 0, 0};
+		float color[3];
+		qs_settings_get_bacground_color(color);
+		glEnable(GL_DEPTH_TEST);
+		glClearColor(color[0], color[1], color[2], 0);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glPushMatrix();
-
-	//	glTranslatef(0, 0, -1);
-	//	p_status_print();
-	//	draw_table_debuging();
-		
 		qs_set_camera();
-	//	p_lod_set_wiev_pos(double view_cam);
-	//	p_draw_scene();
-
-	//	glScalef(12, 12, 12);
-	/*	{
-			static float rot_x = 0, rot_y = 0, delta_x = 0, delta_y = 0;
-			if(input->mouse_button[0])
-			{
-				delta_x = delta_x * 0.9 + (input->pointer_x - input->click_pointer_x) * 0.1;
-				delta_y = delta_y * 0.9 + (input->pointer_y - input->click_pointer_y) * 0.1;
-			}
-			rot_x += delta_x * 360 * betray_get_delta_time();
-			rot_y += delta_y * 360 * betray_get_delta_time();
-
-			glRotatef(rot_x, 0, 1, 0);
-			glRotatef(rot_y, 1, 0, 0);
-		}*/
 		p_draw_scene();
-//		sds_2_test();
-		glPopMatrix();
+		{
+			uint x, y;
+			betray_get_screen_mode(&x, &y, NULL);
+			betray_reshape_view(x, y);
+		}
+		glPushMatrix();
+		glTranslatef(0, 0, -1);
+		glDisable(GL_DEPTH_TEST);
 	}else
-		qs_compute_camera(input, betray_get_delta_time());
+	{
+		if(input->mouse_button[2] == TRUE && input->last_mouse_button[2] != TRUE)
+			settings = !settings;
+		if(!settings)
+			qs_compute_camera(input, betray_get_delta_time());
+	}
+	if(settings)
+		qs_draw_settings(input);
+	if(input->mode == BAM_DRAW)
+		glPopMatrix();
 }
 
 
@@ -161,11 +146,11 @@ void qs_intro_handler(BInputState *input, void *user)
 			}
 			
 			sui_type_in(input, -0.2, -0.2, 0.4, SUI_T_SIZE, address, 64, NULL, NULL, 0, 0, 0);
-			sui_draw_2d_line_gl(-0.2, -0.2, 0.2, -0.2, 0, 0, 0);
+			sui_draw_2d_line_gl(-0.2, -0.2, 0.2, -0.2, 0, 0, 0, 0);
 			sui_type_in(input, -0.2, -0.25, 0.4, SUI_T_SIZE, name, 64, NULL, NULL, 0, 0, 0);
-			sui_draw_2d_line_gl(-0.2, -0.25, 0.2, -0.25, 0, 0, 0);
+			sui_draw_2d_line_gl(-0.2, -0.25, 0.2, -0.25, 0, 0, 0, 0);
 			sui_type_in(input, -0.2, -0.3, 0.4, SUI_T_SIZE, pass, 64, NULL, NULL, 0, 0, 0);
-			sui_draw_2d_line_gl(-0.2, -0.3, 0.2, -0.3, 0, 0, 0);
+			sui_draw_2d_line_gl(-0.2, -0.3, 0.2, -0.3, 0, 0, 0, 0);
 
 
 			if(sw_text_button(input, -0.2, -0.325 - 2 * 0.02, 0, 0.02, 0.3, "OK", 0, 0, 0))
@@ -198,11 +183,12 @@ void qs_intro_handler(BInputState *input, void *user)
 extern void *se_symbol_editor_func(BInputState *input, void *user_pointer);
 extern void *se_font_editor_func(BInputState *input, void *user_pointer);
 extern void qs_intro_init(void);
-
+extern void p_init_render_to_texture(void);
 
 int main(int argc, char **argv)
 {
-	betray_init(argc, argv, 1280, 1024, FALSE, "Quel Solaar");
+	betray_init(argc, argv, 800, 600, FALSE, "Quel Solaar");
+	deceive_set_arg(argc, argv);
 	sui_load_settings("qs_config.cfg");
 	sui_init();
 	qs_camera_init();
@@ -210,8 +196,8 @@ int main(int argc, char **argv)
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	enough_init();					/* initializing the Enough Lib, setting the max subdivision level to 3*/
 #ifdef PERSUADE_H
-	persuade_init(3, betray_get_gl_proc_address());
-	p_geo_set_sds_level(2);
+	persuade_init(4, betray_get_gl_proc_address());
+	p_geo_set_sds_level(4);
 #endif
 	qs_intro_init();
 //	betray_set_mouse_warp(TRUE);
