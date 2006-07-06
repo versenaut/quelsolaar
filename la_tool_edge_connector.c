@@ -297,16 +297,14 @@ void select_found(double *array, uint *edge_vertex, uint *create_final)
 		create_final[1] = edge_vertex[1];
 		create_final[2] = GlobalSurfaceCreate.create[best[1 - flip]].create_ref[0];
 		create_final[3] = GlobalSurfaceCreate.create[best[1 - flip]].create_ref[1];
-	}else
-		create_final[0] = -1;
+	}
 	if((GlobalSurfaceCreate.create_length != 1 || flip == 0) && GlobalSurfaceCreate.create[best[flip]].destroy[0] < 3)
 	{
 		create_final[4] = GlobalSurfaceCreate.create[best[flip]].create_ref[0];
 		create_final[5] = edge_vertex[1];
 		create_final[6] = edge_vertex[0];
 		create_final[7] = GlobalSurfaceCreate.create[best[flip]].create_ref[1];
-	}else
-		create_final[4] = -1;
+	}
 }
 
 
@@ -493,8 +491,9 @@ boolean crease_edge(uint *crease, uint *vertex, uint *ref, uint ref_length)
 boolean la_t_edge_connector(uint *vertex)
 {
 	double *vertex_array;
-	uint *edge, edge_length, *crease, create_final[8], crease_final[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	uint *edge, edge_length, *crease, create_final[8] = { -1, -1, -1, -1, -1, -1, -1, -1 }, crease_final[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	uint *ref, ref_length, vertex_length;
+
 	udg_get_geometry(&vertex_length, &ref_length, &vertex_array, &ref, &crease);
 	if(crease_edge(crease, vertex, ref, ref_length))
 		return FALSE;
