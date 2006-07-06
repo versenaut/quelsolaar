@@ -153,7 +153,7 @@ void deceive_load_bookmarks(char *file_name)
 	}
 }
 
-ENode *deceive_get_edit_node()
+ENode *deceive_get_edit_node(void)
 {
 	ENode *node;
 	char *name;
