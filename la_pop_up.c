@@ -25,7 +25,7 @@ struct{
 void la_intro_draw(void *user);
 void geometry_load_obj(void *user, char *file);
 void geometry_save_obj(void *user, char *file);
-extern void draw_settings_menu(BInputState *input, void *user);
+extern void la_draw_settings_menu(BInputState *input, void *user);
 
 
 void connect_type_in_func(void *user, char *text)
@@ -81,7 +81,7 @@ void la_pu_connect(BInputState *input, void *user)
 		else
 		{
 			sui_type_in(input, -0.2, -0.45, 0.4, SUI_T_SIZE, connect_type_in, 48, connect_type_in_func, NULL, 0, 0, 0);
-			sui_draw_2d_line_gl(-0.2, -0.45, 0.2, -0.45, 0, 0, 0);
+			sui_draw_2d_line_gl(-0.2, -0.45, 0.2, -0.45, 0, 0, 0, 0.0);
 			if(input->mode == BAM_DRAW)
 				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECT") * -0.5, 0.35, 0.02, 2, "CONNECT", 0, 0, 0);
 
@@ -223,10 +223,11 @@ boolean la_pu_empty(BInputState *input)
 	switch(ring)
 	{
 		case 0 :
-/*			betray_set_action_func(draw_settings_menu, NULL);
-			geometry_load_obj(NULL, "./sds_girl_higher.obj");
-*/			la_close_all_holes();
-		break;
+			betray_set_action_func(la_draw_settings_menu, NULL);
+/*			geometry_load_obj(NULL, "./girl_hi.obj");
+			la_close_all_holes();
+			geometry_save_obj(NULL,"cafe.obj");
+*/		break;
 		case 1 :
 			udg_undo_geometry();
 		break;
@@ -529,10 +530,10 @@ void la_pu_edge(BInputState *input, uint *edge)
 			la_t_select_open_edge();
 		break;
 		case 1 :
-			la_t_revolve(edge, 16);
+			la_t_revolve(edge, sui_get_setting_int("REVOLVE_INTERSECTIONS", 8));
 		break;
 		case 2 :
-			la_t_tube(edge, 8);
+			la_t_tube(edge, sui_get_setting_int("REVOLVE_INTERSECTIONS", 8));
 		break;
 		case 3 :
 			la_t_select_hull(edge);
