@@ -16,8 +16,8 @@ extern void p_get_tri_tess_index(uint *index, uint base_tess);
 extern void p_get_quad_tess_index(uint *index, uint base_tess);
 extern boolean p_lod_displacement_update_test(PMesh *mesh);
 
-uint p_sds_force_level = 0;
-float p_sds_mesh_factor = 10000;
+static uint p_sds_force_level = 0;
+static float p_sds_mesh_factor = 10000;
 
 void p_geo_set_sds_force_level(uint level)
 {
@@ -235,7 +235,7 @@ uint p_rm_get_param_count(PMesh *mesh)
 #define P_QUAD_TESS_REF 7500
 
 boolean p_lod_material_test(PMesh *mesh, ENode *o_node);
-double *p_lod_get_view_pos();
+double *p_lod_get_view_pos(void);
 
 PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 {
@@ -290,7 +290,6 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 	v_timer_start(&timer);
 	while(v_timer_elapsed(&timer) < 0.025)
 	{
-	
 		switch(mesh->stage)
 		{
 			case POS_ALLOCATE : /* clearing and allocating */
@@ -381,7 +380,6 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 				}
 				break;
 			case POS_CREATE_DEPEND : /* building depend */
-
 				{
 					PDepend *dep;
 					uint poly;
@@ -513,7 +511,6 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 							p_lod_compute_normal_array(mesh->render.normal_array, mesh->render.vertex_count, mesh->normal.normal_ref, mesh->render.vertex_array);
 						}
 					}
-
 				}
 				return mesh;	
 		}
