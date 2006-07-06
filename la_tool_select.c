@@ -4,7 +4,34 @@
 #include "la_geometry_undo.h"
 #include "la_projection.h"
 
-uint la_t_poly_test(BInputState *input)
+
+void la_t_poly_compute_normal(double *normal, egreal *vertex, uint *ref)
+{
+	egreal r, v0[3], v1[3];
+	v0[0] = vertex[ref[1] * 3 + 0] - vertex[ref[0] * 3 + 0];
+	v0[1] = vertex[ref[1] * 3 + 1] - vertex[ref[0] * 3 + 1];
+	v0[2] = vertex[ref[1] * 3 + 2] - vertex[ref[0] * 3 + 2];
+	r = sqrt(v0[0] * v0[0] + v0[1] * v0[1] + v0[2] * v0[2]);
+	v0[0] /= r;
+	v0[1] /= r;
+	v0[2] /= r;
+	v1[0] = vertex[ref[2] * 3 + 0] - vertex[ref[0] * 3 + 0];
+	v1[1] = vertex[ref[2] * 3 + 1] - vertex[ref[0] * 3 + 1];
+	v1[2] = vertex[ref[2] * 3 + 2] - vertex[ref[0] * 3 + 2];
+	r = sqrt(v1[0] * v1[0] + v1[1] * v1[1] + v1[2] * v1[2]);
+	v1[0] /= r;
+	v1[1] /= r;
+	v1[2] /= r;
+	normal[0] = v0[1] * v1[2] - v0[2] * v1[1];
+	normal[1] = v0[2] * v1[0] - v0[0] * v1[2];
+	normal[2] = v0[0] * v1[1] - v0[1] * v1[0];
+	r = sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
+	normal[0] /= r;
+	normal[1] /= r;
+	normal[2] /= r;
+}
+
+uint la_t_poly_test(BInputState *input, double *mid, double *normal)
 {
 	uint i, j, j2, poly, found, ref_count, *ref, vertex_count;
 	double *vertex, temp[4][3], mouse[2], value;
@@ -41,7 +68,23 @@ uint la_t_poly_test(BInputState *input)
 					break;
 			}
 			if(j == poly)
+			{
+				if(mid != NULL)
+				{
+					mid[0] = 0;
+					mid[1] = 0;
+					mid[2] = 0;
+					for(j = 0; j < poly; j++)
+					{
+						mid[0] += vertex[ref[i * 4 + j] * 3 + 0] / (double)poly;
+						mid[1] += vertex[ref[i * 4 + j] * 3 + 1] / (double)poly;
+						mid[2] += vertex[ref[i * 4 + j] * 3 + 2] / (double)poly;
+					}
+				}
+				if(normal != NULL)
+					la_t_poly_compute_normal(normal, vertex, &ref[i * 4]);
 				return i;
+			}
 		}
 	}
 	return -1;
