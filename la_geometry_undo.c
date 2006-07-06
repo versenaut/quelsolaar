@@ -605,6 +605,9 @@ boolean udg_update_geometry(void)
 {
 	ENode *g_node;
 	EGeoLayer *layer;
+
+	if((g_node = deceive_get_edit_node()) != NULL)
+		UNDOGlobal.g_node = e_ns_get_node_id(g_node);
 	if(udg_check_g_node(UNDOGlobal.g_node))
 	{
 		g_node = e_ns_get_node(0, UNDOGlobal.g_node);
@@ -825,7 +828,12 @@ void udg_vertex_set(uint32 id, double *state, double x, double y, double z)
 }
 void udg_vertex_move(uint32 id, double x, double y, double z)
 {
-	verse_send_g_vertex_set_xyz_real64(UNDOGlobal.g_node, UNDOGlobal.vertex_layer, id, x, y, z);
+/*	if(x > 1000 || x < -1000)
+	{
+		uint *a = NULL;
+		*a = 0;
+	}
+*/	verse_send_g_vertex_set_xyz_real64(UNDOGlobal.g_node, UNDOGlobal.vertex_layer, id, x, y, z);
 }
 
 
