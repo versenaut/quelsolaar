@@ -30,17 +30,17 @@
 
 
 void p_texture_render_bind(uint texture, uint size, uint target);
-void p_texture_render_unbind();
+void p_texture_render_unbind(void);
 uint p_create_renderable_texture(uint size, uint format);
 
 void p_render_set_transform(ENode *node);
 
 void p_pre_fbo_draw(float fov);
-void p_post_fbo_draw();
+void p_post_fbo_draw(void);
 void p_render_object(ENode *node, boolean transparency);
 
-uint p_impostor_resolution = 128; 
-float p_render_impostor_size = 0.03;
+static uint p_impostor_resolution = 128; 
+static float p_render_impostor_size = 0.03;
 
 void p_render_set_impostor_size(float size)
 {
@@ -79,8 +79,8 @@ void p_init_impostor(PObjImpostor *imp)
 	imp->environment = -1;
 }
 void p_render_lit_and_transformed_object(ENode *node, boolean transparency);
-double *p_lod_get_view_pos();
-double *p_lod_get_view_matrix();
+double *p_lod_get_view_pos(void);
+double *p_lod_get_view_matrix(void);
 
 void create_matrix_normalized_c(double *matrix, double *origo, double *point_a, double *point_b);
 
@@ -427,7 +427,7 @@ void update_object_impostor(ENode *node, double *pos, uint texture)
 	reverse_matrix(matrix);
 }
 
-void p_update_object_impostors()
+void p_update_object_impostors(void)
 {
 	static uint node_id = 0, stage = 0;
 	uint counter = 0;
@@ -516,7 +516,7 @@ void p_draw_object_impostor(ENode *node)
 	glPopMatrix();
 }
 
-void p_draw_all_impostors()
+void p_draw_all_impostors(void)
 {
 	ENode *node;
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
