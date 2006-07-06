@@ -753,7 +753,7 @@ void e_nso_get_anim_evaluate_scale(ESLink *link, double *pos, uint32 time_s, uin
 		pos[i] = link->anim_scale[i] + link->anim_scale_speed[i] * delta;
 }
 
-void callback_send_o_hide(VNodeID node_id, uint8 hidden)
+void callback_send_o_hide(void *user, VNodeID node_id, uint8 hidden)
 {
 	ESObjectNode	*node;
 	node = e_create_o_node(node_id, 0);
