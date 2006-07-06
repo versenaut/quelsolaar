@@ -185,7 +185,7 @@ void p_shader_init(void)
 
 		for(length = 0; p_standard_vertex_shader_code[length] != 0; length++);
 		code = p_standard_vertex_shader_code;
-		p_glShaderSourceARB(p_standard_shader->vertex_obj, 1, &code, &length);
+		p_glShaderSourceARB(p_standard_shader->vertex_obj, 1, (const char **) &code, &length);
 		p_glCompileShaderARB(p_standard_shader->vertex_obj);
 			{
 				char buf[2000];
@@ -195,7 +195,7 @@ void p_shader_init(void)
 			}
 		for(length = 0; p_standard_fragment_shader_code[length] != 0; length++);
 		code = p_standard_fragment_shader_code;
-		p_glShaderSourceARB(p_standard_shader->fragment_obj, 1, &code, &length);
+		p_glShaderSourceARB(p_standard_shader->fragment_obj, 1, (const char **) &code, &length);
 		p_glCompileShaderARB(p_standard_shader->fragment_obj);
 			{
 				char buf[2000];
@@ -531,7 +531,7 @@ boolean p_shader_compute(uint node_id)
 			printf("\n%s\n", t->f_shader);
 			printf("\n%s\n", t->v_shader);
 
-			p_glShaderSourceARB(t->s->vertex_obj, 1, &t->v_shader, &t->v_length);
+			p_glShaderSourceARB(t->s->vertex_obj, 1, (const char **) &t->v_shader, &t->v_length);
 			p_glCompileShaderARB(t->s->vertex_obj);
 			{
 				char buf[2000];
@@ -542,7 +542,7 @@ boolean p_shader_compute(uint node_id)
 			t->stage = 3;
 		break;
 		case 3 :
-			p_glShaderSourceARB(t->s->fragment_obj, 1, &t->f_shader, &t->f_length);
+			p_glShaderSourceARB(t->s->fragment_obj, 1, (const char **) &t->f_shader, &t->f_length);
 			p_glCompileShaderARB(t->s->fragment_obj);
 			{
 				char buf[2000];
@@ -645,14 +645,14 @@ void p_shader_init_shadow(void)
 	p_glAttachObjectARB(shadow_prog_obj, vertex_obj);
 	p_glAttachObjectARB(shadow_prog_obj, fragment_obj);
 	for(i = 0; v_shader[i] != 0; i++);
-	p_glShaderSourceARB(vertex_obj, 1, &v_shader, &i);
+	p_glShaderSourceARB(vertex_obj, 1, (const char **) &v_shader, &i);
 	p_glCompileShaderARB(vertex_obj);
 
 	p_glGetInfoLogARB(vertex_obj, 2000, &i, buf);
 	printf("%s\n", v_shader);
 	printf("Shadow Errors:\n%s\n", buf);
 	for(i = 0; f_shader[i] != 0; i++);
-	p_glShaderSourceARB(fragment_obj, 1, &f_shader, &i);
+	p_glShaderSourceARB(fragment_obj, 1, (const char **) &f_shader, &i);
 	p_glCompileShaderARB(fragment_obj);
 	p_glGetInfoLogARB(fragment_obj, 2000, &i, buf);
 	printf("%s\n", f_shader);
@@ -725,14 +725,14 @@ void p_shader_init_blur_cube(void)
 	p_glAttachObjectARB(shadow_prog_obj, vertex_obj);
 	p_glAttachObjectARB(shadow_prog_obj, fragment_obj);
 	for(i = 0; v_shader[i] != 0; i++);
-	p_glShaderSourceARB(vertex_obj, 1, &v_shader, &i);
+	p_glShaderSourceARB(vertex_obj, 1, (const char **) &v_shader, &i);
 	p_glCompileShaderARB(vertex_obj);
 
 	p_glGetInfoLogARB(vertex_obj, 2000, &i, buf);
 	printf("%s\n", v_shader);
 	printf("Shadow Errors:\n%s\n", buf);
 	for(i = 0; f_shader[i] != 0; i++);
-	p_glShaderSourceARB(fragment_obj, 1, &f_shader, &i);
+	p_glShaderSourceARB(fragment_obj, 1, (const char **) &f_shader, &i);
 	p_glCompileShaderARB(fragment_obj);
 	p_glGetInfoLogARB(fragment_obj, 2000, &i, buf);
 	printf("%s\n", f_shader);
