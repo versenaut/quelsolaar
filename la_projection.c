@@ -1,5 +1,6 @@
 #include "la_includes.h"
 
+#include "la_projection.h"
 #include "la_geometry_undo.h"
 
  
@@ -22,7 +23,7 @@ extern void scale_matrix(double *matrix, double x, double y, double z);
 extern void negate_matrix(double *matrix);
 extern void reverse_matrix(double *matrix);
 extern void matrix_print(const double *matrix);
-
+extern void la_draw_force_update_persuade(void);
 
 struct{
 	double			matrix[16];
@@ -40,6 +41,7 @@ struct{
 	float			grab[2];
 	uint			view_axis;
 	uint			axis;
+	double			direction;
 }ProjectionData;
 
 void p_init(void)
@@ -54,8 +56,8 @@ void p_init(void)
 	ProjectionData.target[0] = 0;
 	ProjectionData.target[1] = 0;
 	ProjectionData.target[2] = 0;
-	ProjectionData.distance = 0.1;
-	ProjectionData.distance_target = 0.1;
+	ProjectionData.distance = 1.0;
+	ProjectionData.distance_target = 1.0;
 	ProjectionData.view_axis = 3;
 	ProjectionData.speed = 0.8;
     ProjectionData.grid_size = 1000;
@@ -134,6 +136,11 @@ void p_view_change(BInputState *input)
 			ProjectionData.view_axis = 2;
 		else*/
 			ProjectionData.view_axis = 3;
+
+	/*	if(input->mouse_button[1] == TRUE && (input->delta_pointer_x > 0.0001 || input->delta_pointer_x < 0.0001 || input->delta_pointer_y > 0.0001 || input->delta_pointer_y < 0.0001))
+			la_draw_force_update_persuade();*/
+		if(input->mouse_button[1] == FALSE && input->last_mouse_button[1] == TRUE)
+			la_draw_force_update_persuade();
 	}
 }
 
@@ -161,12 +168,28 @@ void p_set_view_center(double *center)
 	udg_get_geometry(&vertex_count, &polygon_count, &vertex, &ref, NULL);
 	for(i = 0; i < polygon_count; i++)
 	{
-		if(ref[i * 4] < vertex_count && vertex[ref[i * 4] * 3] != V_REAL64_MAX && 0.01 < udg_get_select(ref[i * 4]) && ref[i * 4 + 1] < vertex_count && vertex[ref[i * 4 + 1] * 3] != V_REAL64_MAX && 0.01 < udg_get_select(ref[i * 4 + 1]) && ref[i * 4 + 2] < vertex_count  && vertex[ref[i * 4 + 2] * 3] != V_REAL64_MAX && 0.01 < udg_get_select(ref[i * 4 + 2]) && ((ref[i * 4 + 3] > vertex_count  && vertex[ref[i * 4] * 3] != V_REAL64_MAX) || 0.01 < udg_get_select(ref[i * 4 + 3])))
+		if(ref[i * 4] < vertex_count && vertex[ref[i * 4] * 3] != V_REAL64_MAX && 0.01 < udg_get_select(ref[i * 4]) && ref[i * 4 + 1] < vertex_count && vertex[ref[i * 4 + 1] * 3] != V_REAL64_MAX && 0.01 < udg_get_select(ref[i * 4 + 1]) && ref[i * 4 + 2] < vertex_count  && vertex[ref[i * 4 + 2] * 3] != V_REAL64_MAX && 0.01 < udg_get_select(ref[i * 4 + 2]) && (ref[i * 4 + 3] >= vertex_count || vertex[ref[i * 4 + 3] * 3] == V_REAL64_MAX || 0.01 < udg_get_select(ref[i * 4 + 3])))
 		{	
 			normal[0] += ((vertex[ref[i * 4] * 3 + 1] - vertex[ref[i * 4 + 1] * 3 + 1]) * (vertex[ref[i * 4 + 2] * 3 + 2] - vertex[ref[i * 4 + 1] * 3 + 2]) - (vertex[ref[i * 4] * 3 + 2] - vertex[ref[i * 4 + 1] * 3 + 2]) * (vertex[ref[i * 4 + 2] * 3 + 1] - vertex[ref[i * 4 + 1] * 3 + 1]));
 			normal[1] += ((vertex[ref[i * 4] * 3 + 2] - vertex[ref[i * 4 + 1] * 3 + 2]) * (vertex[ref[i * 4 + 2] * 3 + 0] - vertex[ref[i * 4 + 1] * 3 + 0]) - (vertex[ref[i * 4] * 3 + 0] - vertex[ref[i * 4 + 1] * 3 + 0]) * (vertex[ref[i * 4 + 2] * 3 + 2] - vertex[ref[i * 4 + 1] * 3 + 2]));
 			normal[2] += ((vertex[ref[i * 4] * 3 + 0] - vertex[ref[i * 4 + 1] * 3 + 0]) * (vertex[ref[i * 4 + 2] * 3 + 1] - vertex[ref[i * 4 + 1] * 3 + 1]) - (vertex[ref[i * 4] * 3 + 1] - vertex[ref[i * 4 + 1] * 3 + 1]) * (vertex[ref[i * 4 + 2] * 3 + 0] - vertex[ref[i * 4 + 1] * 3 + 0]));
 			rotate = TRUE;
+		}
+	}
+	if(rotate != TRUE)
+	{
+		for(i = 0; i < polygon_count; i++)
+		{
+			if(ref[i * 4] < vertex_count && vertex[ref[i * 4] * 3] != V_REAL64_MAX && ref[i * 4 + 1] < vertex_count && vertex[ref[i * 4 + 1] * 3] != V_REAL64_MAX && ref[i * 4 + 2] < vertex_count && vertex[ref[i * 4 + 2] * 3] != V_REAL64_MAX)
+			{	
+				if(0.01 < udg_get_select(ref[i * 4]) || 0.01 < udg_get_select(ref[i * 4 + 1]) || 0.01 < udg_get_select(ref[i * 4 + 2]) || (ref[i * 4 + 3] < vertex_count && vertex[ref[i * 4 + 3] * 3] != V_REAL64_MAX && 0.01 < udg_get_select(ref[i * 4 + 3])))
+				{
+					normal[0] += ((vertex[ref[i * 4] * 3 + 1] - vertex[ref[i * 4 + 1] * 3 + 1]) * (vertex[ref[i * 4 + 2] * 3 + 2] - vertex[ref[i * 4 + 1] * 3 + 2]) - (vertex[ref[i * 4] * 3 + 2] - vertex[ref[i * 4 + 1] * 3 + 2]) * (vertex[ref[i * 4 + 2] * 3 + 1] - vertex[ref[i * 4 + 1] * 3 + 1]));
+					normal[1] += ((vertex[ref[i * 4] * 3 + 2] - vertex[ref[i * 4 + 1] * 3 + 2]) * (vertex[ref[i * 4 + 2] * 3 + 0] - vertex[ref[i * 4 + 1] * 3 + 0]) - (vertex[ref[i * 4] * 3 + 0] - vertex[ref[i * 4 + 1] * 3 + 0]) * (vertex[ref[i * 4 + 2] * 3 + 2] - vertex[ref[i * 4 + 1] * 3 + 2]));
+					normal[2] += ((vertex[ref[i * 4] * 3 + 0] - vertex[ref[i * 4 + 1] * 3 + 0]) * (vertex[ref[i * 4 + 2] * 3 + 1] - vertex[ref[i * 4 + 1] * 3 + 1]) - (vertex[ref[i * 4] * 3 + 1] - vertex[ref[i * 4 + 1] * 3 + 1]) * (vertex[ref[i * 4 + 2] * 3 + 0] - vertex[ref[i * 4 + 1] * 3 + 0]));
+					rotate = TRUE;
+				}
+			}
 		}
 	}
 	if(rotate == TRUE)
@@ -177,9 +200,9 @@ void p_set_view_center(double *center)
 		if(temp < 0 &&  ProjectionData.yaw > temp + 180)
 			ProjectionData.yaw -= 360;
 		ProjectionData.yaw_target = temp;
-
-		temp = sqrt((normal[0] * normal[0]) + (normal[1] * normal[1]) + (normal[2] * normal[2]));
-		ProjectionData.pitch_target = 360 * atan(normal[1] / temp) / 6.28;
+		temp = (normal[0] * normal[0]) + (normal[1] * normal[1]) + (normal[2] * normal[2]);
+		if(0.0 != temp)
+			ProjectionData.pitch_target = 360 * atan(normal[1] / sqrt(temp)) / 6.28;
 	}
 
 	for(i = 0; i < vertex_count; i++)
@@ -228,6 +251,7 @@ void p_view_set(void)
 	ProjectionData.position[0] = ProjectionData.target[0] * (1 - ProjectionData.speed) + ProjectionData.position[0] * ProjectionData.speed;
 	ProjectionData.position[1] = ProjectionData.target[1] * (1 - ProjectionData.speed) + ProjectionData.position[1] * ProjectionData.speed;
 	ProjectionData.position[2] = ProjectionData.target[2] * (1 - ProjectionData.speed) + ProjectionData.position[2] * ProjectionData.speed;
+
 	ProjectionData.pitch = ProjectionData.pitch_target * (1 - ProjectionData.speed) + ProjectionData.pitch * ProjectionData.speed;
 	ProjectionData.yaw = ProjectionData.yaw_target * (1 - ProjectionData.speed) + ProjectionData.yaw * ProjectionData.speed;
 	ProjectionData.distance = ProjectionData.distance_target * (1 - ProjectionData.speed) + ProjectionData.distance * ProjectionData.speed;
@@ -236,13 +260,7 @@ void p_view_set(void)
 	glRotated(ProjectionData.yaw, 0, 1, 0); /* the rotate functions now handels radians too */
 	glTranslated(-ProjectionData.position[0], -ProjectionData.position[1], -ProjectionData.position[2]);
 	p_projection_update();
-/*	{
-		double pos[3];
-		pos[0] = ProjectionData.model[2] * ProjectionData.distance + ProjectionData.position[0];
-		pos[1] = ProjectionData.model[6] * ProjectionData.distance + ProjectionData.position[1];
-		pos[2] = ProjectionData.model[10] * ProjectionData.distance + ProjectionData.position[2];
-		p_op_lod_set_camers_pos(pos);
-	}*/
+
 }
 
 
@@ -359,24 +377,61 @@ double p_get_projection_line(double *dist, uint axis, double pointer_x, double p
 		a[1] = (a[1] / a[2]) + pointer_y;
 		*dist = a[0] * a[0] + a[1] * a[1];
 	}
+
 	return r3;
 }
 
-void p_get_projection_vertex_with_axis(double *output, double *start, double pointer_x, double pointer_y, boolean snap, double *closest)
+void p_get_projection_line_snap(double *output, uint axis, double direction, double *start, double *snap, LASnapType snap_type)
 {
-	double dist, best_dist, pos, best_pos;
+	output[0] = start[0];
+	output[1] = start[1];
+	output[2] = start[2];
+	if(snap_type == LA_ST_VERTEX)
+	{
+		output[axis] = snap[axis];
+	}else if(snap_type == LA_ST_EDGE)
+	{
+		if(direction > 0)
+			output[axis] += snap[3];
+		else
+			output[axis] -= snap[3];
+		printf("HH p_get_projection_line_snap %u %f \n", axis, snap[3]);
+		printf("HH start %f %f %f\n", start[0], start[1], start[2]);
+		printf("HH out %f %f %f\n", output[0], output[1], output[2]);
+	}else if(snap_type == LA_ST_SURFACE)
+	{
+		double r, vector[3] = {0, 0, 0};
+		vector[axis] = 1;
+		
+		r = vector[0] * snap[3] + vector[1] * snap[4] + vector[2] * snap[5];
+		if(r < 0.1 && r > -0.1)
+			;//output[axis] += direction;
+		else
+		{
+			r = (snap[3] * (start[0] - snap[0]) + snap[4] * (start[1] - snap[1]) + snap[5] * (start[2] - snap[2])) / r;
+			output[0] = start[0] - r * vector[0];
+			output[1] = start[1] - r * vector[1];
+			output[2] = start[2] - r * vector[2];
+		}
+	}
+}
+
+void p_get_projection_vertex_with_axis(double *output, double *start, double pointer_x, double pointer_y, boolean snap, double *closest, LASnapType snap_type)
+{
+	double dist, best_dist, pos;
 	//static uint axis; 
 	uint i; 
+//	printf("*closest = %f\n", *closest);
 	if(snap != TRUE)
 	{
-		best_pos = p_get_projection_line(&best_dist, 0, pointer_x, pointer_y, start);
+		ProjectionData.direction = p_get_projection_line(&best_dist, 0, pointer_x, pointer_y, start);
 		ProjectionData.axis = 0;
 		for(i = 1; i < 3; i++)
 		{
 			pos = p_get_projection_line(&dist, i, pointer_x, pointer_y, start);
 			if(dist < best_dist)
 			{
-				best_pos = pos;
+				ProjectionData.direction = pos;
 				best_dist = dist;
 				ProjectionData.axis = i;
 			}
@@ -396,14 +451,19 @@ void p_get_projection_vertex_with_axis(double *output, double *start, double poi
 	output[1] = start[1];
 	output[2] = start[2];
 	if(snap != TRUE)
-		output[ProjectionData.axis] += best_pos;
+		output[ProjectionData.axis] += ProjectionData.direction;
 	else
 	{
-        best_pos = p_get_projection_line(&best_dist, ProjectionData.axis, pointer_x, pointer_y, start);
+      /*  p_get_projection_line(&best_dist, 0, pointer_x, pointer_y, start);
 		if(best_dist < 0.0001)
-			output[ProjectionData.axis] += (double)((int)(best_pos * ProjectionData.grid_size)) / ProjectionData.grid_size;
+		{
+			output[0] = p_get_projection_line(&best_dist, ProjectionData.axis, pointer_x, pointer_y, start);
+			output[ProjectionData.axis] += (double)((int)(output[0] * ProjectionData.grid_size)) / ProjectionData.grid_size;
+		}
 		else
-			output[ProjectionData.axis] = closest[ProjectionData.axis];
+		{*/
+			p_get_projection_line_snap(output, ProjectionData.axis, ProjectionData.direction, start, closest, snap_type);
+	/*	}*/
 	}
 }
 
@@ -550,7 +610,7 @@ boolean p_find_closest_edge_test(double *a, double *b, double x, double y)
 	return TRUE;
 }
 
-void p_find_closest_edge(uint *edge, double x, double y)
+boolean p_find_closest_edge(uint *edge, double *snap, double x, double y)
 {
 	double *vertex;
 	double a[3], b[3], c[3], d[3];
@@ -574,13 +634,13 @@ void p_find_closest_edge(uint *edge, double x, double y)
 				{
 					edge[0] = ref[i];
 					edge[1] = ref[i + 1];
-					return;
+					break;
 				}
 				if(p_find_closest_edge_test(b, c, x, y))
 				{
 					edge[0] = ref[i + 1];
 					edge[1] = ref[i + 2];
-					return;
+					break;
 				}
 				if(ref[i + 3] < vertex_count && vertex[ref[i + 3] * 3] != V_REAL64_MAX)
 				{
@@ -589,33 +649,57 @@ void p_find_closest_edge(uint *edge, double x, double y)
 					{
 						edge[0] = ref[i + 2];
 						edge[1] = ref[i + 3];
-						return;
+						break;
 					}
 					if(p_find_closest_edge_test(a, d, x, y))
 					{
 						edge[0] = ref[i + 3];
 						edge[1] = ref[i + 0];
-						return;
+						break;
 					}
 				}else if(p_find_closest_edge_test(c, a, x, y))
 				{
 					edge[0] = ref[i + 2];
 					edge[1] = ref[i + 0];
-					return;
+					break;
 				}
 			}
 		}
 	}
-	ref = udg_get_edge_data(&ref_count);
-	for(i = 0; i < ref_count; i++)
+	if(edge[0] == -1)
 	{
-		p_get_projection_screen(a, vertex[ref[i * 2] * 3], vertex[ref[i * 2] * 3 + 1], vertex[ref[i * 2] * 3 + 2]);
-		p_get_projection_screen(b, vertex[ref[i * 2 + 1] * 3], vertex[ref[i * 2 + 1] * 3 + 1], vertex[ref[i * 2 + 1] * 3 + 2]);
-		if(p_find_closest_edge_test(a, b, x, y))
+		ref = udg_get_edge_data(&ref_count);
+		for(i = 0; i < ref_count; i++)
 		{
-			edge[0] = ref[i * 2];
-			edge[1] = ref[i * 2 + 1];
-			return;
+			p_get_projection_screen(a, vertex[ref[i * 2] * 3], vertex[ref[i * 2] * 3 + 1], vertex[ref[i * 2] * 3 + 2]);
+			p_get_projection_screen(b, vertex[ref[i * 2 + 1] * 3], vertex[ref[i * 2 + 1] * 3 + 1], vertex[ref[i * 2 + 1] * 3 + 2]);
+			if(p_find_closest_edge_test(a, b, x, y))
+			{
+				edge[0] = ref[i * 2];
+				edge[1] = ref[i * 2 + 1];
+				break;
+			}
 		}
 	}
+	if(edge[0] != -1)
+	{
+		snap[0] = (vertex[edge[0] * 3 + 0] + vertex[edge[1] * 3 + 0]) * 0.5;
+		snap[1] = (vertex[edge[0] * 3 + 1] + vertex[edge[1] * 3 + 1]) * 0.5;
+		snap[2] = (vertex[edge[0] * 3 + 2] + vertex[edge[1] * 3 + 2]) * 0.5;
+		a[0] = vertex[edge[0] * 3 + 0] - vertex[edge[1] * 3 + 0];
+		a[1] = vertex[edge[0] * 3 + 1] - vertex[edge[1] * 3 + 1];
+		a[2] = vertex[edge[0] * 3 + 2] - vertex[edge[1] * 3 + 2];
+		snap[3] = sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]);
+
+		printf("v 1 = %f %f %f\n", vertex[edge[1] * 3 + 0],
+					vertex[edge[1] * 3 + 1],
+					vertex[edge[1] * 3 + 2]);
+		printf("v 2 = %f %f %f\n", vertex[edge[0] * 3 + 0],
+					vertex[edge[0] * 3 + 1],
+					vertex[edge[0] * 3 + 2]);
+		printf("a = %f %f %f\n", a[0], a[1], a[2]);
+		printf("snap[3] = %f\n", snap[3]);
+		return TRUE;
+	}
+	return FALSE;
 }

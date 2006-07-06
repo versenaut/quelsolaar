@@ -40,7 +40,7 @@ extern void		la_t_tm_draw(BInputState *input, boolean active);
 extern boolean	la_t_tm_grab(BInputState *input);
 extern void		la_t_tm_view_center(void);
 extern boolean	la_t_tm_test_center(BInputState *input);
-extern void		la_t_tm_manipulate(BInputState *input, double *snap);
+extern void		la_t_tm_manipulate(BInputState *input, double *snap, uint snap_type);
 extern void 	grab_one_vertex(BInputState *input, uint id, double *pos);
 
 /* la_tool_poly_select.c */
@@ -70,7 +70,7 @@ extern void 	la_t_select_open_edge(void);
 extern void 	la_t_crease_selected(uint32 crease_value);
 
 /* la_tool_select.c */
-extern uint		la_t_poly_test(BInputState *input);
+extern uint		la_t_poly_test(BInputState *input, double *mid, double *normal);
 extern void		la_t_poly_select(uint polygon);
 extern void		la_t_smooth_select(void);
 
