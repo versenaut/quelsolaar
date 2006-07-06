@@ -12,6 +12,7 @@
 	#include <GL/gl.h>
 #endif
 #endif
+
 #include "verse.h"
 #include "enough.h"
 
