@@ -6,6 +6,7 @@
 #include "enough.h"
 #include "seduce.h"
 #include "persuade.h"
+#include "deceive.h"
 
 #include "co_vn_graphics.h"
 #include "co_vn_handle.h"
