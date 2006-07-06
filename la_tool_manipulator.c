@@ -36,6 +36,7 @@ struct{
 	float		*manipulator_rings_color;
 	float		*manipulator_rings_shadow;
 	double		manipulator_pos[3];
+	double		manipulator_start[3];
 	double		manipulator_size;
 	double		manipulator_scale[3];
 	double		manipulator_rotate_scale;
@@ -286,9 +287,9 @@ void la_t_tm_draw(BInputState *input, boolean active)
 			glRotated(90, 0, 1, 0);
 		if(GlobalTransformManipulator.grab_axis == 1)
 			glRotated(90, 1, 0, 0);
-		sui_draw_gl(GL_LINES, GlobalTransformManipulator.manipulator_circle, (ROTATE_GRID_DEGREES * 6 + 24), 3, 1, 1, 1);
+		sui_draw_gl(GL_LINES, GlobalTransformManipulator.manipulator_circle, (ROTATE_GRID_DEGREES * 6 + 24), 3, 1, 1, 1, 0.0);
 		glScaled(1, 1, GlobalTransformManipulator.manipulator_rotate_scale);
-		sui_draw_gl(GL_QUADS, GlobalTransformManipulator.manipulator_grid, (ROTATE_GRID_DEGREES * 4 + ROTATE_GRID_SPLITS * 4), 3, 1, 1, 1);
+		sui_draw_gl(GL_QUADS, GlobalTransformManipulator.manipulator_grid, (ROTATE_GRID_DEGREES * 4 + ROTATE_GRID_SPLITS * 4), 3, 1, 1, 1, 0.0);
 		glScaled(-8 * GlobalTransformManipulator.manipulator_size / GlobalTransformManipulator.manipulator_scale[0], -8 * GlobalTransformManipulator.manipulator_size / GlobalTransformManipulator.manipulator_scale[1], -8 * GlobalTransformManipulator.manipulator_size / GlobalTransformManipulator.manipulator_scale[2]);
 	}
 
@@ -297,7 +298,7 @@ void la_t_tm_draw(BInputState *input, boolean active)
 	{
 		double matrix[16];
 //		sui_set_normal_array_gl(GlobalTransformManipulator.manipulator_normal, 12 + 24 * 6);
-		sui_draw_gl(GL_QUADS, GlobalTransformManipulator.manipulator_array, 12 + 24 * 6, 3, 1, 1, 1);
+		sui_draw_gl(GL_QUADS, GlobalTransformManipulator.manipulator_array, 12 + 24 * 6, 3, 1, 1, 1, 0.0);
 		p_get_model_matrix(matrix);
 		matrix[3] = 0;
 		matrix[7] = 0;
@@ -312,10 +313,10 @@ void la_t_tm_draw(BInputState *input, boolean active)
 		glMultMatrixd(matrix);
 		glScaled(GlobalTransformManipulator.manipulator_size, GlobalTransformManipulator.manipulator_size, GlobalTransformManipulator.manipulator_size);
 //		sui_set_normal_array_gl(GlobalTransformManipulator.manipulator_normal, 12 + 24 * 6);
-		sui_draw_gl(GL_QUADS, GlobalTransformManipulator.manipulator_rings, 4 * (ROTATE_GRID_DEGREES + 6), 2, 1, 1, 1);
+		sui_draw_gl(GL_QUADS, GlobalTransformManipulator.manipulator_rings, 4 * (ROTATE_GRID_DEGREES + 6), 2, 1, 1, 1, 0.0);
 		sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		sui_set_color_array_gl(GlobalTransformManipulator.manipulator_rings_color, 16 * (ROTATE_GRID_DEGREES + 6), 4);
-		sui_draw_gl(GL_QUADS, GlobalTransformManipulator.manipulator_rings_shadow, 16 * (ROTATE_GRID_DEGREES + 6), 2, 1, 1, 1);
+		sui_draw_gl(GL_QUADS, GlobalTransformManipulator.manipulator_rings_shadow, 16 * (ROTATE_GRID_DEGREES + 6), 2, 1, 1, 1, 0.0);
 		glPopMatrix();
 		glPushMatrix();
 	}
@@ -338,7 +339,7 @@ void la_t_tm_draw(BInputState *input, boolean active)
 	glPopMatrix();
 	if(GlobalTransformManipulator.mode == TMM_NORMAL || GlobalTransformManipulator.mode == TMM_TANGENT || GlobalTransformManipulator.mode == TMM_SMOOTH)	
 	{
-		sui_draw_gl(GL_LINES, GlobalTransformManipulator.manipulator_normal_array, GlobalTransformManipulator.manipulator_normal_array_length * 2, 3, 1, 1, 1);
+		sui_draw_gl(GL_LINES, GlobalTransformManipulator.manipulator_normal_array, GlobalTransformManipulator.manipulator_normal_array_length * 2, 3, 1, 1, 1, 0.0);
 	}
 	glEnable(GL_DEPTH_TEST);
 }
@@ -347,6 +348,9 @@ void compute_tangent(double *vertex, uint edge_a, uint edge_b, uint other)
 {
 	float r;
 	double normal[3], temp[3];
+	edge_a *= 3;
+	edge_b *= 3;
+	other *= 3;
 	dv3o_sub(normal, &vertex[edge_a], &vertex[other]);
 	dv3o_sub(temp, &vertex[edge_a], &vertex[edge_b]);
 	dv3_normalize(temp);
@@ -410,38 +414,34 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 	{
 		double x, y, z, x2, y2, z2, r;
 		uint *pos, poly, j2;
-		boolean *edge;
-		edge = malloc((sizeof *edge) * vertex_count);
 		GlobalTransformManipulator.normal = malloc((sizeof *GlobalTransformManipulator.normal) * vertex_count * 3);
 		for(i = 0; i < vertex_count; i++)
 		{
 			GlobalTransformManipulator.normal[i * 3] = 0;
 			GlobalTransformManipulator.normal[i * 3 + 1] = 0;
 			GlobalTransformManipulator.normal[i * 3 + 2] = 0;
-			edge[i] = TRUE;
 		}
 		pos = ref;
 		for(i = 0; i < ref_count; pos += 4)
 		{
 			i++;
-			if(ref[0] < vertex_count)
+			if(pos[i] < vertex_count && pos[1] < vertex_count && pos[2] < vertex_count && vertex[pos[0] * 3] != V_REAL64_MAX && vertex[pos[1] * 3] != V_REAL64_MAX && vertex[pos[2] * 3] != V_REAL64_MAX)
 			{
-				if(pos[3] > vertex_count)
-					poly = 3;
-				else
+				if(pos[3] < vertex_count && vertex[pos[3] * 3] != V_REAL64_MAX)
 					poly = 4;
-				if(udg_get_select(pos[0]) > 0.01 && udg_get_select(pos[1]) > 0.01 && udg_get_select(pos[2]) > 0.01 && (pos[3] > vertex_count || udg_get_select(pos[3]) > 0.01))
+				else
+					poly = 3;
+				if(udg_get_select(pos[0]) > 0.01 && udg_get_select(pos[1]) > 0.01 && udg_get_select(pos[2]) > 0.01 && (poly == 3 || udg_get_select(pos[3]) > 0.01))
 				{
 					x = ((vertex[pos[0] * 3 + 1] - vertex[pos[1] * 3 + 1]) * (vertex[pos[2] * 3 + 2] - vertex[pos[1] * 3 + 2]) - (vertex[pos[0] * 3 + 2] - vertex[pos[1] * 3 + 2]) * (vertex[pos[2] * 3 + 1] - vertex[pos[1] * 3 + 1]));
-					y = ((vertex[pos[0] * 3 + 2] - vertex[pos[1] * 3 + 2]) * (vertex[pos[2] * 3] - vertex[pos[1] * 3]) - (vertex[pos[0] * 3] - vertex[pos[1] * 3]) * (vertex[pos[2] * 3 + 2] - vertex[pos[1] * 3 + 2]));
-					z = ((vertex[pos[0] * 3] - vertex[pos[1] * 3]) * (vertex[pos[2] * 3 + 1] - vertex[pos[1] * 3 + 1]) - (vertex[pos[0] * 3 + 1] - vertex[pos[1] * 3 + 1]) * (vertex[pos[2] * 3] - vertex[pos[1] * 3]));
+					y = ((vertex[pos[0] * 3 + 2] - vertex[pos[1] * 3 + 2]) * (vertex[pos[2] * 3 + 0] - vertex[pos[1] * 3 + 0]) - (vertex[pos[0] * 3 + 0] - vertex[pos[1] * 3 + 0]) * (vertex[pos[2] * 3 + 2] - vertex[pos[1] * 3 + 2]));
+					z = ((vertex[pos[0] * 3 + 0] - vertex[pos[1] * 3 + 0]) * (vertex[pos[2] * 3 + 1] - vertex[pos[1] * 3 + 1]) - (vertex[pos[0] * 3 + 1] - vertex[pos[1] * 3 + 1]) * (vertex[pos[2] * 3 + 0] - vertex[pos[1] * 3 + 0]));
 					r = sqrt(x * x + y * y + z * z);
 					x = x / r;
 					y = y / r;
 					z = z / r;
 					for(j = 0; j < poly; j++)
 					{
-						edge[pos[j]] = FALSE;
 						GlobalTransformManipulator.normal[pos[j] * 3] += x;
 						GlobalTransformManipulator.normal[pos[j] * 3 + 1] += y;
 						GlobalTransformManipulator.normal[pos[j] * 3 + 2] += z;
@@ -450,47 +450,20 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 			}
 		}
 		pos = ref;
-		for(i = 0; i < ref_count; pos += 4)
-		{
-			i++;
-			if(udg_get_select(pos[0]) < 0.01 || udg_get_select(pos[1]) < 0.01 || udg_get_select(pos[2]) < 0.01 || (pos[3] < vertex_count && udg_get_select(pos[3]) < 0.01))
-			{
-				if(pos[3] > vertex_count)
-					poly = 3;
-				else
-					poly = 4;
-				computed = FALSE;
-				for(j = 0; j < poly; j++)
-				{
-					if(udg_get_select(pos[j]) > 0.01 &&  edge[pos[j]])
-					{
-						if(computed != TRUE)
-						{
-							x = ((vertex[pos[0] * 3 + 1] - vertex[pos[1] * 3 + 1]) * (vertex[pos[2] * 3 + 2] - vertex[pos[1] * 3 + 2]) - (vertex[pos[0] * 3 + 2] - vertex[pos[1] * 3 + 2]) * (vertex[pos[2] * 3 + 1] - vertex[pos[1] * 3 + 1]));
-							y = ((vertex[pos[0] * 3 + 2] - vertex[pos[1] * 3 + 2]) * (vertex[pos[2] * 3] - vertex[pos[1] * 3]) - (vertex[pos[0] * 3] - vertex[pos[1] * 3]) * (vertex[pos[2] * 3 + 2] - vertex[pos[1] * 3 + 2]));
-							z = ((vertex[pos[0] * 3] - vertex[pos[1] * 3]) * (vertex[pos[2] * 3 + 1] - vertex[pos[1] * 3 + 1]) - (vertex[pos[0] * 3 + 1] - vertex[pos[1] * 3 + 1]) * (vertex[pos[2] * 3] - vertex[pos[1] * 3]));
-							r = sqrt(x * x + y * y + z * z);
-							computed = TRUE;
-						}
-						GlobalTransformManipulator.normal[pos[j] * 3] = x / r;
-						GlobalTransformManipulator.normal[pos[j] * 3 + 1] = y / r;
-						GlobalTransformManipulator.normal[pos[j] * 3 + 2] = z / r;
-					}
-				}
-			}
-		}
-		j = 0;
 		for(i = 0; i < vertex_count; i++)
 		{
-			if(GlobalTransformManipulator.normal[i * 3] != 0 || GlobalTransformManipulator.normal[i * 3 + 1] != 0 || GlobalTransformManipulator.normal[i * 3 + 2] != 0)
+			x = GlobalTransformManipulator.normal[i * 3];
+			y = GlobalTransformManipulator.normal[i * 3 + 1];
+			z = GlobalTransformManipulator.normal[i * 3 + 2];
+			r = x * x + y * y + z * z;
+			if(r > 0.001)
 			{
-				dv3_normalize(&GlobalTransformManipulator.normal[i * 3]);
-				if(udg_get_select(i) > 0.01)
-					j++;
+				r = sqrt(r);
+				GlobalTransformManipulator.normal[i * 3] = x / r;
+				GlobalTransformManipulator.normal[i * 3 + 1] = y / r;
+				GlobalTransformManipulator.normal[i * 3 + 2] = z / r;
 			}
 		}
-		free(edge);
-
 	}
 	if(tangent)
 	{
@@ -541,14 +514,20 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 		for(i = 0; i < vertex_count; i++)
 			if(GlobalTransformManipulator.normal[i * 3] != 0 || GlobalTransformManipulator.normal[i * 3 + 1] != 0 || GlobalTransformManipulator.normal[i * 3 + 2] != 0)
 				j++;
-		free(edge);
+/*		for(i = 0; i < vertex_count; i++)
+		{
+			printf("tangent output %f %f %f edge %u\n",GlobalTransformManipulator.normal[i * 3],
+			GlobalTransformManipulator.normal[i * 3 + 1],
+			GlobalTransformManipulator.normal[i * 3 + 2],
+			edge[i]);
+		}
+*/		free(edge);
 	}
 	if(smooth)
 	{
 		uint *count, poly;
-		double vertex[3], sum[3], *temp;
+		double vertex[3], sum[3];
 		GlobalTransformManipulator.normal = malloc((sizeof *GlobalTransformManipulator.normal) * vertex_count * 3);
-		temp = malloc((sizeof *temp) * vertex_count * 3);
 		count = malloc((sizeof *count) * vertex_count);
 		for(i = 0; i < vertex_count; i++)
 		{
@@ -557,13 +536,11 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 			GlobalTransformManipulator.normal[i * 3 + 2] = 0;
 			count[i] = 0;
 		}
-		for(i = 0; i < vertex_count * 3; i++)
-			temp[i] = 0;
 		for(i = 0; i < ref_count * 4; i += 4)
 		{
-			if(ref[i] < vertex_count)
+			if(ref[i] < vertex_count && ref[i + 1] < vertex_count && ref[i + 2] < vertex_count && vertex[ref[i] * 3] != V_REAL64_MAX && vertex[ref[i + 1] * 3] != V_REAL64_MAX && vertex[ref[i + 2] * 3] != V_REAL64_MAX)
 			{
-				if(ref[i + 3] < vertex_count)
+				if(ref[i + 3] < vertex_count && vertex[ref[i + 3] * 3] != V_REAL64_MAX)
 					poly = 4;
 				else
 					poly = 3;
@@ -595,7 +572,6 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 				GlobalTransformManipulator.normal[i * 3 + 2] = (vertex[2] - (GlobalTransformManipulator.normal[i * 3 + 2] / count[i])) / (GlobalTransformManipulator.manipulator_size * 0.4);
 			}
 		}
-		free(temp);
 		free(count);
 	}
 	if(tangent || normal || smooth)
@@ -782,7 +758,7 @@ void  normal_func(double *output, uint vertex_id, void *data)
 	output[2] = GlobalTransformManipulator.data[vertex_id * 3 + 2] + (select * *(double *)data * GlobalTransformManipulator.normal[vertex_id * 3 + 2]);
 }
 
-void la_t_tm_manipulate(BInputState *input, double *snap)
+void la_t_tm_manipulate(BInputState *input, double *snap, uint snap_type)
 {
 	ENode *node;
 	double select, delta, vertex[3], state[3], matrix[16], normal_tangent;
@@ -797,7 +773,12 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 		GlobalTransformManipulator.update_rotate = 0;
 
 	if(GlobalTransformManipulator.mode == TMM_IDLE)
+	{
+		GlobalTransformManipulator.manipulator_start[0] = GlobalTransformManipulator.manipulator_pos[0];
+		GlobalTransformManipulator.manipulator_start[1] = GlobalTransformManipulator.manipulator_pos[1];
+		GlobalTransformManipulator.manipulator_start[2] = GlobalTransformManipulator.manipulator_pos[2];
 		return;
+	}
 	if(GlobalTransformManipulator.mode == TMM_PLACE)
 	{
 		GlobalTransformManipulator.manipulator_pos[0] = snap[0];
@@ -838,7 +819,10 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 	if(GlobalTransformManipulator.mode == TMM_TRANSFORM)
 	{
 		if(input->mouse_button[1])
-			GlobalTransformManipulator.manipulator_pos[GlobalTransformManipulator.grab_axis] = snap[GlobalTransformManipulator.grab_axis];
+		{
+		//	GlobalTransformManipulator.manipulator_pos[GlobalTransformManipulator.grab_axis] = snap[GlobalTransformManipulator.grab_axis];
+			p_get_projection_line_snap(GlobalTransformManipulator.manipulator_pos, GlobalTransformManipulator.grab_axis, GlobalTransformManipulator.manipulator_pos[GlobalTransformManipulator.grab_axis] - GlobalTransformManipulator.manipulator_start[GlobalTransformManipulator.grab_axis], GlobalTransformManipulator.manipulator_start, snap, snap_type);
+		}
 		else
 			GlobalTransformManipulator.manipulator_pos[GlobalTransformManipulator.grab_axis] += p_get_projection_line(NULL, GlobalTransformManipulator.grab_axis, input->pointer_x, input->pointer_y, GlobalTransformManipulator.manipulator_pos) - GlobalTransformManipulator.grab_pos;
 		
@@ -894,7 +878,7 @@ void la_t_tm_manipulate(BInputState *input, double *snap)
 	if(GlobalTransformManipulator.mode == TMM_SCALE)
 	{
 		double scale[3], vertex[3], length;
-		p_get_projection_vertex_with_axis(vertex, GlobalTransformManipulator.manipulator_pos, input->pointer_x, input->pointer_y, input->mouse_button[1], snap);
+		p_get_projection_vertex_with_axis(vertex, GlobalTransformManipulator.manipulator_pos, input->pointer_x, input->pointer_y, input->mouse_button[1], snap, LA_ST_VERTEX);
 		
 		scale[0] = 0;
 		scale[1] = 0;
@@ -1052,7 +1036,7 @@ void grab_one_vertex(BInputState *input, uint id, double *pos)
             for(i = 0; i < GlobalTransformManipulator.data_length; i++)
                 if(select[i] > 0.0001)
                     udg_vertex_move(i, GlobalTransformManipulator.data[i * 3], GlobalTransformManipulator.data[i * 3 + 1], GlobalTransformManipulator.data[i * 3 + 2]);
-        if(recursion == 0 || recursion == 3)
+        if(recursion == 0 || recursion == 5)
             direction = 0 - direction;
         for(i = 0; i < GlobalTransformManipulator.data_length; i++)
             select[i] = 0;
@@ -1096,7 +1080,8 @@ void grab_one_vertex(BInputState *input, uint id, double *pos)
                     }
                 }
                 for(i = 0; i < GlobalTransformManipulator.data_length; i++)
-                    select[i] = value[i] / (double)count[i];
+					if(count[i] > 0)
+	                    select[i] = value[i] / (double)count[i];
             }
             temp = 0;
             for(i = 0; i < GlobalTransformManipulator.data_length; i++)
@@ -1104,6 +1089,9 @@ void grab_one_vertex(BInputState *input, uint id, double *pos)
                     temp = select[i];
             for(i = 0; i < GlobalTransformManipulator.data_length; i++)
                 select[i] = select[i] / temp;
+/*		for(i = 0; i < GlobalTransformManipulator.data_length; i++)
+			printf("select[%u] = %f\n", i, select[i]);
+*/
             free(count);
             free(value);
         }
