@@ -30,7 +30,7 @@ struct{
 	boolean		select_length;
 }GlobalDrawLine;
 
-void la_t_init_draw_line()
+void la_t_init_draw_line(void)
 {
 	uint i;
 	GlobalDrawLine.array = malloc((sizeof *GlobalDrawLine.array) * ((DRAW_LINE_LENGTH * 2) + 2));
@@ -72,7 +72,7 @@ void la_t_draw_line_add(float x, float y, boolean add)
 		GlobalDrawLine.array_length++;
 		return;
 	}
-	if(GlobalDrawLine.array_length != DRAW_LINE_LENGTH - 2)
+	if(GlobalDrawLine.array_length < DRAW_LINE_LENGTH - 2)
 	{
 		dist = sqrt((last_x - x) * (last_x - x) + (last_y - y) * (last_y - y));
 		if(add && (dist > 0.002 || GlobalDrawLine.array_length != 0) && GlobalDrawLine.select_length == FALSE)
@@ -106,10 +106,10 @@ void la_t_draw_line_add(float x, float y, boolean add)
 	glDisable(GL_DEPTH_TEST);
 	glPushMatrix();
 	glTranslatef(GlobalDrawLine.array[0], GlobalDrawLine.array[1], 0);
-	sui_draw_gl(GL_LINES, GlobalDrawLine.ring, RING_SECTIONS * 8, 2, 0.1, 0.2, 0.4);
+	sui_draw_gl(GL_LINES, GlobalDrawLine.ring, RING_SECTIONS * 8, 2, 0.1, 0.2, 0.4, 0.0);
 	glPopMatrix();
 //	sui_draw_gl(GL_LINES, GlobalDrawLine.array, GlobalDrawLine.array_length, 2, 0.8, 0.8, 0.8);
-	sui_draw_gl(GL_LINES, GlobalDrawLine.vertex, GlobalDrawLine.vertex_tie_length, 2, 0.8, 0.8, 0.8);
+	sui_draw_gl(GL_LINES, GlobalDrawLine.vertex, GlobalDrawLine.vertex_tie_length, 2, 0.8, 0.8, 0.8, 0.0);
 //	nglDrawArray(NGL_LINES, GlobalDrawLine.vertex, NULL, 0 ,sui_get_material(), 0);
 	glEnable(GL_DEPTH_TEST);
 	glPopMatrix();
@@ -164,6 +164,10 @@ boolean la_t_draw_line_test_delete(void)
 	double *vertex, a[3], b[3], c[3], d[3];
 	boolean del = FALSE;
 	uint vertex_length, *ref, ref_length, i;
+
+	if(GlobalDrawLine.array_length == 0)
+		return FALSE;
+
 	udg_get_geometry(&vertex_length, &ref_length, &vertex, &ref, NULL);
 	for(i = 0; i < ref_length; i++)
 	{

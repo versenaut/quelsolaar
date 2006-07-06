@@ -406,25 +406,24 @@ void la_pfx_init(uint particle_count, uint texture_size)
 	{
 		uint texture_id;
 		float light_color[3] = {0.2, 0.6, 1};
-		float light_pos[3] = {-0.2, 0.2, 0} , r;
+		float light_pos[3] = {0.2, -0.2, 0} , r;
 		for(i = 0; i < texture_size * texture_size * 3; i++)
 			data[i] = 0;
-		add_shade(texture_size / 2, data, light_pos, light_color, -0.0, 0.03);
-		light_color[2] = 1;
+		add_shade(texture_size / 2, data, light_pos, light_color, -0.0, 0.06);
+		light_color[0] = 1;
 		light_color[1] = 0.5;
-		light_color[0] = 0.3;
-		light_pos[0] = -0.3;
-		light_pos[1] = 0.3;
-		light_pos[2] = -1;
-		add_shade(texture_size / 2, data, light_pos, light_color, -0.06, 0.02);
-
-		light_color[0] = 0.2;
-		light_color[1] = -0.1;
-		light_color[2] = -0.1;
+		light_color[2] = 0.3;
 		light_pos[0] = 0.3;
 		light_pos[1] = -0.3;
+		light_pos[2] = -1;
+		add_shade(texture_size / 2, data, light_pos, light_color, -0.06, 0.04);
+		light_color[0] = 0.4;
+		light_color[1] = -0.2;
+		light_color[2] = -0.2;
+		light_pos[0] = -0.3;
+		light_pos[1] = 0.3;
 		light_pos[2] = -0.3;
-		add_shade(texture_size / 2, data, light_pos, light_color, -0.06, 0.01);
+		add_shade(texture_size / 2, data, light_pos, light_color, -0.06, 0.02);
 		GlobalParticleData.surface_material = la_save_targa("la_tmp_surface.tga", data, texture_size / 2);
 	}
 	if(!la_load_targa("la_tmp_video.tga", &GlobalParticleData.video_material))
@@ -456,13 +455,17 @@ void la_pfx_create_dust(double *pos, double size)
 	DustParticle *p;
 	if(GlobalParticleData.dust_count == 0)
 	{
+		uint	i;
+
 		GlobalParticleData.dust = malloc((sizeof *GlobalParticleData.dust) * GlobalParticleData.dust_length);
 		GlobalParticleData.dust_pos = malloc((sizeof *GlobalParticleData.dust_pos) * GlobalParticleData.dust_length * 2 * 3);
 		GlobalParticleData.dust_col = malloc((sizeof *GlobalParticleData.dust_col) * GlobalParticleData.dust_length * 2 * 3);
+		for(i = 0; i < GlobalParticleData.dust_length; i++)
+			GlobalParticleData.dust[i].age = -2.0;
 	}
-	if(GlobalParticleData.dust_length > GlobalParticleData.dust_count)
-		GlobalParticleData.dust_count++;
 	p = &GlobalParticleData.dust[GlobalParticleData.dust_start++ % GlobalParticleData.dust_length];
+	if(p->age < 0.0)
+		GlobalParticleData.dust_count++;
 	p->pos[0] = pos[0];
 	p->pos[1] = pos[1];
 	p->pos[2] = pos[2];
@@ -482,10 +485,12 @@ void la_pfx_create_spark(double *pos)
 	if(GlobalParticleData.spark_count == 0)
 	{
 		GlobalParticleData.spark = malloc((sizeof *GlobalParticleData.spark) * GlobalParticleData.spark_length);
+		for(counter = 0; counter < GlobalParticleData.spark_length; counter++)
+			GlobalParticleData.spark[counter].age = -2.0;
 	}
-	if(GlobalParticleData.spark_length > GlobalParticleData.spark_count)
-		GlobalParticleData.spark_count++;
 	p = &GlobalParticleData.spark[GlobalParticleData.spark_start++ % GlobalParticleData.spark_length];
+	if(p->age < 0.0)
+		GlobalParticleData.spark_count++;
 	p->pos[0] = pos[0];
 	p->pos[1] = pos[1];
 	p->pos[2] = pos[2];
@@ -512,10 +517,12 @@ void la_pfx_create_intro_spark(double *pos)
 	if(GlobalParticleData.spark_count == 0)
 	{
 		GlobalParticleData.spark = malloc((sizeof *GlobalParticleData.spark) * GlobalParticleData.spark_length);
+		for(counter = 0; counter < GlobalParticleData.spark_length; counter++)
+			GlobalParticleData.spark[counter].age = -2.0;
 	}
-	if(GlobalParticleData.spark_length > GlobalParticleData.spark_count)
-		GlobalParticleData.spark_count++;
 	p = &GlobalParticleData.spark[GlobalParticleData.spark_start++ % GlobalParticleData.spark_length];
+	if(p->age < 0.0)
+		GlobalParticleData.spark_count++;
 	p->pos[0] = pos[0];
 	p->pos[1] = pos[1];
 	p->pos[2] = pos[2];
@@ -651,7 +658,7 @@ void la_pfx_draw(boolean intro)
 			glDepthMask(0);
 			sui_set_blend_gl(GL_ONE, GL_ONE);
 			sui_set_color_array_gl(GlobalParticleData.dust_col, GlobalParticleData.dust_length * 2, 3);
-			sui_draw_gl(GL_LINES, GlobalParticleData.dust_pos, GlobalParticleData.dust_length * 2, 3, 0, 0, 0);
+			sui_draw_gl(GL_LINES, GlobalParticleData.dust_pos, GlobalParticleData.dust_length * 2, 3, 0, 0, 0, 0.0);
 			glDepthMask(1);
 		}
 	}
@@ -691,7 +698,7 @@ void la_pfx_draw(boolean intro)
 					sui_set_blend_gl(GL_ONE, GL_ONE);
 					sui_set_texture2D_array_gl(uv, 4, 2, GlobalParticleData.flare_material /**/);
 				}
-				sui_draw_gl(GL_QUADS, vertex, 4, 3, 1, 1, 1);
+				sui_draw_gl(GL_QUADS, vertex, 4, 3, 1, 1, 1, 0.0);
 				glDepthMask(1);
 				if(p->age < 0)
 				{
@@ -732,7 +739,7 @@ void la_pfx_draw(boolean intro)
 				sui_draw_set_vec3(vertex, 3, p->pos[0] + matrix[0] * size + matrix[1] * size, p->pos[1] + matrix[4] * size + matrix[5] * size, p->pos[2] + matrix[8] * size + matrix[9] * size);
 				sui_set_blend_gl(GL_ONE, GL_ONE);
 				sui_set_texture2D_array_gl(uv, 4, 2, GlobalParticleData.flare_material);
-				sui_draw_gl(GL_QUADS, vertex, 4, 3, 1, 1, 1);
+				sui_draw_gl(GL_QUADS, vertex, 4, 3, 1, 1, 1, 0.0);
 
 				size = p->size * 3 * p->age;
 				size2 = p->size * 0.1 * p->age * p->age * p->age;
@@ -742,7 +749,7 @@ void la_pfx_draw(boolean intro)
 				sui_draw_set_vec3(vertex, 3, p->pos[0] + matrix[0] * size + matrix[1] * size2, p->pos[1] + matrix[4] * size + matrix[5] * size2, p->pos[2] + matrix[8] * size + matrix[9] * size2);
 				sui_set_blend_gl(GL_ONE, GL_ONE);
 				sui_set_texture2D_array_gl(uv, 4, 2, GlobalParticleData.star_material);
-				sui_draw_gl(GL_QUADS, vertex, 4, 3, 1, 1, 1);
+				sui_draw_gl(GL_QUADS, vertex, 4, 3, 1, 1, 1, 0.0);
 				{
 					float light[4];
 					light[0] = p->pos[0];
@@ -805,7 +812,7 @@ void la_pfx_select_vertex(void)
 			{
 				sui_set_blend_gl(GL_ONE, GL_ONE);
 				sui_set_texture2D_array_gl(GlobalParticleData.select_uv, SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 4, 2, GlobalParticleData.point_material);
-				sui_draw_gl(GL_QUADS, GlobalParticleData.select_pos, SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 4, 3, 0.3, 0.3, 0.3);	
+				sui_draw_gl(GL_QUADS, GlobalParticleData.select_pos, SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 4, 3, 0.3, 0.3, 0.3, 0.0);	
 				j = 0;
 			}
 		}
@@ -816,7 +823,7 @@ void la_pfx_select_vertex(void)
 			sui_draw_set_vec3(GlobalParticleData.select_pos, j, 0, 0, -1);
 		sui_set_blend_gl(GL_ONE, GL_ONE);
 		sui_set_texture2D_array_gl(GlobalParticleData.select_uv, SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 4, 2, GlobalParticleData.point_material);
-		sui_draw_gl(GL_QUADS, GlobalParticleData.select_pos, SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 4, 3, 0.3, 0.3, 0.3);	
+		sui_draw_gl(GL_QUADS, GlobalParticleData.select_pos, SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 4, 3, 0.3, 0.3, 0.3, 0.0);	
 	}
 	if(sui_get_setting_int("DISPLAY_SILLY_FLARES", TRUE))
 	{
@@ -855,7 +862,7 @@ void la_pfx_select_vertex(void)
 		}*/
 		la_t_tm_get_pos(pos);
 		p_get_projection_screen(output, pos[0], pos[1], pos[2]);
-		t += 0.002;
+		t += betray_get_delta_time() * 0.2;
 		output[0] += 0.1 * sin(t); 
 		output[1] += 0.1 * cos(t);
 		sui_draw_set_vec3(v, 0, 2 * output[0] + MANIPULATOR_FLARE_SIZE, 2 * output[1] + MANIPULATOR_FLARE_SIZE, -1);
@@ -864,7 +871,7 @@ void la_pfx_select_vertex(void)
 		sui_draw_set_vec3(v, 3, 2 * output[0] + MANIPULATOR_FLARE_SIZE, 2 * output[1] - MANIPULATOR_FLARE_SIZE, -1);
 		sui_set_blend_gl(GL_ONE, GL_ONE);
 		sui_set_texture2D_array_gl(uv, 4, 2, GlobalParticleData.soft_material2);
-		sui_draw_gl(GL_QUADS, v, 4, 3, 1, 1, 1);
+		sui_draw_gl(GL_QUADS, v, 4, 3, 1, 1, 1, 0.0);
 
 		sui_draw_set_vec3(v, 0, 4 * output[0] + MANIPULATOR_FLARE_SIZE * 0.5, 4 * output[1] + MANIPULATOR_FLARE_SIZE * 0.5, -1);
 		sui_draw_set_vec3(v, 1, 4 * output[0] - MANIPULATOR_FLARE_SIZE * 0.5, 4 * output[1] + MANIPULATOR_FLARE_SIZE * 0.5, -1);
@@ -872,7 +879,7 @@ void la_pfx_select_vertex(void)
 		sui_draw_set_vec3(v, 3, 4 * output[0] + MANIPULATOR_FLARE_SIZE * 0.5, 4 * output[1] - MANIPULATOR_FLARE_SIZE * 0.5, -1);
 		sui_set_blend_gl(GL_ONE, GL_ONE);
 		sui_set_texture2D_array_gl(uv, 4, 2, GlobalParticleData.soft_material);
-		sui_draw_gl(GL_QUADS, v, 4, 3, 1, 1, 1);
+		sui_draw_gl(GL_QUADS, v, 4, 3, 1, 1, 1, 0.0);
 
 		sui_draw_set_vec3(v, 0, -1.5 * output[0] + MANIPULATOR_FLARE_SIZE * 0.15, -1.5 * output[1] + MANIPULATOR_FLARE_SIZE * 0.15, -1);
 		sui_draw_set_vec3(v, 1, -1.5 * output[0] - MANIPULATOR_FLARE_SIZE * 0.15, -1.5 * output[1] + MANIPULATOR_FLARE_SIZE * 0.15, -1);
@@ -880,7 +887,7 @@ void la_pfx_select_vertex(void)
 		sui_draw_set_vec3(v, 3, -1.5 * output[0] + MANIPULATOR_FLARE_SIZE * 0.15, -1.5 * output[1] - MANIPULATOR_FLARE_SIZE * 0.15, -1);
 		sui_set_blend_gl(GL_ONE, GL_ONE);
 		sui_set_texture2D_array_gl(uv, 4, 2, GlobalParticleData.soft_material2);
-		sui_draw_gl(GL_QUADS, v, 4, 3, 1, 1, 1);
+		sui_draw_gl(GL_QUADS, v, 4, 3, 1, 1, 1, 0.0);
 
 		sui_draw_set_vec3(v, 0, -1.8 * output[0] - 0.4 * output[1] + MANIPULATOR_FLARE_SIZE * 0.5, -1.8 * output[1] + 0.4 * output[0] + MANIPULATOR_FLARE_SIZE * 0.5, -1);
 		sui_draw_set_vec3(v, 1, -1.8 * output[0] - 0.4 * output[1] - MANIPULATOR_FLARE_SIZE * 0.5, -1.8 * output[1] + 0.4 * output[0] + MANIPULATOR_FLARE_SIZE * 0.5, -1);
@@ -888,7 +895,7 @@ void la_pfx_select_vertex(void)
 		sui_draw_set_vec3(v, 3, -1.8 * output[0] - 0.4 * output[1] + MANIPULATOR_FLARE_SIZE * 0.5, -1.8 * output[1] + 0.4 * output[0] - MANIPULATOR_FLARE_SIZE * 0.5, -1);
 		sui_set_blend_gl(GL_ONE, GL_ONE);
 		sui_set_texture2D_array_gl(uv, 4, 2, GlobalParticleData.soft_material);
-		sui_draw_gl(GL_QUADS, v, 4, 3, 1, 1, 1);
+		sui_draw_gl(GL_QUADS, v, 4, 3, 1, 1, 1, 0.0);
 
 		sui_draw_set_vec3(v, 0, -1.8 * output[0] + 0.4 * output[1] + MANIPULATOR_FLARE_SIZE * 0.5, -1.8 * output[1] - 0.4 * output[0] + MANIPULATOR_FLARE_SIZE * 0.5, -1);
 		sui_draw_set_vec3(v, 1, -1.8 * output[0] + 0.4 * output[1] - MANIPULATOR_FLARE_SIZE * 0.5, -1.8 * output[1] - 0.4 * output[0] + MANIPULATOR_FLARE_SIZE * 0.5, -1);
@@ -896,7 +903,7 @@ void la_pfx_select_vertex(void)
 		sui_draw_set_vec3(v, 3, -1.8 * output[0] + 0.4 * output[1] + MANIPULATOR_FLARE_SIZE * 0.5, -1.8 * output[1] - 0.4 * output[0] - MANIPULATOR_FLARE_SIZE * 0.5, -1);
 		sui_set_blend_gl(GL_ONE, GL_ONE);
 		sui_set_texture2D_array_gl(uv, 4, 2, GlobalParticleData.soft_material);
-		sui_draw_gl(GL_QUADS, v, 4, 3, 1, 1, 1);
+		sui_draw_gl(GL_QUADS, v, 4, 3, 1, 1, 1, 0.0);
 		
 		
 	}
@@ -938,7 +945,7 @@ void la_pfx_draw_intro(void)
 				glDepthMask(0);
 				sui_set_blend_gl(GL_ZERO, GL_SRC_COLOR);
 				sui_set_texture2D_array_gl(uv, 4, 2, GlobalParticleData.video_material);
-				sui_draw_gl(GL_QUADS, pos, 4, 3, 1, 1, 1);
+				sui_draw_gl(GL_QUADS, pos, 4, 3, 1, 1, 1, 0.0);
 				glDepthMask(1);
 				if(p->age < 0)
 				{
@@ -962,7 +969,7 @@ void la_pfx_video_flare(void)
 	glDisable(GL_DEPTH_TEST);
 	sui_set_blend_gl(GL_ZERO, GL_SRC_COLOR);
 	sui_set_texture2D_array_gl(uv, 4, 2, GlobalParticleData.video_material);
-	sui_draw_gl(GL_QUADS, pos, 4, 2, 1, 1, 1);
+	sui_draw_gl(GL_QUADS, pos, 4, 2, 1, 1, 1, 0.0);
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(1);
 }
