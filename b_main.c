@@ -4,16 +4,7 @@
 #include <stdlib.h>
 
 #include "betray.h"
-/*#include <sys/time.h>*/
 #include <time.h>
-#ifdef WIN32
-	#include <windows.h>
-	#include <GL/gl.h>
-#else
-//	#include <gl.h>
-/*	#include <GLUT/glut.h>*/
-/*	#include <GL/glut.h>*/
-#endif
 
 extern boolean b_sdl_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
 extern boolean b_glut_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
@@ -31,7 +22,6 @@ struct{
 	GraphicsMode	screen_mode;
 	void			(*action_func)(BInputState *input, void *user);
 	void			*action_func_data;
-	uint			mouse_warp;
 	uint32			time[2];
 	double			delta_time;
 }BGlobal;
@@ -49,10 +39,7 @@ void betray_reshape_view(uint x_size, uint y_size)
 	aspect = w / h;
 	glLoadIdentity();
 	glFrustum(-fov * 0.005, fov * 0.005, (-fov / aspect) * 0.005, (fov / aspect) * 0.005, 0.005, 10000.0);
-	if(aspect > w / h)
-		glViewport((uint)0, (uint)(h - (w / aspect)) / 2, (uint)w, (uint)(w / aspect));	
-	else
-		glViewport((uint)(w - (h * aspect)) / 2, 0, (uint)(h * aspect), (uint)h);
+	glViewport(0, 0, x_size, y_size);
 	glMatrixMode(GL_MODELVIEW);	
 }
 
@@ -194,6 +181,9 @@ void betray_start_type_in(char *string, uint length, void (*done_func)(void *use
 	cursor_pos = 0;
 	for(type_in_length = 0; string[type_in_length] != 0; type_in_length++)
 		;
+/*	for(i = AXIS_BUTTON_VECTOR_1_X; i <= AXIS_BUTTON_VECTOR_2_Z; i++)
+		out_going_data.axis_state[i] = 0;*/
+
 }
 
 void betray_end_type_in_mode(boolean cancel)
