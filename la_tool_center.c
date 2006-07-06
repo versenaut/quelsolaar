@@ -1,5 +1,5 @@
 #include "la_includes.h"
-
+#include "la_tool.h"
 #include "la_geometry_undo.h"
 
 double high_x, low_x, high_y, low_y, high_z, low_z;
