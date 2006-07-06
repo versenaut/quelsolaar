@@ -509,7 +509,7 @@ boolean test_point(float *pos, float *vector, float *normal, float *dist)
 	return FALSE;
 }
 
-#define POINT_COUNT 5000
+#define POINT_COUNT 50000
 
 float point_vertex_array[POINT_COUNT * 3];
 float point_color_array[POINT_COUNT * 3];
@@ -535,7 +535,7 @@ void create_test_draw(uint *ref, uint *group, uint ref_length, egreal *vertex)
 	for(i = 0; i < POINT_COUNT; i++)
 	{
 		point_vertex_array[i * 3 + 0] = get_fake_rand(i * 3 + 0) * 0.5;
-		point_vertex_array[i * 3 + 1] = get_fake_rand(i * 3 + 1) * 0.005;
+		point_vertex_array[i * 3 + 1] = get_fake_rand(i * 3 + 1) * 0.5;
 		point_vertex_array[i * 3 + 2] = get_fake_rand(i * 3 + 2) * 0.5;
 		vector[0] = 0;
 		vector[1] = -1;
@@ -684,7 +684,7 @@ void test_fps(void)
 	vertex[3] = pos[0] + sin(rot) * 0.1;
 	vertex[4] = pos[1];
 	vertex[5] = pos[2] + cos(rot) * 0.1;
-	sui_draw_gl(GL_LINES, vertex, 2, 3, 1, 0, 1);
+	sui_draw_gl(GL_LINES, vertex, 2, 3, 1, 0, 1, 0.0);
 
 }
 
@@ -692,15 +692,15 @@ void test_draw(void)
 {
 	if(test_vertex_array == NULL)
 		return;
-/*	glDisable(GL_BLEND);
+	glDisable(GL_BLEND);
 	update_points();
 	sui_set_color_array_gl(test_color_array, test_length, 3);
-	sui_draw_gl(GL_TRIANGLES, test_vertex_array, test_length, 3, 1, 1, 1);
+	sui_draw_gl(GL_TRIANGLES, test_vertex_array, test_length, 3, 1, 1, 1, 0.0);
 //	sui_set_color_array_gl(point_color_array, POINT_COUNT, 3);
 	glDisable(GL_DEPTH_TEST);
-	sui_draw_gl(GL_LINES, point_vertex_array, POINT_COUNT, 3, 1, 1, 1);
+	sui_draw_gl(GL_LINES, point_vertex_array, POINT_COUNT, 3, 1, 1, 1, 0.0);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);*/
+	glEnable(GL_BLEND);
 	test_fps();
 }
 
