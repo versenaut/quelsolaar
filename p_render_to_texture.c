@@ -101,17 +101,16 @@ void (APIENTRY *p_glRenderbufferStorageEXT)(GLenum target, GLenum internalformat
 void (APIENTRY *p_glFramebufferTexture2DEXT)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
 void (APIENTRY *p_glFramebufferRenderbufferEXT)(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
 
-typedef struct{
+typedef struct {
 	uint size;
 	uint fbo;
 	uint depth;
 	uint stencil;
-}RenderSetup;
+} RenderSetup;
 
-RenderSetup g_global_fbos[2] = {128, -1, -1, -1, 128, -1, -1, -1};
+static RenderSetup g_global_fbos[2] = {128, -1, -1, -1, 128, -1, -1, -1};
 
-
-void p_init_render_to_texture()
+void p_init_render_to_texture(void)
 {
 	if(p_extension_test("GL_EXT_framebuffer_object"))
 	{
@@ -128,7 +127,7 @@ void p_init_render_to_texture()
 	}
 }
 
-void CheckFramebufferStatus()
+void CheckFramebufferStatus(void)
 {
     GLenum status;
     status = (GLenum) p_glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
@@ -208,8 +207,7 @@ void p_texture_render_bind(uint texture, uint size, uint target)
 	}
 }
 
-
-void p_texture_render_unbind()
+void p_texture_render_unbind(void)
 {
 	p_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
@@ -252,7 +250,7 @@ uint p_create_renderable_texture(uint size, uint format)
 	return texture;
 }
 
-uint my_test_texture = -1; 
+static uint my_test_texture = -1; 
 
 void p_pre_fbo_draw(float fov)
 {
@@ -268,13 +266,12 @@ void p_pre_fbo_draw(float fov)
 	glClearColor(0.2, 0.2, 0.2, 0);
 }
 
-float color_array[8] = {0, 0, 1, 0, 1, 1, 0, 1};
-float vertex_array[12] = {-0.25, -0.25, -1, 0.25, -0.25, -1, 0.25, 0.25, -1, -0.25, 0.25, -1};
+static float color_array[8] = {0, 0, 1, 0, 1, 1, 0, 1};
+static float vertex_array[12] = {-0.25, -0.25, -1, 0.25, -0.25, -1, 0.25, 0.25, -1, -0.25, 0.25, -1};
 
-void p_post_fbo_draw()
+void p_post_fbo_draw(void)
 {
 	p_texture_render_unbind();
-
 }
 
 
