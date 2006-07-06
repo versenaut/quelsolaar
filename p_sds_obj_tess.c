@@ -267,11 +267,11 @@ PTessTableElement	*p_select_quad_tesselation(const PPolyStore *mesh, const egrea
 					}
 */
 
-double view_cam_lod_eye_pos[3];
-double view_cam_lod_eye_matrix[16];
-double view_cam_lod_factor = 0.01;
-double view_cam_lod_limit = 1.5;
-double view_cam_lod_geometry_only = 1000;
+static double view_cam_lod_eye_pos[3];
+static double view_cam_lod_eye_matrix[16];
+static double view_cam_lod_factor = 0.01;
+static double view_cam_lod_limit = 1.5;
+static double view_cam_lod_geometry_only = 1000;
 
 void p_lod_set_view_pos(double *view_cam)
 {
@@ -286,12 +286,12 @@ void p_lod_set_view_matrix(double *view_matrix)
 		view_cam_lod_eye_matrix[i] = view_matrix[i];
 }
 
-double *p_lod_get_view_pos()
+double *p_lod_get_view_pos(void)
 {
 	return view_cam_lod_eye_pos;
 }
 
-double *p_lod_get_view_matrix()
+double *p_lod_get_view_matrix(void)
 {
 	return view_cam_lod_eye_matrix;
 }
@@ -506,13 +506,10 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 			mesh->sub_stages[3] = 0;
 			free(mesh->temp);
 			mesh->temp = NULL;
-		//	exit(0);
+		/*	exit(0);*/
 		}
 	}
 }
-
-
-
 
 void p_lod_select_tesselation_old(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 {
@@ -643,4 +640,3 @@ void p_lod_select_tesselation_old(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 		}
 	}
 }
-
