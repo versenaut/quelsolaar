@@ -381,15 +381,10 @@ boolean co_handle_object(BInputState *input, ENode *node)
 	y -= 0.05;	
 	if(rot_hide > 0.001)
 	{
-		static uint trams = 0;
-		boolean state = TRUE;
-		sui_draw_text(-0.27, y, SUI_T_SIZE, SUI_T_SPACE, "Hidden:", color, color, color); 
-		state = e_nso_get_hide(node);
+		boolean state = e_nso_get_hide(node);
+		sui_draw_text(-0.27, y, SUI_T_SIZE, SUI_T_SPACE, "Hidden:", color, color, color);
 		if(co_w_checkbox(input, 0.17, y, &state, color, color, color))
-		{
-			trams++;
-			verse_send_o_hide(e_ns_get_node_id(node), trams % 2);
-		}
+			verse_send_o_hide(e_ns_get_node_id(node), state);
 		y -= 0.05 * rot_hide;
 	}
 	glPopMatrix();
