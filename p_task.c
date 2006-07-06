@@ -5,6 +5,7 @@
 	#include <windows.h>
 	#include <GL/gl.h>
 #else
+	#include <sys/time.h>
 #if defined(__APPLE__) || defined(MACOSX)
 	#include <OpenGL/gl.h>
 #else
@@ -67,6 +68,7 @@ extern boolean p_init_table(uint max_tesselation_level);
 
 void p_task_compute(uint count)
 {
+	PTimer timer;
 	PTask *t;
 	uint i;
 /*	if(PGlobalTaskManager.init == FALSE)
@@ -75,7 +77,10 @@ void p_task_compute(uint count)
 			PGlobalTaskManager.init = p_init_table(0);
 		return;
 	}*/
-	for(i = 0; i < count && PGlobalTaskManager.count != 0; i++)
+
+	p_timer_start(&timer);
+	while(p_timer_elapsed(&timer) < 0.01 && PGlobalTaskManager.count != 0)
+//	for(i = 0; i < count && PGlobalTaskManager.count != 0; i++)
 	{
 //		for(t = &PGlobalTaskManager.tasks[PGlobalTaskManager.current]; t->wait < 0.99; t = &PGlobalTaskManager.tasks[PGlobalTaskManager.current])
 //		{
@@ -99,6 +104,7 @@ extern void p_shader_func(ENode *node, ECustomDataCommand command);
 extern void p_texture_func(ENode *node, ECustomDataCommand command);
 extern void p_array_init(void);
 extern void p_env_init(uint size);
+extern void p_init_render_to_texture(void);
 
 void persuade_init(uint max_tesselation_level, void *(*gl_GetProcAddress)(const char* proc))
 {
@@ -107,6 +113,7 @@ void persuade_init(uint max_tesselation_level, void *(*gl_GetProcAddress)(const 
 	p_array_init();
 	p_shader_init();
 	p_env_init(8);
+	p_init_render_to_texture();
 	PGlobalTaskManager.count = 0;
 	PGlobalTaskManager.current = 0;
 	PGlobalTaskManager.init = FALSE;
@@ -126,4 +133,40 @@ void persuade_init(uint max_tesselation_level, void *(*gl_GetProcAddress)(const 
 	e_ns_set_custom_func(P_ENOUGH_SLOT, V_NT_OBJECT, p_object_func);
 	e_ns_set_custom_func(P_ENOUGH_SLOT, V_NT_GEOMETRY, p_geometry_func);
 	e_ns_set_custom_func(P_ENOUGH_SLOT, V_NT_BITMAP, p_texture_func);
+}
+
+#if defined _WIN32
+static timer_period = -1.0;		/* Conversion factor for QueryPerformanceCounter. */
+#endif
+
+void p_timer_start(PTimer *t)
+{
+	if(t == NULL)
+		return;
+#if defined _WIN32
+	QueryPerformanceCounter(&t->now);
+	if(timer_period < 0.0)		/* Hopefully, this is a pretty quick test. */
+	{
+		LARGE_INTEGER	freq;
+
+		QueryPerformanceFrequency(&freq);
+		timer_period = 1.0 / freq.QuadPart;	/* Convert Hz into period. */
+	}
+#else
+	gettimeofday(&t->now, NULL);
+#endif
+}
+
+double p_timer_elapsed(const PTimer *t)
+{
+	PTimer	t2;
+
+	if(t == NULL)
+		return 0.0;
+	p_timer_start(&t2);
+#if defined _WIN32
+	return timer_period * (t2.now.QuadPart - t->now.QuadPart);
+#else
+	return t2.now.tv_sec - t->now.tv_sec + 1e-6 * (t2.now.tv_usec - t->now.tv_usec);
+#endif
 }

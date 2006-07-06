@@ -7,7 +7,6 @@
 #include "p_sds_table.h"
 #include "p_sds_obj.h"
 #include "p_task.h"
-#include "v_util.h"
 
 #include <math.h>
 
@@ -242,7 +241,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 	ENode *g_node;
 	PMesh *store = NULL;
 	PTessTableElement *table;
-	VUtilTimer timer;
+	PTimer timer;
 	PPolyStore *smesh;
 	uint i, j, k, poly_size = 4;
 	double *eye;
@@ -287,8 +286,8 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 
 	for(i = 1 ; i < smesh->level; i++)
 		poly_size *= 4;
-	v_timer_start(&timer);
-	while(v_timer_elapsed(&timer) < 0.025)
+	p_timer_start(&timer);
+	while(p_timer_elapsed(&timer) < 0.025)
 	{
 		switch(mesh->stage)
 		{

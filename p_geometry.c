@@ -6,7 +6,6 @@
 #include "enough.h"
 #include "p_sds_geo.h"
 #include "p_task.h"
-#include "v_util.h"
 #include "p_sds_table.h"
 
 typedef enum{
@@ -68,12 +67,10 @@ boolean p_geo_sds_compute_func(uint id)
 	PPolyStore *old = NULL;
 	ENode *node;
 	EGeoLayer *p, *v, *e;
-	VUtilTimer ttimer;
+	PTimer ttimer;
 	float timer = 0;
 	if((node = e_ns_get_node(0, id)) == NULL || e_ns_get_node_type(node) != V_NT_GEOMETRY)
 		return TRUE;
-
-
 
 	p = e_nsg_get_layer_by_id(node,  1);
 	v = e_nsg_get_layer_by_id(node,  0);
@@ -106,9 +103,9 @@ boolean p_geo_sds_compute_func(uint id)
 		mesh = p_sds_create(ref, ref_count, vertex, vertex_count, version);
 
 
-	v_timer_start(&ttimer);
+	p_timer_start(&ttimer);
 
-	while(v_timer_elapsed(&ttimer) < 0.05)
+	while(p_timer_elapsed(&ttimer) < 0.05)
 	{
 		switch(mesh->stage[0])
 		{
