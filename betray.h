@@ -20,7 +20,7 @@
 #include <SDL/SDL.h>
 
 /* On Windows, we also need the main platform header file. */
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 
