@@ -7,6 +7,8 @@ extern void la_do_edge_delete_air(double *vertex_a, double *vertex_b);
 
 extern void la_do_active_vertex(double *vertex, boolean move);
 extern void la_do_xyz_lines(double *start, boolean snap);
+extern void la_do_draw_snap_edge(uint *edge);
+extern void la_do_active_polygon(double *snap);
 extern void la_do_draw(double *start, double *end, boolean snap, double *closest);
 extern void la_do_owerlay(void);
 extern void la_do_draw_closest_edge(uint *edge, double x, double y, boolean snap);
