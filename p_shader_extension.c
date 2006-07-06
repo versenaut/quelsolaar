@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef WIN32
 	#include <windows.h>
@@ -182,8 +183,7 @@ void p_shader_init(void)
 		p_standard_shader = p_shader_allocate();
 
 
-
-		for(length = 0; p_standard_vertex_shader_code[length] != 0; length++);
+		length = strlen(p_standard_vertex_shader_code);
 		code = p_standard_vertex_shader_code;
 		p_glShaderSourceARB(p_standard_shader->vertex_obj, 1, (const char **) &code, &length);
 		p_glCompileShaderARB(p_standard_shader->vertex_obj);
@@ -193,7 +193,7 @@ void p_shader_init(void)
 				p_glGetInfoLogARB(p_standard_shader->vertex_obj, 2000, &length, buf);
 				printf("1STD Errors:\n%s\n", buf);
 			}
-		for(length = 0; p_standard_fragment_shader_code[length] != 0; length++);
+		length = strlen(p_standard_fragment_shader_code);
 		code = p_standard_fragment_shader_code;
 		p_glShaderSourceARB(p_standard_shader->fragment_obj, 1, (const char **) &code, &length);
 		p_glCompileShaderARB(p_standard_shader->fragment_obj);
@@ -644,14 +644,14 @@ void p_shader_init_shadow(void)
 	fragment_obj = p_glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
 	p_glAttachObjectARB(shadow_prog_obj, vertex_obj);
 	p_glAttachObjectARB(shadow_prog_obj, fragment_obj);
-	for(i = 0; v_shader[i] != 0; i++);
+	i = strlen(v_shader);
 	p_glShaderSourceARB(vertex_obj, 1, (const char **) &v_shader, &i);
 	p_glCompileShaderARB(vertex_obj);
 
 	p_glGetInfoLogARB(vertex_obj, 2000, &i, buf);
 	printf("%s\n", v_shader);
 	printf("Shadow Errors:\n%s\n", buf);
-	for(i = 0; f_shader[i] != 0; i++);
+	i = strlen(f_shader);
 	p_glShaderSourceARB(fragment_obj, 1, (const char **) &f_shader, &i);
 	p_glCompileShaderARB(fragment_obj);
 	p_glGetInfoLogARB(fragment_obj, 2000, &i, buf);
@@ -724,14 +724,14 @@ void p_shader_init_blur_cube(void)
 	fragment_obj = p_glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
 	p_glAttachObjectARB(shadow_prog_obj, vertex_obj);
 	p_glAttachObjectARB(shadow_prog_obj, fragment_obj);
-	for(i = 0; v_shader[i] != 0; i++);
+	i = strlen(v_shader);
 	p_glShaderSourceARB(vertex_obj, 1, (const char **) &v_shader, &i);
 	p_glCompileShaderARB(vertex_obj);
 
 	p_glGetInfoLogARB(vertex_obj, 2000, &i, buf);
 	printf("%s\n", v_shader);
 	printf("Shadow Errors:\n%s\n", buf);
-	for(i = 0; f_shader[i] != 0; i++);
+	i = strlen(f_shader);
 	p_glShaderSourceARB(fragment_obj, 1, (const char **) &f_shader, &i);
 	p_glCompileShaderARB(fragment_obj);
 	p_glGetInfoLogARB(fragment_obj, 2000, &i, buf);
