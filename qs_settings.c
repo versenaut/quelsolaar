@@ -6,10 +6,9 @@
 #include "seduce.h"
 #include "persuade.h"
 
+static float background_color[3] = {0.0, 0.0, 0.0};
 
-float background_color[3] = {0.0, 0.0, 0.0};
-
-void qs_settings_get_bacground_color(float *color)
+void qs_settings_get_background_color(float *color)
 {
 	color[0] = background_color[0];
 	color[1] = background_color[1];

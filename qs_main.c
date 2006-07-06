@@ -27,7 +27,7 @@ extern float	*qs_get_cam_matrix(void);
 extern float	*qs_get_cam_pos(void);
 extern void		qs_set_camera(void);
 extern void		qs_compute_camera(BInputState *input, float delta_time);
-extern void		qs_settings_get_bacground_color(float *color);
+extern void		qs_settings_get_background_color(float *color);
 
 void qs_draw_handler(BInputState *input, void *user)
 {
@@ -43,7 +43,7 @@ void qs_draw_handler(BInputState *input, void *user)
 	{
 		double pos[3] = {0, 0, 0};
 		float color[3];
-		qs_settings_get_bacground_color(color);
+		qs_settings_get_background_color(color);
 		glEnable(GL_DEPTH_TEST);
 		glClearColor(color[0], color[1], color[2], 0);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
