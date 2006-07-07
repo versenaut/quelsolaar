@@ -123,6 +123,7 @@ void lp_normal_create(ENode *node)
 		lp_normal[i + 2] /= r;
 	}
 }
+
 void lp_lock_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *blue)
 {
 	EGeoLayer *(layers[3]);
@@ -311,16 +312,16 @@ void lp_apply_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *bl
 	layers[0] = red;
 	layers[1] = green;
 	layers[2] = blue;
-	printf("red - %s\n", e_nsg_get_layer_name(red));
+/*	printf("red - %s\n", e_nsg_get_layer_name(red));
 	printf("green - %s\n", e_nsg_get_layer_name(green));
 	printf("blue - %s\n", e_nsg_get_layer_name(blue));
-	for(i = 0; i < 3; i++)
+*/	for(i = 0; i < 3; i++)
 	{
-		printf("layers[%u] %p\n", i, layers[i]);
+/*		printf("layers[%u] %p\n", i, layers[i]);*/
 		if(layers[i] != NULL)
 		{
 			layer_id = e_nsg_get_layer_id(layers[i]);
-			printf("layers[%u] %u\n", i, e_nsg_get_layer_id(layers[i]));
+/*			printf("layers[%u] %u\n", i, e_nsg_get_layer_id(layers[i]));*/
 			switch(e_nsg_get_layer_type(layers[i]))
 			{
 				case VN_G_LAYER_VERTEX_XYZ :
