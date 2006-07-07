@@ -9,6 +9,8 @@
 #include "seduce.h"
 #include "persuade.h"
 
+#include "co_vn_graphics.h"
+
 #define GAME_BULLET_COUNT 32
 #define GAME_DUST_COUNT 3200
 #define GAME_REVIVE_TIME 2
@@ -468,11 +470,10 @@ void co_draw_dust(void)
 }
 void co_play_game(BInputState *input)
 {
-	uint i, j, k;
-	printf("co_play_game\n");
+	uint i, j;
+/*	printf("co_play_game\n");*/
 	if(input->mode == BAM_DRAW)
 	{
-		COParticle *p;
 		COGame.aspect = betray_get_screen_mode(NULL, NULL, NULL);
 		COGame.time += betray_get_delta_time();
 		co_draw_dust();
