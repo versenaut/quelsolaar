@@ -451,7 +451,6 @@ uint create_param_segment(ENode *g_node, egreal *output, uint output_start, PTes
 			for(i = start; i < tri_start; i++)
 			{
 				table = table_array[i];
-				layer_data[order_node[i]];
 				a = (egreal)layer_data[order_node[i]];
 				for(j = 0; j < table->vertex_count; j++)
 				{
@@ -478,7 +477,6 @@ uint create_param_segment(ENode *g_node, egreal *output, uint output_start, PTes
 			for(i = start; i < tri_start; i++)
 			{
 				table = table_array[i];
-				layer_data[order_node[i]];
 				a = (egreal)layer_data[order_node[i]];
 				for(j = 0; j < table->vertex_count; j++)
 				{
@@ -505,7 +503,6 @@ uint create_param_segment(ENode *g_node, egreal *output, uint output_start, PTes
 			for(i = start; i < tri_start; i++)
 			{
 				table = table_array[i];
-				layer_data[order_node[i]];
 				a = layer_data[order_node[i]];
 				for(j = 0; j < table->vertex_count; j++)
 				{
