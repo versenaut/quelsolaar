@@ -2,6 +2,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "enough.h"
 #include "st_types.h"
