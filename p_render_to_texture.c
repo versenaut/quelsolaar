@@ -108,7 +108,7 @@ typedef struct {
 	uint stencil;
 } RenderSetup;
 
-static RenderSetup g_global_fbos[2] = {128, -1, -1, -1, 128, -1, -1, -1};
+static RenderSetup g_global_fbos[2] = {{ 128, -1, -1, -1 }, { 128, -1, -1, -1 }};
 
 void p_init_render_to_texture(void)
 {
