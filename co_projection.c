@@ -379,7 +379,7 @@ double p_get_projection_line(double *dist, uint axis, double pointer_x, double p
 
 void p_get_projection_vertex_with_axis(double *output, double *start, double pointer_x, double pointer_y, boolean snap, double *closest)
 {
-	double dist, best_dist, pos, best_pos;
+	double dist, best_dist, pos, best_pos = 0.0;
 	//static uint axis; 
 	uint i; 
 	if(snap != TRUE)
