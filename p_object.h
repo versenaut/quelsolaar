@@ -5,7 +5,7 @@ typedef struct{
 	boolean impostor;
 	uint version;
 	uint texture;
-	float vectror[3];
+	float vector[3];
 	float length;
 	float timer;
 	float priority;

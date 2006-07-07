@@ -71,7 +71,7 @@ void p_init_impostor(PObjImpostor *imp)
 	imp->impostor = FALSE;
 	imp->version = 0;
 	imp->texture = -1;
-	imp->vectror[3];
+	imp->vector[0] = imp->vector[1] = imp->vector[2] = 0.0;
 	imp->length = 0;
 	imp->timer = (float)((i * i) % 20) / 20.0;
 	imp->priority = 0.4;
