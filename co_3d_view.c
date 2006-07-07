@@ -20,6 +20,7 @@ extern float co_get_pos_y(float y);
 extern float co_get_view_x(float x);
 extern float co_get_view_y(float y);
 extern void co_draw_summary(ENode *node, float x, float y);
+extern void p_get_projection_screen(double *output, double x, double y, double z);
 
 boolean co_draw_3d_click_test_node(float x, float y)
 {
