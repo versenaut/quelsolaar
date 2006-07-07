@@ -9,6 +9,8 @@
 #include "enough.h"
 #include "seduce.h"
 
+#include "co_vn_graphics.h"
+
 /* These can be reduced for low-performance machines. Restrictions
  * apply, lowest "safe" settings are probably 12/12/1 respectively.
 */
