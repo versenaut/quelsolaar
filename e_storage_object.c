@@ -419,7 +419,7 @@ void callback_send_o_link_set(void *user_data, VNodeID node_id, uint16 link_id, 
 void callback_send_o_anim_run(void *user_data, VNodeID node_id, uint16 link_id, uint32 time_s, uint32 time_f, uint32 dimensions, real64 *pos, real64 *speed, real64 *accel, real64 *scale, real64 *scale_speed)
 {
 	ESObjectNode	*node;
-	uint i, j;
+	uint i = 0, j;
 	node = e_create_o_node(node_id, 0);
 	if(node->link_count <= link_id)
 	{
