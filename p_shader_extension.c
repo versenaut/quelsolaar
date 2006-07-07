@@ -314,6 +314,7 @@ void p_shader_uniform_locate(PShader *s, ENode *node)
 				sprintf(frag_name, "texture_%u", frag);
 				p_shader_texture_add(s, frag, p_glGetUniformLocationARB(s->prog_obj, frag_name), handle, p_th_get_texture_id(handle));
 				break;
+			default:;
 		}
 	}
 	s->environment[0] = p_glGetUniformLocationARB(s->prog_obj, "environment");
@@ -352,6 +353,7 @@ void p_shader_param_load(ENode *parent, uint32 node_id, PRenderArray *array, uin
 					m[j] = (float)f->matrix.matrix[j];
 				p_glUniformMatrix4fvARB(s->uniforms_fragments[i * 2 + 1], 1, FALSE, m);
 				break;
+			default:;
 		}
 	}
 	for(i = 0; i < s->t_f_count; i++)
@@ -611,6 +613,7 @@ void p_shader_func(ENode *node, ECustomDataCommand command)
 		case E_CDC_DESTROY :
 			p_shader_destroy(e_ns_get_custom_data(node, P_ENOUGH_SLOT));
 		break;
+		default:;
 	}
 }
 
