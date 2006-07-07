@@ -503,7 +503,7 @@ void lp_geometry_draw(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *
 		{
 			sui_set_color_array_gl(g->color, g->tri_count * 3, 4);
 	//		sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			sui_draw_gl(GL_TRIANGLES, g->tri, g->tri_count * 3, 3, 1, 0, 1);
+			sui_draw_gl(GL_TRIANGLES, g->tri, g->tri_count * 3, 3, 1, 0, 1, 1.0f);
 			
 		/*	glDisable(GL_DEPTH_TEST);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

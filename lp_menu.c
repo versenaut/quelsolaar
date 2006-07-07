@@ -8,6 +8,8 @@
 #include "lp_projection.h"
 #include "lp_layer_groups.h"
 
+extern void lp_compute_int_color(float *color, uint i);
+
 float slider_vertex[20];
 
 
@@ -66,7 +68,7 @@ float lp_menu_slider(BInputState *input, float x, float y, float length, float p
 		slider_vertex[12] = -length * pos - 0.01;
 		slider_vertex[16] = length * (1 - pos) + 0.01;
 		sui_set_color_array_gl(slider_color, 10, 3);
-		sui_draw_gl(GL_LINES, slider_vertex, 10, 2, 0, 0, 0);
+		sui_draw_gl(GL_LINES, slider_vertex, 10, 2, 0, 0, 0, 1.0f);
 		glPopMatrix();
 	}else
 	{
@@ -104,7 +106,7 @@ void lp_draw_pointer(BInputState *input, double brush_size)
 	glPushMatrix();
 	glTranslatef(input->pointer_x, input->pointer_y, 0);
 	glScalef(brush_size, brush_size, brush_size);
-	sui_draw_gl(GL_LINES, pointer, 64, 2, 0, 0, 0);
+	sui_draw_gl(GL_LINES, pointer, 64, 2, 0, 0, 0, 1.0f);
 	glPopMatrix();
 }
 
@@ -165,13 +167,13 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 			{
 				sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Integer:", 0, 0, 0);
 				lp_compute_int_color(color, *integer);
-				sui_type_number_uint(input, 0.55, position - 0.05, 0.4, SUI_T_SIZE, integer, integer, color[0], color[1], color[2]);
+				sui_type_number_uint(input, 0.55, position - 0.05, 0.4, 0.5f, SUI_T_SIZE, (uint32 *) integer, integer, color[0], color[1], color[2]);
 				position -= 0.1;
 			}else
 			{
 				sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "color:", 0, 0, 0);
 				slider[0] = lp_menu_slider(input, 0.5, position - 0.05, 0.4, slider[0], 0, 0, 0, 1, 1, 1);
-				sui_type_number_double(input, 0.55, position - 0.1, 0.4, SUI_T_SIZE, &slider[0], &slider[0], color[0], color[1], color[2]);
+				sui_type_number_double(input, 0.55, position - 0.1, 0.4, 0.5f, SUI_T_SIZE, &slider[0], &slider[0], color[0], color[1], color[2]);
 				glPopMatrix();
 				position -= 0.15;
 			}		
@@ -179,8 +181,8 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 		if(type != VN_G_LAYER_VERTEX_UINT32 && type != VN_G_LAYER_POLYGON_CORNER_UINT32 && type != VN_G_LAYER_POLYGON_FACE_UINT8 && type != VN_G_LAYER_POLYGON_FACE_UINT32)
 		{				
 			sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Tone Range:", 0, 0, 0);
-			sui_type_number_double(input, 0.55, position - 0.05, 0.4, SUI_T_SIZE, &start_range, &start_range, 0, 0, 0);
-			sui_type_number_double(input, 0.75, position - 0.05, 0.4, SUI_T_SIZE, &end_range, &end_range, 0, 0, 0);
+			sui_type_number_double(input, 0.55, position - 0.05, 0.4, 0.5f, SUI_T_SIZE, &start_range, &start_range, 0, 0, 0);
+			sui_type_number_double(input, 0.75, position - 0.05, 0.4, 0.5f, SUI_T_SIZE, &end_range, &end_range, 0, 0, 0);
 			position -= 0.1;
 		}
 
