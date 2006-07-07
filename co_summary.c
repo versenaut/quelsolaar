@@ -82,7 +82,7 @@ static float co_draw_node_summary(ENode *node, float x, float y, uint recursion)
 				{
 					if((link_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL)
 					{
-						sprintf(text, "label: %s", link_node);
+						sprintf(text, "label: %s", e_nso_get_link_name(link));
 						sui_draw_text(x + 0.02, line, SUI_T_SIZE * 0.7, SUI_T_SPACE * 0.7, text, SUMMARY_COLOR, SUMMARY_COLOR, SUMMARY_COLOR);
 						line -= 0.02;
 						if(recursion != 0)
