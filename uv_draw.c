@@ -97,10 +97,10 @@ void uv_draw_line_add(float x, float y, boolean add)
 
 	glPushMatrix();
 	glTranslatef(GlobalDrawLine.array[0], GlobalDrawLine.array[1], 0);
-	sui_draw_gl(GL_LINES, GlobalDrawLine.ring, RING_SECTIONS * 8, 2, 0.1, 0.2, 0.4);
+	sui_draw_gl(GL_LINES, GlobalDrawLine.ring, RING_SECTIONS * 8, 2, 0.1, 0.2, 0.4, 1.0f);
 	glPopMatrix();
 //	sui_draw_gl(GL_LINES, GlobalDrawLine.array, GlobalDrawLine.array_length, 2, 0.8, 0.8, 0.8);
-	sui_draw_gl(GL_LINES, GlobalDrawLine.vertex, GlobalDrawLine.vertex_tie_length, 2, 0.8, 0.8, 0.8);
+	sui_draw_gl(GL_LINES, GlobalDrawLine.vertex, GlobalDrawLine.vertex_tie_length, 2, 0.8, 0.8, 0.8, 1.0f);
 //	nglDrawArray(NGL_LINES, GlobalDrawLine.vertex, NULL, 0 ,sui_get_material(), 0);
 	glPopMatrix();
 }

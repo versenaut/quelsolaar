@@ -48,12 +48,12 @@ void uvo_draw_square()
 		h = p_th_create_texture_handle(e_ns_get_node_id(node), "col_r", "col_g", "col_b");
 		printf("node = %u tex id = %u handle %p\n\n", e_ns_get_node_id(node), p_th_get_texture_id(h), h);
 		sui_set_texture2D_array_gl(uv, 4, 2, p_th_get_texture_id(h));
-		sui_draw_gl(GL_QUADS, vertex, 4, 2, 1, 1, 1);
+		sui_draw_gl(GL_QUADS, vertex, 4, 2, 1, 1, 1, 1.0f);
 		p_th_destroy_texture_handle(h);	
 	}
 #endif
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	sui_draw_gl(GL_QUADS, vertex, 4, 2, 0.1, 0.2, 0.4);
+	sui_draw_gl(GL_QUADS, vertex, 4, 2, 0.1, 0.2, 0.4, 1.0f);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
@@ -277,7 +277,7 @@ void uvo_draw_overlay(BInputState *input)
 //	sui_set_blend_gl(GL_ONE, GL_ONE);
 
 	sui_set_color_array_gl(color, pos, 3);
-	sui_draw_gl(GL_QUADS, array, pos, 2, 0, 0, 0);
+	sui_draw_gl(GL_QUADS, array, pos, 2, 0, 0, 0, 1.0f);
 
 //	free(array);
 //	free(color);
@@ -324,25 +324,25 @@ void draw_a_polygon(uint id, float x, float y)
 								uv[1] * 0.2 + uv[3] * 0.05 + uv[5] * 0.05 + uv[7] * 0.7,
 								uv[0] * 0.7 + uv[2] * 0.05 + uv[4] * 0.05 + uv[6] * 0.2,
 								uv[1] * 0.7 + uv[3] * 0.05 + uv[5] * 0.05 + uv[7] * 0.2,
-									0.45, 0.3, 0);
+									0.45, 0.3, 0, 1.0f);
 			else if(part == 1)
 				sui_draw_2d_line_gl(uv[0] * 0.7 + uv[2] * 0.2 + uv[4] * 0.05 + uv[6] * 0.05,
 								uv[1] * 0.7 + uv[3] * 0.2 + uv[5] * 0.05 + uv[7] * 0.05,
 								uv[0] * 0.2 + uv[2] * 0.7 + uv[4] * 0.05 + uv[6] * 0.05,
 								uv[1] * 0.2 + uv[3] * 0.7 + uv[5] * 0.05 + uv[7] * 0.05,
-									0.45, 0.3, 0);
+									0.45, 0.3, 0, 1.0f);
 			else if(part == 2)
 				sui_draw_2d_line_gl(uv[0] * 0.05 + uv[2] * 0.7 + uv[4] * 0.2 + uv[6] * 0.05,
 								uv[1] * 0.05 + uv[3] * 0.7 + uv[5] * 0.2 + uv[7] * 0.05,
 								uv[0] * 0.05 + uv[2] * 0.2 + uv[4] * 0.7 + uv[6] * 0.05,
 								uv[1] * 0.05 + uv[3] * 0.2 + uv[5] * 0.7 + uv[7] * 0.05,
-									0.45, 0.3, 0);
+									0.45, 0.3, 0, 1.0f);
 			else if(part == 3)
 				sui_draw_2d_line_gl(uv[0] * 0.05 + uv[2] * 0.05 + uv[4] * 0.7 + uv[6] * 0.2,
 								uv[1] * 0.05 + uv[3] * 0.05 + uv[5] * 0.7 + uv[7] * 0.2,
 								uv[0] * 0.05 + uv[2] * 0.05 + uv[4] * 0.2 + uv[6] * 0.7,
 								uv[1] * 0.05 + uv[3] * 0.05 + uv[5] * 0.2 + uv[7] * 0.7,
-									0.45, 0.3, 0);
+									0.45, 0.3, 0, 1.0f);
 
 		}else
 		{
@@ -350,22 +350,22 @@ void draw_a_polygon(uint id, float x, float y)
 								uv[1] * 0.7 + uv[3] * 0.2 + uv[5] * 0.05 + uv[7] * 0.05,
 								uv[0] * 0.2 + uv[2] * 0.7 + uv[4] * 0.05 + uv[6] * 0.05,
 								uv[1] * 0.2 + uv[3] * 0.7 + uv[5] * 0.05 + uv[7] * 0.05,
-									0.3, 0.2, 0);
+									0.3, 0.2, 0, 1.0f);
 			sui_draw_2d_line_gl(uv[0] * 0.05 + uv[2] * 0.7 + uv[4] * 0.2 + uv[6] * 0.05,
 								uv[1] * 0.05 + uv[3] * 0.7 + uv[5] * 0.2 + uv[7] * 0.05,
 								uv[0] * 0.05 + uv[2] * 0.2 + uv[4] * 0.7 + uv[6] * 0.05,
 								uv[1] * 0.05 + uv[3] * 0.2 + uv[5] * 0.7 + uv[7] * 0.05,
-									0.3, 0.2, 0);
+									0.3, 0.2, 0, 1.0f);
 			sui_draw_2d_line_gl(uv[0] * 0.05 + uv[2] * 0.05 + uv[4] * 0.7 + uv[6] * 0.2,
 								uv[1] * 0.05 + uv[3] * 0.05 + uv[5] * 0.7 + uv[7] * 0.2,
 								uv[0] * 0.05 + uv[2] * 0.05 + uv[4] * 0.2 + uv[6] * 0.7,
 								uv[1] * 0.05 + uv[3] * 0.05 + uv[5] * 0.2 + uv[7] * 0.7,
-									0.3, 0.2, 0);
+									0.3, 0.2, 0, 1.0f);
 			sui_draw_2d_line_gl(uv[0] * 0.2 + uv[2] * 0.05 + uv[4] * 0.05 + uv[6] * 0.7,
 								uv[1] * 0.2 + uv[3] * 0.05 + uv[5] * 0.05 + uv[7] * 0.7,
 								uv[0] * 0.7 + uv[2] * 0.05 + uv[4] * 0.05 + uv[6] * 0.2,
 								uv[1] * 0.7 + uv[3] * 0.05 + uv[5] * 0.05 + uv[7] * 0.2,
-									0.3, 0.2, 0);
+									0.3, 0.2, 0, 1.0f);
 		}
 	}else
 	{
@@ -377,36 +377,36 @@ void draw_a_polygon(uint id, float x, float y)
 								uv[1] * 0.7 + uv[3] * 0.2 + uv[5] * 0.1,
 								uv[0] * 0.2 + uv[2] * 0.7 + uv[4] * 0.1,
 								uv[1] * 0.2 + uv[3] * 0.7 + uv[5] * 0.1,
-									0.45, 0.3, 0);
+									0.45, 0.3, 0, 1.0f);
 			else if(part == 2)
 				sui_draw_2d_line_gl(uv[0] * 0.1 + uv[2] * 0.2 + uv[4] * 0.7,
 								uv[1] * 0.1 + uv[3] * 0.2 + uv[5] * 0.7,
 								uv[0] * 0.1 + uv[2] * 0.7 + uv[4] * 0.2,
 								uv[1] * 0.1 + uv[3] * 0.7 + uv[5] * 0.2,
-									0.45, 0.3, 0);
+									0.45, 0.3, 0, 1.0f);
 			else if(part == 0)
 				sui_draw_2d_line_gl(uv[0] * 0.7 + uv[2] * 0.1 + uv[4] * 0.2,
 								uv[1] * 0.7 + uv[3] * 0.1 + uv[5] * 0.2,
 								uv[0] * 0.2 + uv[2] * 0.1 + uv[4] * 0.7,
 								uv[1] * 0.2 + uv[3] * 0.1 + uv[5] * 0.7,
-									0.45, 0.3, 0);
+									0.45, 0.3, 0, 1.0f);
 		}else
 		{
 			sui_draw_2d_line_gl(uv[0] * 0.7 + uv[2] * 0.2 + uv[4] * 0.1,
 								uv[1] * 0.7 + uv[3] * 0.2 + uv[5] * 0.1,
 								uv[0] * 0.2 + uv[2] * 0.7 + uv[4] * 0.1,
 								uv[1] * 0.2 + uv[3] * 0.7 + uv[5] * 0.1,
-									0.3, 0.2, 0);
+									0.3, 0.2, 0, 1.0f);
 			sui_draw_2d_line_gl(uv[0] * 0.1 + uv[2] * 0.2 + uv[4] * 0.7,
 								uv[1] * 0.1 + uv[3] * 0.2 + uv[5] * 0.7,
 								uv[0] * 0.1 + uv[2] * 0.7 + uv[4] * 0.2,
 								uv[1] * 0.1 + uv[3] * 0.7 + uv[5] * 0.2,
-									0.3, 0.2, 0);
+									0.3, 0.2, 0, 1.0f);
 			sui_draw_2d_line_gl(uv[0] * 0.7 + uv[2] * 0.1 + uv[4] * 0.2,
 								uv[1] * 0.7 + uv[3] * 0.1 + uv[5] * 0.2,
 								uv[0] * 0.2 + uv[2] * 0.1 + uv[4] * 0.7,
 								uv[1] * 0.2 + uv[3] * 0.1 + uv[5] * 0.7,
-									0.3, 0.2, 0);
+									0.3, 0.2, 0, 1.0f);
 		}
 	}
 }

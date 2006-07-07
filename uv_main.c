@@ -70,7 +70,7 @@ void uv_intro_handler(BInputState *input, void *user)
 		else
 		{
 			sui_type_in(input, -0.2, -0.45, 0.4, SUI_T_SIZE, connect_type_in, 48, connect_type_in_func, NULL, 0, 0, 0);
-			sui_draw_2d_line_gl(-0.2, -0.45, 0.2, -0.45, 0, 0, 0);
+			sui_draw_2d_line_gl(-0.2, -0.45, 0.2, -0.45, 0, 0, 0, 1.0f);
 			if(input->mode == BAM_DRAW)
 				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECT") * -0.5, 0.35, 0.02, 2, "CONNECT", 0, 0, 0);
 

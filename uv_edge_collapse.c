@@ -131,8 +131,8 @@ void uve_find_intersection(egreal *output, egreal *e1start, egreal *e1end, egrea
 {
 	egreal vec1[2], vec2[2], r;
 
-	sui_draw_2d_line_gl(e1start[0], e1start[1], e1start[0] + (e1start[0] - e1end[0]) * 0.2, e1start[1] + (e1start[1] - e1end[1]) * 0.2, 1, 0.9, 0);
-	sui_draw_2d_line_gl(e2start[0], e2start[1], e2start[0] + (e2start[0] - e2end[0]) * 0.2, e2start[1] + (e2start[1] - e2end[1]) * 0.2, 1, 0.5, 0);
+	sui_draw_2d_line_gl(e1start[0], e1start[1], e1start[0] + (e1start[0] - e1end[0]) * 0.2, e1start[1] + (e1start[1] - e1end[1]) * 0.2, 1, 0.9, 0, 1.0f);
+	sui_draw_2d_line_gl(e2start[0], e2start[1], e2start[0] + (e2start[0] - e2end[0]) * 0.2, e2start[1] + (e2start[1] - e2end[1]) * 0.2, 1, 0.5, 0, 1.0f);
 
 	vec1[0] = e2end[0] - e2start[0];
 	vec1[1] = e2end[1] - e2start[1];
@@ -181,11 +181,10 @@ void uve_find_intersection(egreal *output, egreal *e1start, egreal *e1end, egrea
 void	sui_draw_edge_colapse(float pos_x, float pos_y, float red, float green, float blue)
 {
 	static float array[] = {0.018000, 0.000000, 0.011112, 0.001370, 0.011112, 0.001370, 0.005272, 0.005272, 0.005272, 0.005272, 0.001370, 0.011112, 0.001370, 0.011112, -0.000000, 0.018000, -0.000000, 0.024000, 0.007416, 0.022825, 0.007416, 0.022825, 0.014107, 0.019416, 0.014107, 0.019416, 0.019416, 0.014107, 0.019416, 0.014107, 0.022825, 0.007416, 0.022825, 0.007416, 0.024000, 0.000000, -0.000000, -0.024000, -0.007416, -0.022825, -0.007416, -0.022825, -0.014107, -0.019416, -0.014107, -0.019416, -0.019416, -0.014107, -0.019416, -0.014107, -0.022825, -0.007416, -0.022825, -0.007416, -0.024000, 0.000000, -0.000000, 0.018000, -0.006888, 0.016630, -0.006888, 0.016630, -0.012728, 0.012728, -0.012728, 0.012728, -0.016630, 0.006888, -0.016630, 0.006888, -0.018000, 0.000000, -0.018000, 0.000000, -0.011112, -0.001370, -0.011112, -0.001370, -0.005272, -0.005272, -0.005272, -0.005272, -0.001370, -0.011112, -0.001370, -0.011112, -0.000000, -0.018000, -0.000000, -0.018000, 0.006888, -0.016630, 0.006888, -0.016630, 0.012728, -0.012728, 0.012728, -0.012728, 0.016630, -0.006888, 0.016630, -0.006888, 0.018000, 0.000000, -0.000000, 0.024000, -0.000000, 0.018000, 0.024000, 0.000000, 0.018000, 0.000000, -0.000000, -0.018000, -0.000000, -0.024000, -0.018000, 0.000000, -0.024000, 0.000000};
-	static float t = 0;
 	glPushMatrix();
 //	glRotatef(t++, 0, 0, 1);
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 60, 2, red, green, blue);
+	sui_draw_gl(GL_LINES, array, 60, 2, red, green, blue, 1.0f);
 	glPopMatrix();
 }
 
@@ -213,12 +212,12 @@ void uve_draw()
 		sui_draw_2d_line_gl(uv_get_view_x((uv[v[0]] + uv[v[1]]) * 0.46 + (uv2[v[2]] + uv2[v[3]]) * 0.04), 
 					uv_get_view_y((uv[v[0] + 1] + uv[v[1] + 1]) * 0.46 + (uv2[v[2] + 1] + uv2[v[3] + 1]) * 0.04), 
 					uv_get_view_x((uv2[v[2]] + uv2[v[3]]) * 0.1 + (uv[v[0]] + uv[v[1]]) * 0.4), 
-					uv_get_view_y((uv2[v[2] + 1] + uv2[v[3] + 1]) * 0.1 + (uv[v[0] + 1] + uv[v[1] + 1]) * 0.4), 0.3, 0.1, 0);
+					uv_get_view_y((uv2[v[2] + 1] + uv2[v[3] + 1]) * 0.1 + (uv[v[0] + 1] + uv[v[1] + 1]) * 0.4), 0.3, 0.1, 0, 1.0f);
 
 		sui_draw_2d_line_gl(uv_get_view_x((uv[v[0]] + uv[v[1]]) * 0.1 + (uv2[v[2]] + uv2[v[3]]) * 0.4), 
 					uv_get_view_y((uv[v[0] + 1] + uv[v[1] + 1]) * 0.1 + (uv2[v[2] + 1] + uv2[v[3] + 1]) * 0.4), 
 					uv_get_view_x((uv2[v[2]] + uv2[v[3]]) * 0.46 + (uv[v[0]] + uv[v[1]]) * 0.04), 
-					uv_get_view_y((uv2[v[2] + 1] + uv2[v[3] + 1]) * 0.46 + (uv[v[0] + 1] + uv[v[1] + 1]) * 0.04), 0.3, 0.1, 0);
+					uv_get_view_y((uv2[v[2] + 1] + uv2[v[3] + 1]) * 0.46 + (uv[v[0] + 1] + uv[v[1] + 1]) * 0.04), 0.3, 0.1, 0, 1.0f);
 
 
 		sui_draw_edge_colapse(pos[0], pos[1], 0.6, 0.2, 0);
@@ -229,7 +228,6 @@ void uve_draw()
 boolean uve_test(float pointer_x, float pointer_y)
 {
 	egreal uv[8], uv2[8], pos[2];
-	boolean output = FALSE;
 	UVEdge *e;
 	uint i, v[4];
 	for(i = 0; i < UVEdgeGlobal.edge_count; i++)
@@ -247,7 +245,6 @@ boolean uve_test(float pointer_x, float pointer_y)
 
 		if(pos[0] * pos[0] + pos[1] * pos[1] < 0.02 * 0.02)
 		{
-			egreal pos2[2];
 			uve_find_intersection(pos, &uv[e->edge[0] * 2],
 									&uv[((e->edge[0] + uvg_get_sides(e->poly[0]) - 1) % uvg_get_sides(e->poly[0])) * 2],
 								&uv2[((e->edge[1] + 1) % uvg_get_sides(e->poly[1])) * 2],

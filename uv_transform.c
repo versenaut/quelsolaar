@@ -352,6 +352,6 @@ void uv_trans_draw()
 	cam = get_cam_pos();
 	glTranslatef(uv_get_view_x(UVTGlobal.manip_pos[0]), uv_get_view_y(UVTGlobal.manip_pos[1]), 0);
 	glTranslatef(-cam[0], -cam[1], cam[2] - 1);
-	sui_draw_gl(GL_LINES, array, 220, 2, 1, 1, 1);
+	sui_draw_gl(GL_LINES, array, 220, 2, 1, 1, 1, 1.0f);
 	glPopMatrix();
 }
