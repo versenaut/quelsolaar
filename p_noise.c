@@ -65,7 +65,7 @@ egreal p_noise_multi_function(egreal *vec)
 
 egreal p_noise_point_function(egreal *vec)
 {
-	int i, j, k, start, pos, found;
+	int i, j, k, start, pos, found = 0;
 	egreal fi, fj, fk, f, fbest = 100000, vector[3]; 
 	fi = vec[0];
 	fj = vec[1];
