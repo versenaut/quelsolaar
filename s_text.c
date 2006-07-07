@@ -156,7 +156,7 @@ boolean sui_type_in(BInputState *input, float pos_x, float pos_y, float length, 
 				sui_type_in_cursor = i;
 			}
 		}
-		if(sui_return_text = text)
+		if(sui_return_text == text)
 		{
 			sui_return_text = NULL;
 			return TRUE;
