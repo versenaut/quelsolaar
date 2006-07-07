@@ -661,7 +661,7 @@ void co_play_game(BInputState *input)
 
 		for(i = 0; i < COGame.pebble_count; i++)
 		{
-			float x, y, size;
+			float x, y, size = 0.0;
 			COGame.pebbles[i].pos[0] += COGame.pebbles[i].vec[0] * betray_get_delta_time();
 			COGame.pebbles[i].pos[1] += COGame.pebbles[i].vec[1] * betray_get_delta_time();
 			co_pos_wrap(COGame.pebbles[i].pos);
