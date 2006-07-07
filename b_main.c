@@ -169,7 +169,6 @@ static void *func_param;
 
 void betray_start_type_in(char *string, uint length, void (*done_func)(void *user, boolean cancel), uint *cursor, void *user_pointer)
 {
-	uint	i;
 	type_in_string = string;
 	type_in_alocated = length;
 	type_in_done_func = done_func;
@@ -239,7 +238,6 @@ void betray_delete_character(void)
 
 void betray_move_cursor(int move)
 {
-	int pos;
 	(*cursor_pos_pointer) += move;
 	if(*cursor_pos_pointer < 0)
 		*cursor_pos_pointer = 0;
@@ -288,6 +286,8 @@ void betray_get_current_time(uint32 *seconds, uint32 *fractions)
 }
 
 #else
+
+#include <sys/time.h>
 
 void betray_get_current_time(uint32 *seconds, uint32 *fractions)
 {
