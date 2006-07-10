@@ -28,7 +28,7 @@ APPS=connector loqairou lpaint quelsolaar uvedit
 # that requires Persuade will cause breakage.
 #
 PROG="\#include \"verse.h\"\n\#include \"persuade.h\"\nint main(void)\n{\n\#if defined PERSUADE_ENABLED\n puts(\"enabled\");\n\#else\n puts(\"disabled\");\n\#endif\n return 0;\n}"
-PERSUADE:=$(shell echo -e $(PROG) | gcc -I../verse -x c - && ./a.out)
+PERSUADE:=$(shell echo -e $(PROG) | gcc -I$(VERSE) -x c - && ./a.out)
 ifeq ($(PERSUADE), enabled)
 	LIBPERSUADE := libpersuade.a
 else
