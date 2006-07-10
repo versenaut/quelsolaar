@@ -1,6 +1,20 @@
 #
 # Build Quel apps. Simple hand-written (and rather verbose) Makefile, for now.
 #
+# NOTE: Currently, this Makefile requires ugliness in the code. In particular,
+# a block like this is needed in every C file that contains a main() entrypoint:
+#
+#
+# /* Disable hijacking of main() by SDL. This is needed for command-line Win32 build. */
+# #if defined UNDEF_MAIN
+# #undef main
+# #endif
+#
+# UNDEF_MAIN is defined by a command-line option to the compiler, below. This is
+# not the way things are supposed to work, but I (Emil) haven't been able to
+# create anything better. And this does build the binaries, with rather minimal
+# disturbance. People building from an IDE should not be affected.
+#
 
 # Location of a (compiled) Verse core directory. Must contain verse.h and libverse.a.
 VERSE=C:\projects\verse-sdk
@@ -9,7 +23,7 @@ TARGETS=connector.exe loqairou.exe quelsolaar.exe uvedit.exe lpaint.exe
 
 ALL:		$(TARGETS)
 
-CFLAGS=/nologo /I$(VERSE)\include
+CFLAGS=/nologo /I$(VERSE)\include /DUNDEF_MAIN
 LIBEXE=link /lib
 LIBFLAGS=/nologo /out:
 # Comment out the next two lines to build without the "Persuade" library.
@@ -21,7 +35,7 @@ connector.exe:	co_3d_view.obj co_main.obj co_game.obj co_intro.obj co_popup.obj 
 		co_vn_object.obj co_vn_search.obj co_vn_text.obj co_widgets.obj \
 		st_matrix_operations.obj \
 		seduce.lib betray.lib enough.lib $(PERSUADE) deceive.lib
-		$(CC) $(CFLAGS) /Fe$@ $** $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib sdlmain.lib
+		$(CC) $(CFLAGS) /Fe$@ $** $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib
 
 loqairou.exe:	la_cache.obj la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.obj la_hole.obj la_input_parser.obj la_intro.obj la_key_input.obj \
 		la_main.obj la_neighbor.obj la_particle_fx.obj la_pop_up.obj la_projection.obj la_reference.obj la_save.obj \
@@ -30,7 +44,7 @@ loqairou.exe:	la_cache.obj la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.
 		la_tool_slice.obj la_tool_splitter.obj la_tool_subdivide.obj \
 		st_math.obj st_matrix_operations.obj st_text.obj \
 		seduce.lib betray.lib enough.lib deceive.lib $(PERSUADE)
-		$(CC) $(CFLAGS) /Fe$@ $** $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib sdlmain.lib
+		$(CC) $(CFLAGS) /Fe$@ $** $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib
 
 quelsolaar.exe:	qs_camera.obj qs_intro.obj qs_main.obj \
 		st_math.obj st_matrix_operations.obj st_text.c st_types.obj \
@@ -41,6 +55,7 @@ uvedit.exe:	uv_main.obj uv_draw.obj uv_edge_collapse.obj uv_geometry.obj uv_menu
 		uv_tool_edge.obj uv_tool_polygon.obj uv_transform.obj uv_tool_select.obj uv_tool_strip.obj uv_unfold.obj \
 		uv_view.obj uv_input_parse.obj \
 		betray.lib enough.lib deceive.lib seduce.lib $(PERSUADE)
+		st_matrix_operations.obj \
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSE)/lib/verse.lib wsock32.lib winmm.lib opengl32.lib sdl.lib
 
 lpaint.exe:	lp_geometry.obj lp_handle.obj lp_layer_group.obj lp_main.obj lp_menu.obj lp_paint.obj lp_popup.obj \
