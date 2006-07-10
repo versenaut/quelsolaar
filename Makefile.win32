@@ -56,7 +56,7 @@ uvedit.exe:	uv_main.obj uv_draw.obj uv_edge_collapse.obj uv_geometry.obj uv_menu
 		uv_tool_edge.obj uv_tool_polygon.obj uv_transform.obj uv_tool_select.obj uv_tool_strip.obj uv_unfold.obj \
 		uv_view.obj uv_input_parse.obj \
 		st_matrix_operations.obj \
-		betray.lib enough.lib deceive.lib seduce.lib $(PERSUADE) \
+		betray.lib enough.lib deceive.lib seduce.lib $(PERSUADE)
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
 
 lpaint.exe:	lp_geometry.obj lp_handle.obj lp_layer_group.obj lp_main.obj lp_menu.obj lp_paint.obj lp_popup.obj \
