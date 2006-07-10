@@ -28,7 +28,7 @@ LIBEXE=link /lib
 LIBFLAGS=/nologo /out:
 VERSELIB=$(VERSE)\verse.lib
 # Comment out the next two lines to build without the "Persuade" library.
-#PERSUADE=persuade.lib
+PERSUADE=persuade.lib
 #CFLAGS=$(CFLAGS) /DPERSUADE_ENABLED
 
 connector.exe:	co_3d_view.obj co_main.obj co_game.obj co_intro.obj co_popup.obj co_projection.obj co_summary.obj co_vn_audio.obj co_vn_bitmap.obj \
