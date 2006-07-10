@@ -17,13 +17,13 @@
 #
 
 # Location of a (compiled) Verse core directory. Must contain verse.h and libverse.a.
-VERSE=C:\projects\verse-sdk
+VERSE=..\verse
 
 TARGETS=connector.exe loqairou.exe quelsolaar.exe uvedit.exe lpaint.exe
 
 ALL:		$(TARGETS)
 
-CFLAGS=/nologo /I$(VERSE)\include /DUNDEF_MAIN
+CFLAGS=/nologo /I$(VERSE) /DUNDEF_MAIN
 LIBEXE=link /lib
 LIBFLAGS=/nologo /out:
 # Comment out the next two lines to build without the "Persuade" library.
@@ -80,7 +80,7 @@ enough.lib:	e_storage_audio.obj e_storage_bitmap.obj e_storage_curve.obj e_stora
 persuade.lib:	p_extension.obj p_geometry.obj p_object_environment.obj p_object_handle.obj p_object_light.obj p_object_param.obj \
 		p_object_render.obj p_sds_array.obj p_sds_geo_clean.obj p_sds_geo_divide.obj p_sds_obj.obj \
 		p_sds_obj_anim.obj p_sds_obj_displace.obj p_sds_obj_edge_normal.obj p_sds_obj_param.obj p_sds_obj_sort.obj p_sds_obj_tess.obj \
-		p_sds_table.obj p_sds_table_debug.obj p_sds_table_edge_sort.obj p_sds_table_normals.obj p_sds_table_split.obj p_shader_bind.obj \
+		p_sds_table.obj p_sds_table_debug.obj p_sds_table_edge_sort.obj p_sds_table_normals.obj p_sds_table_split.obj \
 		p_shader_extension.obj p_shader_gl_one_fall_back.obj p_shader_writer.obj p_status_print.obj \
 		p_task.obj p_texture.obj
 		$(LIBEXE) $(LIBFLAGS)$@ $**
