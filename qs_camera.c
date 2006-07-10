@@ -125,8 +125,8 @@ void qs_set_camera(void)
 
 static void eulers_to_quat(VNQuat64 *quat, real32 heading, real32 attitude)
 {
-	real32	c1 = cosf(heading / 2.0f), c2 = cosf(attitude / 2.0f), c3 = 1.0f;
-	real32	s1 = sinf(heading / 2.0f), s2 = sinf(attitude / 2.0f), s3 = 0.0f;
+	real32	c1 = cos(heading / 2.0f), c2 = cos(attitude / 2.0f), c3 = 1.0f;
+	real32	s1 = sin(heading / 2.0f), s2 = sin(attitude / 2.0f), s3 = 0.0f;
 
 	quat->x = s1 * s2 * c3 + c1 * c2 * s3;
 	quat->y = s1 * c2 * c3 + c1 * s2 * s3;
