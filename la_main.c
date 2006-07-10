@@ -8,7 +8,10 @@
 #include "persuade.h"
 #include "deceive.h"
 
-/* Disable hijacking of main() by SDL. */
+/* Disable hijacking of main() by SDL. This is needed for command-line Win32 build. */
+#if defined UNDEF_MAIN
+#undef main
+#endif
 
 
 #define THREADED FALSE

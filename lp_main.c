@@ -7,7 +7,7 @@
 #include "lp_projection.h"
 
 /* Disable hijacking of main() by SDL. */
-#if defined _WIN32 && defined BETRAY_SDL_SYSTEM_WRAPPER
+#if defined UNDEF_MAIN
 #undef main
 #endif
 

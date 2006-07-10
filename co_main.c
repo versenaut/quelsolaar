@@ -7,7 +7,10 @@
 //#include "co_func_repository.h"
 //#include "co_storage.h"
 
-/* Disable hijacking of main() by SDL. */
+/* Disable hijacking of main() by SDL. This is needed for command-line Win32 build. */
+#if defined UNDEF_MAIN
+#undef main
+#endif
 
 
 #include "co_vn_handle.h"

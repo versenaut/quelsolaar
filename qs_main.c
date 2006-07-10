@@ -8,6 +8,11 @@
 //#include "co_func_repository.h"
 //#include "co_storage.h"
 
+/* Disable hijacking of main() by SDL. This is needed for command-line Win32 build. */
+#if defined UNDEF_MAIN
+#undef main
+#endif
+
 void connect_type_in_func(void *user, char *text)
 {
 	e_vc_connect(text, "unknown", "none", NULL);
