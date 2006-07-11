@@ -82,7 +82,7 @@ persuade.lib:	p_extension.obj p_geometry.obj p_impostor.obj p_noise.obj p_object
 		p_object_render.obj p_render_to_texture.obj p_sds_array.obj p_sds_geo_clean.obj p_sds_geo_divide.obj p_sds_obj.obj \
 		p_sds_obj_anim.obj p_sds_obj_displace.obj p_sds_obj_edge_normal.obj p_sds_obj_param.obj p_sds_obj_sort.obj p_sds_obj_tess.obj \
 		p_sds_table.obj p_sds_table_debug.obj p_sds_table_edge_sort.obj p_sds_table_normals.obj p_sds_table_split.obj \
-		p_shader_extension.obj p_shader_gl_one_fall_back.obj p_shader_writer.obj p_status_print.obj \
+		p_shader_extension.obj p_shader_gl_one_fall_back.obj p_shader_ramp_texture.obj p_shader_writer.obj p_status_print.obj \
 		p_task.obj p_texture.obj
 		$(LIBEXE) $(LIBFLAGS)$@ $**
 
