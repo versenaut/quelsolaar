@@ -49,7 +49,7 @@ loqairou.exe:	la_cache.obj la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.
 
 quelsolaar.exe:	qs_camera.obj qs_intro.obj qs_main.obj \
 		st_math.obj st_matrix_operations.obj st_text.c st_types.obj seduce_persuade.obj \
-		$(PERSUADE) seduce.lib betray.lib enough.lib
+		$(PERSUADE) seduce.lib betray.lib deceive.lib enough.lib
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
 
 uvedit.exe:	uv_main.obj uv_draw.obj uv_edge_collapse.obj uv_geometry.obj uv_menu.obj uv_overlay.obj uv_popup.obj uv_texture.obj uv_tool_corner.obj \
