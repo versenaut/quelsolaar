@@ -23,7 +23,7 @@
 #ifdef _WIN32
 #include <windows.h>
 
-/* FIXME: This should be necessary. We should just link with sdlmain.lib and
+/* FIXME: This shouldn't be necessary. We should just link with sdlmain.lib and
  * be happy. Unfortunately, I can't seem to be able to get it to work. So, the
  * work-around here is to undefine SDL's wrapping of main().
 */
