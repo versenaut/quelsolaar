@@ -1,5 +1,11 @@
 #define P_MAX_TASKS 300000
 
+#if defined _WIN32
+#include <windows.h>
+#else
+#include <sys/time.h>
+#endif
+
 /* Timer data structure, for use with the p_timer_ calls. */
 typedef struct {
 #if defined _WIN32
