@@ -68,7 +68,7 @@ lpaint.exe:	lp_geometry.obj lp_handle.obj lp_layer_group.obj lp_main.obj lp_menu
 
 # -------------------------------------------------------------
 
-seduce.lib:	s_background.obj s_draw.obj s_editor.obj s_line_font.obj s_main.obj s_popup.obj s_settings.obj s_text.obj
+seduce.lib:	s_background.obj s_draw.obj s_editor.obj s_line_font.obj s_main.obj s_popup.obj s_settings.obj s_settings_window.obj s_text.obj
 		$(LIBEXE) $(LIBFLAGS)$@ $**
 
 betray.lib:	b_glut.obj b_main.obj b_sdl.obj
