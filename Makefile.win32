@@ -34,7 +34,7 @@ PERSUADE=persuade.lib
 connector.exe:	co_3d_view.obj co_main.obj co_game.obj co_intro.obj co_popup.obj co_projection.obj co_summary.obj co_vn_audio.obj co_vn_bitmap.obj \
 		co_vn_curve.obj co_vn_geometry.obj co_vn_graphics.obj co_vn_handle.obj co_vn_head.obj co_vn_mat_render.obj co_vn_material.obj \
 		co_vn_object.obj co_vn_search.obj co_vn_text.obj co_widgets.obj \
-		st_matrix_operations.obj \
+		st_matrix_operations.obj seduce_persuade.o \
 		seduce.lib betray.lib enough.lib $(PERSUADE) deceive.lib
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
 
@@ -48,7 +48,7 @@ loqairou.exe:	la_cache.obj la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
 
 quelsolaar.exe:	qs_camera.obj qs_intro.obj qs_main.obj \
-		st_math.obj st_matrix_operations.obj st_text.c st_types.obj \
+		st_math.obj st_matrix_operations.obj st_text.c st_types.obj seduce_persuade.lib \
 		$(PERSUADE) seduce.lib betray.lib enough.lib
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
 
@@ -78,8 +78,8 @@ enough.lib:	e_storage_audio.obj e_storage_bitmap.obj e_storage_curve.obj e_stora
 		e_storage_node.obj e_storage_object.obj e_storage_text.obj st_types.obj
 		$(LIBEXE) $(LIBFLAGS)$@ $**
 
-persuade.lib:	p_extension.obj p_geometry.obj p_object_environment.obj p_object_handle.obj p_object_light.obj p_object_param.obj \
-		p_object_render.obj p_sds_array.obj p_sds_geo_clean.obj p_sds_geo_divide.obj p_sds_obj.obj \
+persuade.lib:	p_extension.obj p_geometry.obj p_impostor.obj p_noise.obj p_object_environment.obj p_object_handle.obj p_object_light.obj p_object_param.obj \
+		p_object_render.obj p_render_to_texture.obj p_sds_array.obj p_sds_geo_clean.obj p_sds_geo_divide.obj p_sds_obj.obj \
 		p_sds_obj_anim.obj p_sds_obj_displace.obj p_sds_obj_edge_normal.obj p_sds_obj_param.obj p_sds_obj_sort.obj p_sds_obj_tess.obj \
 		p_sds_table.obj p_sds_table_debug.obj p_sds_table_edge_sort.obj p_sds_table_normals.obj p_sds_table_split.obj \
 		p_shader_extension.obj p_shader_gl_one_fall_back.obj p_shader_writer.obj p_status_print.obj \
