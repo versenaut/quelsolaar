@@ -22,6 +22,14 @@
 /* On Windows, we also need the main platform header file. */
 #ifdef _WIN32
 #include <windows.h>
+
+/* FIXME: This should be necessary. We should just link with sdlmain.lib and
+ * be happy. Unfortunately, I can't seem to be able to get it to work. So, the
+ * work-around here is to undefine SDL's wrapping of main().
+*/
+#ifdef UNDEF_MAIN
+#undef main
+#endif
 #endif
 
 /* Get hold of OpenGL main header, gl.h. */

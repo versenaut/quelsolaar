@@ -6,11 +6,6 @@
 
 #include "lp_projection.h"
 
-/* Disable hijacking of main() by SDL. */
-#if defined UNDEF_MAIN
-#undef main
-#endif
-
 extern void lp_input_handler(BInputState *input, void *user);
 
 int main(int argc, char **argv)
