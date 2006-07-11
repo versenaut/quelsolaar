@@ -23,7 +23,7 @@ extern void init_draw_settings(void);
 extern void p_init(void);
 extern void init_draw_line(void);
 extern void init_transform_manipulator(void);
-extern void	la_intro(void);
+extern void la_intro(void);
 extern void init_key_input(void);
 extern void parse_input(BInputState *input, void *user);
 extern void la_intro_draw(void *user);
