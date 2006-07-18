@@ -35,6 +35,7 @@ connector.exe:	co_3d_view.obj co_main.obj co_game.obj co_intro.obj co_popup.obj 
 		co_vn_curve.obj co_vn_geometry.obj co_vn_graphics.obj co_vn_handle.obj co_vn_head.obj co_vn_mat_render.obj co_vn_material.obj \
 		co_vn_object.obj co_vn_search.obj co_vn_text.obj co_widgets.obj \
 		st_matrix_operations.obj seduce_persuade.obj \
+		resources\connector.obj \
 		seduce.lib betray.lib enough.lib $(PERSUADE) deceive.lib
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
 
@@ -44,11 +45,13 @@ loqairou.exe:	la_cache.obj la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.
 		la_tool_manipulator.obj la_tool_poly_select.obj la_tool_reshape.obj la_tool_revolve.obj la_tool_select.obj \
 		la_tool_slice.obj la_tool_splitter.obj la_tool_subdivide.obj \
 		st_math.obj st_matrix_operations.obj st_text.obj \
+		reources\loqairou.obj \
 		seduce.lib betray.lib enough.lib deceive.lib $(PERSUADE)
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
 
 quelsolaar.exe:	qs_camera.obj qs_intro.obj qs_main.obj qs_settings.obj \
 		st_math.obj st_matrix_operations.obj st_text.c st_types.obj seduce_persuade.obj \
+		resources\quelsolaar.obj \
 		$(PERSUADE) seduce.lib betray.lib deceive.lib enough.lib
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
 
