@@ -9,8 +9,8 @@ The way this works is like this:
 2) The resource points to a graphics file in the ICO file format, of which
    there are also one per executable.
 3) The .rc files are run through a resource compiler, which generates the
-   PROG.obj files.
-4) Each executable is linked with its corresponding PROG.obj file to create
+   PROG.res files.
+4) Each executable is linked with its corresponding PROG.res file to create
    a final PROG.exe, which will then (magically, heh) have the proper icon.
 
 The provided Makefile.win32 specifies the above, and relies on nmake knowing
