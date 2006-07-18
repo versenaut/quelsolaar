@@ -1,0 +1,19 @@
+This directory contains some "resources", which are used to add icon graphics
+into the executables, when built in Windows.
+
+The way this works is like this:
+
+1) Each supported executable has a file named PROG.rc, which specifies the
+   resources used by that program. These are one-liners, that simply define
+   a single ICON-type resource.
+2) The resource points to a graphics file in the ICO file format, of which
+   there are also one per executable.
+3) The .rc files are run through a resource compiler, which generates the
+   PROG.obj files.
+4) Each executable is linked with its corresponding PROG.obj file to create
+   a final PROG.exe, which will then (magically, heh) have the proper icon.
+
+The provided Makefile.win32 specifies the above, and relies on nmake knowing
+that RES files are built by the "rc.exe" compiler (part of the Platform SDK).
+
+Enjoy.
