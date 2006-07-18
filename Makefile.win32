@@ -45,7 +45,7 @@ loqairou.exe:	la_cache.obj la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.
 		la_tool_manipulator.obj la_tool_poly_select.obj la_tool_reshape.obj la_tool_revolve.obj la_tool_select.obj \
 		la_tool_slice.obj la_tool_splitter.obj la_tool_subdivide.obj \
 		st_math.obj st_matrix_operations.obj st_text.obj \
-		reources\loqairou.res \
+		resources\loqairou.res \
 		seduce.lib betray.lib enough.lib deceive.lib $(PERSUADE)
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
 
