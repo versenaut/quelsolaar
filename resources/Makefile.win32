@@ -1,0 +1,14 @@
+#
+# Simplistic Makefile to build the resource files for the quel apps.
+#
+
+ALL:	connector.res loqairou.res quelsolaar.res
+
+connector.res:	connector.rc
+
+loqairou.res:	loqairou.rc
+
+quelsolaar.res:	quelsolaar.rc
+
+clean:
+	del *.res
