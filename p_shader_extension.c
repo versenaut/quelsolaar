@@ -6,7 +6,11 @@
 	#include <windows.h>
 	#include <GL/gl.h>
 #else
+#if defined(__APPLE__) || defined(MACOSX)
+	#include <OpenGL/gl.h>
+#else
 	#include <GL/gl.h>
+#endif
 #define APIENTRY
 #endif
 
@@ -16,7 +20,9 @@
 #include "p_extension.h"
 #include "p_sds_array.h"
 
+#if !defined(__APPLE__) && !defined(MACOSX)
 typedef unsigned int GLhandleARB;
+#endif
 
 #define GL_VERTEX_SHADER_ARB                        0x8B31
 #define GL_FRAGMENT_SHADER_ARB                      0x8B30

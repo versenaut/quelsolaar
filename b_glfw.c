@@ -7,8 +7,14 @@
 #include <stdlib.h>
 #include <math.h>
 
+static uint screen_size_x = 0;
+static uint screen_size_y = 0;
+static boolean mouse_warp = FALSE;
+
 void b_glfw_reshape_func(int width, int height)
 {
+  screen_size_x = width;
+  screen_size_y = height;
   betray_reshape_view(width, height);
 }
 
@@ -136,6 +142,11 @@ boolean b_glfw_init_display(int argc, char **argv, uint size_x, uint size_y, boo
   return TRUE;
 }
 
+void betray_set_mouse_warp(boolean warp)
+{
+	mouse_warp = warp;
+}
+
 void betray_launch_main_loop(void)
 {
   BInputState *input;
@@ -143,6 +154,17 @@ void betray_launch_main_loop(void)
 
   while (glfwGetWindowParam(GLFW_OPENED))
   {
+    if(mouse_warp)
+    {
+      input->pointer_x = 0;
+      input->pointer_y = 0;
+    }
+
+    glfwPollEvents();
+
+    if(mouse_warp)
+      glfwSetMousePos(screen_size_x / 2, screen_size_y / 2);
+
     if(input->mouse_button[0] == FALSE && input->last_mouse_button[0] == FALSE)
     {
       input->click_pointer_x = input->pointer_x;
