@@ -35,7 +35,7 @@ connector.exe:	co_3d_view.obj co_main.obj co_game.obj co_intro.obj co_popup.obj 
 		co_vn_curve.obj co_vn_geometry.obj co_vn_graphics.obj co_vn_handle.obj co_vn_head.obj co_vn_mat_render.obj co_vn_material.obj \
 		co_vn_object.obj co_vn_search.obj co_vn_text.obj co_widgets.obj \
 		st_matrix_operations.obj seduce_persuade.obj \
-		resources\connector.obj \
+		resources\connector.res \
 		seduce.lib betray.lib enough.lib $(PERSUADE) deceive.lib
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
 
@@ -45,7 +45,7 @@ loqairou.exe:	la_cache.obj la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.
 		la_tool_manipulator.obj la_tool_poly_select.obj la_tool_reshape.obj la_tool_revolve.obj la_tool_select.obj \
 		la_tool_slice.obj la_tool_splitter.obj la_tool_subdivide.obj \
 		st_math.obj st_matrix_operations.obj st_text.obj \
-		reources\loqairou.obj \
+		reources\loqairou.res \
 		seduce.lib betray.lib enough.lib deceive.lib $(PERSUADE)
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
 
@@ -58,7 +58,7 @@ quelsolaar.exe:	qs_camera.obj qs_intro.obj qs_main.obj qs_settings.obj \
 uvedit.exe:	uv_main.obj uv_draw.obj uv_edge_collapse.obj uv_geometry.obj uv_menu.obj uv_overlay.obj uv_popup.obj uv_texture.obj uv_tool_corner.obj \
 		uv_tool_edge.obj uv_tool_polygon.obj uv_transform.obj uv_tool_select.obj uv_tool_strip.obj uv_unfold.obj \
 		uv_view.obj uv_input_parse.obj \
-		st_matrix_operations.obj \
+		st_matrix_operations.res \
 		betray.lib enough.lib deceive.lib seduce.lib $(PERSUADE)
 		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
 
