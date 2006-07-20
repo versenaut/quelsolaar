@@ -91,18 +91,18 @@
 	#define APIENTRY
 #endif
 
-void (APIENTRY *p_glBindFramebufferEXT)(GLenum target, GLuint framebuffer);
-void (APIENTRY *p_glDeleteFramebuffersEXT)(GLsizei n, const GLuint *framebuffers);
-void (APIENTRY *p_glGenFramebuffersEXT)(GLsizei n, GLuint *framebuffers);
+void (APIENTRY *p_glBindFramebufferEXT)(GLenum target, GLuint framebuffer) = NULL;
+void (APIENTRY *p_glDeleteFramebuffersEXT)(GLsizei n, const GLuint *framebuffers) = NULL;
+void (APIENTRY *p_glGenFramebuffersEXT)(GLsizei n, GLuint *framebuffers) = NULL;
 
-void (APIENTRY *p_glBindRenderbufferEXT)(GLenum target, GLuint renderbuffer);
-void (APIENTRY *p_glDeleteRenderbuffersEXT)(GLsizei n, const GLuint *renderbuffers);
-void (APIENTRY *p_glGenRenderbuffersEXT)(GLsizei n, GLuint *renderbuffers);
-GLenum (APIENTRY *p_glCheckFramebufferStatusEXT)(GLenum target);
-void (APIENTRY *p_glRenderbufferStorageEXT)(GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
+void (APIENTRY *p_glBindRenderbufferEXT)(GLenum target, GLuint renderbuffer) = NULL;
+void (APIENTRY *p_glDeleteRenderbuffersEXT)(GLsizei n, const GLuint *renderbuffers) = NULL;
+void (APIENTRY *p_glGenRenderbuffersEXT)(GLsizei n, GLuint *renderbuffers) = NULL;
+GLenum (APIENTRY *p_glCheckFramebufferStatusEXT)(GLenum target) = NULL;
+void (APIENTRY *p_glRenderbufferStorageEXT)(GLenum target, GLenum internalformat, GLsizei width, GLsizei height) = NULL;
 
-void (APIENTRY *p_glFramebufferTexture2DEXT)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
-void (APIENTRY *p_glFramebufferRenderbufferEXT)(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
+void (APIENTRY *p_glFramebufferTexture2DEXT)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level) = NULL;
+void (APIENTRY *p_glFramebufferRenderbufferEXT)(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer) = NULL;
 
 typedef struct {
 	uint size;
@@ -115,17 +115,6 @@ static RenderSetup g_global_fbos[2] = {{ 128, -1, -1, -1 }, { 128, -1, -1, -1 }}
 
 void p_init_render_to_texture(void)
 {
-	p_glBindFramebufferEXT = NULL;
-	p_glDeleteFramebuffersEXT = NULL;
-	p_glGenFramebuffersEXT = NULL;
-	p_glBindRenderbufferEXT = NULL;
-	p_glDeleteRenderbuffersEXT = NULL;
-	p_glGenRenderbuffersEXT = NULL;
-	p_glCheckFramebufferStatusEXT = NULL;
-	p_glRenderbufferStorageEXT = NULL;
-	p_glFramebufferTexture2DEXT = NULL;
-	p_glFramebufferRenderbufferEXT = NULL;
-
 	if(p_extension_test("GL_EXT_framebuffer_object"))
 	{
 		p_glBindFramebufferEXT = p_extension_get_address("glBindFramebufferEXT");
@@ -181,6 +170,9 @@ void CheckFramebufferStatus(void)
 
 void p_texture_render_bind(uint texture, uint size, uint target)
 {
+	if (!p_glBindFramebufferEXT)
+		return;
+
 	RenderSetup *fbo;
 
         if (!p_glBindFramebufferEXT)
