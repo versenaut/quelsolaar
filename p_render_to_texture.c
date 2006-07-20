@@ -87,6 +87,9 @@
 
 #include "seduce.h"
 
+#if defined(__APPLE__) || defined(MACOSX)
+	#define APIENTRY
+#endif
 
 void (APIENTRY *p_glBindFramebufferEXT)(GLenum target, GLuint framebuffer);
 void (APIENTRY *p_glDeleteFramebuffersEXT)(GLsizei n, const GLuint *framebuffers);
@@ -112,6 +115,17 @@ static RenderSetup g_global_fbos[2] = {{ 128, -1, -1, -1 }, { 128, -1, -1, -1 }}
 
 void p_init_render_to_texture(void)
 {
+	p_glBindFramebufferEXT = NULL;
+	p_glDeleteFramebuffersEXT = NULL;
+	p_glGenFramebuffersEXT = NULL;
+	p_glBindRenderbufferEXT = NULL;
+	p_glDeleteRenderbuffersEXT = NULL;
+	p_glGenRenderbuffersEXT = NULL;
+	p_glCheckFramebufferStatusEXT = NULL;
+	p_glRenderbufferStorageEXT = NULL;
+	p_glFramebufferTexture2DEXT = NULL;
+	p_glFramebufferRenderbufferEXT = NULL;
+
 	if(p_extension_test("GL_EXT_framebuffer_object"))
 	{
 		p_glBindFramebufferEXT = p_extension_get_address("glBindFramebufferEXT");
@@ -129,6 +143,9 @@ void p_init_render_to_texture(void)
 
 void CheckFramebufferStatus(void)
 {
+    if (!p_glBindFramebufferEXT)
+        return;
+
     GLenum status;
     status = (GLenum) p_glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
     switch(status) {
@@ -165,6 +182,10 @@ void CheckFramebufferStatus(void)
 void p_texture_render_bind(uint texture, uint size, uint target)
 {
 	RenderSetup *fbo;
+
+        if (!p_glBindFramebufferEXT)
+		return;
+
 	if(target == GL_TEXTURE_2D)
 		fbo = &g_global_fbos[0];
 	else
@@ -209,6 +230,9 @@ void p_texture_render_bind(uint texture, uint size, uint target)
 
 void p_texture_render_unbind(void)
 {
+        if (!p_glBindFramebufferEXT)
+		return;
+
 	p_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
