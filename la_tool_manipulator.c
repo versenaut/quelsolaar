@@ -425,7 +425,12 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 		for(i = 0; i < ref_count; pos += 4)
 		{
 			i++;
-			if(pos[i] < vertex_count && pos[1] < vertex_count && pos[2] < vertex_count && vertex[pos[0] * 3] != V_REAL64_MAX && vertex[pos[1] * 3] != V_REAL64_MAX && vertex[pos[2] * 3] != V_REAL64_MAX)
+			if(pos[0] < vertex_count &&
+			   pos[1] < vertex_count &&
+			   pos[2] < vertex_count &&
+			   vertex[pos[0] * 3] != V_REAL64_MAX &&
+			   vertex[pos[1] * 3] != V_REAL64_MAX &&
+			   vertex[pos[2] * 3] != V_REAL64_MAX)
 			{
 				if(pos[3] < vertex_count && vertex[pos[3] * 3] != V_REAL64_MAX)
 					poly = 4;
