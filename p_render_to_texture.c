@@ -132,10 +132,11 @@ void p_init_render_to_texture(void)
 
 void CheckFramebufferStatus(void)
 {
+    GLenum status;
+
     if (!p_glBindFramebufferEXT)
         return;
 
-    GLenum status;
     status = (GLenum) p_glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
     switch(status) {
         case GL_FRAMEBUFFER_COMPLETE_EXT:
@@ -170,10 +171,10 @@ void CheckFramebufferStatus(void)
 
 void p_texture_render_bind(uint texture, uint size, uint target)
 {
+	RenderSetup *fbo;
+
 	if (!p_glBindFramebufferEXT)
 		return;
-
-	RenderSetup *fbo;
 
         if (!p_glBindFramebufferEXT)
 		return;
