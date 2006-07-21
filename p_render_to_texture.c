@@ -176,9 +176,6 @@ void p_texture_render_bind(uint texture, uint size, uint target)
 	if (!p_glBindFramebufferEXT)
 		return;
 
-        if (!p_glBindFramebufferEXT)
-		return;
-
 	if(target == GL_TEXTURE_2D)
 		fbo = &g_global_fbos[0];
 	else
