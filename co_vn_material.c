@@ -153,7 +153,7 @@ void clear_new_frag(VMatFrag *frag, uint type)
 			for(i = 0; color_b[i] != 0; i++)
 				frag->texture.layer_b[i] = color_b[i]; 
 			frag->texture.layer_b[i] = 0; 
-			frag->texture.filterd = TRUE;
+			frag->texture.filtered = TRUE;
 			break;
 		case VN_M_FT_NOISE :
 			frag->noise.mapping = -1;
@@ -717,9 +717,6 @@ void co_draw_lable(COVNMaterial *mat, float y, float color, char *lable)
 
 extern float co_handle_node_head(BInputState *input, ENode *node, boolean reset);
 
-void build_material(void *node);
-
-
 boolean co_handle_material(BInputState *input, ENode *node)
 {
 	static char *material_type_names[] = {"COLOR", "LIGHT", "REFLECTION", "TRANSPARENCY", "VOLUME", "VIEW", "GEOMETRY", "TEXTURE",  "NOISE", "BLENDER", "CLAMP", "MATRIX", "RAMP", "ANIMATION", "ALTERNATIVE", "OUTPUT"};
@@ -736,9 +733,6 @@ boolean co_handle_material(BInputState *input, ENode *node)
 
 	y = co_handle_node_head(input, node, change_m_node_id != e_ns_get_node_id(node));
 	change_m_node_id = e_ns_get_node_id(node);
-if(input->mode != BAM_DRAW)
-if(input->mouse_button[2] != TRUE && input->last_mouse_button[2] == TRUE)
-	build_material(node);
 
 	co_vng_divider(input, 0.2, y, &rot_tree, &color, &color_light, &show_tree, "FRAGMENT TREE");
 	pre_expander = y;
