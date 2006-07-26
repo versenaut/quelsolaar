@@ -46,6 +46,14 @@ void sp_settings_pre(SUIViewElement *element)
 	element[9].type = S_VET_BOOLEAN;
 	element[9].text = "Draw Wireframe";
 	element[9].param.checkbox = p_render_get_wireframe();
+
+	element[10].type = S_VET_BOOLEAN;
+	element[10].text = "Use HDRI";
+	element[10].param.checkbox = p_th_get_sds_use_hdri();
+
+	element[11].type = S_VET_BOOLEAN;
+	element[11].text = "Draw flares";
+	element[11].param.checkbox = p_render_get_flare();
 }
 
 void sp_settings_post(SUIViewElement *element)
@@ -58,4 +66,11 @@ void sp_settings_post(SUIViewElement *element)
 	p_render_set_impostor_resolution(element[7].param.integer);
 	p_render_set_shadows(element[8].param.checkbox);
 	p_render_set_wireframe(element[9].param.checkbox);
+	if(element[10].param.checkbox != p_th_get_sds_use_hdri())
+	{
+		p_th_set_sds_use_hdri(element[10].param.checkbox);
+		p_context_update();
+	}
+	p_render_set_flare(element[11].param.checkbox);
+	
 }
