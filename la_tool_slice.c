@@ -141,6 +141,7 @@ void la_t_slice(double *pos, double *vector, boolean del)
 							new_vertex[2] = create_new_split_vertex(&edge, &edge_length, &edge_alloc, pos, vector, ref[i + 2], ref[i + 3]);
 							new_vertex[3] = create_new_split_vertex(&edge, &edge_length, &edge_alloc, pos, vector, ref[i + 3], ref[i + 0]);
 							udg_polygon_set(i / 4, new_vertex[0], new_vertex[1], new_vertex[2], new_vertex[3]);
+							udg_crease_set(i / 4, 0, 0, 0, 0);
 							for(j = 0; j < 4; j++)
 							{
 								if(desition[j] != SVP_OUTSIDE || del != TRUE)
@@ -148,7 +149,7 @@ void la_t_slice(double *pos, double *vector, boolean del)
 									id = udg_find_empty_slot_polygon();
 									udg_polygon_set(id, new_vertex[(j + 3) % 4], ref[i + j], new_vertex[j], -1);
 									if(crease != NULL)
-										udg_crease_set(id, crease[i + (j + 3) % 3], crease[i + j], 0, 0);
+										udg_crease_set(id, crease[i + (j + 3) % 4], crease[i + (j + 0) % 4], 0, 0);
 								}
 							}
 
@@ -160,17 +161,17 @@ void la_t_slice(double *pos, double *vector, boolean del)
 								new_vertex[1] = create_new_split_vertex(&edge, &edge_length, &edge_alloc, pos, vector, ref[i + (j + 1) % 4], ref[i + (j + 2) % 4]);
 								udg_polygon_set(i / 4, new_vertex[0], new_vertex[1], ref[i + (j + 2) % 4], ref[i + j]);
 								if(crease != NULL)
-									udg_crease_set(i / 4, 0, crease[i + (j + 1) % 3], 0, crease[i + j]);					
+									udg_crease_set(i / 4, 0, crease[i + (j + 1) % 4], 0, crease[i + j]);					
 								id = udg_find_empty_slot_polygon();
 								udg_polygon_set(id, ref[i + (j + 2) % 4], ref[i + (j + 3) % 4], ref[i + j], -1);
 								if(crease != NULL)
-									udg_crease_set(id, crease[i + (j + 2) % 3], crease[i + (j + 3) % 3], 0, 0);
+									udg_crease_set(id, crease[i + (j + 2) % 4], crease[i + (j + 3) % 4], 0, 0);
 								if(del != TRUE)
 								{
 									id = udg_find_empty_slot_polygon();
 									udg_polygon_set(id, new_vertex[0], ref[i + (j + 1) % 4], new_vertex[1], -1);
 									if(crease != NULL)
-										udg_crease_set(id, crease[i + j], crease[i + (j + 1) % 3], 0, 0);
+										udg_crease_set(id, crease[i + j], crease[i + (j + 1) % 4], 0, 0);
 								}
 								break;
 							}
@@ -180,7 +181,7 @@ void la_t_slice(double *pos, double *vector, boolean del)
 								new_vertex[1] = create_new_split_vertex(&edge, &edge_length, &edge_alloc, pos, vector, ref[i + (j + 1) % 4], ref[i + (j + 2) % 4]);
 								udg_polygon_set(i / 4, new_vertex[0], ref[i + (j + 1) % 4], new_vertex[1], -1);
 								if(crease != NULL)
-									udg_crease_set(i / 4, crease[i + j], crease[i + (j + 1) % 3], 0, 0);
+									udg_crease_set(i / 4, crease[i + j], crease[i + (j + 1) % 4], 0, 0);
 								if(del != TRUE)
 								{
 									id = udg_find_empty_slot_polygon();
@@ -190,7 +191,7 @@ void la_t_slice(double *pos, double *vector, boolean del)
 									id = udg_find_empty_slot_polygon();
 									udg_polygon_set(id, ref[i + (j + 2) % 4], ref[i + (j + 3) % 4], ref[i + j], -1);
 									if(crease != NULL)
-										udg_crease_set(id, crease[i + (j + 2) % 3], crease[i + (j + 3) % 3], 0, 0);
+										udg_crease_set(id, crease[i + (j + 2) % 4], crease[i + (j + 3) % 4], 0, 0);
 								}
 								break;
 							}
@@ -200,13 +201,13 @@ void la_t_slice(double *pos, double *vector, boolean del)
 								new_vertex[1] = create_new_split_vertex(&edge, &edge_length, &edge_alloc, pos, vector, ref[i + (j + 3) % 4], ref[i + (j + 0) % 4]);
 								udg_polygon_set(i / 4, ref[i + (j + 0) % 4], ref[i + (j + 1) % 4], new_vertex[0], new_vertex[1]);
 								if(crease != NULL)
-									udg_crease_set(i / 4, crease[i + j], crease[i + (j + 1) % 3], 0, crease[i + (j + 3) % 3]);
+									udg_crease_set(i / 4, crease[i + j], crease[i + (j + 1) % 4], 0, crease[i + (j + 3) % 4]);
 								if(del != TRUE)
 								{
 									id = udg_find_empty_slot_polygon();
 									udg_polygon_set(id, new_vertex[1], new_vertex[0], ref[i + (j + 2) % 4], ref[i + (j + 3) % 4]);
 									if(crease != NULL)
-										udg_crease_set(id, 0, crease[i + (j + 1) % 3], crease[i + (j + 2) % 3], crease[i + (j + 3) % 3]);
+										udg_crease_set(id, 0, crease[i + (j + 1) % 4], crease[i + (j + 2) % 4], crease[i + (j + 3) % 4]);
 								}
 							}
 						}
