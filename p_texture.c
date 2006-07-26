@@ -470,7 +470,7 @@ void p_texture_func(ENode *node, ECustomDataCommand command)
 }
 
 
-void p_th_context_update()
+void p_th_context_update(void)
 {
 	ENode *node;
 	uint i;
