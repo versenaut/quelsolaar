@@ -357,6 +357,8 @@ void duplicate_polygon(ExtrudeParams *extrude, uint *ref, uint ref_id, uint *cre
 		new_poly[3] = create_vertex_copy(extrude, new_poly[3]);
 	udg_polygon_set(create, new_poly[0], new_poly[1], new_poly[2], new_poly[3]);
 
+	udg_crease_set(create, crease[0], crease[1], crease[2], crease[3]);
+
 }
 
 void la_t_duplicate_selected_polygons(void)
@@ -404,7 +406,7 @@ void la_t_flip_selected_polygons(void)
 			{
 				if(crease != NULL)
 				{
-					if(ref[i + 3] > vertex_length)
+					if(ref[i + 3] < vertex_length)
 						udg_crease_set(i / 4, crease[i + 1], crease[i], crease[i + 3], crease[i + 2]);
 					else
 						udg_crease_set(i / 4, crease[i + 1], crease[i], crease[i + 2], 0);
