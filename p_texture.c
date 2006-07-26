@@ -24,6 +24,13 @@
 #define STD_TEXTURE_SIZE 16
 #define PIXELS_PER_UPDATE 4096
 
+//"GL_ARB_texture_float"
+#define GL_RGBA16F_ARB                  0x881A
+#define GL_RGB16F_ARB                   0x881B
+//"GL_NV_float_buffer"
+#define GL_FLOAT_RGB16_NV               0x8888
+#define GL_FLOAT_RGBA16_NV              0x888A
+//"GL_ATI_texture_float"
 #define GL_RGBA_FLOAT32                 0x8814
 #define GL_RGB_FLOAT32                  0x8815
 
@@ -49,7 +56,9 @@ struct{
 	uint			std_texture_id;
 	uint			update_pos;
 	boolean			use32bit;
-	uint			floating_point_enum;
+	uint			floating_point_rgb_enum;
+	uint			floating_point_rgba_enum;
+	boolean			use_floating_point;
 }PTextureStorage;
 
 uint p_th_create_std_texture(void)
@@ -95,10 +104,53 @@ void p_th_init(void)
 		PTextureStorage.handels[i] = NULL;
 	PTextureStorage.std_texture_id = p_th_create_std_texture();
 	PTextureStorage.use32bit = TRUE;
-	if(p_extension_test("ATI_texture_float"))
-		PTextureStorage.floating_point_enum = GL_RGB_FLOAT32;
-	else
-		PTextureStorage.floating_point_enum = GL_RGB;
+	if(p_extension_test("ARB_texture_float"))
+	{
+		PTextureStorage.floating_point_rgb_enum = GL_RGB16F_ARB;
+		PTextureStorage.floating_point_rgba_enum = GL_RGBA16F_ARB;
+	}
+	else if(p_extension_test("NV_float_buffer"))
+	{
+		PTextureStorage.floating_point_rgb_enum = GL_FLOAT_RGB16_NV;
+		PTextureStorage.floating_point_rgba_enum = GL_FLOAT_RGBA16_NV;
+	}
+	else if(p_extension_test("ATI_texture_float"))
+	{
+		PTextureStorage.floating_point_rgb_enum = GL_RGB_FLOAT32;
+		PTextureStorage.floating_point_rgba_enum = GL_RGBA_FLOAT32;
+	}else
+	{
+		PTextureStorage.floating_point_rgb_enum = GL_RGB;
+		PTextureStorage.floating_point_rgba_enum = GL_RGBA;
+	}
+	PTextureStorage.use_floating_point = FALSE;
+}
+
+void p_th_set_sds_use_hdri(boolean hdri)
+{
+	PTextureStorage.use_floating_point = hdri;
+}
+
+boolean	p_th_get_sds_use_hdri(void)
+{
+	return PTextureStorage.use_floating_point;
+}
+
+uint p_th_get_hdri_token(boolean alpha)
+{
+	if(PTextureStorage.use_floating_point)
+	{
+		if(alpha)
+			return PTextureStorage.floating_point_rgba_enum;
+		else
+			return PTextureStorage.floating_point_rgb_enum;
+	}else
+	{
+		if(alpha)
+			return GL_RGBA;
+		else
+			return GL_RGB;
+	}
 }
 
 void p_th_texture_restart(void)
@@ -122,8 +174,6 @@ uint p_th_compute_size_check_sum(uint *size)
 {
 	return size[0] * 17 + size[1] * 23 + size[2];
 }
-
-
 
 void p_th_create_new_texture(ENode *node, PTextureHandle *handle)
 {
@@ -264,7 +314,6 @@ uint p_th_get_texture_dimentions(PTextureHandle *handle)
 {
 	return GL_TEXTURE_2D;
 }
-
 
 /*
 typedef void EBMHandle;
@@ -418,4 +467,16 @@ void p_texture_func(ENode *node, ECustomDataCommand command)
 		return;
 	th_in_service = TRUE;
 	p_task_add(-1, 1, p_texture_compute);
+}
+
+
+void p_th_context_update()
+{
+	ENode *node;
+	uint i;
+	for(i = 0; i < PTextureStorage.handel_count; i++)
+		if(PTextureStorage.handels[i] != NULL)
+			if((node = e_ns_get_node(0, PTextureStorage.handels[i]->node_id)) != NULL)
+				p_th_create_new_texture(node, PTextureStorage.handels[i]);
+	PTextureStorage.std_texture_id = p_th_create_std_texture();
 }

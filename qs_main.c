@@ -28,6 +28,8 @@ extern float	*qs_get_cam_pos(void);
 extern void		qs_set_camera(void);
 extern void		qs_compute_camera(BInputState *input, float delta_time);
 extern void		qs_settings_get_background_color(float *color);
+extern void		p_context_update(void);
+extern void		qs_draw_settings(BInputState *input);
 
 void qs_draw_handler(BInputState *input, void *user)
 {
@@ -204,6 +206,7 @@ int main(int argc, char **argv)
 
 	betray_set_action_func(qs_intro_handler, NULL);
 //	betray_set_action_func(sui_symbol_editor_func, NULL);
+	betray_set_context_update_func(p_context_update);
 	betray_launch_main_loop();
 	return 0;
 }
