@@ -54,7 +54,7 @@ uvedit:		uv_draw.o uv_edge_collapse.o uv_geometry.o uv_main.o uv_menu.o uv_overl
 
 loqairou:	la_cache.o la_draw_overlay.o la_flare_fx.o la_geometry_undo.o la_hole.o la_input_parser.o la_intro.o la_key_input.o \
 		la_main.o la_neighbor.o la_particle_fx.o la_pop_up.o la_projection.o la_reference.o la_save.o \
-		la_settings.o la_tool_collapse.o la_tool_center.o la_tool_deploy.o la_tool_draw.o la_tool_edge_connector.o \
+		la_settings.o la_tool_collapse.o la_tool_center.o la_tool_cut_paste.o la_tool_deploy.o la_tool_draw.o la_tool_edge_connector.o \
 		la_tool_manipulator.o la_tool_poly_select.o la_tool_reshape.o la_tool_revolve.o la_tool_select.o \
 		la_tool_slice.o la_tool_splitter.o la_tool_subdivide.o \
 		st_math.o st_matrix_operations.o st_text.o $(LIBPERSUADE) \
@@ -87,7 +87,7 @@ libenough.a:	e_storage_audio.o e_storage_bitmap.o e_storage_curve.o e_storage_ge
 		e_storage_node.o e_storage_object.o e_storage_text.o st_types.o
 		ar -cr $@ $^
 
-libpersuade.a:	p_extension.o p_geometry.o p_impostor.o p_noise.o p_object_environment.o p_object_handle.o p_object_light.o p_object_param.o \
+libpersuade.a:	p_extension.o p_flare.o p_geometry.o p_impostor.o p_noise.o p_object_environment.o p_object_handle.o p_object_light.o p_object_param.o \
 		p_object_render.o p_render_to_texture.o p_sds_array.o p_sds_geo_clean.o p_sds_geo_divide.o p_sds_obj.o \
 		p_sds_obj_anim.o p_sds_obj_displace.o p_sds_obj_edge_normal.o p_sds_obj_param.o p_sds_obj_sort.o p_sds_obj_tess.o \
 		p_sds_table.o p_sds_table_debug.o p_sds_table_edge_sort.o p_sds_table_normals.o p_sds_table_split.o p_shader_ramp_texture.o \
