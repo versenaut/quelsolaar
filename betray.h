@@ -91,6 +91,7 @@ typedef struct{
 extern void		betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, boolean window_fullscreen, char *name);
 extern void		betray_action(BActionMode mode);
 extern void		betray_set_action_func(void (*input_compute_func)(BInputState *data, void *user_pointer), void *user_pointer);
+extern void		betray_set_context_update_func(void (*context_func)(void));
 extern void		betray_set_mouse_warp(boolean warp);
 extern void		betray_execute(const char *command);
 extern float	betray_get_time(void);
