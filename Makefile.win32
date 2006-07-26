@@ -41,7 +41,7 @@ connector.exe:	co_3d_view.obj co_main.obj co_game.obj co_intro.obj co_popup.obj 
 
 loqairou.exe:	la_cache.obj la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.obj la_hole.obj la_input_parser.obj la_intro.obj la_key_input.obj \
 		la_main.obj la_neighbor.obj la_particle_fx.obj la_pop_up.obj la_projection.obj la_reference.obj la_save.obj \
-		la_settings.obj la_tool_center.obj la_tool_collapse.obj la_tool_deploy.obj la_tool_draw.obj la_tool_edge_connector.obj \
+		la_settings.obj la_tool_center.obj la_tool_collapse.obj la_tool_copy_paste.obj la_tool_deploy.obj la_tool_draw.obj la_tool_edge_connector.obj \
 		la_tool_manipulator.obj la_tool_poly_select.obj la_tool_reshape.obj la_tool_revolve.obj la_tool_select.obj \
 		la_tool_slice.obj la_tool_splitter.obj la_tool_subdivide.obj \
 		st_math.obj st_matrix_operations.obj st_text.obj \
@@ -81,7 +81,7 @@ enough.lib:	e_storage_audio.obj e_storage_bitmap.obj e_storage_curve.obj e_stora
 		e_storage_node.obj e_storage_object.obj e_storage_text.obj st_types.obj
 		$(LIBEXE) $(LIBFLAGS)$@ $**
 
-persuade.lib:	p_extension.obj p_geometry.obj p_impostor.obj p_noise.obj p_object_environment.obj p_object_handle.obj p_object_light.obj p_object_param.obj \
+persuade.lib:	p_extension.obj p_flare.obj p_geometry.obj p_impostor.obj p_noise.obj p_object_environment.obj p_object_handle.obj p_object_light.obj p_object_param.obj \
 		p_object_render.obj p_render_to_texture.obj p_sds_array.obj p_sds_geo_clean.obj p_sds_geo_divide.obj p_sds_obj.obj \
 		p_sds_obj_anim.obj p_sds_obj_displace.obj p_sds_obj_edge_normal.obj p_sds_obj_param.obj p_sds_obj_sort.obj p_sds_obj_tess.obj \
 		p_sds_table.obj p_sds_table_debug.obj p_sds_table_edge_sort.obj p_sds_table_normals.obj p_sds_table_split.obj \
