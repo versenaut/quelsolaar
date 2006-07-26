@@ -106,7 +106,7 @@ extern void p_texture_func(ENode *node, ECustomDataCommand command);
 extern void p_array_init(void);
 extern void p_env_init(uint size);
 extern void p_init_render_to_texture(void);
-extern void p_create_flare();
+extern void p_create_flare(void);
 
 void persuade_init(uint max_tesselation_level, void *(*gl_GetProcAddress)(const char* proc))
 {
