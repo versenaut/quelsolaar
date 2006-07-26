@@ -29,6 +29,13 @@ extern void parse_input(BInputState *input, void *user);
 extern void la_intro_draw(void *user);
 extern void la_edit_func(BInputState *input, void *user);
 
+void la_context_update(void)
+{
+	glClearColor(0, 0, 0, 0);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	glMatrixMode(GL_MODELVIEW);
+	la_pfx_image_init(sui_get_setting_int("FLARE_TEXTURE_SIZE", 512));
+}
 
 int main(int argc, char **argv)
 {
@@ -48,7 +55,8 @@ int main(int argc, char **argv)
 	la_t_init_draw_line();
 	la_t_init_edge_connector();
 	la_t_tm_init();
-	la_pfx_init(sui_get_setting_int("PARTICLE_COUNT", 512), sui_get_setting_int("FLARE_TEXTURE_SIZE", 512));
+	la_context_update();
+	la_pfx_init(sui_get_setting_int("PARTICLE_COUNT", 512));
 #ifdef PERSUADE_H
 	persuade_init(4, betray_get_gl_proc_address());
 	p_geo_set_sds_level(sui_get_setting_int("MAX_TESS_LEVEL", 4));
@@ -59,6 +67,7 @@ int main(int argc, char **argv)
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);/*GL_AMBIENT_AND_DIFFUSE*/
 
 	deceive_set_intro_draw_func(la_intro_draw, NULL);
+	betray_set_context_update_func(la_context_update);
 	betray_set_action_func(deceive_intro_handler, la_edit_func);
 	betray_launch_main_loop();	
 	return 0;

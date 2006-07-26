@@ -18,6 +18,16 @@ extern void co_intro_draw(void *user);
 extern void *se_symbol_editor_func(BInputState *input, void *user_pointer);
 extern void *se_font_editor_func(BInputState *input, void *user_pointer);
 extern void co_intro_init(void);
+extern void co_update_context_textures(void);
+
+void co_context_update(void)
+{
+	glClearColor(1, 1, 1, 1);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	glMatrixMode(GL_MODELVIEW);
+	co_update_context_textures();
+	p_context_update();
+}
 
 int main(int argc, char **argv)
 {
@@ -40,6 +50,7 @@ int main(int argc, char **argv)
 	e_nsm_set_custom_func(CO_ENOUGH_NODE_SLOT, material_func);
 	e_ns_set_node_create_func(NULL, NULL);
 
+	betray_set_context_update_func(co_context_update);
 	deceive_set_intro_draw_func(co_intro_draw, NULL);
 	betray_set_action_func(deceive_intro_handler, co_input_handler);
 

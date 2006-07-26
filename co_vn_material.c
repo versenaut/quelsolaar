@@ -153,7 +153,7 @@ void clear_new_frag(VMatFrag *frag, uint type)
 			for(i = 0; color_b[i] != 0; i++)
 				frag->texture.layer_b[i] = color_b[i]; 
 			frag->texture.layer_b[i] = 0; 
-			frag->texture.filtered = TRUE;
+			frag->texture.filterd = TRUE;
 			break;
 		case VN_M_FT_NOISE :
 			frag->noise.mapping = -1;
@@ -509,6 +509,33 @@ void co_draw_param_text(float x, float y, uint count, char **text, float color)
 
 extern void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float *buffer);
 
+void co_update_context_textures(void)
+{
+	ENode *node;
+	VNMFragmentID id;
+	COVNMaterial *mat;
+	
+	for(node = e_ns_get_node_next(0, 0, V_NT_MATERIAL); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_MATERIAL))
+	{
+		for(id = e_nsm_get_fragment_next(node, 0); id != (uint16)-1; id = e_nsm_get_fragment_next(node, 1 + id))
+		{	
+			mat = e_nsm_get_custom_data(node, id, CO_ENOUGH_NODE_SLOT);	
+			if(mat != NULL)
+			{
+				glGenTextures(1, &mat->texture_id);
+				mat->version = 56756;
+				glBindTexture(GL_TEXTURE_2D, mat->texture_id);
+				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, TEXTURE_RESOLUTION, TEXTURE_RESOLUTION, 0, GL_RGB, GL_FLOAT, NULL);
+			}
+		}
+	}
+}
+
 void material_func(ENode *node, VNMFragmentID frag, ECustomDataCommand command)
 {
 	COVNMaterial *data;
@@ -517,7 +544,6 @@ void material_func(ENode *node, VNMFragmentID frag, ECustomDataCommand command)
 		float *buf;
 		uint i;
 		data = malloc(sizeof *data);
-		printf("created fragment data at %p for fragment %u\n", data, frag);
 		data->pos[0] = 0.45 - 0.1 * (float)(frag % 10);
 		data->pos[1] = -0.1 * (float)(frag % 10 + frag / 10);
 		data->version = 56756;
@@ -691,6 +717,9 @@ void co_draw_lable(COVNMaterial *mat, float y, float color, char *lable)
 
 extern float co_handle_node_head(BInputState *input, ENode *node, boolean reset);
 
+void build_material(void *node);
+
+
 boolean co_handle_material(BInputState *input, ENode *node)
 {
 	static char *material_type_names[] = {"COLOR", "LIGHT", "REFLECTION", "TRANSPARENCY", "VOLUME", "VIEW", "GEOMETRY", "TEXTURE",  "NOISE", "BLENDER", "CLAMP", "MATRIX", "RAMP", "ANIMATION", "ALTERNATIVE", "OUTPUT"};
@@ -707,6 +736,9 @@ boolean co_handle_material(BInputState *input, ENode *node)
 
 	y = co_handle_node_head(input, node, change_m_node_id != e_ns_get_node_id(node));
 	change_m_node_id = e_ns_get_node_id(node);
+if(input->mode != BAM_DRAW)
+if(input->mouse_button[2] != TRUE && input->last_mouse_button[2] == TRUE)
+	build_material(node);
 
 	co_vng_divider(input, 0.2, y, &rot_tree, &color, &color_light, &show_tree, "FRAGMENT TREE");
 	pre_expander = y;
