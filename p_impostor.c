@@ -54,13 +54,15 @@ extern void p_render_object(ENode *node, boolean transparency);
 extern uint p_shader_create(char *vertex, char *fragment);
 extern uint p_th_get_hdri_token(boolean alpha);
 
+static uint create_environment(uint size, float *buf);
+
 
 static uint p_impostor_resolution = 128; 
 static float p_render_impostor_size = 0.03;
 static uint p_blur_program = -1; 
 
 
-void print_blur_matrix()
+void print_blur_matrix(void)
 {
 	double matrix[16], origo[3] = {0, 0, 0}, point_a[3], point_b[3];
 	uint i;
@@ -78,7 +80,7 @@ void print_blur_matrix()
 		printf("color += textureCube(environment, normal * mat3(%f, %f, %f, %f, %f, %f, %f, %f, %f\n", -matrix[0], -matrix[1], -matrix[2], matrix[4], matrix[5], matrix[6], matrix[8], matrix[9], matrix[10]);
 	}
 }
-void p_create_cube_blur_shader()
+void p_create_cube_blur_shader(void)
 {
 	char vertex[300] = {
 	"varying vec3 r_normal;"
