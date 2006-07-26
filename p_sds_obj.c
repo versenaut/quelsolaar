@@ -16,7 +16,7 @@ extern void p_get_quad_tess_index(uint *index, uint base_tess);
 extern boolean p_lod_displacement_update_test(PMesh *mesh);
 
 static uint p_sds_force_level = 0;
-static float p_sds_mesh_factor = 10000;
+static float p_sds_mesh_factor = 100;
 
 void p_geo_set_sds_force_level(uint level)
 {
