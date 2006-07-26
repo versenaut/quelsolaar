@@ -691,14 +691,14 @@ boolean p_find_closest_edge(uint *edge, double *snap, double x, double y)
 		a[2] = vertex[edge[0] * 3 + 2] - vertex[edge[1] * 3 + 2];
 		snap[3] = sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]);
 
-		printf("v 1 = %f %f %f\n", vertex[edge[1] * 3 + 0],
+	/*	printf("v 1 = %f %f %f\n", vertex[edge[1] * 3 + 0],
 					vertex[edge[1] * 3 + 1],
 					vertex[edge[1] * 3 + 2]);
 		printf("v 2 = %f %f %f\n", vertex[edge[0] * 3 + 0],
 					vertex[edge[0] * 3 + 1],
 					vertex[edge[0] * 3 + 2]);
 		printf("a = %f %f %f\n", a[0], a[1], a[2]);
-		printf("snap[3] = %f\n", snap[3]);
+		printf("snap[3] = %f\n", snap[3]);*/
 		return TRUE;
 	}
 	return FALSE;

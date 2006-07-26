@@ -220,8 +220,6 @@ void co_c_draw_point(BInputState *input, ENode *node, ECurve *curve, float *scro
 						{
 							grab_point = i;
 							grab_control = -1;
-							printf("del %u %u %u\n", e_ns_get_node_id(node), e_nsc_get_curve_id(curve), point);
-
 							verse_send_c_key_destroy(e_ns_get_node_id(node), e_nsc_get_curve_id(curve), point);
 						}
 					}else

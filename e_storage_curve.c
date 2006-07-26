@@ -229,7 +229,6 @@ void callback_send_c_key_set(void *user_data, VNodeID node_id, VLayerID curve_id
 	{
 		for(i = curve->length; i != 0 && pos < curve->points[curve->points[i - 1].sorted].pos; i--)
 		{
-				printf("m");
 			curve->points[i].sorted = curve->points[i - 1].sorted;
 			curve->points[curve->points[i].sorted].sorted_pos++;
 		}

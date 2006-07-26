@@ -70,7 +70,6 @@ void la_parse_input(BInputState *input)
 			{
 				if(p_find_closest_edge(edge, snap, input->pointer_x, input->pointer_y))
 				{
-					printf("snap[3] = %f\n", snap[3]);
 					snap_type = LA_ST_EDGE;
 				}
 			}
