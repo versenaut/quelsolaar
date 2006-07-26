@@ -32,6 +32,13 @@ boolean b_sdl_system_wrapper_set_display(uint size_x, uint size_y, boolean full_
 	return SDL_SetVideoMode(size_x, size_y, 0, video_flags) == NULL;
 }
 
+void (*sdl_context_func)(void) = NULL;
+
+void betray_set_context_update_func(void (*context_func)(void))
+{
+	sdl_context_func = context_func;
+}
+
 void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, char *caption) 
 {  
 	if(SDL_Init(SDL_INIT_VIDEO) < 0 )
@@ -77,7 +84,15 @@ void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, char *cap
 
 void system_wrapper_endframe(void)
 { 
+	static uint32 timer = 0;
+	uint32 update;
 	SDL_GL_SwapBuffers();
+	update = SDL_GetTicks();
+	if ((timer - update) < 10)
+	{
+	  SDL_Delay(5);
+	}
+	timer = update;
 }
 
 void system_wrapper_lose_focus(void)
@@ -172,7 +187,10 @@ uint system_wrapper_eventloop(BInputState *input)
 				return FALSE;
 			break;
 			case SDL_VIDEORESIZE :
+				b_sdl_system_wrapper_set_display(event.resize.w, event.resize.h, FALSE);
 				betray_reshape_view(event.resize.w, event.resize.h);
+				if(sdl_context_func != NULL)
+					sdl_context_func();
 			break;
 			case SDL_KEYDOWN: 
 			{
