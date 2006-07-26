@@ -200,7 +200,7 @@ void p_draw_object_impostor(ENode *node);
 void p_update_object_impostors(void);
 boolean p_draw_object_as_impostor(ENode *node);
 void p_set_enable_shadow(uint id);
-void p_draw_flares();
+void p_draw_flares(void);
 
 void p_draw_scene(void)
 {
