@@ -314,8 +314,8 @@ void co_draw_3d_view(float x, float y)
 			betray_get_screen_mode(&x, &y, NULL);
 			betray_reshape_view(x, y);
 		}
-		glClearColor(1.0, 1.0, 1.0, 0);
-		glPushMatrix();
+		glClearColor(1, 1, 1, 0);
+	//	glPushMatrix();
 #endif
 	}
 	else

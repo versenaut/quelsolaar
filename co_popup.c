@@ -30,12 +30,12 @@ boolean co_draw_settings(BInputState *input)
 {
 	if(co_settings == TRUE)
 	{
-		SUIViewElement element[10];
+		SUIViewElement element[12];
 		glPushMatrix();
 		glTranslatef(0, 0, -1);
 		sp_settings_pre(element);
 		glDisable(GL_DEPTH_TEST);
-		co_settings = !sui_draw_setting_view(input, 0, 0.3, 0.5, element, 10, "SETTINGS", 1.0);
+		co_settings = !sui_draw_setting_view(input, 0, 0.3, 0.5, element, 12, "SETTINGS", 1.0);
 		glEnable(GL_DEPTH_TEST);
 		sp_settings_post(element);
 		glPopMatrix();
