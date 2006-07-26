@@ -50,17 +50,16 @@ void p_array_init()
 	p_glEnableVertexAttribArrayARB = p_extension_get_address("glEnableVertexAttribArrayARB");
 	p_glDisableVertexAttribArrayARB = p_extension_get_address("glDisableVertexAttribArrayARB");
 
-/*	if(p_extension_test("GL_ARB_vertex_buffer_object"))
+	if(p_extension_test("GL_ARB_vertex_buffer_object"))
 	{
 		use_vertex_buffer_object = TRUE;
-	
 		p_glGenBuffersARB = p_extension_get_address("glGenBuffersARB");
 		p_glDeleteBuffersARB = p_extension_get_address("glDeleteBuffersARB");
 		p_glBindBufferARB = p_extension_get_address("glBindBufferARB");
 		p_glBufferDataARB = p_extension_get_address("glBufferDataARB");
 		p_glMapBufferARB = p_extension_get_address("glMapBufferARB");
 		p_glUnmapBufferARB = p_extension_get_address("glUnmapBufferARB");
-	}*/
+	}
 }
 
 egreal *p_ra_get_array_real(PRenderArray *array, uint length)
