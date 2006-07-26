@@ -159,6 +159,87 @@ PShader *p_shader_allocate(void)
 
 extern void p_shader_func(ENode *node, ECustomDataCommand command);
 
+
+uint shadow_prog_obj = -1;
+
+uint p_shader_create(char *vertex, char *fragment)
+{
+	uint vertex_obj, fragment_obj, prog_obj;
+	uint i;
+	char buf[2000];
+	prog_obj = p_glCreateProgramObjectARB();
+	vertex_obj = p_glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+	fragment_obj = p_glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+	p_glAttachObjectARB(prog_obj, vertex_obj);
+	p_glAttachObjectARB(prog_obj, fragment_obj);
+	i = strlen(vertex);
+	p_glShaderSourceARB(vertex_obj, 1, (const char **) &vertex, &i);
+	p_glCompileShaderARB(vertex_obj);
+	p_glGetInfoLogARB(vertex_obj, 2000, &i, buf);
+	printf("%s\n", vertex);
+	printf("Shadow Errors:\n%s\n", buf);
+	i = strlen(fragment);
+	p_glShaderSourceARB(fragment_obj, 1, (const char **) &fragment, &i);
+	p_glCompileShaderARB(fragment_obj);
+	p_glGetInfoLogARB(fragment_obj, 2000, &i, buf);
+	printf("%s\n", fragment);
+	printf("Shadow Errors:\n%s\n", buf);
+	p_glLinkProgramARB(prog_obj);
+	p_glGetInfoLogARB(prog_obj, 2000, &i, buf);
+	printf("Errors:\n%s\n", buf);
+	return prog_obj;
+}
+
+void p_shader_use(uint program)
+{
+	p_glUseProgramObjectARB(program);
+}
+
+void p_shader_init_shadow(void)
+{
+	uint vertex_obj, fragment_obj;
+	uint i;
+	char buf[2000];
+	char *v_shader = "vec3 vector;\n"
+	"vec3 normal;\n"
+	"vec4 position;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"\tposition = gl_ModelViewMatrix * gl_Vertex;\n"
+	"\tvector = gl_LightSource[0].position.xyz - position.xyz;\n"
+	"\tnormal = normalize(gl_NormalMatrix * gl_Normal);\n"
+	"\tif(dot(vector, normal) < 0.0)\n"	
+	"\t{\n"
+	"\t\tvector = normalize(vector);\n"
+	"\t\tgl_Position = gl_ProjectionMatrix * vec4((position.xyz - vector * vec3(100.0, 100.0, 100.0)), 1.0);\n"
+	"\t}else\n"
+	"\t\tgl_Position = gl_ProjectionMatrix * vec4((position.xyz - vector * vec3(0.0, 0.0, 0.0)), 1.0);\n"
+	"}\n";
+	char *f_shader = "void main()\n{\n\tgl_FragColor = vec4(1.0, 1.0, 1.0, 0.0);\n}\n";
+
+	shadow_prog_obj = p_glCreateProgramObjectARB();
+	vertex_obj = p_glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+	fragment_obj = p_glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+	p_glAttachObjectARB(shadow_prog_obj, vertex_obj);
+	p_glAttachObjectARB(shadow_prog_obj, fragment_obj);
+	i = strlen(v_shader);
+	p_glShaderSourceARB(vertex_obj, 1, (const char **) &v_shader, &i);
+	p_glCompileShaderARB(vertex_obj);
+
+	p_glGetInfoLogARB(vertex_obj, 2000, &i, buf);
+	printf("%s\n", v_shader);
+	printf("Shadow Errors:\n%s\n", buf);
+	i = strlen(f_shader);
+	p_glShaderSourceARB(fragment_obj, 1, (const char **) &f_shader, &i);
+	p_glCompileShaderARB(fragment_obj);
+	p_glGetInfoLogARB(fragment_obj, 2000, &i, buf);
+	printf("%s\n", f_shader);
+	printf("Shadow Errors:\n%s\n", buf);
+
+	p_glLinkProgramARB(shadow_prog_obj);
+}
+
 void p_shader_init(void)
 {
 	uint length;
@@ -219,6 +300,7 @@ void p_shader_init(void)
 			}
 			p_standard_shader->src = GL_ONE;
 			p_standard_shader->dest = GL_ZERO;
+			p_shader_init_shadow();
 		
 	}else
 	{
@@ -385,6 +467,20 @@ void p_shader_param_load(ENode *parent, uint32 node_id, PRenderArray *array, uin
 		p_ra_bind_param_array(&array[i], s->geometry_fragments[i * 2 + 1]);
 }
 
+void p_shader_bind_texture(uint program, char *name, uint unit, uint texture_id)
+{
+	p_glUniform1iARB(p_glGetUniformLocationARB(program, name), unit);
+	p_glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	glEnable(GL_TEXTURE_CUBE_MAP_EXT);
+	glBindTexture(GL_TEXTURE_CUBE_MAP_EXT, texture_id);
+}
+
+void p_shader_unbind_texture(uint unit)
+{
+	p_glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	glDisable(GL_TEXTURE_CUBE_MAP_EXT);
+	p_glActiveTextureARB(GL_TEXTURE0_ARB);
+}
 
 uint p_shader_get_param_count(ENode *node)
 {
@@ -623,52 +719,6 @@ void p_shader_func(ENode *node, ECustomDataCommand command)
 	}
 }
 
-uint shadow_prog_obj = -1;
-
-void p_shader_init_shadow(void)
-{
-	uint vertex_obj, fragment_obj;
-	uint i;
-	char buf[2000];
-	char *v_shader = "vec3 vector;\n"
-	"vec3 normal;\n"
-	"vec4 position;\n"
-	"\n"
-	"void main()\n"
-	"{\n"
-	"\tposition = gl_ModelViewMatrix * gl_Vertex;\n"
-	"\tvector = gl_LightSource[0].position.xyz - position.xyz;\n"
-	"\tnormal = normalize(gl_NormalMatrix * gl_Normal);\n"
-	"\tif(dot(vector, normal) < 0.0)\n"	
-	"\t{\n"
-	"\t\tvector = normalize(vector);\n"
-	"\t\tgl_Position = gl_ProjectionMatrix * vec4((position.xyz - vector * vec3(100.0, 100.0, 100.0)), 1.0);\n"
-	"\t}else\n"
-	"\t\tgl_Position = gl_ProjectionMatrix * vec4((position.xyz - vector * vec3(0.01, 0.01, 0.01)), 1.0);\n"
-	"}\n";
-	char *f_shader = "void main()\n{\n\tgl_FragColor = vec4(1.0, 1.0, 1.0, 0.0);\n}\n";
-
-	shadow_prog_obj = p_glCreateProgramObjectARB();
-	vertex_obj = p_glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-	fragment_obj = p_glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-	p_glAttachObjectARB(shadow_prog_obj, vertex_obj);
-	p_glAttachObjectARB(shadow_prog_obj, fragment_obj);
-	i = strlen(v_shader);
-	p_glShaderSourceARB(vertex_obj, 1, (const char **) &v_shader, &i);
-	p_glCompileShaderARB(vertex_obj);
-
-	p_glGetInfoLogARB(vertex_obj, 2000, &i, buf);
-	printf("%s\n", v_shader);
-	printf("Shadow Errors:\n%s\n", buf);
-	i = strlen(f_shader);
-	p_glShaderSourceARB(fragment_obj, 1, (const char **) &f_shader, &i);
-	p_glCompileShaderARB(fragment_obj);
-	p_glGetInfoLogARB(fragment_obj, 2000, &i, buf);
-	printf("%s\n", f_shader);
-	printf("Shadow Errors:\n%s\n", buf);
-
-	p_glLinkProgramARB(shadow_prog_obj);
-}
 
 boolean p_shader_shadow_bind(void)
 {
