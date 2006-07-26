@@ -13,6 +13,7 @@ typedef struct{
 	double size;
 	float vertex_array[12];
 	uint environment;
+	uint blur;
 }PObjImpostor;
 
 typedef struct{
