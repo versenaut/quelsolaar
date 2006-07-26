@@ -293,7 +293,7 @@ void la_pu_vertex(BInputState *input, uint vertex)
 
 void la_pu_manipulator(BInputState *input)
 {
-	SUIPUElement element[20];
+	SUIPUElement element[23];
 	static float x, y;
 	uint ring;
 	element[0].type = PU_T_ANGLE;
@@ -350,6 +350,14 @@ void la_pu_manipulator(BInputState *input)
 	element[18].text = "Auto Crease";
 	element[19].type = PU_T_BOTTOM;
 	element[19].text = "Find Quads";
+
+	element[20].type = PU_T_BOTTOM;
+	element[20].text = "Cut";
+	element[21].type = PU_T_BOTTOM;
+	element[21].text = "Copy";
+	element[22].type = PU_T_BOTTOM;
+	element[22].text = "Paste";
+
 	if(input->mode == BAM_DRAW)
 	{
 		glDisable(GL_DEPTH_TEST);
@@ -363,7 +371,7 @@ void la_pu_manipulator(BInputState *input)
 		x = input->pointer_x;
 		y = input->pointer_y;
 	}
-	ring = sui_draw_popup(input, x, y, element, 20, 2, 0);
+	ring = sui_draw_popup(input, x, y, element, 23, 2, 0);
 	switch(ring)
 	{
 		case 0 :
@@ -468,6 +476,29 @@ void la_pu_manipulator(BInputState *input)
 		case 19 :
 		{
 			la_t_poly_find_quads();
+		}
+		break;
+		case 20 :
+		{
+			double pos[3];
+			la_t_tm_get_pos(pos);
+			la_t_copy(pos);
+			la_t_delete_selection();
+		}
+		break;
+		case 21 :
+		{
+			double pos[3];
+			la_t_tm_get_pos(pos);
+			la_t_copy(pos);
+
+		}
+		break;
+		case 22 :
+		{
+			double pos[3];
+			la_t_tm_get_pos(pos);
+			la_t_paste(pos);
 		}
 		break;
 	}

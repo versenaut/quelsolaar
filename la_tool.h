@@ -99,3 +99,8 @@ extern void		la_t_center_manipulator(void);
 extern void la_t_poly_triangulate(void);
 extern void la_t_poly_auto_crease(void);
 extern void la_t_poly_find_quads(void);
+
+/* la_tool_cut_paste.c */
+
+extern void la_t_copy(egreal *pos);
+extern void la_t_paste(egreal *pos);
