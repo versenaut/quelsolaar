@@ -25,12 +25,12 @@ void p_render_set_flare(boolean draw)
 	p_display_flare = draw;
 }
 
-boolean	p_render_get_flare()
+boolean	p_render_get_flare(void)
 {
 	return p_display_flare;
 }
 
-void p_create_flare()
+void p_create_flare(void)
 {
 	int i, j, k, temp;
 	float x, y, r, half, best;
@@ -60,7 +60,6 @@ void p_create_flare()
 	glTexImage2D(GL_TEXTURE_2D, 0, p_th_get_hdri_token(FALSE), flare_size, flare_size, 0, GL_RGB, GL_FLOAT, data);
 	free(data);
 }
-
 
 void p_draw_flare(double *pos, double *color)
 {
@@ -122,7 +121,7 @@ void p_draw_flare(double *pos, double *color)
 	glPopMatrix();
 }
 
-void p_draw_flares()
+void p_draw_flares(void)
 {
 	if(p_display_flare)
 	{
@@ -139,8 +138,6 @@ void p_draw_flares()
 		}
 	}
 }
-
-
 
 void p_draw_reflection_flare(double *view, double *pos, double *color)
 {
