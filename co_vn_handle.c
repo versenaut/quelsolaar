@@ -792,7 +792,9 @@ void co_input_handler(BInputState *input, void *user_pointer)
 						mode = COIM_NONE;
 					break;
 			}
-		}
+		}else
+			mode == COIM_NONE;
+
 		if(mode == COIM_NONE && betray_is_type_in())
 			betray_end_type_in_mode(TRUE);
 	}else
