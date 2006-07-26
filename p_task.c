@@ -106,6 +106,7 @@ extern void p_texture_func(ENode *node, ECustomDataCommand command);
 extern void p_array_init(void);
 extern void p_env_init(uint size);
 extern void p_init_render_to_texture(void);
+extern void p_create_flare();
 
 void persuade_init(uint max_tesselation_level, void *(*gl_GetProcAddress)(const char* proc))
 {
@@ -113,8 +114,10 @@ void persuade_init(uint max_tesselation_level, void *(*gl_GetProcAddress)(const 
 	p_extension_init(gl_GetProcAddress);
 	p_array_init();
 	p_shader_init();
+	p_th_init();
 	p_env_init(8);
 	p_init_render_to_texture();
+	p_create_flare();
 	PGlobalTaskManager.count = 0;
 	PGlobalTaskManager.current = 0;
 	PGlobalTaskManager.init = FALSE;
@@ -129,7 +132,7 @@ void persuade_init(uint max_tesselation_level, void *(*gl_GetProcAddress)(const 
 	}
 	while(!p_init_table(max_tesselation_level))
 		;
-	p_th_init();
+	
 
 	e_ns_set_custom_func(P_ENOUGH_SLOT, V_NT_OBJECT, p_object_func);
 	e_ns_set_custom_func(P_ENOUGH_SLOT, V_NT_GEOMETRY, p_geometry_func);
@@ -170,4 +173,22 @@ double p_timer_elapsed(const PTimer *t)
 #else
 	return t2.now.tv_sec - t->now.tv_sec + 1e-6 * (t2.now.tv_usec - t->now.tv_usec);
 #endif
+}
+
+extern void p_th_context_update(void);
+extern void p_impostor_context_update(void);
+
+void p_context_update(void)
+{
+	ENode *node;
+	p_th_context_update();
+	for(node = e_ns_get_node_next(0, 0, V_NT_MATERIAL); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_MATERIAL))
+	{
+		p_shader_func(node, E_CDC_DESTROY);
+		p_shader_func(node, E_CDC_CREATE);
+		e_ns_update_node_version_struct(node);
+	}
+	p_impostor_context_update();
+	p_create_flare();
+	p_shader_init();
 }
