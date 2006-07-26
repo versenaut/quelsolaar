@@ -398,8 +398,6 @@ void p_env_destroy(PObjEnv *env)
 	free(env);
 }
 
-
-
 void p_env_init(unsigned int size)
 {
 	PObjEnv *env = NULL;
