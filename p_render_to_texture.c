@@ -113,8 +113,16 @@ typedef struct {
 
 static RenderSetup g_global_fbos[2] = {{ 128, -1, -1, -1 }, { 128, -1, -1, -1 }};
 
+boolean fbo_suported = FALSE;
+
+boolean p_render_to_texture_suported(void)
+{
+	return fbo_suported;
+}
+
 void p_init_render_to_texture(void)
 {
+	fbo_suported = FALSE;
 	if(p_extension_test("GL_EXT_framebuffer_object"))
 	{
 		p_glBindFramebufferEXT = p_extension_get_address("glBindFramebufferEXT");
@@ -127,10 +135,11 @@ void p_init_render_to_texture(void)
 		p_glRenderbufferStorageEXT = p_extension_get_address("glRenderbufferStorageEXT");
 		p_glFramebufferTexture2DEXT = p_extension_get_address("glFramebufferTexture2DEXT");
 		p_glFramebufferRenderbufferEXT = p_extension_get_address("glFramebufferRenderbufferEXT");
+		fbo_suported = TRUE;
 	}
 }
 
-void CheckFramebufferStatus(void)
+void p_checks_framebuffer_status(void)
 {
     GLenum status;
 
@@ -166,7 +175,7 @@ void CheckFramebufferStatus(void)
      //   default:
        //     assert(0);
     }
-	exit(0);
+	fbo_suported = FALSE;
 }
 
 void p_texture_render_bind(uint texture, uint size, uint target)
@@ -210,7 +219,7 @@ void p_texture_render_bind(uint texture, uint size, uint target)
         p_glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, p_global_stencil);
 */
 	//	p_glCheckFramebufferStatusEXT();
-		CheckFramebufferStatus();
+		p_checks_framebuffer_status();
 	}else
 	{
 		p_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo->fbo);    
@@ -227,6 +236,7 @@ void p_texture_render_unbind(void)
 }
 
 egreal p_noise_function(egreal *vec, uint level);
+
 
 uint p_create_renderable_texture(uint size, uint format)
 {
