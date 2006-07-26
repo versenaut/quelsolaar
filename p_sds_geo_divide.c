@@ -81,6 +81,14 @@ uint p_sds_get_vertex(PPolyStore *old_mesh, uint corner)
 		uint	i, a;
 		egreal best, second_best, third_best;
 
+		crease[0] = 0;
+		crease[1] = 0;
+		crease[2] = 0;
+		crease[3] = 0;
+		crease[4] = 0;
+		crease[5] = 0;
+		crease[6] = 0;
+
 		vertex[0] = old_mesh->ref[p_sds_get_corner_next(old_mesh, corner, 1)];
 		crease[0] = 1 - p_sds_get_crease(old_mesh, corner);
 		a = p_sds_get_corner_next(old_mesh, corner, -1);
@@ -91,6 +99,8 @@ uint p_sds_get_vertex(PPolyStore *old_mesh, uint corner)
 		a = old_mesh->neighbor[corner];
 		if(a != -1)
 			a = p_sds_get_corner_next(old_mesh, a, 1);
+
+
 
 		while(a != -1)
 		{
@@ -105,9 +115,8 @@ uint p_sds_get_vertex(PPolyStore *old_mesh, uint corner)
 				a = p_sds_get_corner_next(old_mesh, a, 1);
 		}
 		if(a == -1)
-		{
-			crease[0] = 1;
 
+		{
 			a = old_mesh->neighbor[p_sds_get_corner_next(old_mesh, corner, -1)];
 			if(a != -1)
 				a = p_sds_get_corner_next(old_mesh, a, -1);
@@ -119,15 +128,12 @@ uint p_sds_get_vertex(PPolyStore *old_mesh, uint corner)
 				if(i < vertex_count)
 					break;
 				polys[poly_count++] = a;
-				crease[vertex_count++] = 1 - p_sds_get_crease(old_mesh, a);
+				crease[vertex_count++] = (1 - p_sds_get_crease(old_mesh, a));
 				a = old_mesh->neighbor[a];
 				if(a != -1)
 					a = p_sds_get_corner_next(old_mesh, a, -1);
 			}
-			if(a == -1)
-				crease[0] = 1;
 		}
-	//	if(vertex_count != poly_count)
 
 		if(poly_count == 1)
 			p_sds_add_depend(dep, &old_mesh->vertex_dependency[old_mesh->ref[corner]], 1);
@@ -138,19 +144,18 @@ uint p_sds_get_vertex(PPolyStore *old_mesh, uint corner)
 			third_best = 0;	
 			for(i = 0; i < vertex_count; i++)
 			{
-				if(crease[i] > best)
+				if(crease[i] >= best)
 				{
 					third_best = second_best;
 					second_best = best;
 					best = crease[i];
-				}else if(crease[i] > second_best)
+				}else if(crease[i] >= second_best)
 				{
 					third_best = second_best;
 					second_best = crease[i];
-				}else if(crease[i] > third_best)
+				}else if(crease[i] >= third_best)
 					third_best = crease[i];
 			}
-			
 
 			for(i = 0; i < vertex_count; i++)
 				p_sds_add_depend(dep, &old_mesh->vertex_dependency[vertex[i]], ((1 - second_best) + crease[i] * (1 - third_best)) / vertex_count);

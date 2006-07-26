@@ -199,14 +199,14 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 					}else if(element[i].data.angle[0] < 180 && element[i].data.angle[1] > 180)
 					{
 						sui_draw_text(pos_x + sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].text) * -0.5, pos_y - 0.15, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color);
-					}else if(element[i].data.angle[0] < 180)
+					}else if(element[i].data.angle[0] + element[i].data.angle[1] < 360)
 					{
 						glPushMatrix();
 						glTranslatef(pos_x, pos_y, 0);
 						glRotatef(90 - (element[i].data.angle[0] + element[i].data.angle[1]) * 0.5, 0, 0, 1);
 						sui_draw_text(0.15, -SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color);
 						glPopMatrix();
-					}else if(element[i].data.angle[0] > 180)
+					}else if(element[i].data.angle[0] + element[i].data.angle[1] > 360)
 					{
 						glPushMatrix();
 						glTranslatef(pos_x, pos_y, 0);
@@ -249,7 +249,7 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 						return i;
 					break;
 				case PU_T_ANGLE :
-					if((element[i].data.angle[0] < angle && element[i].data.angle[1] > angle) || (element[i].data.angle[0] - 360 < angle && element[i].data.angle[1] - 360 > angle))
+					if((element[i].data.angle[0] < angle && element[i].data.angle[1] > angle) || (element[i].data.angle[0] + 360 < angle && element[i].data.angle[1] + 360 > angle))
 						return i;
 					break;
 				case PU_T_SQUARE :

@@ -20,17 +20,17 @@ void sp_settings_post(SUIViewElement *element);
 
 void qs_draw_settings(BInputState *input)
 {
-	SUIViewElement element[15];
+	SUIViewElement element[13];
 	char text[32] = {0};
 	sp_settings_pre(element);
-	element[10].type = S_VET_COLOR;
-	element[10].text = "bakground";
-	element[10].param.color[0] = background_color[0];
-	element[10].param.color[1] = background_color[1];
-	element[10].param.color[2] = background_color[2];
-	sui_draw_setting_view(input, 0, 0.3, 0.5, element, 11, "SETTINGS", 0.0);
+	element[12].type = S_VET_COLOR;
+	element[12].text = "bakground";
+	element[12].param.color[0] = background_color[0];
+	element[12].param.color[1] = background_color[1];
+	element[12].param.color[2] = background_color[2];
+	sui_draw_setting_view(input, 0, 0.3, 0.5, element, 13, "SETTINGS", 0.0);
 	sp_settings_post(element);
-	background_color[0] = element[10].param.color[0];
-	background_color[1] = element[10].param.color[1];
-	background_color[2] = element[10].param.color[2];
+	background_color[0] = element[12].param.color[0];
+	background_color[1] = element[12].param.color[1];
+	background_color[2] = element[12].param.color[2];
 }

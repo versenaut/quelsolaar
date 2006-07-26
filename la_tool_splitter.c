@@ -422,9 +422,9 @@ extern void		udg_polygon_set(uint32 id, uint32 a, uint32 b, uint32 c, uint32 d);
 
 void la_t_poly_spliter(uint id)
 {	
-	uint32 i, vertex_count, polygon_count, *ref, vertex_id;
+	uint32 i, poly_id, vertex_count, polygon_count, *ref, vertex_id, *crease;
 	double *vertex, pos[3], center[3] = {0, 0, 0};
-	udg_get_geometry(&vertex_count, &polygon_count, &vertex, &ref, NULL);
+	udg_get_geometry(&vertex_count, &polygon_count, &vertex, &ref, &crease);
 
 	id *= 4;
 	if(ref[id] < vertex_count && ref[id + 1] < vertex_count &&  ref[id + 2] < vertex_count && vertex[ref[id] * 3] != E_REAL_MAX && vertex[ref[id + 1] * 3] != E_REAL_MAX && vertex[ref[id + 2] * 3] != E_REAL_MAX)
@@ -443,24 +443,29 @@ void la_t_poly_spliter(uint id)
 			udg_get_vertex_pos(pos, ref[id + 3]);
 			udg_vertex_set(vertex_id, NULL, (center[0] + pos[0]) / 4.0, (center[1] + pos[1]) / 4.0, (center[2] + pos[2]) / 4.0);
 			
-			udg_polygon_set(id / 4,
-				ref[id + 0], ref[id + 1], vertex_id, -1);
-			udg_polygon_set(udg_find_empty_slot_polygon(),
-				ref[id + 1], ref[id + 2], vertex_id, -1);
-			udg_polygon_set(udg_find_empty_slot_polygon(),
-				ref[id + 2], ref[id + 3], vertex_id, -1);
-			udg_polygon_set(udg_find_empty_slot_polygon(),
-				ref[id + 3], ref[id + 0], vertex_id, -1);
+			udg_polygon_set(id / 4,	ref[id + 0], ref[id + 1], vertex_id, -1);
+			udg_crease_set(id / 4, crease[id + 0], 0, 0, 0);
+			poly_id = udg_find_empty_slot_polygon();
+			udg_polygon_set(poly_id, ref[id + 1], ref[id + 2], vertex_id, -1);
+			udg_crease_set(poly_id, crease[id + 1], 0, 0, 0);
+			poly_id = udg_find_empty_slot_polygon();
+			udg_polygon_set(poly_id, ref[id + 2], ref[id + 3], vertex_id, -1);
+			udg_crease_set(poly_id, crease[id + 2], 0, 0, 0);
+			poly_id = udg_find_empty_slot_polygon();
+			udg_polygon_set(poly_id, ref[id + 3], ref[id + 0], vertex_id, -1);
+			udg_crease_set(poly_id, crease[id + 3], 0, 0, 0);
 		}else
 		{
 			udg_vertex_set(vertex_id, NULL, center[0] / 3.0, center[1] / 3.0, center[2] / 3.0);
 			
-			udg_polygon_set(id / 4,
-				ref[id + 0], ref[id + 1], vertex_id, -1);
-			udg_polygon_set(udg_find_empty_slot_polygon(),
-				ref[id + 1], ref[id + 2], vertex_id, -1);
-			udg_polygon_set(udg_find_empty_slot_polygon(),
-				ref[id + 2], ref[id + 0], vertex_id, -1);
+			udg_polygon_set(id / 4, ref[id + 0], ref[id + 1], vertex_id, -1);
+			udg_crease_set(id / 4, crease[id + 0], 0, 0, 0);
+			poly_id = udg_find_empty_slot_polygon();
+			udg_polygon_set(poly_id, ref[id + 1], ref[id + 2], vertex_id, -1);
+			udg_crease_set(poly_id, crease[id + 1], 0, 0, 0);
+			poly_id = udg_find_empty_slot_polygon();
+			udg_polygon_set(poly_id, ref[id + 2], ref[id + 0], vertex_id, -1);
+			udg_crease_set(poly_id, crease[id + 1], 0, 0, 0);
 		}
 	}
 }

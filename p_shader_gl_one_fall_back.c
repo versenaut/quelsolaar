@@ -39,6 +39,8 @@ void p_shader_fallback_func(ENode *node, ECustomDataCommand command)
 	PMatFallBack *s;
 	switch(command)
 	{
+		case E_CDC_CREATE :
+		case E_CDC_STRUCT :
 		case E_CDC_DATA :
 			e_ns_set_custom_data(node, P_ENOUGH_SLOT, p_shader_compute_fallback(node, e_ns_get_custom_data(node, P_ENOUGH_SLOT)));
 		break;
@@ -72,7 +74,7 @@ void p_shader_bind_fallback(uint node_id)
 			glEnable(GL_NORMALIZE);
 			glEnable(GL_LIGHTING);
 			glColor4f(0.2, 0.6, 1, 1);
-			glBlendFunc(GL_ZERO, GL_ONE);
+			glBlendFunc(GL_ONE, GL_ZERO);
 		}else
 		{
 			if(s->texture != NULL)
@@ -81,6 +83,7 @@ void p_shader_bind_fallback(uint node_id)
 				glBindTexture(p_th_get_texture_dimentions(s->texture), p_th_get_texture_id(s->texture));
 			}else
 				glDisable(GL_TEXTURE);
+			
 			glColor4f(s->color[0], s->color[1], s->color[2], s->color[3]);
 
 			if(s->lighting)

@@ -563,6 +563,7 @@ VNMFragmentID p_shader_compute_get_fragment_color_front(ENode *node, uint *dest,
 	VMatFrag *frag;
 	VNMFragmentID fragment, a, b;
 	VNMFragmentType ta, tb;
+	VMatFrag *fa, *fb;
 	VNMBlendType type;
 	*dest = GL_ZERO;
 	*src = GL_ONE;
@@ -577,7 +578,9 @@ VNMFragmentID p_shader_compute_get_fragment_color_front(ENode *node, uint *dest,
 			type = frag->blender.type;
 			ta = e_nsm_get_fragment_type(node, a);
 			tb = e_nsm_get_fragment_type(node, b);
-			if(ta == VN_M_FT_TRANSPARENCY && tb == VN_M_FT_TRANSPARENCY)
+			fa = e_nsm_get_fragment(node, a);
+			fb = e_nsm_get_fragment(node, b);
+			if(ta == VN_M_FT_TRANSPARENCY && fa->transparency.refraction_index > 0.99 && fa->transparency.refraction_index < 1.01 && tb == VN_M_FT_TRANSPARENCY && fb->transparency.refraction_index > 0.99 && fb->transparency.refraction_index < 1.01)
 			{
 				if(type == VN_M_BLEND_MULTIPLY)
 				{
@@ -606,7 +609,7 @@ VNMFragmentID p_shader_compute_get_fragment_color_front(ENode *node, uint *dest,
 				}
 				return -1;
 			}
-			if(ta == VN_M_FT_TRANSPARENCY || tb == VN_M_FT_TRANSPARENCY)
+			if((ta == VN_M_FT_TRANSPARENCY && fa->transparency.refraction_index > 0.99 && fa->transparency.refraction_index < 1.01) || (tb == VN_M_FT_TRANSPARENCY && fb->transparency.refraction_index > 0.99 && fb->transparency.refraction_index < 1.01))
 			{
 					printf("p_shader_compute_get_fragment_color_front F\n");
 				if(frag->blender.type == VN_M_BLEND_MULTIPLY)

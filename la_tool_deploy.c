@@ -153,7 +153,7 @@ void grabb_marked_mesh(LATDeployParam *param, uint poly)
 {
     uint32 vertex_count, polygon_count, *ref, i, j, k, *crease;
 	boolean *select, found = TRUE;
-	double *vertex;
+	egreal *vertex;
 	param->v_count = 0;
 	param->p_count = 0;
     udg_get_geometry(&vertex_count, &polygon_count, &vertex, &ref, &crease);
@@ -241,7 +241,9 @@ void copy_marked_mech(LATDeployParam *param, uint poly)
 		vertex[0] = param->vertex[i * 3] - param->origo[0];
 		vertex[1] = param->vertex[i * 3 + 1] - param->origo[1];
 		vertex[2] = param->vertex[i * 3 + 2] - param->origo[2];
+/*		printf("vertex pre %f %f %f\n", vertex[0], vertex[1], vertex[2]);*/
 		point_threw_matrix3(matrix, &vertex[0], &vertex[1], &vertex[2]);
+/*		printf("vertex post %f %f %f\n", vertex[0], vertex[1], vertex[2]);/
 		udg_vertex_set(param->vertex_id[i], NULL, vertex[0] + origo[0], vertex[1] + origo[1], vertex[2] + origo[2]);
 	}
 	for(i = 1; i < param->p_count; i++)

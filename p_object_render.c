@@ -147,7 +147,7 @@ void p_render_object(ENode *node, boolean transparency)
 				if(transparency == p_shader_transparancy(mat))
 				{
 					p_shader_bind(mat);
-					p_shader_param_load(node, mat, p_rm_get_param(mesh), p_rm_get_param_count(mesh), /*p_env_get_environment(o->environment)*/o->impostor.environment, p_env_get_diffuse(o->environment));
+					p_shader_param_load(node, mat, p_rm_get_param(mesh), p_rm_get_param_count(mesh), /*p_env_get_environment(o->environment)*/o->impostor.environment/*o->impostor.blur*/, p_env_get_diffuse(o->environment));
 					glDrawElements(GL_TRIANGLES, p_rm_get_material_range(mesh, j) - range, GL_UNSIGNED_INT, &ref[range]);
 					range = p_rm_get_material_range(mesh, j);
 					p_shader_unbind(mat);
@@ -200,6 +200,7 @@ void p_draw_object_impostor(ENode *node);
 void p_update_object_impostors(void);
 boolean p_draw_object_as_impostor(ENode *node);
 void p_set_enable_shadow(uint id);
+void p_draw_flares();
 
 void p_draw_scene(void)
 {
@@ -218,6 +219,8 @@ void p_draw_scene(void)
 				p_render_lit_and_transformed_object(node, FALSE);
 		glClearStencil(0);
 		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(1.0, 1.0);
+
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_STENCIL_TEST);
 		glStencilFunc(GL_ALWAYS, 0, 0xff);
@@ -238,6 +241,7 @@ void p_draw_scene(void)
 		for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 			p_render_object_shadow(node);
 		glEnable(GL_DEPTH_TEST);
+		glPolygonOffset(0, 0);
 
 		glDisable(GL_POLYGON_OFFSET_FILL);
 		glDisable(GL_BLEND);
@@ -254,11 +258,12 @@ void p_draw_scene(void)
 /*	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_NORMALIZE);
 	glDisableClientState(GL_NORMAL_ARRAY);
-	glPopMatrix();
-	return;*/
+	glPopMatrix();*/
+	
 	if(p_render_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glEnable(GL_BLEND);
+
 	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 	{
 		if(!p_draw_object_as_impostor(node))
@@ -274,12 +279,15 @@ void p_draw_scene(void)
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.9);
 	glDisableClientState(GL_NORMAL_ARRAY);
+	p_draw_flares();
 	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 	{
 		if(p_draw_object_as_impostor(node))
 			p_draw_object_impostor(node);
 	}
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glEnable(GL_BLEND);
+
 	glDisable(GL_ALPHA_TEST);
 	glPopMatrix();
 	p_set_enable_shadow(-1);
