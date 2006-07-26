@@ -179,7 +179,7 @@ void sui_load_settings(const char *file_name)
 
 			if(sscanf(line, "%s %s", key, value) == 2)
 			{
-				printf("key %s\n", key);
+			//	printf("key %s\n", key);
 				if(sscanf(value, "%f", &r) == 1)
 				{
 					sui_set_setting_double(key, r);
