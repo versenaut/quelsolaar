@@ -177,7 +177,7 @@ void qs_compute_camera(BInputState *input, float delta_time)
 
 		qs_compute_matrix(GView.matrix);
 
-		eulers_to_quat(&rot, GView.jaw + M_PI/ 2 , -GView.pitch);
+		eulers_to_quat(&rot, GView.jaw + PI / 2 , -GView.pitch);
 		verse_send_o_transform_rot_real64(e_ns_get_node_id(e_ns_get_node_avatar(0)),
 						  0, 0, &rot, NULL, NULL, NULL, 0.0f);
 	}
