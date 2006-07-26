@@ -327,28 +327,11 @@ uint create_def_material(void)
 
 extern void get_randomized_color(float *color, uint32 index);
 
-void la_pfx_init(uint particle_count, uint texture_size)
+void la_pfx_image_init(uint texture_size)
 {
 	float *data, color[3];
 	uint i, j, temp;
-	GlobalParticleData.dust = NULL;
-	GlobalParticleData.dust_length = particle_count * 4;
-	GlobalParticleData.dust_count = 0;
-	GlobalParticleData.dust_start = 0;
-	GlobalParticleData.dust_pos = 0;
-	GlobalParticleData.dust_col = 0;
-	GlobalParticleData.spark = NULL;
-	GlobalParticleData.spark_length = particle_count / 2;
-	GlobalParticleData.spark_count = 0;
-	GlobalParticleData.spark_start = 0;
-	GlobalParticleData.bright = malloc((sizeof *GlobalParticleData.bright) * BRIGHT_COUNT);
-	for(i = 0; i < BRIGHT_COUNT; i++)
-		GlobalParticleData.bright[i].age = -2.0;
-	GlobalParticleData.bright_count = 0;
-	GlobalParticleData.bright_start = 0;
 	data = malloc((sizeof *data) * texture_size * texture_size * 3);
-
-
 	if(!la_load_targa("la_tmp_star.tga", &GlobalParticleData.star_material))
 	{
 		add_star(texture_size / 2, data);
@@ -365,15 +348,8 @@ void la_pfx_init(uint particle_count, uint texture_size)
 		GlobalParticleData.flare_material = la_save_targa("la_tmp_flare.tga", data, texture_size / 2);
 	}
 
-	GlobalParticleData.select_pos = malloc((sizeof *GlobalParticleData.select_pos) * 4 * SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 3);
-	GlobalParticleData.select_uv = malloc((sizeof *GlobalParticleData.select_pos) * 4 * SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 2);
-	for(i = 0; i < SELECT_FLARE_SPITT * SELECT_FLARE_SPITT; i++)
-	{
-		sui_draw_set_vec2(GlobalParticleData.select_uv, i * 4 + 0, (float)(i % SELECT_FLARE_SPITT) / SELECT_FLARE_SPITT, (float)(i / SELECT_FLARE_SPITT) / SELECT_FLARE_SPITT);
-		sui_draw_set_vec2(GlobalParticleData.select_uv, i * 4 + 1, (float)(i % SELECT_FLARE_SPITT) / SELECT_FLARE_SPITT, (float)(i / SELECT_FLARE_SPITT + 1) / SELECT_FLARE_SPITT);
-		sui_draw_set_vec2(GlobalParticleData.select_uv, i * 4 + 2, (float)(i % SELECT_FLARE_SPITT + 1) / SELECT_FLARE_SPITT, (float)(i / SELECT_FLARE_SPITT + 1) / SELECT_FLARE_SPITT);
-		sui_draw_set_vec2(GlobalParticleData.select_uv, i * 4 + 3, (float)(i % SELECT_FLARE_SPITT + 1) / SELECT_FLARE_SPITT, (float)(i / SELECT_FLARE_SPITT) / SELECT_FLARE_SPITT);
-	}
+
+
 
 	if(!la_load_targa("la_tmp_points.tga", &GlobalParticleData.point_material))
 	{
@@ -448,6 +424,37 @@ void la_pfx_init(uint particle_count, uint texture_size)
 		GlobalParticleData.soft_material2 = la_save_targa("la_tmp_soft2.tga", data, texture_size / 4);
 	}
 	free(data);
+}
+
+
+void la_pfx_init(uint particle_count)
+{
+	float *data, color[3];
+	uint i, j, temp;
+	GlobalParticleData.dust = NULL;
+	GlobalParticleData.dust_length = particle_count * 4;
+	GlobalParticleData.dust_count = 0;
+	GlobalParticleData.dust_start = 0;
+	GlobalParticleData.dust_pos = 0;
+	GlobalParticleData.dust_col = 0;
+	GlobalParticleData.spark = NULL;
+	GlobalParticleData.spark_length = particle_count / 2;
+	GlobalParticleData.spark_count = 0;
+	GlobalParticleData.spark_start = 0;
+	GlobalParticleData.bright = malloc((sizeof *GlobalParticleData.bright) * BRIGHT_COUNT);
+	for(i = 0; i < BRIGHT_COUNT; i++)
+		GlobalParticleData.bright[i].age = -2.0;
+	GlobalParticleData.bright_count = 0;
+	GlobalParticleData.bright_start = 0;
+	GlobalParticleData.select_pos = malloc((sizeof *GlobalParticleData.select_pos) * 4 * SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 3);
+	GlobalParticleData.select_uv = malloc((sizeof *GlobalParticleData.select_pos) * 4 * SELECT_FLARE_SPITT * SELECT_FLARE_SPITT * 2);
+	for(i = 0; i < SELECT_FLARE_SPITT * SELECT_FLARE_SPITT; i++)
+	{
+		sui_draw_set_vec2(GlobalParticleData.select_uv, i * 4 + 0, (float)(i % SELECT_FLARE_SPITT) / SELECT_FLARE_SPITT, (float)(i / SELECT_FLARE_SPITT) / SELECT_FLARE_SPITT);
+		sui_draw_set_vec2(GlobalParticleData.select_uv, i * 4 + 1, (float)(i % SELECT_FLARE_SPITT) / SELECT_FLARE_SPITT, (float)(i / SELECT_FLARE_SPITT + 1) / SELECT_FLARE_SPITT);
+		sui_draw_set_vec2(GlobalParticleData.select_uv, i * 4 + 2, (float)(i % SELECT_FLARE_SPITT + 1) / SELECT_FLARE_SPITT, (float)(i / SELECT_FLARE_SPITT + 1) / SELECT_FLARE_SPITT);
+		sui_draw_set_vec2(GlobalParticleData.select_uv, i * 4 + 3, (float)(i % SELECT_FLARE_SPITT + 1) / SELECT_FLARE_SPITT, (float)(i / SELECT_FLARE_SPITT) / SELECT_FLARE_SPITT);
+	}
 }
 
 void la_pfx_create_dust(double *pos, double size)

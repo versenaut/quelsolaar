@@ -1,5 +1,5 @@
-
-extern void la_pfx_init(uint particle_count, uint texture_size);
+extern void la_pfx_image_init(uint texture_size);
+extern void la_pfx_init(uint particle_count);
 extern void la_pfx_create_spark(double *pos);
 extern void la_pfx_create_intro_spark(double *pos);
 extern void la_pfx_create_aches(double *pos);
