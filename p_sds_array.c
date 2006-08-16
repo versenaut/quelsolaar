@@ -50,6 +50,7 @@ void p_array_init()
 	p_glEnableVertexAttribArrayARB = p_extension_get_address("glEnableVertexAttribArrayARB");
 	p_glDisableVertexAttribArrayARB = p_extension_get_address("glDisableVertexAttribArrayARB");
 
+	return;
 	if(p_extension_test("GL_ARB_vertex_buffer_object"))
 	{
 		use_vertex_buffer_object = TRUE;
