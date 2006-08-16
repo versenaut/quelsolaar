@@ -368,7 +368,7 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 	
 	if(frag == NULL || !e_nsm_enter_fragment(node, fragment))
 	{
-		sprintf(code, "vec4(0.0, 1.0, 0.0, 0.0)");
+		sprintf(code, "vec4(0.0, 0.0, 0.0, 0.0)");
 		return;
 	}
 	for(i = 0; passed[i * 2] != fragment; i++);
