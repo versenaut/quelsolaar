@@ -6,7 +6,6 @@
 
 #include "lp_projection.h"
 
-
 double lp_brush_size;
 
 void lp_brush_size_set(double size)
@@ -34,7 +33,6 @@ double *lp_vertex_influence = NULL;
 double *lp_polygon_influence = NULL;
 double *lp_vertex_influence_back = NULL;
 double *lp_polygon_influence_back = NULL;
-
 
 void *lp_channels[3] = {NULL, NULL, NULL};
 egreal *lp_normal = NULL;
@@ -137,7 +135,6 @@ void lp_lock_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *blu
 	layers[0] = red;
 	layers[1] = green;
 	layers[2] = blue;
-
 
 	for(i = 0; i < 3; i++)
 	{
@@ -295,7 +292,6 @@ void lp_color_paint(BInputState *input, ENode *node)
 	}
 }
 
-
 void lp_apply_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *blue, double *value, uint integer)
 {
 	EGeoLayer *layers[3];
@@ -303,7 +299,6 @@ void lp_apply_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *bl
 	VNodeID node_id;
 	VLayerID layer_id;
 	uint i, j, *ref, ref_length, length, r[4];
-
 
 	node_id = e_ns_get_node_id(node);
 	length = e_nsg_get_vertex_length(node);
