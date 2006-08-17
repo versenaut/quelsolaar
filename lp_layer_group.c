@@ -46,6 +46,25 @@ EGeoLayer *lp_layer_get_blue(uint group)
 	return lp_groups[group].blue;
 }
 
+boolean lp_layer_current_is_integer(void)
+{
+	VNGLayerType	type = -1;
+	uint		current = lp_layer_current_get();
+
+	if(current >= lp_groups_allocated)
+		return FALSE;
+
+	if(NULL != lp_layer_get_red(current))
+		type = e_nsg_get_layer_type(lp_layer_get_red(current));
+	else if(NULL != lp_layer_get_green(current))
+		type = e_nsg_get_layer_type(lp_layer_get_green(current));
+	else if(NULL != lp_layer_get_blue(current))
+		type = e_nsg_get_layer_type(lp_layer_get_blue(current));
+	if(type >= 0)
+		return type == VN_G_LAYER_VERTEX_UINT32 || type == VN_G_LAYER_POLYGON_CORNER_UINT32 || type == VN_G_LAYER_POLYGON_FACE_UINT8 || type == VN_G_LAYER_POLYGON_FACE_UINT32;
+	return FALSE;
+}
+
 char *lp_layer_get_name(uint group)
 {
 	return lp_groups[group].name;
