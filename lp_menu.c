@@ -123,6 +123,7 @@ void la_compute_set_range(double start, double end);
 	VN_G_LAYER_POLYGON_FACE_REAL
 } VNGLayerType;
 */
+
 void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 {
 	static double brush_size = 0.1;
