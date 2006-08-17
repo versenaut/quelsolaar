@@ -103,7 +103,7 @@ void p_draw_flare(double *pos, double *color)
 	scale = color[0] + color[1] + color[2];
 	glPushMatrix();
 	glTranslated(pos[0], pos[1], pos[2]);
-	glScaled(scale / 10.0, scale / 10.0, scale / 10.0);
+	glScaled(scale / 100.0, scale / 100.0, scale / 100.0);
 	glBlendFunc(GL_ONE, GL_ONE);
 	glEnable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
@@ -167,7 +167,7 @@ void p_draw_reflection_flare(double *view, double *pos, double *color)
 	scale = color[0] + color[1] + color[2];
 	glPushMatrix();
 	glTranslated(pos[0], pos[1], pos[2]);
-	glScaled(scale * 3, scale * 3, scale * 3);
+	glScaled(scale * 0.3, scale * 0.3, scale * 0.3);
 	glBlendFunc(GL_ONE, GL_ONE);
 	glEnable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
