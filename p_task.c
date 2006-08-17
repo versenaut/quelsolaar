@@ -140,7 +140,7 @@ void persuade_init(uint max_tesselation_level, void *(*gl_GetProcAddress)(const 
 }
 
 #if defined _WIN32
-static timer_period = -1.0;		/* Conversion factor for QueryPerformanceCounter. */
+static double timer_period = -1.0;		/* Conversion factor for QueryPerformanceCounter. */
 #endif
 
 void p_timer_start(PTimer *t)
