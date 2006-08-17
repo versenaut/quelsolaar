@@ -48,9 +48,9 @@ PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g, boolean fill, boolean s
 		g->tri_count = 0;
 		g->quad_count = 0;
 	}
-	if(g->version != e_ns_get_node_version_struct(node))
+	if(g->version != e_ns_get_node_version_data(node))
 	{
-		g->version = e_ns_get_node_version_struct(node);
+		g->version = e_ns_get_node_version_data(node);
 		vertex = e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node, 0));
 		ref = e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node, 1));
 		length = e_nsg_get_vertex_length(node);
