@@ -30,7 +30,7 @@ void b_glut_idle_func(void)
 
 void (*glut_context_func)(void) = NULL;
 
-void betray_set_context_update_func(void (*context_func)(void));
+void betray_set_context_update_func(void (*context_func)(void))
 {
 	glut_context_func = context_func;
 }
