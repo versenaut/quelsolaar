@@ -15,32 +15,34 @@
 /*#define BETRAY_GLFW_SYSTEM_WRAPPER*/
 #define BETRAY_SDL_SYSTEM_WRAPPER
 
-#if defined BETRAY_SDL_SYSTEM_WRAPPER
-
-#include <SDL/SDL.h>
 
 /* On Windows, we also need the main platform header file. */
-#ifdef _WIN32
+#if defined _WIN32
 #include <windows.h>
-
-/* FIXME: This shouldn't be necessary. We should just link with sdlmain.lib and
- * be happy. Unfortunately, I can't seem to be able to get it to work. So, the
- * work-around here is to undefine SDL's wrapping of main().
-*/
-#ifdef UNDEF_MAIN
-#undef main
-#endif
 #endif
 
-/* Get hold of OpenGL main header, gl.h. */
+/* We need OpenGL, which is a bit harder to locate on Macintosh systems. */
 #if defined __APPLE_CC__
 #include <OpenGL/gl.h>
 #else
 #include <GL/gl.h>
 #endif
 
-#elif defined BETRAY_GLUT_SYSTEM_WRAPPER
 
+#if defined BETRAY_SDL_SYSTEM_WRAPPER
+#include <SDL/SDL.h>
+
+/* FIXME: This shouldn't be necessary. We should just link with sdlmain.lib and
+ * be happy. Unfortunately, I can't seem to be able to get it to work. So, the
+ * work-around here is to undefine SDL's wrapping of main().
+*/
+#ifdef _WIN32
+#ifdef UNDEF_MAIN
+#undef main
+#endif
+#endif
+
+#elif defined BETRAY_GLUT_SYSTEM_WRAPPER
 /* Get hold of glut.h include file. Need to be Mac-specific, here. */
 #if defined __APPLE_CC__
 #include <GLUT/glut.h>
@@ -49,7 +51,6 @@
 #endif
 
 #elif defined BETRAY_GLFW_SYSTEM_WRAPPER
-
 #include <GL/glfw.h>
 
 #else
