@@ -284,6 +284,19 @@ extern void update_bitmap_load(char *name);
 extern void co_draw_settings(BInputState *input);
 extern boolean co_get_settings(void);
 
+static const char * compute_link_label(ENode *from, ENode *to)
+{
+	VNodeType	type = e_ns_get_node_type(to);
+
+	if(type == V_NT_OBJECT)
+		return "child";
+	else if(type == V_NT_GEOMETRY)
+		return "geometry";
+	else if(type == V_NT_MATERIAL)
+		return "material";
+	return "link";
+}
+
 void co_input_handler(BInputState *input, void *user_pointer)
 {
 	static COInteractMode mode = COIM_NONE;
@@ -699,13 +712,16 @@ void co_input_handler(BInputState *input, void *user_pointer)
 			EObjLink *link;
 			ENode *linker;
 			uint32 found = -1;
-			for(i = 0; i < V_NT_NUM_TYPES; i++)
+			for(i = 0; found == (uint32) -1 && i < V_NT_NUM_TYPES; i++)
 			{
 				for(node = e_ns_get_node_next(0, 0, i); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, i))
 				{
 					co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
-					if(co_node != NULL && co_node->hidden != TRUE && ((co_get_pos_x(input->pointer_x) - co_node->pos_x) * (co_get_pos_x(input->pointer_x) - co_node->pos_x) + (co_get_pos_y(input->pointer_y) - co_node->pos_y) * (co_get_pos_y(input->pointer_y) - co_node->pos_y) < 0.4 * 0.4))					
+					if(co_node != NULL && co_node->hidden != TRUE && ((co_get_pos_x(input->pointer_x) - co_node->pos_x) * (co_get_pos_x(input->pointer_x) - co_node->pos_x) + (co_get_pos_y(input->pointer_y) - co_node->pos_y) * (co_get_pos_y(input->pointer_y) - co_node->pos_y) < 0.4 * 0.4))
+					{
 						found = co_node->node_id;
+						break;
+					}
 				}	
 			}
 
@@ -719,7 +735,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 					else if((link = e_nso_get_link(linker, link_id)) != NULL)
 						verse_send_o_link_set(active, link_id, found, e_nso_get_link_name(link), e_nso_get_link_target_id(link));
 					else
-						verse_send_o_link_set(active, link_id, found, "my_link", 0);
+						verse_send_o_link_set(active, link_id, found, compute_link_label(linker, node), 0);
 				}
 				if(V_NT_MATERIAL == e_ns_get_node_type(linker))
 				{
