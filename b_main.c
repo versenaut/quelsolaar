@@ -282,7 +282,7 @@ void betray_get_current_time(uint32 *seconds, uint32 *fractions)
 	if(seconds != NULL)
 		*seconds = counter.QuadPart / frequency.QuadPart;
 	if(fractions != NULL)
-		*fractions = (uint32)((0xffffffff * (counter.QuadPart % frequency.QuadPart)) / frequency.QuadPart);
+		*fractions = (uint32)((((ULONGLONG) 0xffffffffU) * (counter.QuadPart % frequency.QuadPart)) / frequency.QuadPart);
 }
 
 #else
