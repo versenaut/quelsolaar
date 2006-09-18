@@ -184,8 +184,16 @@ void p_context_update(void)
 	p_th_context_update();
 	for(node = e_ns_get_node_next(0, 0, V_NT_MATERIAL); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_MATERIAL))
 	{
-		p_shader_func(node, E_CDC_DESTROY);
-		p_shader_func(node, E_CDC_CREATE);
+		if(p_shaders_supported())
+		{
+			p_shader_func(node, E_CDC_DESTROY);
+			p_shader_func(node, E_CDC_CREATE);
+		}
+		else
+		{
+			p_shader_fallback_func(node, E_CDC_DESTROY);
+			p_shader_fallback_func(node, E_CDC_CREATE);
+		}
 		e_ns_update_node_version_struct(node);
 	}
 	p_impostor_context_update();
