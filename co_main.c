@@ -31,7 +31,7 @@ void co_context_update(void)
 
 int main(int argc, char **argv)
 {
-	betray_init(argc, argv, 1500, 1100, FALSE, "Connector");
+	betray_init(argc, argv, 1000, 750, FALSE, "Connector");
 	deceive_set_arg(argc, argv);
 	sui_init();
 
