@@ -808,7 +808,6 @@ void draw_owerlay_surface(void)
 	glEnable(GL_BLEND);
 	if(GlobalOverlay.tri_count != 0)
 	{
-
 		glCullFace(GL_FRONT);
 		sui_set_blend_gl(GL_ONE, GL_ONE);
 		sui_set_color_array_gl(GlobalOverlay.tri_normal, GlobalOverlay.tri_count, 3);
@@ -1028,5 +1027,3 @@ void la_do_owerlay(void)
 	draw_owerlay_edge();
 	draw_owerlay_vertex();
 }
-
-
