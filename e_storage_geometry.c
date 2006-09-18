@@ -10,11 +10,11 @@ typedef struct{
 	char	reference[16];
 	char	pos_label[16];
 	char	rot_label[16];
+	char	scale_label[16];
 	uint32	parent;
 	real64	pos_x;
 	real64	pos_y;
 	real64	pos_z;
-	VNQuat64 rot;
 }EGeoBone;
 
 typedef struct{
@@ -817,7 +817,7 @@ egreal e_nsg_get_size(ESGeometryNode *node)
 
 
 void callback_send_g_bone_create(void *user, VNodeID node_id, uint16 bone_id, const char *weight, const char *reference, uint16 parent,
-				 real64 pos_x, real64 pos_y, real64 pos_z, char *pos_label, const VNQuat64 *rot, char *rot_label)
+				 real64 pos_x, real64 pos_y, real64 pos_z, char *pos_label, char *rot_label, char *scale_label)
 {
 	ESGeometryNode	*node;
 	uint			i;
@@ -852,13 +852,15 @@ void callback_send_g_bone_create(void *user, VNodeID node_id, uint16 bone_id, co
 	node->bones[bone_id].pos_label[i] = 0;	
 	for(i = 0; rot_label[i] != 0 && i < 15; i++)
 		node->bones[bone_id].rot_label[i] = rot_label[i];
-	node->bones[bone_id].rot_label[i] = 0;	
+	node->bones[bone_id].rot_label[i] = 0;
+	for(i = 0; scale_label[i] != 0 && i < 15; i++)
+		node->bones[bone_id].scale_label[i] = scale_label[i];
+	node->bones[bone_id].scale_label[i] = '\0';
 
 	node->bones[bone_id].parent = parent,
 	node->bones[bone_id].pos_x = pos_x;
 	node->bones[bone_id].pos_y = pos_y;
 	node->bones[bone_id].pos_z = pos_z;
-	node->bones[bone_id].rot = *rot;
 }
 
 void callback_send_g_bone_destroy(void *user, VNodeID node_id, uint16 bone_id)
@@ -925,6 +927,13 @@ char *e_nsg_get_bone_rot_label(ESGeometryNode *g_node, uint16 bone_id)
 	return NULL;
 }
 
+char *e_nsg_get_bone_scale_label(ESGeometryNode *g_node, uint16 bone_id)
+{
+	if(bone_id < g_node->bones_allocated)
+		return g_node->bones[bone_id].scale_label;
+	return NULL;
+}
+
 uint16 e_nsg_get_bone_parent(ESGeometryNode *g_node, uint16 bone_id)
 {
 	if(bone_id < g_node->bones_allocated)
@@ -954,20 +963,22 @@ void e_nsg_get_bone_pos64(ESGeometryNode *g_node, uint16 bone_id, double *pos)
 
 void e_nsg_get_bone_rot32(ESGeometryNode *g_node, uint16 bone_id, VNQuat32 *rot)
 {
-	if(bone_id < g_node->bones_allocated && rot != NULL)
+/*	if(bone_id < g_node->bones_allocated && rot != NULL)
 	{
 		rot->x = g_node->bones[bone_id].rot.x;
 		rot->y = g_node->bones[bone_id].rot.y;
 		rot->z = g_node->bones[bone_id].rot.z;
 		rot->w = g_node->bones[bone_id].rot.w;
 	}
+*/
 }
 
 void e_nsg_get_bone_rot64(ESGeometryNode *g_node, uint16 bone_id, VNQuat64 *rot)
 {
-	if(bone_id < g_node->bones_allocated && rot != NULL)
+/*	if(bone_id < g_node->bones_allocated && rot != NULL)
 		*rot = g_node->bones[bone_id].rot;
-}
+*/
+} 
 
 void e_nsg_get_bone_matrix32(ESGeometryNode *o_node, ESGeometryNode *g_node, uint16 bone_id, float *matrix)
 {

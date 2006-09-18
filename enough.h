@@ -178,6 +178,7 @@ extern void			e_nsg_get_bone_rot64(ENode *g_node, uint16 bone_id, VNQuat64 *rot)
 
 extern char *		e_nsg_get_bone_pos_label(ENode *g_node, uint16 bone_id);
 extern char *		e_nsg_get_bone_rot_label(ENode *g_node, uint16 bone_id);
+extern char *		e_nsg_get_bone_scale_label(ENode *g_node, uint16 bone_id);
 
 /*
 extern void			e_nsg_get_bone_matrix32(ENode *o_node, ENode *g_node, uint16 bone_id, float *matrix);
