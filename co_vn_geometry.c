@@ -213,19 +213,26 @@ void rename_g_layer_func(void *user, char *text)
 		for(bone_id = e_nsg_get_bone_next(node, 0); bone_id != (uint16)-1; bone_id = e_nsg_get_bone_next(node, bone_id + 1))
 		{
 			double 		pos[3];
-			VNQuat64	rot;
 			e_nsg_get_bone_pos64(node, bone_id, pos);
-			e_nsg_get_bone_rot64(node, bone_id, &rot);
 
-			if(layer == e_nsg_get_bone_weight(node, bone_id))
-				verse_send_g_bone_create(change_g_node_id, bone_id, text, e_nsg_get_bone_reference(node, bone_id), e_nsg_get_bone_parent(node, bone_id), pos[0], pos[1], pos[2], e_nsg_get_bone_pos_label(node, bone_id), &rot, e_nsg_get_bone_rot_label(node, bone_id));
-			if(layer == e_nsg_get_bone_reference(node, bone_id))
-				verse_send_g_bone_create(change_g_node_id, bone_id, e_nsg_get_bone_weight(node, bone_id), text, e_nsg_get_bone_parent(node, bone_id), pos[0], pos[1], pos[2], e_nsg_get_bone_pos_label(node, bone_id), &rot, e_nsg_get_bone_rot_label(node, bone_id));
-
-			if(layer == e_nsg_get_bone_pos_label(node, bone_id))
-				verse_send_g_bone_create(change_g_node_id, bone_id, text, e_nsg_get_bone_reference(node, bone_id), e_nsg_get_bone_parent(node, bone_id), pos[0], pos[1], pos[2], text, &rot, e_nsg_get_bone_rot_label(node, bone_id));
-			if(layer == e_nsg_get_bone_rot_label(node, bone_id))
-				verse_send_g_bone_create(change_g_node_id, bone_id, e_nsg_get_bone_weight(node, bone_id), e_nsg_get_bone_reference(node, bone_id), e_nsg_get_bone_parent(node, bone_id), pos[0], pos[1], pos[2], e_nsg_get_bone_pos_label(node, bone_id), &rot, text);
+			if(user == e_nsg_get_bone_weight(node, bone_id))
+				verse_send_g_bone_create(change_g_node_id, bone_id, text, e_nsg_get_bone_reference(node, bone_id), e_nsg_get_bone_parent(node, bone_id), pos[0], pos[1], pos[2],
+							 e_nsg_get_bone_pos_label(node, bone_id), e_nsg_get_bone_rot_label(node, bone_id), e_nsg_get_bone_scale_label(node, bone_id));
+			else if(user == e_nsg_get_bone_reference(node, bone_id))
+				verse_send_g_bone_create(change_g_node_id, bone_id, e_nsg_get_bone_weight(node, bone_id), text, e_nsg_get_bone_parent(node, bone_id), pos[0], pos[1], pos[2],
+							 e_nsg_get_bone_pos_label(node, bone_id), e_nsg_get_bone_rot_label(node, bone_id), e_nsg_get_bone_scale_label(node, bone_id));
+			else if(user == e_nsg_get_bone_pos_label(node, bone_id))
+				verse_send_g_bone_create(change_g_node_id, bone_id, e_nsg_get_bone_weight(node, bone_id), e_nsg_get_bone_reference(node, bone_id),
+							 e_nsg_get_bone_parent(node, bone_id), pos[0], pos[1], pos[2],
+							 text, e_nsg_get_bone_rot_label(node, bone_id), e_nsg_get_bone_scale_label(node, bone_id));
+			else if(user == e_nsg_get_bone_rot_label(node, bone_id))
+				verse_send_g_bone_create(change_g_node_id, bone_id, e_nsg_get_bone_weight(node, bone_id), e_nsg_get_bone_reference(node, bone_id),
+							 e_nsg_get_bone_parent(node, bone_id), pos[0], pos[1], pos[2],
+							 e_nsg_get_bone_pos_label(node, bone_id), text, e_nsg_get_bone_scale_label(node, bone_id));
+			else if(user == e_nsg_get_bone_scale_label(node, bone_id))
+				verse_send_g_bone_create(change_g_node_id, bone_id, e_nsg_get_bone_weight(node, bone_id), e_nsg_get_bone_reference(node, bone_id),
+							 e_nsg_get_bone_parent(node, bone_id), pos[0], pos[1], pos[2],
+							 e_nsg_get_bone_pos_label(node, bone_id), e_nsg_get_bone_rot_label(node, bone_id), text);
 		}
 	}
 }
@@ -373,13 +380,12 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 			for(bone = e_nsg_get_bone_next(node, 0); bone != (uint16)-1; bone = e_nsg_get_bone_next(node, bone + 1))
 				i++;
 			sprintf(nr, "weight_%u", i);
-			verse_send_g_bone_create(change_g_node_id, -1, nr, "reference", 0, 0, 0, 0, "bone_pos", &identity, "bone_rot");
+			verse_send_g_bone_create(change_g_node_id, -1, nr, "reference", 0, 0, 0, 0, "bone_pos", "bone_rot", "bone_scale");
 		}
 		y -= 0.05;
 		for(bone = e_nsg_get_bone_next(node, 0); bone != (uint16)-1; bone = e_nsg_get_bone_next(node, bone + 1))
 		{
 			double t[3];
-			VNQuat64	rot;
 			char *ref, *text[] = {"X", "Y", "Z", "X", "Y", "Z", "W"};
 			uint i;
 			uint32 parent;
@@ -404,40 +410,27 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 			y -= 0.05;
 
 			e_nsg_get_bone_pos64(node, bone, t);
-			e_nsg_get_bone_rot64(node, bone, &rot);
 			parent = e_nsg_get_bone_parent(node, bone);
 			sui_draw_text(-0.25, y, SUI_T_SIZE, SUI_T_SPACE, "PARENT", color_light, color_light, color_light);
 			if(sui_type_number_uint(input,0.15, y, 0, 0.15, SUI_T_SIZE, &parent, e_nsg_get_bone_weight(node, bone), color, color, color))
-				verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], e_nsg_get_bone_rot_label(node, bone), &rot, e_nsg_get_bone_rot_label(node, bone));
+				verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2],
+							 e_nsg_get_bone_rot_label(node, bone), e_nsg_get_bone_rot_label(node, bone), e_nsg_get_bone_scale_label(node, bone));
 			y -= 0.05;
 			sui_draw_text(-0.25, y, SUI_T_SIZE, SUI_T_SPACE, "POSITION", color_light, color_light, color_light);
 			sui_draw_text(-0.25, y - 0.15, SUI_T_SIZE, SUI_T_SPACE, "ROTATION", color_light, color_light, color_light);
 
-			for(i = 0; i < 7; i++)
+			for(i = 0; i < 3; i++)
 			{	
 				double	*edit;
 
-				/* Hack: since the code assumes position and rotation are in a sequence of 7 reals (3 for pos, 4 for rot),
-				 * but they no longer are since the introduction of quaternions, we use the variable 'edit' to point at
-				 * one of the reals, and the code below to "pick apart" the quaternion as needed. How pretty.
-				*/
-				if(i < 3)
-					edit = t + i;
-				else
-				{
-					switch(i)
-					{
-					case 3:	edit = &rot.x;	break;
-					case 4:	edit = &rot.y;	break;
-					case 5:	edit = &rot.z;	break;
-					case 6:	edit = &rot.w;	break;
-					}
-				}
+				edit = t + i;
 				sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, text[i], color_light, color_light, color_light);  
 				if(sui_type_number_double(input, 0.15, y, 0, 0.15, SUI_T_SIZE, edit, edit, color, color, color))
 					verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent,
-								 t[0], t[1], t[2], e_nsg_get_bone_pos_label(node, bone), &rot, 
-								 e_nsg_get_bone_rot_label(node, bone));
+								 t[0], t[1], t[2],
+								 e_nsg_get_bone_pos_label(node, bone),
+								 e_nsg_get_bone_rot_label(node, bone),
+								 e_nsg_get_bone_scale_label(node, bone));
 				if(co_w_slider(input, 0.3, y, 0.35, edit, 0, 1, color, color, color))
 					/*verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], &rot)*/;
 				y -= 0.05;
