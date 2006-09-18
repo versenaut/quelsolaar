@@ -115,7 +115,7 @@ void delete_text(ESTextNode *node)
 	free(node);
 }
 
-static void callback_send_t_set_language(void *user, VNodeID node_id, const char *language)
+static void callback_send_t_language_set(void *user, VNodeID node_id, const char *language)
 {
 	ESTextNode	*node;
 	uint i;
@@ -227,7 +227,7 @@ static void callback_send_t_text_set(void *user, VNodeID node_id, VBufferID buff
 
 void es_text_init(void)
 {
-	verse_callback_set(verse_send_t_set_language,		callback_send_t_set_language,		NULL);
+	verse_callback_set(verse_send_t_language_set,		callback_send_t_language_set,		NULL);
 	verse_callback_set(verse_send_t_buffer_create,		callback_send_t_buffer_create,		NULL);
 	verse_callback_set(verse_send_t_buffer_destroy,		callback_send_t_buffer_destroy,		NULL);
 	verse_callback_set(verse_send_t_text_set,		callback_send_t_text_set,		NULL);

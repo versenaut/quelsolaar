@@ -39,7 +39,7 @@ void rename_language_func(void *user, char *text)
 {
 	ENode *node;
 	if((node = e_ns_get_node(0, change_t_node_id)) != NULL)
-		verse_send_t_set_language(change_t_node_id, text);
+		verse_send_t_language_set(change_t_node_id, text);
 }
 
 boolean co_handle_text(BInputState *input, ENode *node)
