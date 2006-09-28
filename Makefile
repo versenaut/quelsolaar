@@ -2,11 +2,11 @@
 # Rough and ready Makefile for compiling Connector, Loq Auirou, and UVedit tools.
 #
 
-VERSE=/home/emil/data/projects/verse/
+VERSE=../verse
 
 .PHONY:		clean dist dist-enough dist-connector dist-loqairou
 
-CFLAGS=-I$(VERSE) -g -Wstrict-prototypes
+CFLAGS=-I$(VERSE) -g -pg -Wstrict-prototypes
 LDFLAGS=-L$(VERSE) -L/usr/X11R6/lib
 LDLIBS=-lverse -lGL -lm -lglut  -lGLU -lSDL
 
@@ -44,7 +44,7 @@ connector:	co_3d_view.o co_main.o co_game.o co_intro.o co_popup.o co_projection.
 		co_vn_object.o co_vn_search.o co_vn_text.o co_widgets.o \
 		st_matrix_operations.o $(LIBPERSUADE) seduce_persuade.o \
 		libseduce.a libbetray.a libdeceive.a libenough.a $(LIBPERSUADE)
-		gcc -o $@ $^ $(LDFLAGS) $(LDLIBS)
+		gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 uvedit:		uv_draw.o uv_edge_collapse.o uv_geometry.o uv_main.o uv_menu.o uv_overlay.o uv_popup.o uv_texture.o uv_tool_corner.o\
 		uv_tool_edge.o uv_tool_polygon.o uv_transform.o uv_tool_select.o uv_tool_strip.o uv_unfold.o \
