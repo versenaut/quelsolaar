@@ -16,6 +16,7 @@
 typedef struct {
 	boolean			connected;
 	boolean			accepted;
+	char			rejection[256];
 	DynLookUpTable	look_up_table;
 	uint32			node_type_count[V_NT_NUM_TYPES];
 	uint32			selected_node[V_NT_NUM_TYPES];
@@ -207,6 +208,14 @@ void callback_send_connect_accept(void *user, uint32 avatar, void *address)
 	verse_send_node_index_subscribe(mask);
 }
 
+void callback_send_connect_terminate(const char *address, const char *bye)
+{
+	uint i;
+	for(i = 0; bye[i] != 0; i++)
+		ENSGlobal.context[ENSGlobal.curent_net_connection].rejection[i] = bye[i];
+	ENSGlobal.context[ENSGlobal.curent_net_connection].rejection[i] = 0;
+}
+
 uint e_vc_connect(const char *server_address, const char *name, const char *pass, const uint8 *server_id)
 {
 	uint	connection;
@@ -215,6 +224,7 @@ uint e_vc_connect(const char *server_address, const char *name, const char *pass
 	if(connection == MAX_CONNECTIONS)
 		return -1;
 	ENSGlobal.context[connection].accepted = FALSE;
+	ENSGlobal.context[connection].rejection[0] = 0;
 	session = verse_send_connect(name, pass, server_address, (uint8 *) server_id);
 	if(session  != NULL)
 		e_vc_connect_internal(session, connection);
@@ -254,6 +264,12 @@ boolean e_vc_check_connected_slot(uint connection)
 boolean e_vc_check_accepted_slot(uint connection)
 {
 	return ENSGlobal.context[connection].accepted;
+}
+
+
+char *e_vc_check_rejected_slot(uint connection)
+{
+	return ENSGlobal.context[connection].rejection;
 }
 
 void e_ns_init_head(ENodeHead *head, VNodeType type, VNodeID node_id, VNodeOwner owner)
@@ -306,6 +322,7 @@ ENodeHead *e_ns_get_node_avatar(uint connection)
 	return find_dlut(&ENSGlobal.context[connection].look_up_table, ENSGlobal.context[connection].avatar);
 }
 
+
 void enough_init(void)
 {
 	uint i, j;
@@ -331,9 +348,10 @@ void enough_init(void)
 		ENSGlobal.auto_subscribe[i] = TRUE;
 	ENSGlobal.auto_subscribe[V_NT_BITMAP] = TRUE;
 	ENSGlobal.node_create_func = NULL;
-	verse_callback_set(verse_send_connect_accept,		callback_send_connect_accept,	NULL);
-	verse_callback_set(verse_send_node_create,			callback_send_node_create,		NULL);
-	verse_callback_set(verse_send_node_destroy,			callback_send_node_destroy,		NULL);
+	verse_callback_set(verse_send_connect_accept,		callback_send_connect_accept,		NULL);
+	verse_callback_set(verse_send_connect_terminate,	callback_send_connect_terminate,	NULL);
+	verse_callback_set(verse_send_node_create,			callback_send_node_create,			NULL);
+	verse_callback_set(verse_send_node_destroy,			callback_send_node_destroy,			NULL);
 	es_head_init();
 	es_object_init();
 	es_geometry_init();
