@@ -112,7 +112,7 @@ void p_render_object_shadow(ENode *node)
 	glPopMatrix();
 }
 
-void p_render_object(ENode *node, boolean transparency)
+void p_render_object(ENode *node, boolean transparency, boolean test)
 {
 	double matrix[16], scale[3];
 	PMesh *mesh;
@@ -147,7 +147,10 @@ void p_render_object(ENode *node, boolean transparency)
 				if(transparency == p_shader_transparancy(mat))
 				{
 					p_shader_bind(mat);
-					p_shader_param_load(node, mat, p_rm_get_param(mesh), p_rm_get_param_count(mesh), /*p_env_get_environment(o->environment)*/o->impostor.environment/*o->impostor.blur*/, p_env_get_diffuse(o->environment));
+					if(test)
+						p_shader_param_load(node, mat, p_rm_get_param(mesh), p_rm_get_param_count(mesh), /*p_env_get_environment(o->environment)*/-1, -1/*o->impostor.blur/*, p_env_get_diffuse(o->environment)*/);
+					else
+						p_shader_param_load(node, mat, p_rm_get_param(mesh), p_rm_get_param_count(mesh), /*p_env_get_environment(o->environment)*/o->impostor.environment, o->impostor.blur/*, p_env_get_diffuse(o->environment)*/);
 					glDrawElements(GL_TRIANGLES, p_rm_get_material_range(mesh, j) - range, GL_UNSIGNED_INT, &ref[range]);
 					range = p_rm_get_material_range(mesh, j);
 					p_shader_unbind(mat);
@@ -168,7 +171,7 @@ void p_render_lit_and_transformed_object(ENode *node, boolean transparency)
 
 	glPushMatrix();
 	p_render_set_transform(node);
-	p_render_object(node, transparency);
+	p_render_object(node, transparency, FALSE);
 	glPopMatrix();
 }
 
@@ -200,7 +203,7 @@ void p_draw_object_impostor(ENode *node);
 void p_update_object_impostors(void);
 boolean p_draw_object_as_impostor(ENode *node);
 void p_set_enable_shadow(uint id);
-void p_draw_flares(void);
+void p_draw_flares();
 
 void p_draw_scene(void)
 {
@@ -291,6 +294,8 @@ void p_draw_scene(void)
 	glDisable(GL_ALPHA_TEST);
 	glPopMatrix();
 	p_set_enable_shadow(-1);
+	glEnableClientState(GL_NORMAL_ARRAY);
 	p_update_object_impostors();
+	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisable(GL_LIGHTING);
 }
