@@ -153,12 +153,12 @@ void qs_compute_camera(BInputState *input, float delta_time)
 		GView.matrix[4] = 0;
 		GView.matrix[5] = 1;
 		GView.matrix[6] = 0;
-		GView.pitch_goal -= input->delta_pointer_y * 4;
-		GView.jaw_goal -= input->delta_pointer_x * 4;
-
+		GView.pitch -= input->delta_pointer_y * 4;
+		GView.jaw -= input->delta_pointer_x * 4;
+/*
 		GView.pitch = GView.pitch_goal * 0.3 + GView.pitch * 0.7;
 		GView.jaw = GView.jaw_goal * 0.3 + GView.jaw * 0.7;
-
+*/
 /*		GView.jaw -= input->delta_pointer_x * 4;
 		if(GView.jaw > PI)
 			GView.jaw -= PI * 2.0;
