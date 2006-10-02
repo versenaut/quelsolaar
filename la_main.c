@@ -39,7 +39,7 @@ void la_context_update(void)
 
 int main(int argc, char **argv)
 {
-	betray_init(argc, argv, 1000, 750, FALSE, "Loq Airou");
+	betray_init(argc, argv, 720, 576, FALSE, "Loq Airou");
 	deceive_set_arg(argc, argv);
 	sui_load_settings("la_config.cfg");
 	sui_init();
