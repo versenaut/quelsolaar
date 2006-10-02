@@ -1,8 +1,6 @@
  
 #include "enough.h"
 
-#include "seduce.h"
-
 #include "p_sds_geo.h"
 #include "p_sds_table.h"
 #include "p_sds_obj.h"

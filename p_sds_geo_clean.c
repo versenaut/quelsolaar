@@ -2,7 +2,6 @@
 #include "verse.h"
 #include "enough.h"
 
-#include "seduce.h"
 #include "p_sds_geo.h"
 extern double get_rand(uint32 index);
 
