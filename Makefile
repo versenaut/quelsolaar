@@ -95,7 +95,7 @@ libpersuade.a:	p_extension.o p_flare.o p_geometry.o p_impostor.o p_noise.o p_obj
 		p_task.o p_texture.o
 		ar -cr $@ $^
 
-libdeceive.a:	d_main.o
+libdeceive.a:	d_main.o d_master.o
 		ar -cr $@ $^
 
 # -----------------------------------------------
