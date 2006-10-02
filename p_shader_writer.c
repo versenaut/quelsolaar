@@ -282,7 +282,7 @@ void p_shader_write_lights(ENode *node, PSExeCode *f_c, uint lights)
 	}
 
 	if(ambient)
-		p_shader_extend_code(f_c, "\tambient = textureCube(diffuse_environment, reflect(pixel_pos.xyz, normal.xyz)).xyz;\n");
+		p_shader_extend_code(f_c, "\tambient = textureCube(diffuse_environment, normal).xyz;\n");
 	if(back_ambient)
 		p_shader_extend_code(f_c, "\tb_ambient = textureCube(diffuse_environment, vec3(0.0, 0.0, 0.0) - normal).xyz;\n");
 }
@@ -368,7 +368,7 @@ void p_shader_write_math(ENode *node, uint fragment, char *code, PSExeCode *c, u
 	
 	if(frag == NULL || !e_nsm_enter_fragment(node, fragment))
 	{
-		sprintf(code, "vec4(0.0, 0.0, 0.0, 0.0)");
+		sprintf(code, "vec4(0.0, 1.0, 0.0, 0.0)");
 		return;
 	}
 	for(i = 0; passed[i * 2] != fragment; i++);
@@ -730,6 +730,12 @@ void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, 
 		return NULL;
 	}
 	return t;
+}
+
+void p_shader_code_write(ENode *node, char **v_code, uint *v_length, char **f_code, uint *f_length, uint *dest, uint *src)
+{
+	PCodeGenTemp *t = NULL;
+	while((t = p_shader_write(node, v_code, v_length, f_code, f_length, dest, src, t)) != NULL);
 }
 
 void p_shader_write_destroy_temp(PCodeGenTemp *t)
