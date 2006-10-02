@@ -85,8 +85,6 @@
 #include "p_task.h"
 #include "p_extension.h"
 
-#include "seduce.h"
-
 #if defined(__APPLE__) || defined(MACOSX)
 	#define APIENTRY
 #endif
@@ -243,7 +241,6 @@ uint p_create_renderable_texture(uint size, uint format)
 	uint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-
 	{
 		float *buffer;
 		egreal vec[3] = {0, 0, 0}, f;
@@ -266,7 +263,6 @@ uint p_create_renderable_texture(uint size, uint format)
 		glTexImage2D(GL_TEXTURE_2D, 0, format, size, size, 0, GL_RGB, GL_FLOAT, buffer);
 		free(buffer);
 	}
-
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
