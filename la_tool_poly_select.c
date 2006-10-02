@@ -353,7 +353,7 @@ void duplicate_polygon(ExtrudeParams *extrude, uint *ref, uint ref_id, uint *cre
 		new_poly[1] = create_vertex_copy(extrude, new_poly[1]);
 	if(extrude->select[ref[2]] > 0.01)
 		new_poly[2] = create_vertex_copy(extrude, new_poly[2]);
-	if(extrude->select[ref[3]] > 0.01 && ref[3] < extrude->vertex_length)
+	if(ref[3] < extrude->vertex_length && extrude->select[ref[3]] > 0.01)
 		new_poly[3] = create_vertex_copy(extrude, new_poly[3]);
 	udg_polygon_set(create, new_poly[0], new_poly[1], new_poly[2], new_poly[3]);
 
