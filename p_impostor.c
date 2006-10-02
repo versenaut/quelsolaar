@@ -26,7 +26,6 @@
 #include "p_extension.h"
 #include "p_object.h"
 #include "st_matrix_operations.h"
-#include "seduce.h"
 
 #define GL_TEXTURE_CUBE_MAP_EXT             0x8513 
 #define GL_TEXTURE_BINDING_CUBE_MAP_EXT     0x8514 
@@ -50,70 +49,112 @@ extern void p_render_set_transform(ENode *node);
 extern uint p_create_renderable_texture(uint size, uint format);
 extern void p_pre_fbo_draw(float fov);
 extern void p_post_fbo_draw(void);
-extern void p_render_object(ENode *node, boolean transparency);
+extern void p_render_object(ENode *node, boolean transparency, boolean test);
 extern uint p_shader_create(char *vertex, char *fragment);
 extern uint p_th_get_hdri_token(boolean alpha);
-
-static uint create_environment(uint size, float *buf);
-
+extern void p_shader_bind_texture(uint program, char *name, uint unit, uint texture_id);
+extern void p_shader_unbind_texture(uint unit);
 
 static uint p_impostor_resolution = 128; 
 static float p_render_impostor_size = 0.03;
 static uint p_blur_program = -1; 
 
+uint create_environment(uint size, float *buf)
+{
+	uint environment;
+	uint format = p_th_get_hdri_token(FALSE);
+	glEnable(GL_TEXTURE_CUBE_MAP_EXT);
+	glGenTextures(1, &environment);
+	glBindTexture(GL_TEXTURE_CUBE_MAP_EXT, environment);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_EXT, 0, format, size, size, 0, GL_RGB, GL_FLOAT, buf); 
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y_EXT, 0, format, size, size, 0, GL_RGB, GL_FLOAT, buf); 
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z_EXT, 0, format, size, size, 0, GL_RGB, GL_FLOAT, buf); 
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X_EXT, 0, format, size, size, 0, GL_RGB, GL_FLOAT, buf); 
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_EXT, 0, format, size, size, 0, GL_RGB, GL_FLOAT, buf); 
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_EXT, 0, format, size, size, 0, GL_RGB, GL_FLOAT, buf);
+	glDisable(GL_TEXTURE_CUBE_MAP_EXT);
+	return environment;
+}
 
 void print_blur_matrix(void)
 {
-	double matrix[16], origo[3] = {0, 0, 0}, point_a[3], point_b[3];
+	double point[3];
 	uint i;
 	for(i = 0; i < 20; i++)
 	{
 
-		point_a[0] = (get_rand(i * 6 + 0) * 2 - 1) * 0.8;
-		point_a[1] = (get_rand(i * 6 + 1) * 2 - 1) * 0.8;
-		point_a[2] = (get_rand(i * 6 + 2) * 2 - 1) * 0.8 + 1;
-		point_b[0] = (get_rand(i * 6 + 3) * 2 - 1) * 0.8 + 1;
-		point_b[1] = (get_rand(i * 6 + 4) * 2 - 1) * 0.8;
-		point_b[2] = (get_rand(i * 6 + 5) * 2 - 1) * 0.8;
-
-		create_matrix_normalized(matrix, origo, point_a, point_b);
-		printf("color += textureCube(environment, normal * mat3(%f, %f, %f, %f, %f, %f, %f, %f, %f\n", -matrix[0], -matrix[1], -matrix[2], matrix[4], matrix[5], matrix[6], matrix[8], matrix[9], matrix[10]);
+		point[0] = (get_rand(i * 6 + 0) * 2 - 1) * 0.6;
+		point[1] = (get_rand(i * 6 + 1) * 2 - 1) * 0.6;
+		point[2] = (get_rand(i * 6 + 2) * 2 - 1) * 0.6;
+		printf("color += textureCube(environment, normal + vec3(%f, %f, %f) * vec3(scale, scale, scale)\n", point[0], point[1], point[2]);
 	}
 }
+
 void p_create_cube_blur_shader(void)
 {
-	char vertex[300] = {
+	char vertex[300] =
 	"varying vec3 r_normal;"
 	"void main()"
 	"{"
+//	"	r_normal = gl_NormalMatrix * gl_Vertex.xyz;"
 	"	r_normal = gl_Vertex.xyz;"
 	"	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;"
-	"}"};
-	char fragment[6000] = {
+	"}";
+	char fragment[6000] =
 	"uniform samplerCube environment;\n"
-	"uniform samplerCube noise;\n"
+	"uniform samplerCube my_noise;\n"
 	"varying vec3 r_normal;\n"
 	"void main()\n"
 	"{\n"
 	"   vec3 normal;\n"
 	"   vec4 color;\n"
+	"   float scale = 0.5;\n"
 	"	normal = normalize(r_normal);\n"
-	"	color = textureCube(environment, normal);\n"
-	"	color += textureCube(environment, mat3(0.836180, -0.535237, -0.119687, 0.474170, 0.815167, -0.332664, 0.275619, 0.221415, 0.935420) * normal);\n"
-	"	color += textureCube(environment, mat3(0.771369, -0.631501, 0.078723, 0.618714, 0.773136, 0.139476, -0.148943, -0.058881, 0.987091) * normal);\n"
-	"	color += textureCube(environment, mat3(0.545046, -0.838164, -0.020141, 0.701543, 0.469094, -0.536458, 0.459088, 0.278265, 0.843687) * normal);\n"
-	"	color += textureCube(environment, mat3(0.468488, 0.089479, 0.878927, -0.357949, 0.928768, 0.096241, -0.807708, -0.359699, 0.467145) * normal);\n"
-	"	color += textureCube(environment, mat3(0.874601, -0.475520, 0.094622, 0.412822, 0.628017, -0.659677, 0.254266, 0.616016, 0.745569) * normal);\n"
-	"	color += textureCube(environment, mat3(0.954456, -0.142905, -0.261901, 0.081205, 0.969115, -0.232855, 0.287088, 0.200982, 0.936582) * normal);\n"
-	"	color += textureCube(environment, mat3(0.844120, -0.528416, 0.090763, 0.483116, 0.676228, -0.556161, 0.232508, 0.513315, 0.826104) * normal);\n"
-	"	gl_FragColor += color / vec4(16.0, 16.0, 16.0, 1.0);\n"
-	"}\n"};
+	"	color = textureCube(environment, normal + vec3(0.169075, 0.135824, -0.176180) * vec3(scale, scale, scale));\n"
+	"	color += textureCube(environment, normal + vec3(-0.186778, -0.073838, 0.487833) * vec3(scale, scale, scale));\n"
+	"	color += textureCube(environment, normal + vec3(0.446765, 0.270796, 0.071040) * vec3(scale, scale, scale));\n"
+	"	color += textureCube(environment, normal + vec3(-0.540902, -0.240882, -0.437164) * vec3(scale, scale, scale));\n"
+
+/*	"	color += textureCube(environment, normal + vec3(0.239617, 0.580526, -0.047384) * vec3(scale, scale, scale));\n"
+	"	color += textureCube(environment, normal + vec3(-0.177717, 0.124415, -0.170225) * vec3(scale, scale, scale));\n"
+	"	color += textureCube(environment, normal + vec3(0.262794, 0.580178, 0.183709) * vec3(scale, scale, scale));\n"
+	"	color += textureCube(environment, normal + vec3(-0.284242, 0.537213, -0.396187) * vec3(scale, scale, scale));\n"
+*/
+/*	"	color += textureCube(environment, normal + vec3(0.031456, -0.215087, 0.279483) * vec3(scale, scale, scale));\n"
+	"	color += textureCube(environment, normal + vec3(-0.493833, 0.512675, -0.399887) * vec3(scale, scale, scale));\n"
+	"	color += textureCube(environment, normal + vec3(0.260768, 0.109893, -0.244902) * vec3(scale, scale, scale));\n"
+	"	color += textureCube(environment, normal + vec3(-0.321655, -0.434036, 0.533835) * vec3(scale, scale, scale));\n"
+
+	"	color += textureCube(environment, normal + vec3(0.465889, -0.129719, 0.525718) * vec3(scale, scale, scale));\n"
+	"	color += textureCube(environment, normal + vec3(-0.482868, -0.387759, -0.479857) * vec3(scale, scale, scale));\n"
+	"	color += textureCube(environment, normal + vec3(0.161984, -0.218762, -0.293495) * vec3(scale, scale, scale));\n"
+	"	color += textureCube(environment, normal + vec3(-0.492634, 0.166669, -0.325802) * vec3(scale, scale, scale));\n"
+*/	"	gl_FragColor += color / vec4(10.0, 10.0, 10.0, 1.0);\n"
+//	"	gl_FragColor = vec4(normal, 1.0);\n"
+	"}\n";
 
 	if(p_blur_program == -1)
 		p_blur_program = p_shader_create(vertex, fragment);
-	print_blur_matrix();
+//	print_blur_matrix();
 }
 
+/*
+color += textureCube(environment, normal + vec3(0.064213, 0.557927, 0.412619) * vec3(scale, scale, scale));\n"
+color += textureCube(environment, normal + vec3(-0.133883, -0.455591, 0.511163) * vec3(scale, scale, scale)
+color += textureCube(environment, normal + vec3(-0.312261, 0.515510, -0.240775) * vec3(scale, scale, scale)
+color += textureCube(environment, normal + vec3(0.518477, -0.339376, 0.346199) * vec3(scale, scale, scale)
+color += textureCube(environment, normal + vec3(0.169075, 0.135824, -0.176180) * vec3(scale, scale, scale)
+color += textureCube(environment, normal + vec3(-0.186778, -0.073838, 0.487833) * vec3(scale, scale, scale)
+color += textureCube(environment, normal + vec3(0.446765, 0.270796, 0.071040) * vec3(scale, scale, scale)
+color += textureCube(environment, normal + vec3(-0.540902, -0.240882, -0.437164) * vec3(scale, scale, scale)
+color += textureCube(environment, normal + vec3(0.239617, 0.580526, -0.047384) * vec3(scale, scale, scale)
+color += textureCube(environment, normal + vec3(0.177717, 0.124415, -0.170225) * vec3(scale, scale, scale)
+color += textureCube(environment, normal + vec3(0.262794, 0.580178, 0.183709) * vec3(scale, scale, scale)
+*/
 extern void p_shader_use(uint program);
 extern double get_rand(uint32 index);
 
@@ -149,9 +190,10 @@ uint p_blur_object_environment(ENode *node, uint blur, uint texture, uint size, 
 		noise = create_environment(size, buf);
 		free(buf);
 	}
-	glPushMatrix();
+
 	glLoadIdentity();
-	glClearColor(0, 0, 0, 0);
+	glPushMatrix();
+//	glClearColor(0, 0, 0, 0);
 	switch(side)
 	{
 		case 0 :
@@ -405,26 +447,7 @@ void compute_fov(ENode *node, double *matrix, PObject *o, double *fov_v, double 
 // uint p_env_get_environment(PObjEnv *env)
 
 
-uint create_environment(uint size, float *buf)
-{
-	uint environment;
-	uint format = p_th_get_hdri_token(FALSE);
-	glEnable(GL_TEXTURE_CUBE_MAP_EXT);
-	glGenTextures(1, &environment);
-	glBindTexture(GL_TEXTURE_CUBE_MAP_EXT, environment);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_EXT, 0, format, size, size, 0, GL_RGB, GL_FLOAT, buf); 
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y_EXT, 0, format, size, size, 0, GL_RGB, GL_FLOAT, buf); 
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z_EXT, 0, format, size, size, 0, GL_RGB, GL_FLOAT, buf); 
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X_EXT, 0, format, size, size, 0, GL_RGB, GL_FLOAT, buf); 
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_EXT, 0, format, size, size, 0, GL_RGB, GL_FLOAT, buf); 
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_EXT, 0, format, size, size, 0, GL_RGB, GL_FLOAT, buf);
-	glDisable(GL_TEXTURE_CUBE_MAP_EXT);
-	return environment;
-}
+
 
 void p_draw_reflection_flares(double *view);
 
@@ -484,13 +507,14 @@ uint update_object_environment(ENode *node, uint texture, uint size, uint side)
 	{
 		if(node != n)
 		{
+			float light[3] = {10, 10, 10};
 			glEnable(GL_DEPTH_TEST);
 			glPushMatrix();
 			o = e_ns_get_custom_data(n, P_ENOUGH_SLOT);
 			p_set_light(&o->light, 3, 0, 0);
 			p_render_set_transform(n);
-			p_render_object(n, FALSE);
-			p_render_object(n, TRUE);
+			p_render_object(n, FALSE, TRUE);
+			p_render_object(n, TRUE, TRUE);
 			glPopMatrix();
 			glDisable(GL_DEPTH_TEST);
 		}	
@@ -559,8 +583,8 @@ void update_object_impostor(ENode *node, double *pos, uint texture)
 
 	if(o->impostor.impostor)
 	{
-		p_render_object(node, FALSE);
-		p_render_object(node, TRUE);
+		p_render_object(node, FALSE, FALSE);
+		p_render_object(node, TRUE, FALSE);
 	}
 	glPopMatrix();
 	glPopMatrix();
@@ -610,25 +634,52 @@ void p_update_object_impostors(void)
 					update_object_impostor(node, p_lod_get_view_pos(), o->impostor.texture);
 				else if(stage > 0 && stage < 7)
 					o->impostor.environment = update_object_environment(node, o->impostor.environment, 256, stage - 1);
+			/*	else if(stage < 13)
+					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, o->impostor.environment, 256, stage - 7);
+			
+				else if(stage < 13)
+					intermidiet = p_blur_object_environment(node, intermidiet, o->impostor.environment, 32, stage - 7);
+				else if(stage < (13 + 6))
+					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, intermidiet, 32, stage - 13);
+*/
+				else if(stage < 8)
+				{
+					intermidiet = p_blur_object_environment(node, intermidiet, o->impostor.environment, 64, 0);
+					intermidiet = p_blur_object_environment(node, intermidiet, o->impostor.environment, 64, 1);
+					intermidiet = p_blur_object_environment(node, intermidiet, o->impostor.environment, 64, 2);
+					intermidiet = p_blur_object_environment(node, intermidiet, o->impostor.environment, 64, 3);
+					intermidiet = p_blur_object_environment(node, intermidiet, o->impostor.environment, 64, 4);
+					intermidiet = p_blur_object_environment(node, intermidiet, o->impostor.environment, 64, 5);
+					intermidiet2 = p_blur_object_environment(node, intermidiet2, intermidiet, 64, 0);
+					intermidiet2 = p_blur_object_environment(node, intermidiet2, intermidiet, 64, 1);
+					intermidiet2 = p_blur_object_environment(node, intermidiet2, intermidiet, 64, 2);
+					intermidiet2 = p_blur_object_environment(node, intermidiet2, intermidiet, 64, 3);
+					intermidiet2 = p_blur_object_environment(node, intermidiet2, intermidiet, 64, 4);
+					intermidiet2 = p_blur_object_environment(node, intermidiet2, intermidiet, 64, 5);
+					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, intermidiet2, 64, 0);
+					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, intermidiet2, 64, 1);
+					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, intermidiet2, 64, 2);
+					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, intermidiet2, 64, 3);
+					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, intermidiet2, 64, 4);
+					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, intermidiet2, 64, 5);
+				}
 
 	/*			else if(stage < 13)
-					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, o->impostor.environment, 256, stage - 7);
-	*/		
-	/*			else if(stage < 13)
-					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, o->impostor.environment, 32, stage - 7);
-				else if(stage < (13 + 6))
-					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, intermidiet, 32, stage - (7 + 6));
-*//*
-				else if(stage < 13)
 					intermidiet = p_blur_object_environment(node, intermidiet, o->impostor.environment, 32, stage - 7);
 				else if(stage < (13 + 6))
 					intermidiet2 = p_blur_object_environment(node, intermidiet2, intermidiet, 32, stage - (7 + 6));
 				else if(stage < (13 + 6 + 6))
 					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, intermidiet2, 32, stage - (7 + 6 + 6));
-*/
+			*/
 				else
 				{
-					node_id = e_ns_get_node_id(node) + 1;
+					uint i;
+				/*	intermidiet2 = o->impostor.environment;
+					o->impostor.environment = intermidiet;
+					intermidiet = intermidiet2;
+					o->impostor.blur = o->impostor.environment;
+					o->impostor.blur = o->impostor.environment;
+			*/		node_id = e_ns_get_node_id(node) + 1;
 					stage = 0;
 					return;
 				}
