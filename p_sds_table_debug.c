@@ -1,7 +1,6 @@
 #include "verse.h"
 #include "enough.h"
 
-#include "seduce.h"
 #include "p_sds_table.h"
 
 void blend_one_vertex(PTessTableElement *t, float *vertex, uint corners, uint id)
@@ -45,7 +44,7 @@ void draw_table(PTessTableElement *t, uint corners)
 
 //	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 //	sui_draw_gl(GL_QUADS, pos, 4, 2, 1, 0, 1);	
-	sui_draw_gl(GL_TRIANGLES, vertex, t->element_count, 2, 1, 1, 1, 1);	
+//	sui_draw_gl(GL_TRIANGLES, vertex, t->element_count, 2, 1, 1, 1, 1);	
 
 	free(vertex);
 }
@@ -64,7 +63,7 @@ void draw_table_normals(PTessTableElement *t, uint corners)
 		vertex[3] = (vertex[1] * 0.7 + a[1] * 0.3);
 		vertex[4] = (vertex[0] * 0.7 + b[0] * 0.3);
 		vertex[5] = (vertex[1] * 0.7 + b[1] * 0.3);
-		sui_draw_gl(GL_TRIANGLES, vertex, 3, 2, 0, 1, 0, 1);
+	//	sui_draw_gl(GL_TRIANGLES, vertex, 3, 2, 0, 1, 0, 1);
 
 		blend_one_vertex(t, vertex, corners, i);
 		blend_one_vertex(t, a, corners, t->normals[i * 4 + 2]);
@@ -73,7 +72,7 @@ void draw_table_normals(PTessTableElement *t, uint corners)
 		vertex[3] = (vertex[1] * 0.7 + a[1] * 0.3);
 		vertex[4] = (vertex[0] * 0.7 + b[0] * 0.3);
 		vertex[5] = (vertex[1] * 0.7 + b[1] * 0.3);
-		sui_draw_gl(GL_TRIANGLES, vertex, 3, 2, 1, 0, 0, 1);
+	//	sui_draw_gl(GL_TRIANGLES, vertex, 3, 2, 1, 0, 0, 1);
 	}
 }
 
@@ -88,17 +87,17 @@ void draw_table_debugging(void)
 	splits[3] = (counter / 6400)% 4;
 	counter++;
 
-	glPushMatrix();
-	glTranslatef(0, 0, -1);
+//	glPushMatrix();
+//	glTranslatef(0, 0, -1);
 //	get_dynamic_table_quad(p_get_max_tess_level(), splits);
 	t = get_dynamic_table_quad(4, splits);
 //	t = get_dynamic_table_tri(4, splits);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+/*	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	draw_table(t, 4);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	draw_table_normals(t, 4);
 	glTranslatef(0, 0.7, 0);
 	draw_table(t, 4);
-	glPopMatrix();
+	glPopMatrix();*/
 }
 
