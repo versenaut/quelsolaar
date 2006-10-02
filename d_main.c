@@ -216,6 +216,8 @@ void hidden_type_in(BInputState *input, float pos_x, float pos_y, float length, 
 void (*deceive_draw_func)(void *user_pointer) = NULL;
 void *deceive_user_pointer = NULL;
 
+void d_draw_login(BInputState *input);
+
 void deceive_set_intro_draw_func(void (*draw_func)(void *user_pointer), void *user_pointer)
 {
 	deceive_draw_func = draw_func;
@@ -230,6 +232,7 @@ void deceive_intro_handler(BInputState *input, void *application_handler_func)
 	uint i, j;
 	if(init == FALSE)
 	{
+		d_init_master();
 		deceive_load_bookmarks(NULL);
 		init = TRUE;
 	}
@@ -262,8 +265,8 @@ void deceive_intro_handler(BInputState *input, void *application_handler_func)
 
 	if((input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE) || (input->mouse_button[1] == FALSE && input->last_mouse_button[1] == TRUE) || (input->mouse_button[2] == FALSE && input->last_mouse_button[2] == TRUE))
 		active = TRUE;
-	
-	if(active)
+
+/*	if(active)
 	{
 		if(e_vc_check_connected_slot(0))
 		{
@@ -387,12 +390,16 @@ void deceive_intro_handler(BInputState *input, void *application_handler_func)
 				}
 			}
 		}
-	}
-
+	}*/
 	if(input->mode == BAM_DRAW)
 	{
 		float border[16] = {-1, 10, 1, 10, 1, 0.45, -1, 0.45, -1, -10, 1, -10, 1, -0.45, -1, -0.45};
 		sui_draw_gl(GL_QUADS, border, 8, 2, 0, 0, 0, 1);
+	}
+	if(active)
+		d_draw_login(input);
+	if(input->mode == BAM_DRAW)
+	{	
 		glEnable(GL_DEPTH_TEST);
 		glPopMatrix();
 		glPushMatrix();
