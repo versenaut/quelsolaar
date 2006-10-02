@@ -36,9 +36,14 @@ extern float	p_geo_get_sds_mesh_factor(void);
 extern void		p_render_set_shadows(boolean shadows);
 extern boolean	p_render_get_shadows(void);
 
+extern void		p_render_set_flare(boolean wireframe);
+extern boolean	p_render_get_flare(void);
+
 extern void		p_render_set_wireframe(boolean wireframe);
 extern boolean	p_render_get_wireframe(void);
 
+extern void		p_th_set_sds_use_hdri(boolean hdri);
+extern boolean	p_th_get_sds_use_hdri(void);
 
 
 extern void		p_render_set_impostor_size(float size);
@@ -68,6 +73,8 @@ extern uint		p_rm_get_ref_length(PMesh *mesh); /* get the length of the referenc
 extern uint		p_rm_get_mat_count(PMesh *mesh); /* get tyhe number of materials this object has */
 extern uint		p_rm_get_material_range(PMesh *mesh, uint mat); /* what is the last index range this material has */
 extern uint		p_rm_get_material(PMesh *mesh, uint mat); /* what is the id of the material */
+extern uint		p_rm_get_param_count(PMesh *mesh);
+extern void		*p_rm_get_param(PMesh *mesh);
 
 extern boolean	p_rm_get_shadow(PMesh *mesh);
 
@@ -89,6 +96,18 @@ extern uint		p_th_get_texture_id(PTextureHandle *handle);
 extern uint		p_th_get_texture_dimensions(PTextureHandle *handle);
 
 extern void		p_draw_scene(void);
+
+extern void		p_context_update(void);
+
+/* Noise handler */
+
+extern egreal p_noise_multi_function(egreal *vec);
+extern egreal p_noise_point_function(egreal *vec);
+
+/* Shader Code gen */
+
+extern void p_shader_code_write(ENode *node, char **v_code, uint *v_length, char **f_code, uint *f_length, uint *dest, uint *src);
+
 
 #endif		/* PERSUADE_H */
 
