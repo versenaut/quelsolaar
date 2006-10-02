@@ -4,7 +4,6 @@
 //#include "ngl.h"
 #include "enough.h"
 #include "p_geo_subdivide_internal.h"
-#include "seduce.h"
 /*
 void render_a_mesh_using_ngl(PMesh *mesh)
 {
