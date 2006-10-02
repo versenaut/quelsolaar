@@ -484,23 +484,33 @@ void p_shader_unbind_texture(uint unit)
 
 uint p_shader_get_param_count(ENode *node)
 {
+	VNMFragmentID id;
+	uint i = 0;
 	if(p_programmable_shaders_supported)
 	{
 		PShader *s;
 		s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
 		return s->g_f_count;
 	}else 
-		return 0;
+		for(id = e_nsm_get_fragment_next(node, 0); id != (uint16)-1; id = e_nsm_get_fragment_next(node, id + 1))
+			if(e_nsm_get_fragment_type(node, id) == VN_M_FT_GEOMETRY)
+				i++;
+	return i;
 }
+
 VMatFrag *p_shader_get_param(ENode *node, uint nr)
 {
+	VNMFragmentID id;
+	uint i = 0;
 	if(p_programmable_shaders_supported)
 	{
 		PShader *s;
 		s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
 		return e_nsm_get_fragment(node, s->geometry_fragments[nr * 2]);
 	}else 
-		return NULL;
+		for(id = e_nsm_get_fragment_next(node, 0); id != (uint16)-1; id = e_nsm_get_fragment_next(node, id + 1))
+			if(e_nsm_get_fragment_type(node, id) == VN_M_FT_GEOMETRY && i++ == nr)
+				return e_nsm_get_fragment(node, id);
 }
 
 
