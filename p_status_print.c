@@ -1,6 +1,5 @@
 
 #include "verse.h"
-#include "seduce.h"
 #include "enough.h"
 #include "p_sds_geo.h"
 #include "p_sds_obj.h"
@@ -28,6 +27,7 @@ typedef struct{
 }PObject;
 */
 
+/*
 void p_status_print(void)
 {
 	ENode *node;
@@ -78,7 +78,6 @@ void p_status_print(void)
 				glRotatef(f, 1, 1, 0.1);
 				f += 1;
 			}
-//			sds_test_draw_2(g_mesh, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
 			glPopMatrix();
 		}else
 		{	
@@ -92,3 +91,4 @@ void p_status_print(void)
 		line -= 0.05;
 	}
 }
+*/
