@@ -167,6 +167,7 @@ uint p_shader_create(char *vertex, char *fragment)
 	uint vertex_obj, fragment_obj, prog_obj;
 	uint i;
 	char buf[2000];
+
 	prog_obj = p_glCreateProgramObjectARB();
 	vertex_obj = p_glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
 	fragment_obj = p_glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
