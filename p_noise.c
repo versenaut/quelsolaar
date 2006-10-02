@@ -58,7 +58,26 @@ egreal p_noise_function(egreal *vec, uint level)
 
 egreal p_noise_multi_function(egreal *vec)
 {
-	return p_noise_function(vec, 7) * 0.7 + p_noise_function(vec, 17) * 0.3 + p_noise_function(vec, 31) * 0.15;
+	egreal tmp[3];
+	tmp[0] = vec[0];
+	if(tmp[0] >= 1.0)
+		tmp[0] -= (uint)tmp[0];
+	if(tmp[0] < 0.0)
+		tmp[0] -= (int)tmp[0] - 1;
+
+	tmp[1] = vec[1];
+	if(tmp[1] >= 1.0)
+		tmp[1] -= (uint)tmp[1];
+	if(tmp[1] < 0.0)
+		tmp[1] -= (int)tmp[1] - 1;
+
+	tmp[2] = vec[2];
+	if(tmp[2] >= 1.0)
+		tmp[2] -= (uint)tmp[2];
+	if(tmp[2] < 0.0)
+		tmp[2] -= (int)tmp[2] - 1;
+
+	return p_noise_function(tmp, 7) * 0.7 + p_noise_function(tmp, 17) * 0.3 + p_noise_function(tmp, 29) * 0.15;
 }
 
 #define P_POINT_NOISE_LEVEL 128
@@ -84,9 +103,9 @@ egreal p_noise_point_function(egreal *vec)
 			for(k = 0; k < 3; k++)
 			{
 				pos = start + i + j * P_POINT_NOISE_LEVEL + k * P_POINT_NOISE_LEVEL * P_POINT_NOISE_LEVEL;
-				vector[0] = get_rand(pos * 3 + 0) + (float)i - (1.0 + fi);
-				vector[1] = get_rand(pos * 3 + 1) + (float)j - (1.0 + fj);
-				vector[2] = get_rand(pos * 3 + 2) + (float)k - (1.0 + fk);
+				vector[0] = get_rand(pos * 3 + 0) + (egreal)i - (1.0 + fi);
+				vector[1] = get_rand(pos * 3 + 1) + (egreal)j - (1.0 + fj);
+				vector[2] = get_rand(pos * 3 + 2) + (egreal)k - (1.0 + fk);
 				f = vector[0] * vector[0] + vector[0] * vector[0] + vector[0] * vector[0];	
 				if(f < fbest)
 				{
