@@ -14,7 +14,7 @@ void connect_type_in_func(void *user, char *text)
 }
 
 extern void qs_input_handler(BInputState *input, void *user);
-extern void qs_intro_draw(void);
+extern void qs_intro_draw(void *user);
 extern void g_set_ship_camera(BInputState *input, float delta_time);
 
 
@@ -103,7 +103,7 @@ void qs_intro_handler(BInputState *input, void *user)
 		glTranslatef(0, 0, -1);
 		glDisable(GL_DEPTH_TEST);
 	}
-	qs_intro_draw();
+//	qs_intro_draw(NULL);
 	if((input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE) || (input->mouse_button[1] == FALSE && input->last_mouse_button[1] == TRUE) || (input->mouse_button[2] == FALSE && input->last_mouse_button[2] == TRUE))
 		active = TRUE;
 
@@ -204,7 +204,8 @@ int main(int argc, char **argv)
 	qs_intro_init();
 //	betray_set_mouse_warp(TRUE);
 
-	betray_set_action_func(qs_intro_handler, NULL);
+	deceive_set_intro_draw_func(qs_intro_draw, NULL);
+	betray_set_action_func(deceive_intro_handler, qs_draw_handler);
 //	betray_set_action_func(sui_symbol_editor_func, NULL);
 	betray_set_context_update_func(p_context_update);
 	betray_launch_main_loop();
