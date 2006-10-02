@@ -29,6 +29,8 @@ extern uint		e_vc_connect(const char *server_address, const char *name, const ch
 extern boolean	e_vc_check_connected(void);
 extern boolean	e_vc_check_connected_slot(uint	connection);
 extern boolean	e_vc_check_accepted_slot(uint connection);
+extern char *	e_vc_check_rejected_slot(uint connection);
+
 extern void		e_vc_disconnect(uint	connection);
 extern void		e_vc_disconnect_all(void);
 extern void		e_vc_set_current_active_connection(uint connection);
