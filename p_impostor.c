@@ -119,12 +119,12 @@ void p_create_cube_blur_shader(void)
 	"	color += textureCube(environment, normal + vec3(0.446765, 0.270796, 0.071040) * vec3(scale, scale, scale));\n"
 	"	color += textureCube(environment, normal + vec3(-0.540902, -0.240882, -0.437164) * vec3(scale, scale, scale));\n"
 
-/*	"	color += textureCube(environment, normal + vec3(0.239617, 0.580526, -0.047384) * vec3(scale, scale, scale));\n"
+	"	color += textureCube(environment, normal + vec3(0.239617, 0.580526, -0.047384) * vec3(scale, scale, scale));\n"
 	"	color += textureCube(environment, normal + vec3(-0.177717, 0.124415, -0.170225) * vec3(scale, scale, scale));\n"
 	"	color += textureCube(environment, normal + vec3(0.262794, 0.580178, 0.183709) * vec3(scale, scale, scale));\n"
 	"	color += textureCube(environment, normal + vec3(-0.284242, 0.537213, -0.396187) * vec3(scale, scale, scale));\n"
-*/
-/*	"	color += textureCube(environment, normal + vec3(0.031456, -0.215087, 0.279483) * vec3(scale, scale, scale));\n"
+
+	"	color += textureCube(environment, normal + vec3(0.031456, -0.215087, 0.279483) * vec3(scale, scale, scale));\n"
 	"	color += textureCube(environment, normal + vec3(-0.493833, 0.512675, -0.399887) * vec3(scale, scale, scale));\n"
 	"	color += textureCube(environment, normal + vec3(0.260768, 0.109893, -0.244902) * vec3(scale, scale, scale));\n"
 	"	color += textureCube(environment, normal + vec3(-0.321655, -0.434036, 0.533835) * vec3(scale, scale, scale));\n"
@@ -133,7 +133,7 @@ void p_create_cube_blur_shader(void)
 	"	color += textureCube(environment, normal + vec3(-0.482868, -0.387759, -0.479857) * vec3(scale, scale, scale));\n"
 	"	color += textureCube(environment, normal + vec3(0.161984, -0.218762, -0.293495) * vec3(scale, scale, scale));\n"
 	"	color += textureCube(environment, normal + vec3(-0.492634, 0.166669, -0.325802) * vec3(scale, scale, scale));\n"
-*/	"	gl_FragColor += color / vec4(10.0, 10.0, 10.0, 1.0);\n"
+	"	gl_FragColor += color / vec4(40.0, 40.0, 40.0, 1.0);\n"
 //	"	gl_FragColor = vec4(normal, 1.0);\n"
 	"}\n";
 
