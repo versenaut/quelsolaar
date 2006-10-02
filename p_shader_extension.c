@@ -132,8 +132,8 @@ char p_standard_vertex_shader_code[256] =
 "	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;"
 "}";
 
-PShader *p_standard_shader;
-boolean p_programmable_shaders_supported = FALSE;
+static PShader *p_standard_shader;
+static boolean p_programmable_shaders_supported = FALSE;
 
 PShader *p_shader_allocate(void)
 {
@@ -159,8 +159,7 @@ PShader *p_shader_allocate(void)
 
 extern void p_shader_func(ENode *node, ECustomDataCommand command);
 
-
-uint shadow_prog_obj = -1;
+static uint shadow_prog_obj = -1;
 
 uint p_shader_create(char *vertex, char *fragment)
 {
