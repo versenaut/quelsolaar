@@ -188,13 +188,13 @@ void set_intro_mode(double run)
 		GlobalIntro.intro_t = 0;
 }
 
-boolean qs_intro_draw(void)
+void qs_intro_draw(void *user)
 {
 	uint i;
 	float t = 0, border[16] = {-1, 1, 1, 1, 1, 0.45, -1, 0.45, -1, -1, 1, -1, 1, -0.45, -1, -0.45};
 //	Point position;
 	if(GlobalIntro.intro != TRUE)
-		return FALSE;
+		return;
 	glDisable(GL_CULL_FACE);
 	glPushMatrix();
 	glScalef (0.08, 0.08, 0.04);
@@ -265,6 +265,6 @@ boolean qs_intro_draw(void)
 //	glTranslatef(0, 0, -1);
 	sui_draw_gl(GL_QUADS, border, 8, 2, 0, 0, 0, 0);
 	glPopMatrix();
-	return TRUE;
+	return;
 }
 
