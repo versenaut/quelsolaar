@@ -89,7 +89,7 @@ persuade.lib:	p_extension.obj p_flare.obj p_geometry.obj p_impostor.obj p_noise.
 		p_task.obj p_texture.obj
 		$(LIBEXE) $(LIBFLAGS)$@ $**
 
-deceive.lib:	d_main.obj
+deceive.lib:	d_main.obj d_master.obj
 		$(LIBEXE) $(LIBFLAGS)$@ $**
 
 # -------------------------------------------------------------
