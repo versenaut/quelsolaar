@@ -123,7 +123,6 @@ void la_compute_set_range(double start, double end);
 	VN_G_LAYER_POLYGON_FACE_REAL
 } VNGLayerType;
 */
-
 void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 {
 	static double brush_size = 0.1;
@@ -148,7 +147,7 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 			type = e_nsg_get_layer_type(lp_layer_get_blue(lp_layer_current_get()));
 		if(NULL != lp_layer_get_green(lp_layer_current_get()) || NULL != lp_layer_get_blue(lp_layer_current_get()))
 		{
-			sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Color:", 0, 0, 0);
+			sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Color:", 0, 0, 0, 1.0);
 			if(NULL != lp_layer_get_red(lp_layer_current_get()))
 				slider[0] = lp_menu_slider(input, 0.55, position - 0.05, 0.4, slider[0], 0, slider[1], slider[2], 1, slider[1], slider[2]);
 			else
@@ -166,28 +165,28 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 		{
 			if(type == VN_G_LAYER_VERTEX_UINT32 || type == VN_G_LAYER_POLYGON_CORNER_UINT32 || type == VN_G_LAYER_POLYGON_FACE_UINT8 || type == VN_G_LAYER_POLYGON_FACE_UINT32)
 			{
-				sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Integer:", 0, 0, 0);
+				sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Integer:", 0, 0, 0, 1.0);
 				lp_compute_int_color(color, *integer);
 				sui_type_number_uint(input, 0.55, position - 0.05, 0.4, 0.5f, SUI_T_SIZE, (uint32 *) integer, integer, color[0], color[1], color[2]);
 				position -= 0.1;
 			}else
 			{
-				sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "color:", 0, 0, 0);
+				sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "color:", 0, 0, 0, 1.0);
 				slider[0] = lp_menu_slider(input, 0.5, position - 0.05, 0.4, slider[0], 0, 0, 0, 1, 1, 1);
-				sui_type_number_double(input, 0.55, position - 0.1, 0.4, 0.5f, SUI_T_SIZE, &slider[0], &slider[0], color[0], color[1], color[2]);
+				sui_type_number_double(input, 0.55, position - 0.1, 0.4, 0.5f, SUI_T_SIZE, &slider[0], &slider[0], color[0], color[1], color[2], 1.0);
 				glPopMatrix();
 				position -= 0.15;
 			}		
 		}
 		if(type != VN_G_LAYER_VERTEX_UINT32 && type != VN_G_LAYER_POLYGON_CORNER_UINT32 && type != VN_G_LAYER_POLYGON_FACE_UINT8 && type != VN_G_LAYER_POLYGON_FACE_UINT32)
 		{				
-			sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Tone Range:", 0, 0, 0);
-			sui_type_number_double(input, 0.55, position - 0.05, 0.4, 0.5f, SUI_T_SIZE, &start_range, &start_range, 0, 0, 0);
-			sui_type_number_double(input, 0.75, position - 0.05, 0.4, 0.5f, SUI_T_SIZE, &end_range, &end_range, 0, 0, 0);
+			sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Tone Range:", 0, 0, 0, 1.0);
+			sui_type_number_double(input, 0.55, position - 0.05, 0.4, 0.5f, SUI_T_SIZE, &start_range, &start_range, 0, 0, 0, 1.0);
+			sui_type_number_double(input, 0.75, position - 0.05, 0.4, 0.5f, SUI_T_SIZE, &end_range, &end_range, 0, 0, 0, 1.0);
 			position -= 0.1;
 		}
 
-		sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Brush size:", 0, 0, 0);
+		sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Brush size:", 0, 0, 0, 1.0);
 		brush_size = lp_menu_slider(input, 0.55, position - 0.05, 0.4, brush_size / 0.2, 0, 0, 0, 1, 1, 1) * 0.2;
 		lp_brush_size_set(brush_size);	
 		position -= 0.1;

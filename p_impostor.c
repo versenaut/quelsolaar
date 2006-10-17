@@ -112,7 +112,7 @@ void p_create_cube_blur_shader(void)
 	"{\n"
 	"   vec3 normal;\n"
 	"   vec4 color;\n"
-	"   float scale = 0.5;\n"
+	"   float scale = 0.6;\n"
 	"	normal = normalize(r_normal);\n"
 	"	color = textureCube(environment, normal + vec3(0.169075, 0.135824, -0.176180) * vec3(scale, scale, scale));\n"
 	"	color += textureCube(environment, normal + vec3(-0.186778, -0.073838, 0.487833) * vec3(scale, scale, scale));\n"
@@ -160,7 +160,6 @@ extern double get_rand(uint32 index);
 
 uint p_blur_object_environment(ENode *node, uint blur, uint texture, uint size, uint side)
 {
-	static uint noise = -1;
 	float draw[72] = {
 	1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0,
 	1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, -1.0,
@@ -174,6 +173,7 @@ uint p_blur_object_environment(ENode *node, uint blur, uint texture, uint size, 
 	ENode *n;
 	PObject *o;
 	uint i;
+
 	p_create_cube_blur_shader();
 	e_nso_get_pos_time(node, objpos, 0, 0);
 
@@ -181,16 +181,6 @@ uint p_blur_object_environment(ENode *node, uint blur, uint texture, uint size, 
 	{
 		blur = create_environment(size, NULL);
 	}
-	if(noise == -1)
-	{
-		float *buf;
-		buf = malloc((sizeof *buf) * size * size * 3);
-		for(i = 0; i < size * size * 3; i++)
-			buf[i] = get_rand(i);
-		noise = create_environment(size, buf);
-		free(buf);
-	}
-
 	glLoadIdentity();
 	glPushMatrix();
 //	glClearColor(0, 0, 0, 0);
@@ -230,7 +220,7 @@ uint p_blur_object_environment(ENode *node, uint blur, uint texture, uint size, 
 	glMatrixMode(GL_MODELVIEW);
 	p_shader_use(p_blur_program);
 	p_shader_bind_texture(p_blur_program, "environment", 0, texture);
-	p_shader_bind_texture(p_blur_program, "noise", 1, noise);
+//	p_shader_bind_texture(p_blur_program, "noise", 1, noise);
 
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -241,7 +231,7 @@ uint p_blur_object_environment(ENode *node, uint blur, uint texture, uint size, 
 
 	p_shader_unbind_texture(0);
 	p_shader_unbind_texture(1);
-	p_shader_use(-1);
+	p_shader_use(0);
 	glPopMatrix();
 	p_texture_render_unbind();
 	return blur;
@@ -607,11 +597,12 @@ void update_object_impostor(ENode *node, double *pos, uint texture)
 }
 
 boolean p_render_to_texture_suported(void);
+uint p_blur_intermidiet = -1;
+uint p_blur_intermidiet2 = -1;
 
 void p_update_object_impostors(void)
 {
 	static uint node_id = 0, stage = 0;
-	static uint intermidiet = -1, intermidiet2 = -1;
 	uint counter = 0;
 	ENode *node;
 	PObject *o;
@@ -644,24 +635,24 @@ void p_update_object_impostors(void)
 */
 				else if(stage < 8)
 				{
-					intermidiet = p_blur_object_environment(node, intermidiet, o->impostor.environment, 64, 0);
-					intermidiet = p_blur_object_environment(node, intermidiet, o->impostor.environment, 64, 1);
-					intermidiet = p_blur_object_environment(node, intermidiet, o->impostor.environment, 64, 2);
-					intermidiet = p_blur_object_environment(node, intermidiet, o->impostor.environment, 64, 3);
-					intermidiet = p_blur_object_environment(node, intermidiet, o->impostor.environment, 64, 4);
-					intermidiet = p_blur_object_environment(node, intermidiet, o->impostor.environment, 64, 5);
-					intermidiet2 = p_blur_object_environment(node, intermidiet2, intermidiet, 64, 0);
-					intermidiet2 = p_blur_object_environment(node, intermidiet2, intermidiet, 64, 1);
-					intermidiet2 = p_blur_object_environment(node, intermidiet2, intermidiet, 64, 2);
-					intermidiet2 = p_blur_object_environment(node, intermidiet2, intermidiet, 64, 3);
-					intermidiet2 = p_blur_object_environment(node, intermidiet2, intermidiet, 64, 4);
-					intermidiet2 = p_blur_object_environment(node, intermidiet2, intermidiet, 64, 5);
-					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, intermidiet2, 64, 0);
-					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, intermidiet2, 64, 1);
-					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, intermidiet2, 64, 2);
-					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, intermidiet2, 64, 3);
-					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, intermidiet2, 64, 4);
-					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, intermidiet2, 64, 5);
+					p_blur_intermidiet = p_blur_object_environment(node, p_blur_intermidiet, o->impostor.environment, 64, 0);
+					p_blur_intermidiet = p_blur_object_environment(node, p_blur_intermidiet, o->impostor.environment, 64, 1);
+					p_blur_intermidiet = p_blur_object_environment(node, p_blur_intermidiet, o->impostor.environment, 64, 2);
+					p_blur_intermidiet = p_blur_object_environment(node, p_blur_intermidiet, o->impostor.environment, 64, 3);
+					p_blur_intermidiet = p_blur_object_environment(node, p_blur_intermidiet, o->impostor.environment, 64, 4);
+					p_blur_intermidiet = p_blur_object_environment(node, p_blur_intermidiet, o->impostor.environment, 64, 5);
+					p_blur_intermidiet2 = p_blur_object_environment(node, p_blur_intermidiet2, p_blur_intermidiet, 64, 0);
+					p_blur_intermidiet2 = p_blur_object_environment(node, p_blur_intermidiet2, p_blur_intermidiet, 64, 1);
+					p_blur_intermidiet2 = p_blur_object_environment(node, p_blur_intermidiet2, p_blur_intermidiet, 64, 2);
+					p_blur_intermidiet2 = p_blur_object_environment(node, p_blur_intermidiet2, p_blur_intermidiet, 64, 3);
+					p_blur_intermidiet2 = p_blur_object_environment(node, p_blur_intermidiet2, p_blur_intermidiet, 64, 4);
+					p_blur_intermidiet2 = p_blur_object_environment(node, p_blur_intermidiet2, p_blur_intermidiet, 64, 5);
+					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, p_blur_intermidiet2, 64, 0);
+					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, p_blur_intermidiet2, 64, 1);
+					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, p_blur_intermidiet2, 64, 2);
+					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, p_blur_intermidiet2, 64, 3);
+					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, p_blur_intermidiet2, 64, 4);
+					o->impostor.blur = p_blur_object_environment(node, o->impostor.blur, p_blur_intermidiet2, 64, 5);
 				}
 
 	/*			else if(stage < 13)
@@ -755,6 +746,8 @@ void p_impostor_context_update(void)
 {
 	ENode *node;
 	PObject *o;
+	p_blur_intermidiet = -1;
+	p_blur_intermidiet2 = -1;
 	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 	{		
 		o = e_ns_get_custom_data(node, P_ENOUGH_SLOT);

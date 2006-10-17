@@ -10,6 +10,8 @@
 #include "co_widgets.h"
 
 uint32 change_node_id = 0;
+extern float co_background_color[3];
+extern float co_line_color[3];
 
 void rename_node_func(void *user, char *text)
 {
@@ -264,7 +266,7 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 
 	if(input->mode != BAM_DRAW)
 	{
-		if(input->pointer_x > 0.7 && input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
+		if(input->pointer_x > 0.85 && input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
 			grab = TRUE;
 		if(input->mouse_button[0] == FALSE)
 			grab = FALSE;
@@ -276,21 +278,21 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 	y += pos;
 
 	if(input->mode == BAM_DRAW)
-		sui_draw_text(0.0, y - 0.075, SUI_T_SIZE, SUI_T_SPACE, "Name:", 1.0 - 1.0 / 4.0, 1.0 - 1.0 / 4.0, 1.0 - 1.0 / 4.0);  
+		sui_draw_text(0.0, y - 0.075, SUI_T_SIZE, SUI_T_SPACE, "Name:", co_line_color[0], co_line_color[1], co_line_color[2], 1.0 - 1.0 / 4.0);  
 	co_w_type_in(input, 0.15, y - 0.075, 0.5, SUI_T_SIZE, e_ns_get_node_name(node), 16, rename_node_func, NULL, 0, 0.4);
 	if(input->mode == BAM_DRAW)
 	{
-		sui_draw_text(0.0, y - 0.125, SUI_T_SIZE, SUI_T_SPACE, "Type:", 1.0 - 1.0 / 4.0, 1.0 - 1.0 / 4.0, 1.0 - 1.0 / 4.0); 
-		sui_draw_text(0.15, y - 0.125, SUI_T_SIZE, SUI_T_SPACE, type_names[e_ns_get_node_type(node)], 1.0 - 1.0 / 4.0, 1.0 - 1.0 / 4.0, 1.0 - 1.0 / 4.0); 
+		sui_draw_text(0.0, y - 0.125, SUI_T_SIZE, SUI_T_SPACE, "Type:", co_line_color[0], co_line_color[1], co_line_color[2], 1.0 - 1.0 / 4.0); 
+		sui_draw_text(0.15, y - 0.125, SUI_T_SIZE, SUI_T_SPACE, type_names[e_ns_get_node_type(node)], co_line_color[0], co_line_color[1], co_line_color[2], 1.0 - 1.0 / 4.0); 
 	}
-	co_w_scroll(input, 0, 2);
+//	co_w_scroll(input, 0, 2);
 	y -= 0.15;
 	co_vng_divider(input, 0.2, y, &tag_rot, &color, &color_light, &show_tags, "Tags");
 	y -= 0.05;
 	
 	if(tag_rot > 0.01)
 	{
-		if(sw_text_button(input, -0.3, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new tag group", color, color, color))
+		if(sw_text_button(input, -0.3, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new tag group", co_line_color[0], co_line_color[1], co_line_color[2], color))
 		{
 			char nr[32];
 			j = 0;
@@ -302,15 +304,15 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 		y -= 0.05;
 		if((uint16) -1 == e_ns_get_next_tag_group(node, 0))
 		{
-			sui_draw_text(-0.3, y, SUI_T_SIZE, SUI_T_SPACE, "No Tag Groups", color_light, color_light, color_light);  
+			sui_draw_text(-0.3, y, SUI_T_SIZE, SUI_T_SPACE, "No Tag Groups", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 			y -= 0.05;
 		}
 		for(i = e_ns_get_next_tag_group(node, 0); i != (uint16) -1 ; i = e_ns_get_next_tag_group(node, i + 1))
 		{
 			size = 0.0;
-			sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Group name:", color_light, color_light, color_light);  
+			sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Group name:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 			co_w_type_in(input, 0.15, y + size, 0.5, SUI_T_SIZE, e_ns_get_tag_group(node, i), 16, rename_group_func, e_ns_get_tag_group(node, i), color, color_light);
-			if(sw_text_button(input, -0.27, y + size, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new tag", color, color, color))
+			if(sw_text_button(input, -0.27, y + size, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new tag", co_line_color[0], co_line_color[1], co_line_color[2], color))
 			{
 				char nr[32];
 				k = 0;
@@ -320,7 +322,7 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 				t.vboolean = TRUE;
 				verse_send_tag_create(e_ns_get_node_id(node), i, (uint16) ~0u, nr, VN_TAG_BOOLEAN, &t);
 			}
-			if(co_w_close_button(input, 0.635, y + size, color, color, color))
+			if(co_w_close_button(input, 0.635, y + size, color))
 				verse_send_tag_group_destroy(e_ns_get_node_id(node), i);
 			size = -0.05;
 			for(j = e_ns_get_next_tag(node, i, 0); j != (uint16) ~0u ; j = e_ns_get_next_tag(node, i, j + 1))
@@ -329,14 +331,14 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 				tag = e_ns_get_tag(node, i, j);
 				k = e_ns_get_tag_type(node, i, j);
 
-				sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Tag name:", color_light, color_light, color_light);  
+				sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Tag name:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 				co_w_type_in(input, 0.15, y + size, 0.5, SUI_T_SIZE, e_ns_get_tag_name(node, i, j), 16, rename_tag_func, e_ns_get_tag_name(node, i, j), color, color_light);
 				
-				if(co_w_close_button(input, 0.635, y + size, color, color, color))
+				if(co_w_close_button(input, 0.635, y + size, color))
 					verse_send_tag_destroy(e_ns_get_node_id(node), i, j);
 				size -= 0.05;
-				sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Tag type:", color_light, color_light, color_light);  
-				sui_draw_text(0.15, y + size, SUI_T_SIZE, SUI_T_SPACE, tag_type_names[k], color, color, color);  
+				sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Tag type:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
+				sui_draw_text(0.15, y + size, SUI_T_SIZE, SUI_T_SPACE, tag_type_names[k], co_line_color[0], co_line_color[1], co_line_color[2], color);  
 
 				if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE && sui_box_click_test(0.0, y + size - SUI_T_SIZE, 0.7, SUI_T_SIZE * 3))
 				{
@@ -372,69 +374,69 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 				switch(k)
 				{
 					case VN_TAG_BOOLEAN :
-						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Boolean:", color_light, color_light, color_light);  
-						if(co_w_checkbox(input, 0.17, y + size, &t.vboolean, color, color, color))
+						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Boolean:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
+						if(co_w_checkbox(input, 0.17, y + size, &t.vboolean, color))
 							verse_send_tag_create(e_ns_get_node_id(node), i, j, e_ns_get_tag_name(node, i, j), k, &t);
-						sui_draw_rounded_square(-0.01, y + size + 0.125, 0.7, -0.14, color_light, color_light, color_light);
+						sui_draw_rounded_square(-0.01, y + size + 0.125, 0.7, -0.14, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 						size -= 0.05;
 					break;
 					case VN_TAG_UINT32 :
-						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Integer:", color_light, color_light, color_light);  
+						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Integer:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 						if(sui_type_number_uint(input, 0.15, y + size, 0, 0.5, SUI_T_SIZE, &t.vuint32, tag, color, color, color))
 							verse_send_tag_create(e_ns_get_node_id(node), i, j, e_ns_get_tag_name(node, i, j), k, &t);
-						sui_draw_rounded_square(-0.01, y + size + 0.125, 0.7, -0.14, color_light, color_light, color_light);
+						sui_draw_rounded_square(-0.01, y + size + 0.125, 0.7, -0.14, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 						size -= 0.05;
 					break;
 					case VN_TAG_REAL64 :
-						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Real:", color_light, color_light, color_light);  
-						if(sui_type_number_double(input, 0.15, y + size, 0, 0.5, SUI_T_SIZE, &t.vreal64, tag, color, color, color))
+						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Real:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
+						if(sui_type_number_double(input, 0.15, y + size, 0, 0.5, SUI_T_SIZE, &t.vreal64, tag, co_line_color[0], co_line_color[1], co_line_color[2], color))
 							verse_send_tag_create(e_ns_get_node_id(node), i, j, e_ns_get_tag_name(node, i, j), k, &t);
-						sui_draw_rounded_square(-0.01, y + size + 0.125, 0.7, -0.14, color_light, color_light, color_light);
+						sui_draw_rounded_square(-0.01, y + size + 0.125, 0.7, -0.14, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 						size -= 0.05;
 					break;
 					case VN_TAG_STRING :
-						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "String:", color_light, color_light, color_light);  
+						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "String:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 						co_w_type_in(input, 0.15, y + size, 0.7, SUI_T_SIZE, tag->vstring, 16, tag_string_func, e_ns_get_tag_name(node, i, j), color, color_light);
-						sui_draw_rounded_square(-0.01, y + size + 0.125, 0.7, -0.14, color_light, color_light, color_light);
+						sui_draw_rounded_square(-0.01, y + size + 0.125, 0.7, -0.14, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 						size -= 0.05;
 					break;
 					case VN_TAG_REAL64_VEC3 :
-						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Vector:", color_light, color_light, color_light);  
-						if(sui_type_number_double(input, 0.15, y + size, 0, 0.5, SUI_T_SIZE, &t.vreal64_vec3[0], &tag->vreal64_vec3[0], color, color, color))
+						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Vector:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
+						if(sui_type_number_double(input, 0.15, y + size, 0, 0.5, SUI_T_SIZE, &t.vreal64_vec3[0], &tag->vreal64_vec3[0], co_line_color[0], co_line_color[1], co_line_color[2], color))
 							verse_send_tag_create(e_ns_get_node_id(node), i, j, e_ns_get_tag_name(node, i, j), k, &t);
 						size -= 0.05;
-						if(sui_type_number_double(input, 0.15, y + size, 0, 0.5, SUI_T_SIZE, &t.vreal64_vec3[1], &tag->vreal64_vec3[1], color, color, color))
+						if(sui_type_number_double(input, 0.15, y + size, 0, 0.5, SUI_T_SIZE, &t.vreal64_vec3[1], &tag->vreal64_vec3[1], co_line_color[0], co_line_color[1], co_line_color[2], color))
 							verse_send_tag_create(e_ns_get_node_id(node), i, j, e_ns_get_tag_name(node, i, j), k, &t);
 						size -= 0.05;
-						if(sui_type_number_double(input, 0.15, y + size, 0, 0.5, SUI_T_SIZE, &t.vreal64_vec3[2], &tag->vreal64_vec3[2], color, color, color))
+						if(sui_type_number_double(input, 0.15, y + size, 0, 0.5, SUI_T_SIZE, &t.vreal64_vec3[2], &tag->vreal64_vec3[2], co_line_color[0], co_line_color[1], co_line_color[2], color))
 							verse_send_tag_create(e_ns_get_node_id(node), i, j, e_ns_get_tag_name(node, i, j), k, &t);
 						size -= 0.05;
-						sui_draw_rounded_square(-0.01, y + size + 0.275, 0.7, -0.24, color_light, color_light, color_light);
+						sui_draw_rounded_square(-0.01, y + size + 0.275, 0.7, -0.24, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 					break;
 					case VN_TAG_LINK :
-						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "'Link:", color_light, color_light, color_light);  
+						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "'Link:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 						if(sui_type_number_uint(input, 0.15, y + size, 0, 0.5, SUI_T_SIZE, &t.vlink, tag, color, color, color))
 							verse_send_tag_create(e_ns_get_node_id(node), i, j, e_ns_get_tag_name(node, i, j), k, &t);
-						sui_draw_rounded_square(-0.01, y + size + 0.125, 0.7, -0.14, color_light, color_light, color_light);
+						sui_draw_rounded_square(-0.01, y + size + 0.125, 0.7, -0.14, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 						size -= 0.05;
 					break;
 					case VN_TAG_ANIMATION :
-						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Curve:", color_light, color_light, color_light);
+						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Curve:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 						if(sui_type_number_uint(input, 0.15, y + size, 0, 0.5, SUI_T_SIZE, &t.vanimation.curve, &tag->vanimation.curve, color, color, color))
 							verse_send_tag_create(e_ns_get_node_id(node), i, j, e_ns_get_tag_name(node, i, j), k, &t);
 						size -= 0.05;
-						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Start:", color_light, color_light, color_light);  
+						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Start:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 						if(sui_type_number_uint(input, 0.15, y + size, 0, 0.5, SUI_T_SIZE, &t.vanimation.start, &tag->vanimation.start, color, color, color))
 							verse_send_tag_create(e_ns_get_node_id(node), i, j, e_ns_get_tag_name(node, i, j), k, &t);
 						size -= 0.05;
-						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "End:", color_light, color_light, color_light);  
+						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "End:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 						if(sui_type_number_uint(input, 0.15, y + size, 0, .5, SUI_T_SIZE, &t.vanimation.end, &tag->vanimation.end, color, color, color))
 							verse_send_tag_create(e_ns_get_node_id(node), i, j, e_ns_get_tag_name(node, i, j), k, &t);
 						size -= 0.05;
-						sui_draw_rounded_square(-0.01, y + size + 0.275, 0.7, -0.24, color_light, color_light, color_light);
+						sui_draw_rounded_square(-0.01, y + size + 0.275, 0.7, -0.24, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 					break;
 					case VN_TAG_BLOB :
-						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Size:", color_light, color_light, color_light);  
+						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Size:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 						m = t.vblob.size;
 						if(sui_type_number_uint(input, 0.15, y + size, 0, 0.5, SUI_T_SIZE, &m, tag, color, color, color))
 						{
@@ -451,7 +453,7 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 						}
 
 						size -= 0.05;
-						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Blob:", color_light, color_light, color_light); 
+						sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Blob:", co_line_color[0], co_line_color[1], co_line_color[2], color_light); 
 						size += 0.05;
 						for(l = 0; l < tag->vblob.size; l++)
 						{
@@ -477,12 +479,12 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 								verse_send_tag_create(e_ns_get_node_id(node), i, j, e_ns_get_tag_name(node, i, j), k, &t);
 							}
 						}
-						sui_draw_rounded_square(-0.01, y + size + 0.175 + 0.05 * (float)(tag->vblob.size / 8), 0.7, -0.19 - 0.05 * (float)(tag->vblob.size / 8), color_light, color_light, color_light);
+						sui_draw_rounded_square(-0.01, y + size + 0.175 + 0.05 * (float)(tag->vblob.size / 8), 0.7, -0.19 - 0.05 * (float)(tag->vblob.size / 8), co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 						size -= 0.05;
 					break;
 				}
 			}
-			sui_draw_rounded_square(-0.3, y + 0.025, 1, size, color_light, color_light, color_light);
+			sui_draw_rounded_square(-0.3, y + 0.025, 1, size, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 			y += size - 0.02;
 		}
 

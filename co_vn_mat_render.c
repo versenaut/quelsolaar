@@ -219,9 +219,9 @@ float co_noice_point_function(float *vec)
 	return get_rand(found);
 }
 
-void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float *buffer)
+uint render_material(ENode *node, VNMFragmentID id, uint size, uint line, float *buffer)
 {
-	uint i;
+	uint i, samples = 0;
 	VMatFrag *frag;
 
 	frag = e_nsm_get_fragment(node, id);
@@ -229,7 +229,7 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 	{
 		for(i = 0; i < size * 3; i++)
 			buffer[i] = 0;
-		return;
+		return 1;
 	}
 
 	switch(e_nsm_get_fragment_type(node, id))
@@ -248,64 +248,109 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 				buffer[i++] = g;
 				buffer[i++] = b;
 			}
+			samples = 1;
 			break;
 		}
 		case VN_M_FT_LIGHT :
 		{
 			uint k = 0, l;
 			float normal[3], vec[3], f, light[3];
+			if(frag->light.normal_falloff > 0.001)
+				samples = LIGHT_SAMPLES;
+			else
+				samples = 4;
 			for(i = 0; i < size; i++)
 			{
 				co_compute_vec(normal, size, line, i);
-				light[0] = 0;
-				light[1] = 0;
-				light[2] = 0;
+
 				if(frag->light.type > VN_M_LIGHT_DIRECT_AND_AMBIENT)
 				{
 					normal[0] = -normal[0];
 					normal[1] = -normal[1];
 					normal[2] = -normal[2];
 				}
-				for(l = 0; l < LIGHT_SAMPLES; l++)
+				if(frag->light.normal_falloff > 0.001)
 				{
-					co_compute_stocastic_vector(vec, normal, line * LIGHT_SAMPLES * size + i * LIGHT_SAMPLES + l, frag->light.normal_falloff);
-		
+					light[0] = 0;
+					light[1] = 0;
+					light[2] = 0;
+					for(l = 0; l < LIGHT_SAMPLES; l++)
+					{
+						co_compute_stocastic_vector(vec, normal, line * LIGHT_SAMPLES * size + i * LIGHT_SAMPLES + l, frag->light.normal_falloff);
+			
+						if(frag->light.type % 3 != 1)
+						{
+							f = vec[0] * LIGHT_VEC_X + vec[1] * LIGHT_VEC_Y + vec[2] * -LIGHT_VEC_Z;
+							if(f > 0)
+							{
+								light[0] += f * 0.5;
+								light[1] += f * 0.4;
+								light[2] += f * 0.3;
+							}
+							f = vec[0] * -LIGHT_VEC_X + vec[1] * LIGHT_VEC_Y + vec[2] * -LIGHT_VEC_Z;
+							if(f > 0)
+							{
+								light[0] += f * 0.6;
+								light[1] += f * 0.8;
+								light[2] += f * 1;
+							}
+							f = vec[0] * LIGHT_VEC_X + vec[1] * LIGHT_VEC_Y + vec[2] * LIGHT_VEC_Z;
+							if(f > 0)
+							{
+								light[0] += f * 0.7;
+								light[1] += f * 0.7;
+								light[2] += f * 0.7;
+							}
+						}
+						if(frag->light.type % 3 > 0)
+						{
+							f = 0.1 + 0.1 * vec[0];
+							light[0] += f;
+							light[1] += f;
+							light[2] += f;
+						}
+					}
+					buffer[k++] = light[0] / LIGHT_SAMPLES;
+					buffer[k++] = light[1] / LIGHT_SAMPLES;
+					buffer[k++] = light[2] / LIGHT_SAMPLES;
+				}else
+				{	
+					buffer[k + 0] = 0;
+					buffer[k + 1] = 0;
+					buffer[k + 2] = 0;
 					if(frag->light.type % 3 != 1)
 					{
-						f = vec[0] * LIGHT_VEC_X + vec[1] * LIGHT_VEC_Y + vec[2] * -LIGHT_VEC_Z;
+						f = normal[0] * LIGHT_VEC_X + normal[1] * LIGHT_VEC_Y + normal[2] * -LIGHT_VEC_Z;
 						if(f > 0)
 						{
-							light[0] += f * 0.5;
-							light[1] += f * 0.4;
-							light[2] += f * 0.3;
+							buffer[k + 0] += f * 0.5;
+							buffer[k + 1] += f * 0.4;
+							buffer[k + 2] += f * 0.3;
 						}
-						f = vec[0] * -LIGHT_VEC_X + vec[1] * LIGHT_VEC_Y + vec[2] * -LIGHT_VEC_Z;
+						f = normal[0] * -LIGHT_VEC_X + normal[1] * LIGHT_VEC_Y + normal[2] * -LIGHT_VEC_Z;
 						if(f > 0)
 						{
-							light[0] += f * 0.6;
-							light[1] += f * 0.8;
-							light[2] += f * 1;
+							buffer[k + 0] += f * 0.6;
+							buffer[k + 1] += f * 0.8;
+							buffer[k + 2] += f * 1;
 						}
-						f = vec[0] * LIGHT_VEC_X + vec[1] * LIGHT_VEC_Y + vec[2] * LIGHT_VEC_Z;
+						f = normal[0] * LIGHT_VEC_X + normal[1] * LIGHT_VEC_Y + normal[2] * LIGHT_VEC_Z;
 						if(f > 0)
 						{
-							light[0] += f * 0.7;
-							light[1] += f * 0.7;
-							light[2] += f * 0.7;
+							buffer[k + 0] += f * 0.7;
+							buffer[k + 1] += f * 0.7;
+							buffer[k + 2] += f * 0.7;
 						}
 					}
 					if(frag->light.type % 3 > 0)
 					{
-						f = 0.1 + 0.1 * vec[0];
-						light[0] += f;
-						light[1] += f;
-						light[2] += f;
+						f = 0.1 + 0.1 * normal[0];
+						buffer[k + 0] += f;
+						buffer[k + 1] += f;
+						buffer[k + 2] += f;
 					}
+					k += 3;
 				}
-					
-				buffer[k++] = light[0] / LIGHT_SAMPLES;
-				buffer[k++] = light[1] / LIGHT_SAMPLES;
-				buffer[k++] = light[2] / LIGHT_SAMPLES;
 			}
 			break;
 		}
@@ -313,22 +358,34 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		{
 			uint k = 0, l;
 			float vec[3], normal[3], light[3];
+			if(frag->reflection.normal_falloff > 0.001)
+				samples = LIGHT_SAMPLES;
+			else
+				samples = 1;
 			for(i = 0; i < size; i++)
 			{
 				co_compute_vec(normal, size, line, i);
 				co_compute_reflect_vector(normal);
-				light[0] = 0;
-				light[1] = 0;
-				light[2] = 0;
-				for(l = 0; l < LIGHT_SAMPLES; l++)
+				if(frag->reflection.normal_falloff > 0.001)
 				{
-					co_compute_stocastic_vector(vec, normal, line * LIGHT_SAMPLES * size + i * LIGHT_SAMPLES + l, frag->reflection.normal_falloff);
-					co_compute_reflect_color(vec, light);
+					light[0] = 0;
+					light[1] = 0;
+					light[2] = 0;
+					for(l = 0; l < LIGHT_SAMPLES; l++)
+					{
+						co_compute_stocastic_vector(vec, normal, line * LIGHT_SAMPLES * size + i * LIGHT_SAMPLES + l, frag->reflection.normal_falloff);
+						co_compute_reflect_color(vec, light);
+					}
+					buffer[k] = light[0] / LIGHT_SAMPLES;
+					buffer[k + 1] = light[1] / LIGHT_SAMPLES;
+					buffer[k + 2] = light[2] / LIGHT_SAMPLES;
+				}else
+				{
+					buffer[k] = 0;
+					buffer[k + 1] = 0;
+					buffer[k + 2] = 0;
+					co_compute_reflect_color(normal, &buffer[k]);
 				}
-
-				buffer[k] = light[0] / LIGHT_SAMPLES;
-				buffer[k + 1] = light[1] / LIGHT_SAMPLES;
-				buffer[k + 2] = light[2] / LIGHT_SAMPLES;
 				co_compute_reflect_hightlight(normal, &buffer[k], frag->reflection.normal_falloff);
 				k += 3;
 			}
@@ -338,6 +395,10 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		{
 			uint j, k = 0, l;
 			float f, vec[3], normal[3], light[3];
+			if(frag->transparency.normal_falloff > 0.001)
+				samples = LIGHT_SAMPLES;
+			else
+				samples = 1;
 			for(i = 0; i < size; i++)
 			{
 				co_compute_vec(vec, size, line, i);
@@ -351,18 +412,29 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 				normal[1] /= f;
 				normal[2] /= f;
 
-				light[0] = 0;
-				light[1] = 0;
-				light[2] = 0;
+
 				normal[2] = -normal[2];
-				for(l = 0; l < LIGHT_SAMPLES; l++)
+				if(frag->transparency.normal_falloff > 0.001)
 				{
-					co_compute_stocastic_vector(vec, normal, line * LIGHT_SAMPLES * size + i * LIGHT_SAMPLES + l, frag->transparency.normal_falloff);
-					co_compute_reflect_color(vec, light);
+					light[0] = 0;
+					light[1] = 0;
+					light[2] = 0;
+					for(l = 0; l < LIGHT_SAMPLES; l++)
+					{
+						co_compute_stocastic_vector(vec, normal, line * LIGHT_SAMPLES * size + i * LIGHT_SAMPLES + l, frag->transparency.normal_falloff);
+						co_compute_reflect_color(vec, light);
+					}
+					buffer[k] = light[0] / LIGHT_SAMPLES;
+					buffer[k + 1] = light[1] / LIGHT_SAMPLES;
+					buffer[k + 2] = light[2] / LIGHT_SAMPLES;
+				}else
+				{
+					buffer[k] = 0;
+					buffer[k + 1] = 0;
+					buffer[k + 2] = 0;
+					co_compute_reflect_color(normal, &buffer[k]);
 				}
-				buffer[k++] = light[0] / LIGHT_SAMPLES;
-				buffer[k++] = light[1] / LIGHT_SAMPLES;
-				buffer[k++] = light[2] / LIGHT_SAMPLES;
+				k += 3;
 			}
 			break;
 		}
@@ -417,6 +489,7 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 				buffer[k++] = light[1];
 				buffer[k++] = light[2];
 			}
+			samples = 4;
 			break;
 		}
 		case VN_M_FT_VIEW :
@@ -431,6 +504,7 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 				buffer[k++] = vec[2];
 			}
 			break;
+			samples = 1;
 		}
 		break;
 		case VN_M_FT_GEOMETRY :
@@ -444,6 +518,7 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 				buffer[k++] = (vec[1] + 1.0) * 0.5;
 				buffer[k++] = (vec[2] + 1.0) * 0.5;
 			}
+			samples = 1;
 			break;
 		}
 		case VN_M_FT_TEXTURE :
@@ -452,7 +527,7 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 			ebreal output[3];
 			EBMHandle	*handle;
 			handle = e_nsb_get_image_handle(frag->texture.bitmap, frag->texture.layer_r, frag->texture.layer_g, frag->texture.layer_b);
-			render_material(node, frag->texture.mapping, size, line, buffer);
+			samples = 4 + render_material(node, frag->texture.mapping, size, line, buffer);
 			for(i = 0; i < size; i++)
 			{
 				e_nsb_evaluate_image_handle_tile(handle, output, buffer[k], buffer[k + 1], buffer[k + 2]);
@@ -467,6 +542,7 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		{
 			for(i = 0; i < size * size * 3; i++)
 				buffer[i] = 0.5;
+			samples = 1;
 			break;
 		}
 		case VN_M_FT_NOISE :
@@ -514,20 +590,22 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 				break;
 
 			}
+			samples = 4;
 			break;
 		}
 		case VN_M_FT_BLENDER :
 		{
 			float *buf, *control, f;
 			buf = malloc((sizeof *buf) * size * 3);
-			render_material(node, frag->blender.data_a, size, line, buffer);
-			render_material(node, frag->blender.data_b, size, line, buf);
+			samples = 1;
+			samples += render_material(node, frag->blender.data_a, size, line, buffer);
+			samples += render_material(node, frag->blender.data_b, size, line, buf);
 			
 			switch(frag->blender.type)
 			{
 				case VN_M_BLEND_FADE :
 				control = malloc((sizeof *buf) * size * 3);
-				render_material(node, frag->blender.control, size, line, control);
+				samples += render_material(node, frag->blender.control, size, line, control);
 				for(i = 0; i < size * 3; i++)
 					buffer[i] = buffer[i] * control[i] + buf[i] * (1 - control[i]);
 				free(control);
@@ -577,7 +655,8 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 					if(buffer[i + 2] < frag->clamp.blue)
 						buffer[i + 2] = frag->clamp.blue;
 				}
-			}			
+			}
+			samples = 1;
 		}
 		break;
 		case VN_M_FT_MATRIX :
@@ -585,7 +664,7 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 			float tmp[3], m[16];
 			for(i = 0; i < 16; i++)
 				m[i] = frag->matrix.matrix[i];
-			render_material(node, frag->matrix.data, size, line, buffer);
+			samples = 1 + render_material(node, frag->matrix.data, size, line, buffer);
 			for(i = 0; i < size * 3; i += 3)
 			{
 				tmp[0] = buffer[i] * m[0] + buffer[i + 1] * m[4] + buffer[i + 2] * m[8] + m[12];
@@ -601,7 +680,7 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		{
 			uint j;
 			float f;
-			render_material(node, frag->ramp.mapping, size, line, buffer);
+			samples = 4 + render_material(node, frag->ramp.mapping, size, line, buffer);
 			for(i = 0; i < size * 3; i += 3)
 			{
 				f = buffer[i + frag->ramp.channel];
@@ -616,7 +695,15 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 					{
 						if(f < frag->ramp.ramp[j].pos)
 						{
-							f = (f - frag->ramp.ramp[j - 1].pos) / (frag->ramp.ramp[j].pos - frag->ramp.ramp[j - 1].pos);
+							
+							if(frag->ramp.type != VN_M_RAMP_SQUARE)
+							{
+								f = (f - frag->ramp.ramp[j - 1].pos) / (frag->ramp.ramp[j].pos - frag->ramp.ramp[j - 1].pos);
+								if(frag->ramp.type == VN_M_RAMP_SMOOTH)
+									f = ((f + 1 - f) * f + f * (1 - f)) * f + f * f * (1 - f);
+							}else
+								f = 0;
+
 							buffer[i] = frag->ramp.ramp[j].red * f + frag->ramp.ramp[j - 1].red * (1 - f);
 							buffer[i + 1] = frag->ramp.ramp[j].green * f + frag->ramp.ramp[j - 1].green * (1 - f);
 							buffer[i + 2] = frag->ramp.ramp[j].blue * f + frag->ramp.ramp[j - 1].blue * (1 - f);
@@ -639,8 +726,8 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 			uint j, k;
 			float *buf;
 			buf = malloc((sizeof *buf) * size * 3);
-			render_material(node, frag->alternative.alt_a, size, line, buffer);
-			render_material(node, frag->alternative.alt_b, size, line, buf);
+			samples = render_material(node, frag->alternative.alt_a, size, line, buffer);
+			samples += render_material(node, frag->alternative.alt_b, size, line, buf);
 			for(i = 0; i < line; i++)
 			{
 				k = i * 3;
@@ -654,7 +741,7 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 			break;
 		}
 		case VN_M_FT_OUTPUT :
-			render_material(node, frag->output.front, size, line, buffer);
+			samples = render_material(node, frag->output.front, size, line, buffer);
 		break;
 	}
 	glBindTexture(GL_TEXTURE_2D, co_material_get_texture_id(node, id));
@@ -674,7 +761,7 @@ void render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		free(f);
 	}
 	e_nsm_leave_fragment(node, id);
-/*	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, line, size, 1, GL_RGB, GL_FLOAT, buffer);*/
+	return samples;
 }
 
 
@@ -686,7 +773,6 @@ uint co_get_fragment_version(ENode *node, uint16 fragment)
 {
 	uint i, output, *version;
 	VMatFrag *frag;
-	boolean *recursive;
 	frag = e_nsm_get_fragment(node, fragment);
 	if(frag == NULL)
 		return 0;
@@ -762,7 +848,7 @@ void co_material_compute(uint lines)
 	static VNMFragmentID frag_id = -1;
 	static uint line = 0;
 	ENode *node = NULL;
-	uint i;
+	uint i, j;
 	if((node = e_ns_get_node_next(node_id, 0, V_NT_MATERIAL)) == NULL)
 	{
 		node = e_ns_get_node_next(0, 0, V_NT_MATERIAL);
@@ -783,8 +869,11 @@ void co_material_compute(uint lines)
 		}
 		return;
 	}
-	for(i = 0; i < lines && line != TEXTURE_RESOLUTION; i++)
-		render_material(node, frag_id, TEXTURE_RESOLUTION, line++, buf);
+	for(i = 0; i < 512 && line != TEXTURE_RESOLUTION;)
+	{
+		j =  render_material(node, frag_id, TEXTURE_RESOLUTION, line++, buf);
+		i += j;
+	}
 	if(line == TEXTURE_RESOLUTION)
 	{
 		frag_id = co_get_compute_fragment(node);

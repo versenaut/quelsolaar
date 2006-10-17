@@ -6,11 +6,26 @@
 
 #include "lp_projection.h"
 
+
 double lp_brush_size;
 
 void lp_brush_size_set(double size)
 {
 	lp_brush_size = size;
+}
+
+boolean lp_cull(egreal *v1, egreal *v2, egreal *v3)
+{
+	double a[3], b[3], c[3];
+	p_get_projection_screen(a, v1[0], v1[1], v1[2]);
+	p_get_projection_screen(b, v2[0], v2[1], v2[2]);
+	p_get_projection_screen(c, v3[0], v3[1], v3[2]);
+
+	b[0] -= a[0];
+	b[1] -= a[1];
+	c[0] -= a[0];
+	c[1] -= a[1];
+	return c[0] * b[1] - c[1] * b[0] > 0;
 }
 
 egreal lp_paint(BInputState *input, egreal *vertex)
@@ -33,6 +48,7 @@ double *lp_vertex_influence = NULL;
 double *lp_polygon_influence = NULL;
 double *lp_vertex_influence_back = NULL;
 double *lp_polygon_influence_back = NULL;
+
 
 void *lp_channels[3] = {NULL, NULL, NULL};
 egreal *lp_normal = NULL;
@@ -135,6 +151,7 @@ void lp_lock_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *blu
 	layers[0] = red;
 	layers[1] = green;
 	layers[2] = blue;
+
 
 	for(i = 0; i < 3; i++)
 	{
@@ -260,37 +277,42 @@ void lp_color_paint(BInputState *input, ENode *node)
 		//	lp_polygon_influence_back[i] = lp_polygon_influence[i];
 			if(ref[i * 4] < length && ref[i * 4 + 1] < length && ref[i * 4 + 2] < length && vertex[ref[i * 4] * 3] != V_REAL64_MAX && vertex[ref[i * 4 + 1] * 3] != V_REAL64_MAX && vertex[ref[i * 4 + 2] * 3] != V_REAL64_MAX)
 			{
-				pos[0] = vertex[ref[i * 4] * 3];
-				pos[1] = vertex[ref[i * 4] * 3 + 1];
-				pos[2] = vertex[ref[i * 4] * 3 + 2];
-				pos[0] += vertex[ref[i * 4 + 1] * 3];
-				pos[1] += vertex[ref[i * 4 + 1] * 3 + 1];
-				pos[2] += vertex[ref[i * 4 + 1] * 3 + 2];
-				pos[0] += vertex[ref[i * 4 + 2] * 3];
-				pos[1] += vertex[ref[i * 4 + 2] * 3 + 1];
-				pos[2] += vertex[ref[i * 4 + 2] * 3 + 2];
-				if(ref[i * 4 + 3] < length && vertex[ref[i * 4 + 3] * 3] != V_REAL64_MAX)
+				if(lp_cull(&vertex[ref[i * 4] * 3], &vertex[ref[i * 4 + 1] * 3], &vertex[ref[i * 4 + 2] * 3]))
 				{
-					pos[0] = (pos[0] + vertex[ref[i * 4 + 3] * 3]) / 4.0;
-					pos[1] = (pos[1] + vertex[ref[i * 4 + 3] * 3 + 1]) / 4.0;
-					pos[2] = (pos[2] + vertex[ref[i * 4 + 3] * 3 + 2]) / 4.0;
-				}else
-				{
-					pos[0] /= 3.0;
-					pos[1] /= 3.0;
-					pos[2] /= 3.0;
-				}
-				f = lp_paint(input, pos);
-				if(f > lp_polygon_influence[i])
-				{
-					lp_polygon_influence[i] = f;
-					if(lp_polygon_influence[i] > 1)
-						lp_polygon_influence[i] = 1;
+					pos[0] = vertex[ref[i * 4] * 3];
+					pos[1] = vertex[ref[i * 4] * 3 + 1];
+					pos[2] = vertex[ref[i * 4] * 3 + 2];
+					pos[0] += vertex[ref[i * 4 + 1] * 3];
+					pos[1] += vertex[ref[i * 4 + 1] * 3 + 1];
+					pos[2] += vertex[ref[i * 4 + 1] * 3 + 2];
+					pos[0] += vertex[ref[i * 4 + 2] * 3];
+					pos[1] += vertex[ref[i * 4 + 2] * 3 + 1];
+					pos[2] += vertex[ref[i * 4 + 2] * 3 + 2];
+					
+					if(ref[i * 4 + 3] < length && vertex[ref[i * 4 + 3] * 3] != V_REAL64_MAX)
+					{
+						pos[0] = (pos[0] + vertex[ref[i * 4 + 3] * 3]) / 4.0;
+						pos[1] = (pos[1] + vertex[ref[i * 4 + 3] * 3 + 1]) / 4.0;
+						pos[2] = (pos[2] + vertex[ref[i * 4 + 3] * 3 + 2]) / 4.0;
+					}else
+					{
+						pos[0] /= 3.0;
+						pos[1] /= 3.0;
+						pos[2] /= 3.0;
+					}
+					f = lp_paint(input, pos);
+					if(f > lp_polygon_influence[i])
+					{
+						lp_polygon_influence[i] = f;
+						if(lp_polygon_influence[i] > 1)
+							lp_polygon_influence[i] = 1;
+					}
 				}
 			}
 		}
 	}
 }
+
 
 void lp_apply_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *blue, double *value, uint integer)
 {
@@ -299,6 +321,7 @@ void lp_apply_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *bl
 	VNodeID node_id;
 	VLayerID layer_id;
 	uint i, j, *ref, ref_length, length, r[4];
+
 
 	node_id = e_ns_get_node_id(node);
 	length = e_nsg_get_vertex_length(node);

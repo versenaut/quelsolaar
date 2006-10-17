@@ -277,12 +277,12 @@ void la_t_poly_auto_crease(void)
 			{
 				if(udg_get_select(ref[i + j]) > 0.1 && udg_get_select(ref[i + (j + 1) % poly]) && n[i + j] != -1)
 				{
-					printf("normals %i %f\n", j , normals[(n[i + j] / 4) * 3 + 0]
+				/*	printf("normals %i %f\n", j , normals[(n[i + j] / 4) * 3 + 0]
 						* normals[(i / 4) * 3 + 0]
 						+ normals[(n[i + j] / 4) * 3 + 1]
 						* normals[(i / 4) * 3 + 1]
 						+ normals[(n[i + j] / 4) * 3 + 2]
-						* normals[(i / 4) * 3 + 2]);
+						* normals[(i / 4) * 3 + 2]);*/
 					if(normals[(n[i + j] / 4) * 3 + 0]
 						* normals[(i / 4) * 3 + 0]
 						+ normals[(n[i + j] / 4) * 3 + 1]
@@ -295,7 +295,7 @@ void la_t_poly_auto_crease(void)
 				}else
 					out_crease[j] = crease[i + j];
 			}
-			printf("set = %u %u %u %u\n", out_crease[0], out_crease[1], out_crease[2], out_crease[3]);
+		//	printf("set = %u %u %u %u\n", out_crease[0], out_crease[1], out_crease[2], out_crease[3]);
 			if(out_crease[0] != crease[i] || out_crease[1] != crease[i + 1] || out_crease[2] != crease[i + 2] || out_crease[3] != crease[i + 3])
 				udg_crease_set(i / 4, out_crease[0], out_crease[1], out_crease[2], out_crease[3]);
 		}

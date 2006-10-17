@@ -580,7 +580,7 @@ void p_shader_unbind(uint32 node_id)
 
 
 
-extern void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, uint *f_length, uint *dest, uint *src, void *t);
+extern void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, uint *f_length, uint *dest, uint *src, void *t, boolean initialized);
 extern void p_shader_write_destroy_temp(void *t);
 
 boolean p_shader_compute(uint node_id)
@@ -636,7 +636,7 @@ boolean p_shader_compute(uint node_id)
 					t->s->volume = TRUE;
 				t->writer_temp = NULL;
 			}
-			t->writer_temp = p_shader_write(node, &t->v_shader, &t->v_length, &t->f_shader, &t->f_length, &t->s->dest, &t->s->src, t->writer_temp);
+			t->writer_temp = p_shader_write(node, &t->v_shader, &t->v_length, &t->f_shader, &t->f_length, &t->s->dest, &t->s->src, t->writer_temp, FALSE);
 			if(t->writer_temp == NULL)
 				t->stage = 2;
 
@@ -651,7 +651,7 @@ boolean p_shader_compute(uint node_id)
 				char buf[2000];
 				GLsizei length;
 				p_glGetInfoLogARB(t->s->vertex_obj, 2000, &length, buf);
-				printf("Errors:\n%s\n", buf);
+				printf("Vertex Errors: (node id = %u)\n%s\n", node_id, buf);
 			}
 			t->stage = 3;
 		break;
@@ -662,7 +662,7 @@ boolean p_shader_compute(uint node_id)
 				char buf[2000];
 				GLsizei length;
 				p_glGetInfoLogARB(t->s->fragment_obj, 2000, &length, buf);
-				printf("Errors:\n%s\n", buf);
+				printf("Fragment Errors: (node id = %u)\n%s\n", node_id, buf);
 			}
 			t->stage = 4;
 		break;
@@ -672,7 +672,7 @@ boolean p_shader_compute(uint node_id)
 				char buf[2000];
 				GLsizei length;
 				p_glGetInfoLogARB(t->s->prog_obj, 2000, &length, buf);
-				printf("Errors:\n%s\n", buf);
+				printf("Link Errors: (node id = %u)\n%s\n", node_id, buf);
 			}
 			t->stage = 5;
 		break;

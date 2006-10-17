@@ -104,3 +104,5 @@ extern void la_t_poly_find_quads(void);
 
 extern void la_t_copy(egreal *pos);
 extern void la_t_paste(egreal *pos);
+extern void la_t_copy_to_new_geometry(void);
+extern void la_t_paste_to_new_geometry(void);

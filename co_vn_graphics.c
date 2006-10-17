@@ -24,6 +24,8 @@
 #define FRAG_TOP_RADIUS 0.02
 #define COLOR_RING_SPLITS 32
 
+extern float co_background_color[3];
+extern float co_line_color[3];
 
 struct{
 	float	*ring;
@@ -281,17 +283,15 @@ void co_vng_fragment(float pos_x, float pos_y, float length, float color)
 	glTranslatef(pos_x, pos_y, 0);
 	sui_draw_set_vec2(COVNGraphicsData.frag_top, FRAG_TOP_SPLIT * 2 + 5, FRAG_RADIUS, -length);
 	sui_draw_set_vec2(COVNGraphicsData.frag_top, FRAG_TOP_SPLIT * 2 + 7, -FRAG_RADIUS, -length);
-	sui_draw_gl(GL_LINES, COVNGraphicsData.frag_top, (FRAG_TOP_SPLIT * 2 + 8), 2, color, color, color, 1);
+	sui_draw_gl(GL_LINES, COVNGraphicsData.frag_top, (FRAG_TOP_SPLIT * 2 + 8), 2, co_line_color[0], co_line_color[1], co_line_color[2], color);
 	glTranslatef(0, -length, 0);
-	sui_draw_gl(GL_LINES, COVNGraphicsData.frag_base, FRAG_BASE_SPLIT * 2, 2, color, color, color, 1);
+	sui_draw_gl(GL_LINES, COVNGraphicsData.frag_base, FRAG_BASE_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], color);
 	glPopMatrix();
 }
 
 
 void co_vng_color(float red, float green, float blue)
 {
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_DST_COLOR, GL_ZERO);
 	sui_draw_set_vec3(COVNGraphicsData.color_color, COLOR_RING_SPLITS, red, green, blue);
 	sui_set_color_array_gl(COVNGraphicsData.color_color, COLOR_RING_SPLITS, 3);
 	sui_draw_elements_gl(GL_TRIANGLES, COVNGraphicsData.color_vertex, COVNGraphicsData.color_ref, COLOR_RING_SPLITS * 3, 2, red, green, blue, 1);
@@ -299,21 +299,19 @@ void co_vng_color(float red, float green, float blue)
 
 void co_vng_sunrays()
 {
-	float color = 0.9;
 	glPushMatrix();
 	glRotatef(COVNGraphicsData.time * -0.01, 0, 0, 1);
-	sui_draw_gl(GL_LINES, COVNGraphicsData.rays, SUN_RAYS * 2, 2, color, color, color, 1);
+	sui_draw_gl(GL_LINES, COVNGraphicsData.rays, SUN_RAYS * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 0.9);
 	glPopMatrix();
 }
 
 void co_vng_dust_planet()
 {
-	float color = 0, color_light = 0.9;
 	glPushMatrix();
 	glScalef(0.4, 0.4, 0.4);
-	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, color, color, color, 1);
+	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 1);
 	glRotatef(COVNGraphicsData.time * -0.145, 0.6, 0.1, 1);
-	sui_draw_gl(GL_POINTS, COVNGraphicsData.dust, DUST_PARTICLES, 3, color, color, color, 1);
+	sui_draw_gl(GL_POINTS, COVNGraphicsData.dust, DUST_PARTICLES, 3, co_line_color[0], co_line_color[1], co_line_color[2], 0.4);
 	glPopMatrix();
 }
 
@@ -321,7 +319,6 @@ void co_vng_dust_planet()
 
 void co_vng_geo_planet()
 {
-	float color = 0, color_light = 0.9;
 	uint i;
 	float hight;
 	glPushMatrix();
@@ -336,7 +333,7 @@ void co_vng_geo_planet()
 	for(i = 0; i < PLANET_SPLITS; i++)
 	{
 		glRotatef((180.0 / PLANET_SPLITS), 0, 1, 0);
-		sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, color_light, color_light, color_light, 1);
+		sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 0.1);
 	}
 	glPopMatrix();
 	for(i = 0; i < PLANET_SPLITS; i++)
@@ -345,13 +342,13 @@ void co_vng_geo_planet()
 		hight = (float)i * (2.0 / PLANET_SPLITS) - 1.0;
 		glTranslatef(0, 0, sin(hight * 3.14 / 2.0));
 		glScalef(cos(hight * 3.14 / 2.0), cos(hight * 3.14 / 2.0), 1);
-		sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, color_light, color_light, color_light, 1);
+		sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 0.1);
 		glPopMatrix();
 	}
 	glPopMatrix();
 	glPushMatrix();
 	glScalef(0.4, 0.4, 0.4);
-	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, color, color, color, 1);
+	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 1.0);
 	glPopMatrix();
 }
 
@@ -377,7 +374,7 @@ void co_vng_gas_planet()
 		hight = ((float)i + time) * (2.0 / GAS_PLANET_SPLITS) - 1.0;
 		glTranslatef(0, 0, sin(hight * 3.14 / 2.0));
 		glScalef(cos(hight * 3.14 / 2.0), cos(hight * 3.14 / 2.0), 1);
-		sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, color_light, color_light, color_light, 1);
+		sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 0.1);
 		glPopMatrix();
 	}
 	glRotatef(80, 1, 0.4, 1);
@@ -388,13 +385,13 @@ void co_vng_gas_planet()
 		hight = ((float)i + time) * (2.0 / GAS_PLANET_SPLITS) - 1.0;
 		glTranslatef(0, 0, sin(hight * 3.14 / 2.0));
 		glScalef(cos(hight * 3.14 / 2.0), cos(hight * 3.14 / 2.0), 1);
-		sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, color_light, color_light, color_light, 1);
+		sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 0.1);
 		glPopMatrix();
 	}
 	glPopMatrix();
 	glPushMatrix();
 	glScalef(0.4, 0.4, 0.4);
-	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, color, color, color, 1);
+	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 1.0);
 	glPopMatrix();
 }
 
@@ -414,7 +411,7 @@ void co_vng_black_hole()
 		glTranslatef(0, 0, hight);
 		glScalef(1 / sin(hight * 3.14 / 2.0) - 1, 1 / sin(hight * 3.14 / 2.0) - 1, 1);
 
-		sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, color, color, color, 1);
+		sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 0.0);
 		glPopMatrix();
 	}
 
@@ -431,11 +428,11 @@ void co_vng_sun()
 	time++;
 	glPushMatrix();
 	glScalef(0.41, 0.41, 0.41);
-	sui_draw_gl(GL_POINTS, COVNGraphicsData.particles_array, SUN_PARTICLES, 2, color_light, color_light, color_light, 1);
+	sui_draw_gl(GL_POINTS, COVNGraphicsData.particles_array, SUN_PARTICLES, 2, co_line_color[0], co_line_color[1], co_line_color[2], 0.6);
 	glPopMatrix();
 	glPushMatrix();
 	glScalef(0.4, 0.4, 0.4);
-	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, color, color, color, 1);
+	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 1.0);
 	glPopMatrix();
 }
 
@@ -447,10 +444,9 @@ float *co_vng_get_sparks(uint *length)
 
 void co_vng_ring(void)
 {
-	float color = 0, color_light = 0.9;
 	glPushMatrix();
 	glScalef(0.4, 0.4, 0.4);
-	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, color, color, color, 1);
+	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 1.0);
 	glPopMatrix();
 }
 
@@ -461,57 +457,57 @@ void co_vng_saturn_ring()
 	glRotatef(-90, 1, 0, 0);
 	glRotatef(COVNGraphicsData.time * 0.01, 0, 0.1, 1);
 	glRotatef(COVNGraphicsData.time * 0.09, 0.1, 0.1, 1);
-	sui_draw_gl(GL_QUADS, COVNGraphicsData.qubes, SATURN_RINGS * 8, 2, color_light, color_light, color_light, 1);
-	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, color_light, color_light, color_light, 1);
+	sui_draw_gl(GL_QUADS, COVNGraphicsData.qubes, SATURN_RINGS * 8, 2, co_line_color[0], co_line_color[1], co_line_color[2], 0.1);
+	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 0.1);
 	glPushMatrix();
 	glScalef(0.9, 0.9, 0.9);
-	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, color_light, color_light, color_light, 1);
+	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 0.11);
 	glPopMatrix();
 	glPushMatrix();
 	glScalef(1.38, 1.38, 1.38);
-	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, color_light, color_light, color_light, 1);
+	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 0.1);
 	glPopMatrix();
 	glPopMatrix();
 	glPushMatrix();
 	glScalef(0.4, 0.4, 0.4);
-	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, color, color, color, 1);
+	sui_draw_gl(GL_LINES, COVNGraphicsData.ring, SUN_RING_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 1.0);
 	glPopMatrix();
 }
 
 uint co_vng_render_name(BInputState *input, const char *name, float pos_x, float pos_y, float pointer_x, float pointer_y)
 {
-	float color = 0;
+	float color = 1;
 	if(input->mode == BAM_DRAW)
 	{
 		if((pos_x - 0.80 - pointer_x) * (pos_x - 0.80 - pointer_x) + (pos_y - pointer_y) * (pos_y - pointer_y) < 0.04 * 0.04)
 		{
-			sui_draw_text(-1.1, 0.21 + 0.5 * SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, "Delete", color, color, color);
+			sui_draw_text(-1.1, 0.21 + 0.5 * SUI_T_SIZE * 2, SUI_T_SIZE * 2, SUI_T_SPACE * 2, "Delete", co_line_color[0], co_line_color[1], co_line_color[2], color);
 			sui_draw_set_vec2(COVNGraphicsData.moon_line, 3, pointer_x - pos_x, 0.06);
-			sui_draw_gl(GL_LINES, COVNGraphicsData.moon_line, 4, 2, color, color, color, 1);
+			sui_draw_gl(GL_LINES, COVNGraphicsData.moon_line, 4, 2, co_line_color[0], co_line_color[1], co_line_color[2], color);
 		}
 		if((pos_x - 0.72 - pointer_x) * (pos_x - 0.72 - pointer_x) + (pos_y - pointer_y) * (pos_y - pointer_y) < 0.04 * 0.04)
 		{
-			sui_draw_text(-1.1, 0.21 + 0.5 * SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, "Hide", color, color, color);
+			sui_draw_text(-1.1, 0.21 + 0.5 * SUI_T_SIZE * 2, SUI_T_SIZE * 2, SUI_T_SPACE * 2, "Hide", co_line_color[0], co_line_color[1], co_line_color[2], color);
 			sui_draw_set_vec2(COVNGraphicsData.moon_line, 3, pointer_x - pos_x, 0.06);
-			sui_draw_gl(GL_LINES, COVNGraphicsData.moon_line, 4, 2, color, color, color, 1);
+			sui_draw_gl(GL_LINES, COVNGraphicsData.moon_line, 4, 2, co_line_color[0], co_line_color[1], co_line_color[2], color);
 		}
 		if((pos_x - 0.64 - pointer_x) * (pos_x - 0.64 - pointer_x) + (pos_y - pointer_y) * (pos_y - pointer_y) < 0.04 * 0.04)
 		{
-			sui_draw_text(-1.1, 0.21 + 0.5 * SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, "Hide recursevly", color, color, color);
+			sui_draw_text(-1.1, 0.21 + 0.5 * SUI_T_SIZE * 2, SUI_T_SIZE * 2, SUI_T_SPACE * 2, "Hide recursevly", co_line_color[0], co_line_color[1], co_line_color[2], color);
 			sui_draw_set_vec2(COVNGraphicsData.moon_line, 3, pointer_x - pos_x, 0.06);
-			sui_draw_gl(GL_LINES, COVNGraphicsData.moon_line, 4, 2, color, color, color, 1);
+			sui_draw_gl(GL_LINES, COVNGraphicsData.moon_line, 4, 2, co_line_color[0], co_line_color[1], co_line_color[2], color);
 		}
 		if((pos_x - 0.56 - pointer_x) * (pos_x - 0.56 - pointer_x) + (pos_y - pointer_y) * (pos_y - pointer_y) < 0.04 * 0.04)
 		{
-			sui_draw_text(-1.1, 0.21 + 0.5 * SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, "Clone", color, color, color);
+			sui_draw_text(-1.1, 0.21 + 0.5 * SUI_T_SIZE * 2, SUI_T_SIZE * 2, SUI_T_SPACE * 2, "Clone", co_line_color[0], co_line_color[1], co_line_color[2], color);
 			sui_draw_set_vec2(COVNGraphicsData.moon_line, 3, pointer_x - pos_x, 0.06);
-			sui_draw_gl(GL_LINES, COVNGraphicsData.moon_line, 4, 2, color, color, color, 1);
+			sui_draw_gl(GL_LINES, COVNGraphicsData.moon_line, 4, 2, co_line_color[0], co_line_color[1], co_line_color[2], color);
 		}
-		sui_draw_text(0.6, 0.6 + 0.5 * SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, name, color, color, color);
-		sui_draw_gl(GL_LINES, COVNGraphicsData.name, 4, 2, color, color, color, 1);
+		sui_draw_text(0.6, 0.6 + 0.5 * SUI_T_SIZE * 2, SUI_T_SIZE * 2, SUI_T_SPACE * 2, name, co_line_color[0], co_line_color[1], co_line_color[2], color);
+		sui_draw_gl(GL_LINES, COVNGraphicsData.name, 4, 2, co_line_color[0], co_line_color[1], co_line_color[2], color);
 		glPushMatrix();
 		glTranslatef(-0.8, 0, 0);
-		sui_draw_gl(GL_LINES, COVNGraphicsData.moon, (MOON_SPLIT * 14 + 2), 2, color, color, color, 1);
+		sui_draw_gl(GL_LINES, COVNGraphicsData.moon, (MOON_SPLIT * 14 + 2), 2, co_line_color[0], co_line_color[1], co_line_color[2], color);
 		glPopMatrix();
 	}else
 	{
@@ -538,9 +534,9 @@ boolean co_vng_render_link(BInputState *input, uint id, boolean connected, float
 		glPushMatrix();
 		glRotatef(-20 * (float)id + 30, 0, 0, 1);
 		glTranslatef(0.5, 0, 0);
-		sui_draw_gl(GL_LINES, COVNGraphicsData.connector_one, CONNECT_SPLIT * 2, 2, 0, 0, 0, 1);
+		sui_draw_gl(GL_LINES, COVNGraphicsData.connector_one, CONNECT_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 1);
 		if(!connected)
-			sui_draw_gl(GL_LINES, COVNGraphicsData.connector_two, CONNECT_SPLIT * 2, 2, 0, 0, 0, 1);
+			sui_draw_gl(GL_LINES, COVNGraphicsData.connector_two, CONNECT_SPLIT * 2, 2, co_line_color[0], co_line_color[1], co_line_color[2], 1);
 		glPopMatrix();
 		x = cos(((float)id * 2 - 3) * 3.14 * 2.0 / (360 / 10));
 		y = -sin(((float)id * 2 - 3) * 3.14 * 2.0 / (360 / 10));
@@ -550,13 +546,13 @@ boolean co_vng_render_link(BInputState *input, uint id, boolean connected, float
 			d_y = link_y - y * 0.5;
 			r = sqrt(d_x * d_x + d_y * d_y);
 			if(r > 0.55)
-				sui_draw_2d_line_gl((d_x / r) * 0.1 + x * 0.5, (d_y / r) * 0.1 + y * 0.5, link_x - ((d_x / r) * 0.45), link_y - ((d_y / r) * 0.45), 0, 0, 0, 1);
+				sui_draw_2d_line_gl((d_x / r) * 0.1 + x * 0.5, (d_y / r) * 0.1 + y * 0.5, link_x - ((d_x / r) * 0.45), link_y - ((d_y / r) * 0.45), co_line_color[0], co_line_color[1], co_line_color[2], 1);
 		}
 		else
 		{
-			sui_draw_2d_line_gl(x * 0.6, y * 0.6, x * 0.75, y * 0.75, 0, 0, 0, 1);
-			sui_draw_2d_line_gl(x * 0.75 + 0.17, y * 0.75, x * 0.75, y * 0.75, 0, 0, 0, 1);
-			sui_draw_text(x * 0.75 + 0.02, y * 0.75 + 0.5 * SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, name, 0, 0, 0);
+			sui_draw_2d_line_gl(x * 0.6, y * 0.6, x * 0.75, y * 0.75, co_line_color[0], co_line_color[1], co_line_color[2], 1);
+			sui_draw_2d_line_gl(x * 0.75 + 0.17, y * 0.75, x * 0.75, y * 0.75, co_line_color[0], co_line_color[1], co_line_color[2], 1);
+			sui_draw_text(x * 0.75 + 0.02, y * 0.75 + 0.5 * SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, name, co_line_color[0], co_line_color[1], co_line_color[2], 1);
 		}
 	}else
 	{
@@ -580,11 +576,11 @@ void co_vng_divider(BInputState *input, float pos_x, float pos_y, float *rotate,
 		static float line[] = {-0.03 , 0, -0.1, 0, 0.03, 0, 0.9, 0}, r = 0;
 		glPushMatrix();
 		glTranslatef(pos_x - 0.4, pos_y, 0);
-		sui_draw_text(0.03, 0 - SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE * 2, text, 0.4, 0.4, 0.4);
+		sui_draw_text(0.03, 0 - SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE * 2, text, co_line_color[0], co_line_color[1], co_line_color[2], 0.4);
 		line[4] = 0.05 + sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE * 2, text);
-		sui_draw_gl(GL_LINES, line, 4, 2, 0.4, 0.4, 0.4, 1);	
+		sui_draw_gl(GL_LINES, line, 4, 2, co_line_color[0], co_line_color[1], co_line_color[2], 0.6);	
 		glRotatef(*rotate * -90, 0, 0, 1);
-		sui_draw_gl(GL_LINES, array, 48, 2, 0, 0, 0, 1);
+		sui_draw_gl(GL_LINES, array, 48, 2, co_line_color[0], co_line_color[1], co_line_color[2], 1);
 		glPopMatrix();
 		if(*on)
 			*rotate = *rotate * 0.8 + 0.2;
@@ -596,9 +592,9 @@ void co_vng_divider(BInputState *input, float pos_x, float pos_y, float *rotate,
 		glRotatef((1 - *rotate) * 90, 1, 0, 0);
 		glTranslatef(0, -pos_y, 0);
 		if(color != NULL)
-			*color = (1 - *rotate);
+			*color = *rotate;
 		if(soft_color != NULL)
-			*soft_color = (1 - *rotate) / 4 + 1.0 - 1.0 / 4.0;
+			*soft_color = *rotate * 0.15;
 	}else
 	{
 		if(input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE && sui_box_click_test(-0.5 + pos_x, pos_y - SUI_T_SIZE, 1, SUI_T_SIZE + SUI_T_SIZE) && sui_box_down_click_test(-0.5 + pos_x, pos_y - SUI_T_SIZE, 1, SUI_T_SIZE + SUI_T_SIZE))

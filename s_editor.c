@@ -727,7 +727,7 @@ void se_editor(BInputState *input, SEEdtorMode ed_mode)
 */		if(ed_mode == SE_EM_FONT)
 		{
 			sui_draw_symb_font(0, 0, 0.4, 0.4, 0.4);
-			sui_draw_text(-0.9, -0.5, SUI_T_SIZE, SUI_T_SPACE, d->name, 1, 1, 1);
+			sui_draw_text(-0.9, -0.5, SUI_T_SIZE, SUI_T_SPACE, d->name, 1.0, 1.0, 1.0, 1);
 		}
 		se_draw(d, TRUE, TRUE);
 		if(SE_OUTPUT_SCALE < 0.8)

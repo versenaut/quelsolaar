@@ -10,6 +10,7 @@ egreal *la_vertex_buffer = NULL;
 uint la_vertex_buffer_length = 0;
 uint *la_edge_buffer = NULL;
 uint la_edge_buffer_length = 0;
+uint la_new_node_paste = -1;
 
 void la_t_copy(egreal *pos)
 {
@@ -156,6 +157,20 @@ void la_t_paste(egreal *pos)
 		udg_create_edge(temp[la_edge_buffer[i * 2 + 0]], temp[la_edge_buffer[i * 2 + 1]]);
 }
 
+void la_t_copy_to_new_geometry(void)
+{
+	egreal pos[3] = {0.0, 0.0, 0.0};
+	la_t_copy(pos);
+	udg_create_new_modeling_node();
+	la_new_node_paste = udg_get_modeling_node();
+}
 
-
-
+void la_t_paste_to_new_geometry(void)
+{
+	egreal pos[3] = {0.0, 0.0, 0.0};
+	if(la_new_node_paste == -1)
+		return;
+	if(la_new_node_paste != udg_get_modeling_node())
+	la_t_paste(pos);
+	la_new_node_paste = -1;
+}

@@ -19,6 +19,7 @@
 #include "p_task.h"
 #include "p_object.h"
 
+uint p_light_count = 2;
 
 double p_light_compute_brightnes(double *obj, uint32 node_id, uint32 time_s, uint32 time_f)
 {
@@ -117,23 +118,38 @@ void p_light_update(PObjLight *light, uint32 node_id, uint light_count, uint32 t
 extern void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end_x, float end_y, float end_z, float red, float green, float blue);
 
 uint current_shadow_light = -1;
+uint current_shadow_goal_light = -1;
+float current_light_fade = 0;
+boolean light_fade_up = TRUE;
 
 void p_set_enable_shadow(uint id)
 {
 	double color[3], f, best = 0;
+	uint32 found;
 	ENode *node;
 	if(id != -1)
 	{
-		for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
+		if(current_light_fade < 0.01 || current_light_fade > 0.99)
 		{
-			e_nso_get_light(node, color);
-			f = color[0] + color[1] + color[2]; 
-			if(f > best)
+			for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 			{
-				best = f;
-				current_shadow_light = e_ns_get_node_id(node);
+				e_nso_get_light(node, color);
+				f = color[0] + color[1] + color[2]; 
+				if(f > best)
+				{
+					best = f;
+					found = e_ns_get_node_id(node);
+				}
 			}
+			if(current_light_fade > 0.99)
+			{
+				current_shadow_goal_light = found;
+				light_fade_up = TRUE;
+			}
+			if(current_shadow_goal_light != found && current_light_fade < 0.01)
+				light_fade_up = FALSE;
 		}
+		current_shadow_light = current_shadow_goal_light;
 	}else
 		current_shadow_light = id;
 }
@@ -166,24 +182,34 @@ void p_set_shadow_light(uint32 time_s, uint32 time_f)
 void p_set_light(PObjLight *light, uint light_count, uint32 time_s, uint32 time_f)
 {
 	double pos[3], color[3];
-	float f_pos[4] = {0, 0, 0, 1}, f_color[3], mult = 1, zero[3] = {0, 0, 0};
+	float f_pos[4] = {0, 0, 0, 1}, f_color[3], mult = 1;
 	ENode *node;
 	uint i;
-//	glEnable(GL_LIGHTING);
+	if(light_fade_up)
+		current_light_fade -= 0.001;
+	else
+		current_light_fade += 0.001;
+	if(current_light_fade > 1.0)
+		current_light_fade = 1.0;
+	if(current_light_fade < 0.0)
+		current_light_fade = 0.0;
 
 	for(i = 0; i < light_count; i++)
 	{
 		glEnable(GL_LIGHT0 + i);
 //		printf("i %u %u\n", i, light->lights[i]);
 		node = e_ns_get_node(0, light->lights[i]);
-		if(node == NULL || current_shadow_light == light->lights[i])
+		if(node == NULL)
 		{
 			f_pos[0] = 1;
 			f_pos[1] = 1;
 			f_pos[2] = 1;
+			f_color[0] = 0;
+			f_color[1] = 0;
+			f_color[2] = 0;
 //			printf("bad\n");
 			glLightfv(GL_LIGHT0 + i, GL_POSITION, f_pos);
-			glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, zero);
+			glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, f_color);
 		}
 		else
 		{
@@ -193,7 +219,10 @@ void p_set_light(PObjLight *light, uint light_count, uint32 time_s, uint32 time_
 		/*	if(i == light_count - 1)
 				mult = light->lightfade;
 			else*/
-				mult = 1;
+			if(current_shadow_light == light->lights[i])
+				mult = current_light_fade * 0.9;
+			else 
+				mult = 1.0;
 			f_pos[0] = (float)pos[0];
 			f_pos[1] = (float)pos[1];
 			f_pos[2] = (float)pos[2];

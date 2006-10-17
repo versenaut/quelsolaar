@@ -136,7 +136,7 @@ void co_intro_draw(void *user)
 	uint i;
 	co_vng_update_time();
 	aspect = betray_get_screen_mode(NULL, NULL, NULL);
-
+	sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	if(timer > 0)
 		timer -= 0.16 * betray_get_delta_time();
 	if(timer > 1)

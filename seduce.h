@@ -49,18 +49,18 @@ extern void sui_draw_set_ivec4(uint *array, uint pos, uint a, uint b, uint c, ui
 #define SUI_T_SIZE 0.0125
 #define SUI_T_SPACE 0.3
 
-extern void		sui_draw_letter(uint8 letter, float red, float green, float blue);
+extern void		sui_draw_letter(uint8 letter, float red, float green, float blue, float alpha);
 extern float	sui_get_letter_size(unsigned char letter);
 
-extern void		sui_draw_text(float pos_x, float pos_y, float size, float spacing, const char *text, float red, float green, float blue);
+extern void		sui_draw_text(float pos_x, float pos_y, float size, float spacing, const char *text, float red, float green, float blue, float alpha);
 extern float	sui_compute_text_length(float size, float spacing, const char *text);
 
-extern boolean	sw_text_button(BInputState *input, float pos_x, float pos_y, float center, float size, float spacing, const char *text, float red, float green, float blue);
+extern boolean	sw_text_button(BInputState *input, float pos_x, float pos_y, float center, float size, float spacing, const char *text, float red, float green, float blue, float alpha);
 
-extern boolean	sui_type_number_double(BInputState *input, float pos_x, float pos_y, float center, float length, float size, double *number, void *id, float red, float green, float blue);
+extern boolean	sui_type_number_double(BInputState *input, float pos_x, float pos_y, float center, float length, float size, double *number, void *id, float red, float green, float blue, float alpha);
 extern boolean	sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float center, float length, float size, uint32 *number, void *id, float red, float green, float blue);
 
-extern boolean	sui_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size, void (*done_func)(void *user, char *text), void* user, float red, float green, float blue);
+extern boolean	sui_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size, void (*done_func)(void *user, char *text), void* user, float red, float green, float blue, float alpha);
 
 
 /* Setting are automaticaly created if you ask for them, just use a "sui_get_setting..." to name and set a default value, and the value will

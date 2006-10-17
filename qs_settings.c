@@ -24,7 +24,7 @@ void qs_draw_settings(BInputState *input)
 	char text[32] = {0};
 	sp_settings_pre(element);
 	element[12].type = S_VET_COLOR;
-	element[12].text = "bakground";
+	element[12].text = "background";
 	element[12].param.color[0] = background_color[0];
 	element[12].param.color[1] = background_color[1];
 	element[12].param.color[2] = background_color[2];

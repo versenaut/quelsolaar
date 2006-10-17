@@ -18,15 +18,20 @@ extern void co_intro_draw(void *user);
 extern void *se_symbol_editor_func(BInputState *input, void *user_pointer);
 extern void *se_font_editor_func(BInputState *input, void *user_pointer);
 extern void co_intro_init(void);
+extern void sp_settings_init(void);
 extern void co_update_context_textures(void);
+extern void co_node_create_func(uint connection, uint id, VNodeType type, void *user);
+extern float co_background_color[3];
+extern float co_line_color[3];
 
 void co_context_update(void)
 {
-	glClearColor(1, 1, 1, 1);
+	glClearColor(co_background_color[0], co_background_color[1], co_background_color[2], 1);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	co_update_context_textures();
 	p_context_update();
+	sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 int main(int argc, char **argv)
@@ -44,11 +49,12 @@ int main(int argc, char **argv)
 #ifdef PERSUADE_H
 	persuade_init(4, betray_get_gl_proc_address());
 	p_geo_set_sds_level(4);
+	sp_settings_init();
 #endif
 	co_vng_init();
 	co_intro_init();
 	e_nsm_set_custom_func(CO_ENOUGH_NODE_SLOT, material_func);
-	e_ns_set_node_create_func(NULL, NULL);
+	e_ns_set_node_create_func(co_node_create_func, NULL);
 
 	betray_set_context_update_func(co_context_update);
 	deceive_set_intro_draw_func(co_intro_draw, NULL);

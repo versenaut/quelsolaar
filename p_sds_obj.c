@@ -597,41 +597,91 @@ void p_lod_compute_displacement_array(egreal *vertex, uint vertex_count, const e
 void p_lod_compute_normal_array(egreal *normals, uint vertex_count, const uint *normal_ref, const egreal *vertex)
 {
 	uint i = 0, j = 0;
-	egreal x, y, z, vec0[3], vec1[3], vec2[3], vec3[3];
+	egreal x, y, z, f, vec0[3], vec1[3], vec2[3], vec3[3];
 	vertex_count *= 3;
-	while(i < vertex_count)
+	if(TRUE)
 	{
-		x = vertex[i];
-		y = vertex[i + 1];
-		z = vertex[i + 2];
-
-		vec0[0] = vertex[normal_ref[j] * 3] - x;
-		vec0[1] = vertex[normal_ref[j] * 3 + 1] - y;
-		vec0[2] = vertex[normal_ref[j] * 3 + 2] - z;
-		j++;
-		vec1[0] = vertex[normal_ref[j] * 3] - x;
-		vec1[1] = vertex[normal_ref[j] * 3 + 1] - y;
-		vec1[2] = vertex[normal_ref[j] * 3 + 2] - z;
-		j++;
-		vec2[0] = vertex[normal_ref[j] * 3] - x;
-		vec2[1] = vertex[normal_ref[j] * 3 + 1] - y;
-		vec2[2] = vertex[normal_ref[j] * 3 + 2] - z;
-		j++;
-		vec3[0] = vertex[normal_ref[j] * 3] - x;
-		vec3[1] = vertex[normal_ref[j] * 3 + 1] - y;
-		vec3[2] = vertex[normal_ref[j] * 3 + 2] - z;
-		j++;
-
-		normals[i++] = (vec0[1] * vec1[2] - vec0[2] * vec1[1]) + (vec2[1] * vec3[2] - vec2[2] * vec3[1]);
-		normals[i++] = (vec0[2] * vec1[0] - vec0[0] * vec1[2]) + (vec2[2] * vec3[0] - vec2[0] * vec3[2]);
-		normals[i++] = (vec0[0] * vec1[1] - vec0[1] * vec1[0]) + (vec2[0] * vec3[1] - vec2[1] * vec3[0]);
-
+		while(i < vertex_count)
 		{
-			egreal a;
-			a = sqrt(normals[i - 3] * normals[i - 3] + normals[i - 2] * normals[i - 2] + normals[i - 1] * normals[i - 1]);
-			normals[i - 1] /= a;
-			normals[i - 2] /= a;
-			normals[i - 3] /= a;
+			x = vertex[i];
+			y = vertex[i + 1];
+			z = vertex[i + 2];
+
+			vec0[0] = vertex[normal_ref[j] * 3] - x;
+			vec0[1] = vertex[normal_ref[j] * 3 + 1] - y;
+			vec0[2] = vertex[normal_ref[j] * 3 + 2] - z;
+			j++;
+			vec1[0] = vertex[normal_ref[j] * 3] - x;
+			vec1[1] = vertex[normal_ref[j] * 3 + 1] - y;
+			vec1[2] = vertex[normal_ref[j] * 3 + 2] - z;
+			j++;
+			vec2[0] = vertex[normal_ref[j] * 3] - x;
+			vec2[1] = vertex[normal_ref[j] * 3 + 1] - y;
+			vec2[2] = vertex[normal_ref[j] * 3 + 2] - z;
+			j++;
+			vec3[0] = vertex[normal_ref[j] * 3] - x;
+			vec3[1] = vertex[normal_ref[j] * 3 + 1] - y;
+			vec3[2] = vertex[normal_ref[j] * 3 + 2] - z;
+			j++;
+
+			x = (vec0[1] * vec1[2] - vec0[2] * vec1[1]) + (vec2[1] * vec3[2] - vec2[2] * vec3[1]);
+			y = (vec0[2] * vec1[0] - vec0[0] * vec1[2]) + (vec2[2] * vec3[0] - vec2[0] * vec3[2]);
+			z = (vec0[0] * vec1[1] - vec0[1] * vec1[0]) + (vec2[0] * vec3[1] - vec2[1] * vec3[0]);
+
+			f = sqrt(x * x + y * y + z * z);
+			normals[i++] = x / f;
+			normals[i++] = y / f;
+			normals[i++] = z / f;
+		}
+	}else
+	{
+		while(i < vertex_count)
+		{
+			x = vertex[i];
+			y = vertex[i + 1];
+			z = vertex[i + 2];
+
+			vec0[0] = vertex[normal_ref[j] * 3] - x;
+			vec0[1] = vertex[normal_ref[j] * 3 + 1] - y;
+			vec0[2] = vertex[normal_ref[j] * 3 + 2] - z;
+			f = sqrt(vec0[0] * vec0[0] + vec0[1] * vec0[1] + vec0[2] * vec0[2]);
+			vec0[0] /= f;
+			vec0[1] /= f;
+			vec0[2] /= f;
+			j++;
+			vec1[0] = vertex[normal_ref[j] * 3] - x;
+			vec1[1] = vertex[normal_ref[j] * 3 + 1] - y;
+			vec1[2] = vertex[normal_ref[j] * 3 + 2] - z;
+			f = sqrt(vec1[0] * vec1[0] + vec1[1] * vec1[1] + vec1[2] * vec1[2]);
+			vec1[0] /= f;
+			vec1[1] /= f;
+			vec1[2] /= f;
+			j++;
+			vec2[0] = vertex[normal_ref[j] * 3] - x;
+			vec2[1] = vertex[normal_ref[j] * 3 + 1] - y;
+			vec2[2] = vertex[normal_ref[j] * 3 + 2] - z;
+			f = sqrt(vec2[0] * vec2[0] + vec2[1] * vec2[1] + vec2[2] * vec2[2]);
+			vec2[0] /= f;
+			vec2[1] /= f;
+			vec2[2] /= f;
+			j++;
+			vec3[0] = vertex[normal_ref[j] * 3] - x;
+			vec3[1] = vertex[normal_ref[j] * 3 + 1] - y;
+			vec3[2] = vertex[normal_ref[j] * 3 + 2] - z;
+			f = sqrt(vec3[0] * vec3[0] + vec3[1] * vec3[1] + vec3[2] * vec3[2]);
+			vec3[0] /= f;
+			vec3[1] /= f;
+			vec3[2] /= f;
+			j++;
+
+			x = (vec0[1] * vec1[2] - vec0[2] * vec1[1]) + (vec2[1] * vec3[2] - vec2[2] * vec3[1]);
+			y = (vec0[2] * vec1[0] - vec0[0] * vec1[2]) + (vec2[2] * vec3[0] - vec2[0] * vec3[2]);
+			z = (vec0[0] * vec1[1] - vec0[1] * vec1[0]) + (vec2[0] * vec3[1] - vec2[1] * vec3[0]);
+
+			f = sqrt(x * x + y * y + z * z);
+			normals[i++] = x / f;
+			normals[i++] = y / f;
+			normals[i++] = z / f;
 		}
 	}
 }

@@ -3,7 +3,10 @@
 
 #include "seduce.h"
 
-void	sui_draw_line3(float pos_x, float pos_y, float dest_x, float dest_y, float red, float green, float blue)
+extern float co_background_color[3];
+extern float co_line_color[3];
+
+void	sui_draw_line3(float pos_x, float pos_y, float dest_x, float dest_y, float alpha)
 {
 	float array[48], vec_x, vec_y, r;
 	vec_x = pos_x - dest_x;
@@ -59,10 +62,10 @@ void	sui_draw_line3(float pos_x, float pos_y, float dest_x, float dest_y, float 
 	array[45] = pos_y + -0.001768 * vec_y - -0.004268 * vec_x;
 	array[46] = pos_x - -0.002500 * vec_x - -0.002500 * vec_y;
 	array[47] = pos_y + -0.002500 * vec_y - -0.002500 * vec_x;
-	sui_draw_gl(GL_LINES, array, 24, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 24, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 }
 
-void	sui_draw_line(float pos_x, float pos_y, float dest_x, float dest_y, float red, float green, float blue)
+void	sui_draw_line(float pos_x, float pos_y, float dest_x, float dest_y, float alpha)
 {
 	float array[76], vec_x, vec_y, r;
 	vec_x = pos_x - dest_x;
@@ -146,45 +149,45 @@ void	sui_draw_line(float pos_x, float pos_y, float dest_x, float dest_y, float r
 	array[73] = dest_y + -0.022500 * vec_y - -0.007500 * vec_x;
 	array[74] = pos_x - 0.022500 * vec_x - -0.007500 * vec_y;
 	array[75] = pos_y + 0.022500 * vec_y - -0.007500 * vec_x;
-	sui_draw_gl(GL_LINES, array, 38, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 38, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 }
 
-void	sui_draw_slider_line(float pos_x, float pos_y, float red, float green, float blue)
+void	sui_draw_slider_line(float pos_x, float pos_y, float alpha)
 {
 	static float array[] = {0.005000, 0.015000, 0.005000, 0.027500, -0.005000, 0.027500, -0.005000, 0.015000, -0.000000, 0.010000, 0.005000, 0.015000, -0.005000, -0.027500, -0.005000, -0.015000, 0.005000, -0.015000, 0.005000, -0.027500, -0.005000, -0.015000, -0.000000, -0.010000, 0.005000, -0.027500, -0.005000, -0.027500, -0.000000, -0.010000, 0.005000, -0.015000, 0.005000, 0.027500, -0.005000, 0.027500, -0.005000, 0.015000, -0.000000, 0.010000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 20, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 20, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 
-void sui_draw_check_box_checked(float pos_x, float pos_y, float red, float green, float blue)
+void sui_draw_check_box_checked(float pos_x, float pos_y, float alpha)
 {
 	static float array[] = {-0.010000, -0.017500, 0.010000, -0.017500, 0.017500, 0.012500, 0.017500, -0.010000, -0.017500, 0.010000, -0.017500, -0.010000, 0.027500, 0.032500, -0.000000, 0.005000, -0.010000, -0.017500, -0.013750, -0.016495, -0.013750, -0.016495, -0.016495, -0.013750, -0.016495, -0.013750, -0.017500, -0.010000, -0.010000, 0.012500, -0.015000, 0.005000, 0.027500, 0.032500, 0.005000, -0.012500, 0.012500, 0.017500, -0.010000, 0.017500, -0.000000, 0.005000, -0.010000, 0.012500, -0.005000, -0.012500, -0.015000, 0.005000, -0.010000, 0.017500, -0.013750, 0.016495, -0.013750, 0.016495, -0.016495, 0.013750, -0.016495, 0.013750, -0.017500, 0.010000, 0.010000, -0.017500, 0.013750, -0.016495, 0.013750, -0.016495, 0.016495, -0.013750, 0.016495, -0.013750, 0.017500, -0.010000, 0.005000, -0.012500, -0.005000, -0.012500};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 38, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 38, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 
-void sui_draw_check_box_unchecked(float pos_x, float pos_y, float red, float green, float blue)
+void sui_draw_check_box_unchecked(float pos_x, float pos_y, float alpha)
 {
 	static float array[] = {-0.017500, 0.010000, -0.017500, -0.010000, -0.010000, 0.017500, -0.013750, 0.016495, -0.013750, 0.016495, -0.016495, 0.013750, -0.016495, 0.013750, -0.017500, 0.010000, -0.010000, -0.017500, -0.013750, -0.016495, -0.013750, -0.016495, -0.016495, -0.013750, -0.016495, -0.013750, -0.017500, -0.010000, 0.010000, -0.017500, 0.013750, -0.016495, 0.013750, -0.016495, 0.016495, -0.013750, 0.016495, -0.013750, 0.017500, -0.010000, 0.010000, 0.017500, 0.013750, 0.016495, 0.013750, 0.016495, 0.016495, 0.013750, 0.016495, 0.013750, 0.017500, 0.010000, -0.010000, 0.017500, 0.010000, 0.017500, 0.017500, 0.010000, 0.017500, -0.010000, 0.010000, -0.017500, -0.010000, -0.017500};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 32, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 32, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 
-boolean co_w_checkbox(BInputState *input, float pos_x, float pos_y, boolean *state, float red, float green, float blue)
+boolean co_w_checkbox(BInputState *input, float pos_x, float pos_y, boolean *state, float alpha)
 {
 	pos_y += 0.01;
 	if(input->mode == BAM_DRAW)
 	{
 		if(*state)
-			sui_draw_check_box_checked(pos_x, pos_y, red, green, blue);
+			sui_draw_check_box_checked(pos_x, pos_y, alpha);
 		else
-			sui_draw_check_box_unchecked(pos_x, pos_y, red, green, blue);
+			sui_draw_check_box_unchecked(pos_x, pos_y, alpha);
 	}else if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
 	{
 		if(sui_box_click_test(pos_x - 0.02, pos_y - 0.02, 0.04, 0.04) && sui_box_down_click_test(pos_x - 0.02, pos_y - 0.02, 0.04, 0.04))
@@ -264,7 +267,6 @@ void	co_draw_type_in(float pos_x, float pos_y, float dest_x, float dest_y, float
 	array[48] = pos_x - 0.030000 * vec_x - -0.030000 * vec_y;
 	array[49] = pos_y + 0.030000 * vec_y - -0.030000 * vec_x;
 	array[50] = pos_x - 0.015000 * vec_x - -0.025981 * vec_y;
-	array[51] = pos_y + 0.015000 * vec_y - -0.025981 * vec_x;
 	array[52] = pos_x - 0.015000 * vec_x - -0.025981 * vec_y;
 	array[53] = pos_y + 0.015000 * vec_y - -0.025981 * vec_x;
 	array[54] = pos_x - 0.004019 * vec_x - -0.015000 * vec_y;
@@ -405,18 +407,18 @@ void	sui_draw_line_char_254(float pos_x, float pos_y, float dest_x, float dest_y
 }
 
 
-boolean co_w_slider(BInputState *input, float pos_x, float pos_y, float length, double *nr, double min, double max, float red, float green, float blue)
+boolean co_w_slider(BInputState *input, float pos_x, float pos_y, float length, double *nr, double min, double max, float alpha)
 {
 	if(input->mode == BAM_DRAW)
 	{
 		float f;
-		sui_draw_line3(pos_x, pos_y + 0.01, pos_x + length, pos_y + 0.01, red, green, blue);
+		sui_draw_line3(pos_x, pos_y + 0.01, pos_x + length, pos_y + 0.01, alpha);
 		f = (*nr - min) / (max - min);
 		if(f > 1)
 			f = 1;
 		if(f < 0)
 			f = 0;
-		sui_draw_slider_line(pos_x + length * f, pos_y + 0.01, red, green, blue);
+		sui_draw_slider_line(pos_x + length * f, pos_y + 0.01, alpha);
 	}else
 	{
 		static double *drag = NULL;
@@ -444,11 +446,11 @@ boolean co_w_slider(BInputState *input, float pos_x, float pos_y, float length, 
 boolean co_w_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size, void (*done_func)(void *user, char *text), void* user, float text_color, float line_color)
 {
 	if(input->mode == BAM_DRAW)
-		sui_draw_2d_line_gl(pos_x, pos_y - size * 0.25, pos_x + length, pos_y - size * 0.25,line_color, line_color, line_color, 1);
-	return sui_type_in(input, pos_x, pos_y, length, size, text, buffer_size, done_func, user, text_color, text_color, text_color);
+		sui_draw_2d_line_gl(pos_x, pos_y - size * 0.25, pos_x + length, pos_y - size * 0.25, co_line_color[0], co_line_color[1], co_line_color[2], line_color);
+	return sui_type_in(input, pos_x, pos_y, length, size, text, buffer_size, done_func, user, co_line_color[0], co_line_color[1], co_line_color[2], text_color);
 }
 
-void sui_draw_rounded_square(float pos_x, float pos_y, float size_x, float size_y, float red, float green, float blue)
+void sui_draw_rounded_square(float pos_x, float pos_y, float size_x, float size_y, float red, float green, float blue, float alpha)
 {
 	float array[64];
 	size_x += pos_x;
@@ -517,25 +519,25 @@ void sui_draw_rounded_square(float pos_x, float pos_y, float size_x, float size_
 	array[61] = size_y + 0.002500;
 	array[62] = pos_x + -0.000000;
 	array[63] = size_y + 0.005000;
-	sui_draw_gl(GL_LINES, array, 32, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 32, 2, red, green, blue, alpha);
 }
 
 
-void	sui_draw_symb_close(float pos_x, float pos_y, float red, float green, float blue)
+void	sui_draw_symb_close(float pos_x, float pos_y, float alpha)
 {
 	static float array[] = {-0.002500, -0.002500, -0.010000, -0.010000, -0.000000, -0.017500, 0.005408, -0.016643, 0.005408, -0.016643, 0.010286, -0.014158, 0.010286, -0.014158, 0.014158, -0.010286, 0.014158, -0.010286, 0.016643, -0.005408, 0.016643, -0.005408, 0.017500, 0.000000, -0.000000, -0.017500, -0.005408, -0.016643, -0.005408, -0.016643, -0.010286, -0.014158, -0.010286, -0.014158, -0.014158, -0.010286, -0.014158, -0.010286, -0.016643, -0.005408, -0.016643, -0.005408, -0.017500, 0.000000, -0.000000, 0.017500, -0.005408, 0.016643, -0.005408, 0.016643, -0.010286, 0.014158, -0.010286, 0.014158, -0.014158, 0.010286, -0.014158, 0.010286, -0.016643, 0.005408, -0.016643, 0.005408, -0.017500, 0.000000, 0.002500, 0.002500, 0.010000, 0.010000, -0.000000, 0.017500, 0.005408, 0.016643, 0.005408, 0.016643, 0.010286, 0.014158, 0.010286, 0.014158, 0.014158, 0.010286, 0.014158, 0.010286, 0.016643, 0.005408, 0.016643, 0.005408, 0.017500, 0.000000, 0.002500, -0.002500, 0.010000, -0.010000, -0.002500, 0.002500, -0.010000, 0.010000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
 	glScalef(0.5, 0.5, 0.5);
-	sui_draw_gl(GL_LINES, array, 48, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 48, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 
-boolean co_w_close_button(BInputState *input, float pos_x, float pos_y, float red, float green, float blue)
+boolean co_w_close_button(BInputState *input, float pos_x, float pos_y, float alpha)
 {
 	pos_x += 0.025;
 	if(input->mode == BAM_DRAW)
-		sui_draw_symb_close(pos_x, pos_y, red, green, blue);
+		sui_draw_symb_close(pos_x, pos_y, alpha);
 	else if(input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE)
 		if(0.025 * 0.025 > (pos_x - input->pointer_x) * (pos_x - input->pointer_x) + (pos_y - input->pointer_y) * (pos_y - input->pointer_y))
 			if(0.025 * 0.025 > (pos_x - input->click_pointer_x) * (pos_x - input->click_pointer_x) + (pos_y - input->click_pointer_y) * (pos_y - input->click_pointer_y))
@@ -550,10 +552,6 @@ float co_w_scroll(BInputState *input, float pos, float size)
 	float aspect, p;
 	aspect = betray_get_screen_mode(NULL, NULL, NULL);
 	p = (1 - pos / -size) * aspect;
-/*	if(size < aspect)
-		return pos;
-	pos /= aspect;
-	size /= aspect;*/
 	if(input->mode == BAM_DRAW)
 	{
 		sui_draw_2d_line_gl(0.98, p, 0.98, p - 5.0 / (size * aspect), 0.5, 0.5, 0.5, 1);
@@ -562,21 +560,9 @@ float co_w_scroll(BInputState *input, float pos, float size)
 	}
 	else
 	{
-		if(input->mouse_button[0] == FALSE && input->last_mouse_button[0] == TRUE)
-		{
-			if(input->pointer_x > 0.95 && input->pointer_y < p)
-				pos += (5.0 / (size * aspect)) / aspect * -size;
-			if(input->pointer_x > 0.95 && input->pointer_y > p - 4.0 / (size * aspect))
-				pos -= (5.0 / (size * aspect)) / aspect * -size;
-		}
-		if(input->mouse_button[0] == TRUE && input->click_pointer_x > 0.95 && input->pointer_y < p && input->pointer_y > p - 4.0 / (size * aspect))
-			drag = TRUE;
-		if(drag)
+
+		if(input->mouse_button[0] == TRUE && input->click_pointer_x > 0.95 && (input->pointer_y - input->delta_pointer_y) < p && (input->pointer_y - input->delta_pointer_y) > p - 5.0 / (size * aspect))
 			pos += input->delta_pointer_y * size / aspect;
-		if(input->mouse_button[0] == FALSE || input->last_mouse_button[0] == FALSE)
-			drag = FALSE;
-	//	pos = (-1 + (p / aspect) * -1) * -size;
-	//	p = (1 - -pos / size) * aspect;
 	}
 	return pos;
 }

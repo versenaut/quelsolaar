@@ -1,6 +1,6 @@
 #include "seduce.h"
 
-void sui_draw_letter(uint8 letter, float red, float green, float blue)
+void sui_draw_letter(uint8 letter, float red, float green, float blue, float alpha)
 {
 	static float font_33[] = {(float)0.000000, (float)0.000000, (float)0.000000, (float)-0.060000, (float)0.000000, (float)0.080000, (float)0.000000, (float)0.420000};
 	static float font_34[] = {(float)0.080000, (float)0.240000, (float)0.060000, (float)0.240000, (float)0.020000, (float)0.240000, (float)0.000000, (float)0.240000, (float)0.100000, (float)0.300000, (float)0.080000, (float)0.240000, (float)0.040000, (float)0.300000, (float)0.020000, (float)0.240000};
@@ -357,7 +357,7 @@ void sui_draw_letter(uint8 letter, float red, float green, float blue)
 		font_array[126] = font_126;
 	}
 	if(font_size[letter] != 0)
-		sui_draw_gl(GL_LINES, font_array[letter], font_size[letter], 2, red, green, blue, 0);
+		sui_draw_gl(GL_LINES, font_array[letter], font_size[letter], 2, red, green, blue, alpha);
 }
 
 float sui_get_letter_size(unsigned char letter)

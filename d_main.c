@@ -198,7 +198,7 @@ void hidden_type_in(BInputState *input, float pos_x, float pos_y, float length, 
 		for(i = 0; i < 255 && text[i] != 0; i++)
 			zeros[i] = '0';
 		zeros[i] = 0;
-		sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, zeros, red, green, blue);
+		sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, zeros, red, green, blue, 0.5);
 	}
 	else
 	{
@@ -217,6 +217,7 @@ void (*deceive_draw_func)(void *user_pointer) = NULL;
 void *deceive_user_pointer = NULL;
 
 void d_draw_login(BInputState *input);
+void d_init_master(void);
 
 void deceive_set_intro_draw_func(void (*draw_func)(void *user_pointer), void *user_pointer)
 {
@@ -272,7 +273,7 @@ void deceive_intro_handler(BInputState *input, void *application_handler_func)
 		{
 			if(input->mode == BAM_DRAW)
 				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECTING...") * -0.5, -0.3, 0.02, 2, "CONNECTING...", 0, 0, 0);    
-			if(sw_text_button(input, sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, "Cancel") * -0.5, -0.35, 0, SUI_T_SIZE, SUI_T_SPACE, "Cancel", 0, 0, 0))
+			if(sw_text_button(input, sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, "Cancel") * -0.5, -0.35, 0, SUI_T_SIZE, SUI_T_SPACE, "Cancel", co_line_color[0], co_line_color[1], co_line_color[2], color))
 			{
 				e_vc_disconnect(0);
 			}

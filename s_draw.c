@@ -13,7 +13,6 @@ void sui_draw_gl(uint draw_type, const float *array, uint length, uint dimension
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(dimensions, GL_FLOAT , 0, array);
 	glDrawArrays(draw_type, 0, length);
-	glDisable(GL_BLEND);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -54,7 +53,6 @@ void sui_draw_elements_gl(uint draw_type, float *array, uint *reference, uint le
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_LIGHTING);
-	glDisable(GL_BLEND);
 }
 
 void sui_set_color_array_gl(float *array, uint length, uint channels)

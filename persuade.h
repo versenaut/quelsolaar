@@ -42,9 +42,11 @@ extern boolean	p_render_get_flare(void);
 extern void		p_render_set_wireframe(boolean wireframe);
 extern boolean	p_render_get_wireframe(void);
 
+extern void		p_render_set_light_count(uint light);
+extern uint		p_render_get_light_count(void);
+
 extern void		p_th_set_sds_use_hdri(boolean hdri);
 extern boolean	p_th_get_sds_use_hdri(void);
-
 
 extern void		p_render_set_impostor_size(float size);
 extern float	p_render_get_impostor_size(void);
@@ -106,8 +108,7 @@ extern egreal p_noise_point_function(egreal *vec);
 
 /* Shader Code gen */
 
-extern void p_shader_code_write(ENode *node, char **v_code, uint *v_length, char **f_code, uint *f_length, uint *dest, uint *src);
-
+extern void p_shader_code_write(ENode *node, char **v_code, uint *v_length, char **f_code, uint *f_length, uint *dest, uint *src, boolean initialized);
 
 #endif		/* PERSUADE_H */
 

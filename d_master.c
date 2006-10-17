@@ -36,7 +36,6 @@ static DConnectMode d_current_mode = D_CM_URL;
 
 static char d_master_address[MAX_ADDRESS_SIZE] = "";
 
-
 void d_add_address(DConnectMode mode, char *address, char *description, char *name, char *pass)
 {
 	DMasterAddress *a;
@@ -166,6 +165,12 @@ void d_add_address_to_history(char *address, char *description, char *name, char
 	for(i = 0; i < V_MAX_NAME_PASS_LENGTH - 1 && pass[i] != 0;i++)
 		a->pass[i] = pass[i];
 	a->pass[i] = 0;
+}
+
+void d_typein_done_func(void *user, char *text)
+{
+	d_add_address_to_history(text, text, "somename", "somepass");
+	e_vc_connect(text, "somename", "somepass", NULL);
 }
 
 void callback_send_ping(void *user, const char *address, const char *message)
@@ -299,7 +304,7 @@ void d_draw_star(float x, float y, float color)
 {
 	glPushMatrix();
 	glTranslatef(x, y, 0);
-	sui_draw_gl(GL_LINES, star_data, 20, 2, color, color, color, 0);
+	sui_draw_gl(GL_LINES, star_data, 20, 2, 0.0, 0.0, 0.0, color);
 	glPopMatrix();
 }
 
@@ -338,27 +343,28 @@ void d_draw_login(BInputState *input)
 
 	if(input->mode == BAM_DRAW)
 	{
+		sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		sui_draw_window(0, y_size, x_size, y_size * 2, 1, "CONNECT");
 		if(d_view[D_CM_ADD_FAVORITES] < 0.9)
-			sui_draw_2d_line_gl(line_start, y_size - 0.06, line_end, y_size - 0.06, d_view[D_CM_CONNECTING], d_view[D_CM_CONNECTING], d_view[D_CM_CONNECTING], 0);
+			sui_draw_2d_line_gl(line_start, y_size - 0.06, line_end, y_size - 0.06, 0, 0, 0, d_view[D_CM_CONNECTING]);
 	}
 
 	if(d_view[D_CM_ADD_FAVORITES] < 0.9 && d_view[D_CM_CONNECTING] < 0.9)
 	{
-		if(sw_text_button(input, -0.315, y_size - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "LOCALHOST", d_view[D_CM_CONNECTING], d_view[D_CM_CONNECTING], d_view[D_CM_CONNECTING]))
+		if(sw_text_button(input, -0.315, y_size - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "LOCALHOST", 0.0, 0.0, 0.0, 1.0 - d_view[D_CM_CONNECTING]))
 		{
 			d_add_address_to_history("localhost", "Anonymous localhost", "anonymous", "nopass");
 			e_vc_connect("localhost", "anonymous", "nopass", NULL);
 			d_save_address_settings();
 			d_current_mode = D_CM_CONNECTING;
 		}
-		if(sw_text_button(input, -0.13, y_size - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "URL", d_view[D_CM_CONNECTING], d_view[D_CM_CONNECTING], d_view[D_CM_CONNECTING]))
+		if(sw_text_button(input, -0.13, y_size - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "URL", 0.0, 0.0, 0.0, 1.0 - d_view[D_CM_CONNECTING]))
 			d_current_mode = D_CM_URL;
-		if(sw_text_button(input, -0.047, y_size - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "HISTORY", d_view[D_CM_CONNECTING], d_view[D_CM_CONNECTING], d_view[D_CM_CONNECTING]))
+		if(sw_text_button(input, -0.047, y_size - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "HISTORY", 0.0, 0.0, 0.0, 1.0 - d_view[D_CM_CONNECTING]))
 			d_current_mode = D_CM_HISTORY;
-		if(sw_text_button(input, 0.092, y_size - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "FAVORITES", d_view[D_CM_CONNECTING], d_view[D_CM_CONNECTING], d_view[D_CM_CONNECTING]))
+		if(sw_text_button(input, 0.092, y_size - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "FAVORITES", 0.0, 0.0, 0.0, 1.0 - d_view[D_CM_CONNECTING]))
 			d_current_mode = D_CM_FAVORITES;
-		if(sw_text_button(input, 0.264, y_size - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "LIST", d_view[D_CM_CONNECTING], d_view[D_CM_CONNECTING], d_view[D_CM_CONNECTING]))
+		if(sw_text_button(input, 0.264, y_size - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "LIST", 0.0, 0.0, 0.0, 1.0 - d_view[D_CM_CONNECTING]))
 		{
 			d_current_mode = D_CM_LIST;
 			if(d_address_count[D_CM_LIST] == 0)
@@ -368,15 +374,15 @@ void d_draw_login(BInputState *input)
 
 	if(d_view[D_CM_URL] > 0.1)
 	{
-		sui_draw_text(-0.315, -0.05, SUI_T_SIZE, SUI_T_SPACE, "URL:", 1.0 - d_view[D_CM_URL], 1.0 - d_view[D_CM_URL], 1.0 - d_view[D_CM_URL]);
-		sui_type_in(input, -0.260, -0.05, 1.0, SUI_T_SIZE, name, 64, NULL, NULL,1.0 - d_view[D_CM_URL], 1.0 - d_view[D_CM_URL], 1.0 - d_view[D_CM_URL]);
-		sui_draw_2d_line_gl(-0.260, -0.06, 0.315, -0.06, 1.0 - d_view[D_CM_URL], 1.0 - d_view[D_CM_URL], 1.0 - d_view[D_CM_URL], 0);
+		sui_draw_text(-x_size / 2 - 0.015 , -y_size, SUI_T_SIZE, SUI_T_SPACE, "URL:", 0.0, 0.0, 0.0, d_view[D_CM_URL]);
+		sui_type_in(input, -0.260, -0.05, 1.0, SUI_T_SIZE, name, 64, d_typein_done_func, NULL, 0.0, 0.0, 0.0, d_view[D_CM_URL]);
+		sui_draw_2d_line_gl(-x_size / 2 + 0.045, -y_size - 0.01, x_size / 2 + 0.01, -y_size - 0.01, 0.0, 0.0, 0.0, d_view[D_CM_URL]);
 	}
 
 	if(d_view[D_CM_CONNECTING] > 0.1)
 	{
-		sui_draw_text(-0.085, 0.0, SUI_T_SIZE, SUI_T_SPACE, "CONNECTING . . .", 0, 0, 0);
-		if(sw_text_button(input, x_size / 2 - 0.095, -y_size + 0.0, 0, SUI_T_SIZE, SUI_T_SPACE, "CANCEL", 1.0 - d_view[D_CM_CONNECTING], 1.0 - d_view[D_CM_CONNECTING], 1.0 - d_view[D_CM_CONNECTING]))
+		sui_draw_text(-0.085, 0.0, SUI_T_SIZE, SUI_T_SPACE, "CONNECTING . . .", 0, 0, 0, 1);
+		if(sw_text_button(input, x_size / 2 - 0.095, -y_size + 0.0, 0, SUI_T_SIZE, SUI_T_SPACE, "CANCEL", 0.0, 0.0, 0.0, d_view[D_CM_CONNECTING]))
 		{
 			d_current_mode = 0;
 			e_vc_disconnect_all();
@@ -395,13 +401,13 @@ void d_draw_login(BInputState *input)
 			f = d_view[D_CM_CONNECTING];
 		if(input->mode == BAM_DRAW)
 		{
-			sui_draw_2d_line_gl(x_size / 2, y_size - 0.075, -x_size / 2, y_size - 0.075, f, f, f, 0);
-			sui_draw_2d_line_gl(x_size / 2, -y_size + 0.025, -x_size / 2, -y_size + 0.025, f, f, f, 0);
+			sui_draw_2d_line_gl(x_size / 2, y_size - 0.075, -x_size / 2, y_size - 0.075, 0, 0, 0, 1 - f);
+			sui_draw_2d_line_gl(x_size / 2, -y_size + 0.025, -x_size / 2, -y_size + 0.025, 0, 0, 0, 1 - f);
 		}
 	}
 	if(d_view[D_CM_LIST] > 0.1)
 	{
-		if(sw_text_button(input, -x_size / 2, -y_size + 0.0, 0, SUI_T_SIZE, SUI_T_SPACE, "REFRESH", 1.0 - d_view[D_CM_LIST], 1.0 - d_view[D_CM_LIST], 1.0 - d_view[D_CM_LIST]))
+		if(sw_text_button(input, -x_size / 2, -y_size + 0.0, 0, SUI_T_SIZE, SUI_T_SPACE, "REFRESH", 0.0, 0.0, 0.0, d_view[D_CM_LIST]))
 		{
 			if(d_address_list[D_CM_LIST] != NULL)
 				free(d_address_list[D_CM_LIST]);
@@ -411,16 +417,23 @@ void d_draw_login(BInputState *input)
 		}
 /*		if(sw_text_button(input, -x_size / 2 + 0.15 , -y_size + 0.0, 0, SUI_T_SIZE, SUI_T_SPACE, "PING", 1.0 - d_view[D_CM_LIST], 1.0 - d_view[D_CM_LIST], 1.0 - d_view[D_CM_LIST]))
 			;
-*/		sui_draw_text(-x_size / 2 + 0.25, -y_size + 0, SUI_T_SIZE, SUI_T_SPACE, "MASTER SERVER :", 1.0 - d_view[D_CM_LIST], 1.0 - d_view[D_CM_LIST], 1.0 - d_view[D_CM_LIST]);
-		sui_type_in(input, -x_size / 2 + 0.47, -y_size + 0, 1.0, SUI_T_SIZE, d_master_address, 64, NULL, NULL, 1.0 - d_view[D_CM_LIST], 1.0 - d_view[D_CM_LIST], 1.0 - d_view[D_CM_LIST]);
+*/		sui_draw_text(-x_size / 2 + 0.25, -y_size + 0, SUI_T_SIZE, SUI_T_SPACE, "MASTER SERVER :", 0.0, 0.0, 0.0, d_view[D_CM_LIST]);
+		sui_type_in(input, -x_size / 2 + 0.47, -y_size + 0, 1.0, SUI_T_SIZE, d_master_address, 64, NULL, NULL, 0.0, 0.0, 0.0, d_view[D_CM_LIST]);
 		if(input->mode == BAM_DRAW)
 			sui_draw_2d_line_gl(-x_size / 2 + 0.47, -y_size - 0.01, x_size / 2, -y_size - 0.01, 1.0 - d_view[D_CM_LIST] * 0.25, 1.0 - d_view[D_CM_LIST] * 0.25, 1.0 - d_view[D_CM_LIST] * 0.25, 0);
 	}
 
 	for(i = 1; i < 4; i++)
+	{
 		if(d_view[i] > 0.1 && i != d_current_mode)
+		{
 			for(j = 0; j < d_address_count[i] && j < (uint)((y_size - 0.05) / 0.025); j++)
-				sw_text_button(input, x_size * -0.5, y_size - 0.05 * (float)j - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, d_address_list[i][j].message, 1.0 - d_view[i], 1.0 - d_view[i], 1.0 - d_view[i]);
+			{
+				sw_text_button(input, x_size * -0.5, y_size - 0.05 * (float)j - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, d_address_list[i][j].message, 0.0, 0.0, 0.0, d_view[i]);
+				sw_text_button(input, x_size * 0.1, y_size - 0.05 * (float)j - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, d_address_list[i][j].address, 0.0, 0.0, 0.0, d_view[i]);
+			}
+		}
+	}
 	if(d_current_mode != D_CM_URL && d_current_mode != D_CM_ADD_FAVORITES && d_current_mode != D_CM_CONNECTING && d_current_mode != D_CM_NAME_PASS)
 	{
 		for(j = 0; j < d_address_count[d_current_mode] && j < (uint)((y_size - 0.05) / 0.025); j++)
@@ -428,7 +441,7 @@ void d_draw_login(BInputState *input)
 			if(input->mode == BAM_DRAW)
 			{
 				if(d_address_list[d_current_mode][j].favorites)
-					d_draw_star(x_size * 0.5 - 0.01, y_size - 0.05 * (float)j - 0.1, 0.0);
+					d_draw_star(x_size * 0.5 - 0.01, y_size - 0.05 * (float)j - 0.1, 1.0);
 				else
 					d_draw_star(x_size * 0.5 - 0.01, y_size - 0.05 * (float)j - 0.1, 0.5);
 			}else if(input->last_mouse_button[0] == FALSE && input->mouse_button[0] == TRUE)
@@ -444,7 +457,8 @@ void d_draw_login(BInputState *input)
 						d_add_address(D_CM_FAVORITES, d_address_list[d_current_mode][j].address, d_address_list[d_current_mode][j].message, d_address_list[d_current_mode][j].name, d_address_list[d_current_mode][j].pass);
 				}
 			}
-			if(sw_text_button(input, x_size * -0.5, y_size - 0.05 * (float)j - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, d_address_list[d_current_mode][j].message, 1.0 - d_view[d_current_mode], 1.0 - d_view[d_current_mode], 1.0 - d_view[d_current_mode]))
+			if(sw_text_button(input, x_size * -0.5, y_size - 0.05 * (float)j - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, d_address_list[d_current_mode][j].message, 0.0, 0.0, 0.0, d_view[d_current_mode]) ||
+				sw_text_button(input, x_size * 0.1, y_size - 0.05 * (float)j - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, d_address_list[d_current_mode][j].address, 0.0, 0.0, 0.0, d_view[d_current_mode]))
 			{
 				e_vc_connect(d_address_list[d_current_mode][j].address, d_address_list[d_current_mode][j].name, d_address_list[d_current_mode][j].pass, NULL);
 				d_add_address_to_history(d_address_list[d_current_mode][j].address, d_address_list[d_current_mode][j].message, d_address_list[d_current_mode][j].name, d_address_list[d_current_mode][j].pass);
@@ -455,7 +469,7 @@ void d_draw_login(BInputState *input)
 	}
 	if(d_view[D_CM_HISTORY] > 0.1 && d_address_list[D_CM_HISTORY] != NULL)
 	{
-		if(sw_text_button(input, -x_size / 2, -y_size + 0.0, 0, SUI_T_SIZE, SUI_T_SPACE, "CLEAR", 1.0 - d_view[D_CM_HISTORY], 1.0 - d_view[D_CM_HISTORY], 1.0 - d_view[D_CM_HISTORY]))
+		if(sw_text_button(input, -x_size / 2, -y_size + 0.0, 0, SUI_T_SIZE, SUI_T_SPACE, "CLEAR", 0.0, 0.0, 0.0, d_view[D_CM_HISTORY]))
 		{
 			free(d_address_list[D_CM_HISTORY]);
 			d_address_list[D_CM_HISTORY] = NULL;
@@ -466,34 +480,34 @@ void d_draw_login(BInputState *input)
 
 	if(d_view[D_CM_FAVORITES] > 0.1)
 	{
-		if(sw_text_button(input, -x_size / 2, -y_size + 0.0, 0, SUI_T_SIZE, SUI_T_SPACE, "ADD", 1.0 - d_view[D_CM_FAVORITES], 1.0 - d_view[D_CM_FAVORITES], 1.0 - d_view[D_CM_FAVORITES]))
+		if(sw_text_button(input, -x_size / 2, -y_size + 0.0, 0, SUI_T_SIZE, SUI_T_SPACE, "ADD", 0.0, 0.0, 0.0, d_view[D_CM_FAVORITES]))
 			if(d_view[D_CM_FAVORITES] > 0.5)
 				d_current_mode = D_CM_ADD_FAVORITES;
 	}
 	if(d_current_mode == D_CM_ADD_FAVORITES)
 	{
-		static char address[24] = {0};
+		static char address[48] = {0};
 		static char description[MAX_MESSAGE_SIZE] = {0};
 		static char name[V_MAX_NAME_PASS_LENGTH] = {0};
 		static char pass[V_MAX_NAME_PASS_LENGTH] = {0};
 
-		sui_draw_text(-0.315, 0.075, SUI_T_SIZE, SUI_T_SPACE, "DESCRIPTION :", 0, 0, 0);
-		sui_type_in(input, -0.140, 0.075, 1.0, SUI_T_SIZE, description, MAX_MESSAGE_SIZE, NULL, NULL, 0, 0, 0);
+		sui_draw_text(-0.315, 0.075, SUI_T_SIZE, SUI_T_SPACE, "DESCRIPTION :", 0, 0, 0, d_view[D_CM_ADD_FAVORITES]);
+		sui_type_in(input, -0.140, 0.075, 1.0, SUI_T_SIZE, description, MAX_MESSAGE_SIZE, NULL, NULL, 0, 0, 0, d_view[D_CM_ADD_FAVORITES]);
 		sui_draw_2d_line_gl(-0.150, 0.065, 0.315, 0.065, 0, 0, 0, 0);
 
-		sui_draw_text(-0.315, 0.025, SUI_T_SIZE, SUI_T_SPACE, "URL :", 0, 0, 0);
-		sui_type_in(input, -0.250, 0.025, 1.0, SUI_T_SIZE, address, 24, NULL, NULL, 0, 0, 0);
+		sui_draw_text(-0.315, 0.025, SUI_T_SIZE, SUI_T_SPACE, "URL :", 0, 0, 0, d_view[D_CM_ADD_FAVORITES]);
+		sui_type_in(input, -0.250, 0.025, 1.0, SUI_T_SIZE, address, 48, NULL, NULL, 0, 0, 0, d_view[D_CM_ADD_FAVORITES]);
 		sui_draw_2d_line_gl(-0.260, 0.015, 0.315, 0.015, 0, 0, 0, 0);
 
-		sui_draw_text(-0.315, -0.025, SUI_T_SIZE, SUI_T_SPACE, "NAME :", 0, 0, 0);
-		sui_type_in(input, -0.235, -0.025, 1.0, SUI_T_SIZE, name, MESSAGE_CHUNK_SIZE, NULL, NULL, 0, 0, 0);
+		sui_draw_text(-0.315, -0.025, SUI_T_SIZE, SUI_T_SPACE, "NAME :", 0, 0, 0, d_view[D_CM_ADD_FAVORITES]);
+		sui_type_in(input, -0.235, -0.025, 1.0, SUI_T_SIZE, name, MESSAGE_CHUNK_SIZE, NULL, NULL, 0, 0, 0, d_view[D_CM_ADD_FAVORITES]);
 		sui_draw_2d_line_gl(-0.245, -0.035, 0.315, -0.035, 0, 0, 0, 0);
 
-		sui_draw_text(-0.315, -0.075, SUI_T_SIZE, SUI_T_SPACE, "PASSSWOPRD :", 0, 0, 0);
-		sui_type_in(input, -0.140, -0.075, 1.0, SUI_T_SIZE, pass, MESSAGE_CHUNK_SIZE, NULL, NULL, 0, 0, 0);
+		sui_draw_text(-0.315, -0.075, SUI_T_SIZE, SUI_T_SPACE, "PASSSWOPRD :", 0, 0, 0, d_view[D_CM_ADD_FAVORITES]);
+		sui_type_in(input, -0.140, -0.075, 1.0, SUI_T_SIZE, pass, MESSAGE_CHUNK_SIZE, NULL, NULL, 0, 0, 0, d_view[D_CM_ADD_FAVORITES]);
 		sui_draw_2d_line_gl(-0.150, -0.085, 0.315, -0.085, 0, 0, 0, 0);
 
-		if(sw_text_button(input, -x_size / 2, -y_size + 0.0, 0, SUI_T_SIZE, SUI_T_SPACE, "OK", 1.0 - d_view[D_CM_ADD_FAVORITES], 1.0 - d_view[D_CM_ADD_FAVORITES], 1.0 - d_view[D_CM_ADD_FAVORITES]))
+		if(sw_text_button(input, -x_size / 2, -y_size + 0.0, 0, SUI_T_SIZE, SUI_T_SPACE, "OK", 0.0, 0.0, 0.0, d_view[D_CM_ADD_FAVORITES]))
 		{
 			if(d_view[D_CM_ADD_FAVORITES] > 0.5)
 			{
@@ -506,7 +520,7 @@ void d_draw_login(BInputState *input)
 				d_save_address_settings();
 			}
 		}
-		if(sw_text_button(input, x_size / 2 - 0.095, -y_size + 0.0, 0, SUI_T_SIZE, SUI_T_SPACE, "CANCEL", 1.0 - d_view[D_CM_ADD_FAVORITES], 1.0 - d_view[D_CM_ADD_FAVORITES], 1.0 - d_view[D_CM_ADD_FAVORITES]))
+		if(sw_text_button(input, x_size / 2 - 0.095, -y_size + 0.0, 0, SUI_T_SIZE, SUI_T_SPACE, "CANCEL", 0.0, 0.0, 0.0, d_view[D_CM_ADD_FAVORITES]))
 		{
 			if(d_view[D_CM_ADD_FAVORITES] > 0.5)
 			{

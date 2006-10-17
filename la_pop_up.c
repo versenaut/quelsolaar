@@ -76,18 +76,18 @@ void la_pu_connect(BInputState *input, void *user)
 		if(e_vc_check_connected_slot(0))
 		{
 			if(input->mode == BAM_DRAW)
-				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECTING") * -0.5, -0.35, 0.02, 2, "CONNECTING", 0, 0, 0);
+				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECTING") * -0.5, -0.35, 0.02, 2, "CONNECTING", 0, 0, 0, 1);
 		}
 		else
 		{
-			sui_type_in(input, -0.2, -0.45, 0.4, SUI_T_SIZE, connect_type_in, 48, connect_type_in_func, NULL, 0, 0, 0);
+			sui_type_in(input, -0.2, -0.45, 0.4, SUI_T_SIZE, connect_type_in, 48, connect_type_in_func, NULL, 0, 0, 0, 1);
 			sui_draw_2d_line_gl(-0.2, -0.45, 0.2, -0.45, 0, 0, 0, 0.0);
 			if(input->mode == BAM_DRAW)
-				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECT") * -0.5, 0.35, 0.02, 2, "CONNECT", 0, 0, 0);
+				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECT") * -0.5, 0.35, 0.02, 2, "CONNECT", 0, 0, 0, 1);
 
-			if(sw_text_button(input, -0.2, -0.35 - 2 * 0.02, 0, 0.02, 0.3, "Localhost", 0, 0, 0))
+			if(sw_text_button(input, -0.2, -0.35 - 2 * 0.02, 0, 0.02, 0.3, "Localhost", 0, 0, 0, 1))
 				e_vc_connect("localhost", "somepass", "somepass", NULL);
-			if(sw_text_button(input, 0.2, -0.35 - 2 * 0.02, 1, 0.02, 0.3, "Exit", 0, 0, 0))
+			if(sw_text_button(input, 0.2, -0.35 - 2 * 0.02, 1, 0.02, 0.3, "Exit", 0, 0, 0, 1))
 			{
 				sui_save_settings("co_config.cfg");
 				exit(0);
@@ -293,7 +293,7 @@ void la_pu_vertex(BInputState *input, uint vertex)
 
 void la_pu_manipulator(BInputState *input)
 {
-	SUIPUElement element[23];
+	SUIPUElement element[24];
 	static float x, y;
 	uint ring;
 	element[0].type = PU_T_ANGLE;
@@ -357,6 +357,8 @@ void la_pu_manipulator(BInputState *input)
 	element[21].text = "Copy";
 	element[22].type = PU_T_BOTTOM;
 	element[22].text = "Paste";
+	element[23].type = PU_T_BOTTOM;
+	element[23].text = "Copy to new";
 
 	if(input->mode == BAM_DRAW)
 	{
@@ -371,7 +373,7 @@ void la_pu_manipulator(BInputState *input)
 		x = input->pointer_x;
 		y = input->pointer_y;
 	}
-	ring = sui_draw_popup(input, x, y, element, 23, 2, 0);
+	ring = sui_draw_popup(input, x, y, element, 24, 2, 0);
 	switch(ring)
 	{
 		case 0 :
@@ -500,6 +502,9 @@ void la_pu_manipulator(BInputState *input)
 			la_t_tm_get_pos(pos);
 			la_t_paste(pos);
 		}
+		break;
+		case 23 :
+			la_t_copy_to_new_geometry();
 		break;
 	}
 	if(input->mode == BAM_DRAW)

@@ -227,9 +227,8 @@ void p_texture_render_bind(uint texture, uint size, uint target)
 
 void p_texture_render_unbind(void)
 {
-        if (!p_glBindFramebufferEXT)
+	if(!p_glBindFramebufferEXT)
 		return;
-
 	p_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 

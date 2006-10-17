@@ -14,7 +14,17 @@
 #include "verse.h"
 #include "enough.h"
 #define GL_CLAMP_TO_EDGE                  0x812F
-
+/*
+	VN_M_RAMP_SQUARE = 0,
+	VN_M_RAMP_LINEAR,
+	VN_M_RAMP_SMOOTH
+*/
+/*
+float compute_spline(float f, float v0, float v1, float v2, float v3)
+{
+	return ((1 - f) * (1 - f)) * f + ((1 - f) * f + (f + 1 - f) * (1 - f)) * (1 - f);
+}
+*/
 uint p_shader_ramp_texture_create(uint texture_size, VMatFrag *frag)
 {
 	uint texture_id, i, j = 0;
@@ -34,7 +44,14 @@ uint p_shader_ramp_texture_create(uint texture_size, VMatFrag *frag)
 		f = pos + f * scale;
 		if(f >= frag->ramp.ramp[j + 1].pos && j + 1 < frag->ramp.point_count)
 			j++;
-		f = (f - frag->ramp.ramp[j].pos) / (frag->ramp.ramp[j + 1].pos - frag->ramp.ramp[j].pos);
+		if(frag->ramp.type != VN_M_RAMP_SQUARE)
+		{
+			f = (f - frag->ramp.ramp[j].pos) / (frag->ramp.ramp[j + 1].pos - frag->ramp.ramp[j].pos);
+			if(frag->ramp.type == VN_M_RAMP_SMOOTH)
+				f = ((f + 1 - f) * f + f * (1 - f)) * f + f * f * (1 - f);
+		}else
+			f = 0;
+
 		buf[i * 3 + 0] = frag->ramp.ramp[j].red * (1.0 - f) + frag->ramp.ramp[j + 1].red * f;
 		buf[i * 3 + 1] = frag->ramp.ramp[j].green * (1.0 - f) + frag->ramp.ramp[j + 1].green * f;
 		buf[i * 3 + 2] = frag->ramp.ramp[j].blue * (1.0 - f) + frag->ramp.ramp[j + 1].blue * f;

@@ -10,6 +10,8 @@
 #include "co_widgets.h"
 
 extern boolean co_handle_head(BInputState *input, ENode *node, float *length);
+extern float co_background_color[3];
+extern float co_line_color[3];
 
 typedef struct{
 	float *tri;
@@ -34,7 +36,7 @@ void co_geometry_destroy(PeGeometry *g)
 }
 
 
-PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g, boolean fill, boolean scale, float red, float green, float blue)
+PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g, boolean fill, boolean scale, float red, float green, float blue, float alpha)
 {
 	egreal *vertex;
 	float f, range[6];
@@ -187,9 +189,9 @@ PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g, boolean fill, boolean s
 	if(!fill)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if(g->tri_count != 0)
-		sui_draw_gl(GL_TRIANGLES, g->tri, g->tri_count * 3, 3, red, green, blue, 1);
+		sui_draw_gl(GL_TRIANGLES, g->tri, g->tri_count * 3, 3, red, green, blue, alpha);
 	if(g->quad_count != 0)
-		sui_draw_gl(GL_QUADS, g->quad, g->quad_count * 4,  3, red, green, blue, 1);
+		sui_draw_gl(GL_QUADS, g->quad, g->quad_count * 4,  3, red, green, blue, alpha);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	if(scale)
 		glPopMatrix();	
@@ -255,7 +257,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 	{
 		EGeoLayer *layer;
 		y -= 0.05;
-		if(sw_text_button(input, -0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new Layer", color, color, color))
+		if(sw_text_button(input, -0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new Layer", co_line_color[0], co_line_color[1], co_line_color[2], color))
 		{
 			EGeoLayer *l;
 			uint i;
@@ -266,7 +268,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 			sprintf(nr, "layer_%u", i);
 			verse_send_g_layer_create(change_g_node_id, -1, nr, VN_G_LAYER_VERTEX_XYZ, 0, 0);
 		}
-		if(sw_text_button(input, 0, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Vertex Color", color, color, color))
+		if(sw_text_button(input, 0, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Vertex Color", co_line_color[0], co_line_color[1], co_line_color[2], color))
 		{
 			if(e_nsg_get_layer_by_name(node, "color_r") == NULL)
 				verse_send_g_layer_create(change_g_node_id, -1, "color_r", VN_G_LAYER_VERTEX_REAL, 0, 0);
@@ -275,14 +277,14 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 			if(e_nsg_get_layer_by_name(node, "color_b") == NULL)
 				verse_send_g_layer_create(change_g_node_id, -3, "color_b", VN_G_LAYER_VERTEX_REAL, 0, 0);
 		}
-		if(sw_text_button(input, 0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Texture Mapping", color, color, color))
+		if(sw_text_button(input, 0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Texture Mapping", co_line_color[0], co_line_color[1], co_line_color[2], color))
 		{
 			if(e_nsg_get_layer_by_name(node, "map_u") == NULL)
 				verse_send_g_layer_create(change_g_node_id, -1, "map_u", VN_G_LAYER_POLYGON_CORNER_REAL, 0, 0);
 			if(e_nsg_get_layer_by_name(node, "map_v") == NULL)
 				verse_send_g_layer_create(change_g_node_id, -2, "map_v", VN_G_LAYER_POLYGON_CORNER_REAL, 0, 0);
 		}
-		if(sw_text_button(input, 0.54, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Vertex Select", color, color, color))
+		if(sw_text_button(input, 0.54, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Vertex Select", co_line_color[0], co_line_color[1], co_line_color[2], color))
 		{
 			if(e_nsg_get_layer_by_name(node, "select") == NULL)
 				verse_send_g_layer_create(change_g_node_id, -1, "select", VN_G_LAYER_VERTEX_REAL, 0, 0);
@@ -294,10 +296,10 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 			static popup = -1;
 			VNGLayerType type;
 
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer name:", color_light, color_light, color_light);  
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer name:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nsg_get_layer_name(layer), 16, rename_g_layer_func, e_nsg_get_layer_name(layer), color, color_light);
 
-			if(e_nsg_get_layer_id(layer) > 1 && co_w_close_button(input, 0.635, y, color, color, color))
+			if(e_nsg_get_layer_id(layer) > 1 && co_w_close_button(input, 0.635, y, color))
 				verse_send_g_layer_destroy(change_g_node_id, e_nsg_get_layer_id(layer));
 			y -= 0.05;
 
@@ -309,8 +311,8 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 			if(type < 0)
 				type = 0;
 			
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer type:", color_light, color_light, color_light);  
-			if(sw_text_button(input, 0.15, y, 0, SUI_T_SIZE, SUI_T_SPACE, names[type], color, color, color))
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer type:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
+			if(sw_text_button(input, 0.15, y, 0, SUI_T_SIZE, SUI_T_SPACE, names[type], co_line_color[0], co_line_color[1], co_line_color[2], color))
 				popup = e_nsg_get_layer_id(layer);
 
 			if(popup == e_nsg_get_layer_id(layer))
@@ -342,7 +344,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 			if(input->mouse_button[0] == FALSE && input->last_mouse_button[0] == FALSE)
 				popup = -1;
 			y -= 0.05;
-			sui_draw_rounded_square(-0.3, y + 0.125, 1, -0.09, color_light, color_light, color_light);
+			sui_draw_rounded_square(-0.3, y + 0.125, 1, -0.09, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 		}
 	}
 	glPopMatrix();
@@ -354,9 +356,9 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 	{
 		uint bone;
 		y -= 0.05;
-		sui_draw_text(-0.27, y, SUI_T_SIZE, SUI_T_SPACE, "vertex crease", color_light, color_light, color_light); 
-		sui_draw_text(0.0, y - 0.05, SUI_T_SIZE, SUI_T_SPACE, "Vertex", color_light, color_light, color_light);  
-/*		if(sui_type_number_double(input, 0.15, y - 0.05, 0, 0.15, SUI_T_SIZE, &transform[0], &transform[0], color, color, color))
+		sui_draw_text(-0.27, y, SUI_T_SIZE, SUI_T_SPACE, "vertex crease", co_line_color[0], co_line_color[1], co_line_color[2], color_light); 
+		sui_draw_text(0.0, y - 0.05, SUI_T_SIZE, SUI_T_SPACE, "Vertex", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
+/*		if(sui_type_number_double(input, 0.15, y - 0.05, 0, 0.15, SUI_T_SIZE, &transform[0], &transform[0], co_line_color[0], co_line_color[1], co_line_color[2], color))
 			verse_send_o_transform_pos_real64(e_ns_get_node_id(node), 0, transform, NULL, NULL, NULL, 0);
 		if(co_w_slider(input, 0.3, y - 0.05, 0.35, &transform[0], color, color, color))
 			verse_send_o_transform_pos_real64(e_ns_get_node_id(node), 0, transform, NULL, NULL, NULL, 0);
@@ -371,7 +373,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 	{
 		uint16 bone;
 		y -= 0.05;
-		if(sw_text_button(input, -0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new Bone", color, color, color))
+		if(sw_text_button(input, -0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new Bone", co_line_color[0], co_line_color[1], co_line_color[2], color))
 		{
 			VNQuat64	identity = { 0.0, 0.0, 0.0, 1.0 };
 			uint i;
@@ -389,53 +391,53 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 			char *ref, *text[] = {"X", "Y", "Z", "X", "Y", "Z", "W"};
 			uint i;
 			uint32 parent;
-			if(co_w_close_button(input, 0.645, y, color, color, color))
+			if(co_w_close_button(input, 0.645, y, color))
 				verse_send_g_bone_destroy(change_g_node_id, bone);
 
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Bone Weight:", color_light, color_light, color_light);
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Bone Weight:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nsg_get_bone_weight(node, bone), 16, rename_g_layer_func, e_nsg_get_bone_weight(node, bone), color, color_light);
 			y -= 0.05;
 
 			ref = e_nsg_get_bone_reference(node, bone);
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Bone Ref:", color_light, color_light, color_light);  
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Bone Ref:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nsg_get_bone_reference(node, bone), 16, rename_g_layer_func, e_nsg_get_bone_reference(node, bone), color, color_light);
 			y -= 0.05;
 
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Bone Pos Label:", color_light, color_light, color_light);
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Bone Pos Label:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nsg_get_bone_pos_label(node, bone), 16, rename_g_layer_func, e_nsg_get_bone_pos_label(node, bone), color, color_light);
 			y -= 0.05;
 
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Bone Ros Label:", color_light, color_light, color_light);  
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Bone Ros Label:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nsg_get_bone_rot_label(node, bone), 16, rename_g_layer_func, e_nsg_get_bone_rot_label(node, bone), color, color_light);
 			y -= 0.05;
 
 			e_nsg_get_bone_pos64(node, bone, t);
 			parent = e_nsg_get_bone_parent(node, bone);
-			sui_draw_text(-0.25, y, SUI_T_SIZE, SUI_T_SPACE, "PARENT", color_light, color_light, color_light);
+			sui_draw_text(-0.25, y, SUI_T_SIZE, SUI_T_SPACE, "PARENT", co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 			if(sui_type_number_uint(input,0.15, y, 0, 0.15, SUI_T_SIZE, &parent, e_nsg_get_bone_weight(node, bone), color, color, color))
 				verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2],
 							 e_nsg_get_bone_rot_label(node, bone), e_nsg_get_bone_rot_label(node, bone), e_nsg_get_bone_scale_label(node, bone));
 			y -= 0.05;
-			sui_draw_text(-0.25, y, SUI_T_SIZE, SUI_T_SPACE, "POSITION", color_light, color_light, color_light);
-			sui_draw_text(-0.25, y - 0.15, SUI_T_SIZE, SUI_T_SPACE, "ROTATION", color_light, color_light, color_light);
+			sui_draw_text(-0.25, y, SUI_T_SIZE, SUI_T_SPACE, "POSITION", co_line_color[0], co_line_color[1], co_line_color[2], color_light);
+			sui_draw_text(-0.25, y - 0.15, SUI_T_SIZE, SUI_T_SPACE, "ROTATION", co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 
 			for(i = 0; i < 3; i++)
 			{	
 				double	*edit;
 
 				edit = t + i;
-				sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, text[i], color_light, color_light, color_light);  
-				if(sui_type_number_double(input, 0.15, y, 0, 0.15, SUI_T_SIZE, edit, edit, color, color, color))
+				sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, text[i], co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
+				if(sui_type_number_double(input, 0.15, y, 0, 0.15, SUI_T_SIZE, edit, edit, co_line_color[0], co_line_color[1], co_line_color[2], color))
 					verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent,
 								 t[0], t[1], t[2],
 								 e_nsg_get_bone_pos_label(node, bone),
 								 e_nsg_get_bone_rot_label(node, bone),
 								 e_nsg_get_bone_scale_label(node, bone));
-				if(co_w_slider(input, 0.3, y, 0.35, edit, 0, 1, color, color, color))
+				if(co_w_slider(input, 0.3, y, 0.35, edit, 0, 1, color))
 					/*verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], &rot)*/;
 				y -= 0.05;
 			}
-			sui_draw_rounded_square(-0.3, y + 0.525, 1, -0.49, color_light, color_light, color_light);
+			sui_draw_rounded_square(-0.3, y + 0.525, 1, -0.49, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 		}
 	}
 	glPopMatrix();

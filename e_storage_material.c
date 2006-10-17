@@ -103,7 +103,7 @@ VNMFragmentID e_nsm_get_fragment_color_displacement(ENode *node)
 
 VNMFragmentID e_nsm_find_empty_slot(ENode *node, VNMFragmentID id)
 {
-	for(;id < ((ESMaterialNode *)node)->alocated && ((ESMaterialNode *)node)->fragments[id].type < VN_M_FT_OUTPUT; id++);
+	for(;id < ((ESMaterialNode *)node)->alocated && ((ESMaterialNode *)node)->fragments[id].type <= VN_M_FT_OUTPUT; id++);
 	return id;
 }
 

@@ -12,6 +12,8 @@
 extern float co_handle_node_head(BInputState *input, ENode *node, boolean reset);
 extern boolean co_handle_head(BInputState *input, ENode *node, float *length);
 
+extern float co_background_color[3];
+extern float co_line_color[3];
 uint change_a_node_id;
 
 void rename_a_buffer_func(void *user, char *text)
@@ -60,7 +62,7 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 
 	if(rot_buffer > 0.001)
 	{
-		if(sw_text_button(input, -0.3, y - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new buffer", color, color, color))
+		if(sw_text_button(input, -0.3, y - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new buffer", co_line_color[0], co_line_color[1], co_line_color[2], color))
 		{
 
 			char nr[32];
@@ -73,7 +75,7 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 		y -= 0.05;
 		if(NULL == e_nsa_get_buffer_next(node, 0))
 		{
-			sui_draw_text(-0.3, y - 0.05, SUI_T_SIZE, SUI_T_SPACE, "NO AUDIO LAYERS", color_light, color_light, color_light);
+			sui_draw_text(-0.3, y - 0.05, SUI_T_SIZE, SUI_T_SPACE, "NO AUDIO LAYERS", co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 			y -= 0.05;
 		}
 
@@ -82,14 +84,14 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 		for(buffer = e_nsa_get_buffer_next(node, 0); buffer != NULL ; buffer = e_nsa_get_buffer_next(node, e_nsa_get_buffer_id(buffer) + 1))
 		{
 			boolean e;
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Buffer name:", color_light, color_light, color_light);  
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Buffer name:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nsa_get_buffer_name(buffer), 16, rename_a_buffer_func, buffer, color, color_light);
-			if(co_w_close_button(input, 0.635, y, color, color, color))
+			if(co_w_close_button(input, 0.635, y, color))
 				verse_send_a_buffer_destroy(e_ns_get_node_id(node), e_nsa_get_buffer_id(buffer));
 			y -= 0.05;
 	
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Buffer type:", color_light, color_light, color_light);  
-			sui_draw_text(0.15, y, SUI_T_SIZE, SUI_T_SPACE, buffer_type_names[e_nsa_get_buffer_type(buffer)], color, color, color);  
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Buffer type:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
+			sui_draw_text(0.15, y, SUI_T_SIZE, SUI_T_SPACE, buffer_type_names[e_nsa_get_buffer_type(buffer)], co_line_color[0], co_line_color[1], co_line_color[2], color);  
 
 			if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE && sui_box_click_test(0.0, y - SUI_T_SIZE, 0.7, SUI_T_SIZE * 3))
 				a_buffer_edit_type_id = e_nsa_get_buffer_id(buffer);
@@ -119,16 +121,16 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 				a_buffer_edit_type_id = -1;
 			y -= 0.05;
 
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Frequency:", color_light, color_light, color_light);
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Frequency:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 			frequency = e_nsa_get_buffer_frequency(buffer);
-			if(sui_type_number_double(input, 0.15, y, 0, 0.5, SUI_T_SIZE, &frequency, buffer, color, color, color))
+			if(sui_type_number_double(input, 0.15, y, 0, 0.5, SUI_T_SIZE, &frequency, buffer, co_line_color[0], co_line_color[1], co_line_color[2], color))
 				verse_send_a_buffer_create(change_a_node_id, e_nsa_get_buffer_id(buffer), e_nsa_get_buffer_name(buffer), e_nsa_get_buffer_type(buffer), frequency);
 			y -= 0.05;
 			e = buffer_edit_id != e_nsa_get_buffer_id(buffer);
-			if(co_w_checkbox(input, 0.17, y, &e, color, color, color) && !e)
+			if(co_w_checkbox(input, 0.17, y, &e, color) && !e)
 				buffer_edit_id = e_nsa_get_buffer_id(buffer);
 			y -= 0.05;
-			sui_draw_rounded_square(-0.3, y + 0.225, 1, -0.19, color_light, color_light, color_light);
+			sui_draw_rounded_square(-0.3, y + 0.225, 1, -0.19, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 		}
 
 	}
@@ -140,7 +142,7 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 
 	if(rot_stream > 0.001)
 	{
-		if(sw_text_button(input, -0.3, y - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new Stream", color, color, color))
+		if(sw_text_button(input, -0.3, y - 0.05, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new Stream", co_line_color[0], co_line_color[1], co_line_color[2], color))
 		{
 			char nr[32];
 			i = 0;
@@ -152,7 +154,7 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 		y -= 0.05;
 		if(NULL == e_nsa_get_stream_next(node, 0))
 		{
-			sui_draw_text(-0.3, y - 0.05, SUI_T_SIZE, SUI_T_SPACE, "NO AUDIO STREAMS", color_light, color_light, color_light);
+			sui_draw_text(-0.3, y - 0.05, SUI_T_SIZE, SUI_T_SPACE, "NO AUDIO STREAMS", co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 			y -= 0.05;
 		}
 
@@ -161,12 +163,12 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 		for(stream = e_nsa_get_stream_next(node, 0); stream != NULL ; stream = e_nsa_get_stream_next(node, e_nsa_get_stream_id(stream) + 1))
 		{
 			boolean e;
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Stream name:", color_light, color_light, color_light);  
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Stream name:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nsa_get_stream_name(stream), 16, rename_a_stream_func, stream, color, color_light);
-			if(co_w_close_button(input, 0.635, y, color, color, color))
+			if(co_w_close_button(input, 0.635, y, color))
 				verse_send_a_stream_destroy(e_ns_get_node_id(node), e_nsa_get_buffer_id(stream));
 			y -= 0.05;
-			sui_draw_rounded_square(-0.3, y + 0.075, 1, -0.04, color_light, color_light, color_light);
+			sui_draw_rounded_square(-0.3, y + 0.075, 1, -0.04, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 		}
 
 	}

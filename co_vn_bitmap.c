@@ -12,6 +12,9 @@
 
 extern boolean co_handle_head(BInputState *input, ENode *node, float *length);
 
+extern float co_background_color[3];
+extern float co_line_color[3];
+
 void co_draw_bitmap(ENode *node)
 {
 #ifdef PERSUADE_H
@@ -64,15 +67,15 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 	if(rot_size > 0.001)
 	{	
 		y -= 0.05;
-		sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Width:", color_light, color_light, color_light);  
+		sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Width:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 		if(sui_type_number_uint(input, 0.15, y, 0, 0.5, SUI_T_SIZE, &create_size[0], &create_size[0], color, color, color) && create_size[0] * create_size[1] * create_size[2] != 0)
 			verse_send_b_dimensions_set(change_b_node_id, create_size[0], create_size[1], create_size[2]);
 		y -= 0.05;
-		sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Height:", color_light, color_light, color_light);  
+		sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Height:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 		if(sui_type_number_uint(input, 0.15, y, 0, 0.5, SUI_T_SIZE, &create_size[1], &create_size[1], color, color, color) && create_size[0] * create_size[1] * create_size[2] != 0)
 			verse_send_b_dimensions_set(change_b_node_id, create_size[0], create_size[1], create_size[2]);
 		y -= 0.05;
-		sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Depth:", color_light, color_light, color_light);  
+		sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Depth:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 		if(sui_type_number_uint(input, 0.15, y, 0, 0.5, SUI_T_SIZE, &create_size[2], &create_size[2], color, color, color) && create_size[0] * create_size[1] * create_size[2] != 0)
 			verse_send_b_dimensions_set(change_b_node_id, create_size[0], create_size[1], create_size[2]);	
 	}
@@ -85,7 +88,7 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 	{
 		EBitLayer *layer;
 		y -= 0.05;
-		if(sw_text_button(input, -0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new layer", color, color, color))
+		if(sw_text_button(input, -0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new layer", co_line_color[0], co_line_color[1], co_line_color[2], color))
 		{
 			EBitLayer *l;
 			uint i;
@@ -96,7 +99,7 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 			sprintf(nr, "layer_%u", i);
 			verse_send_b_layer_create(change_b_node_id, -1, nr, VN_B_LAYER_UINT8);
 		}
-		if(sw_text_button(input, 0, y, 0, SUI_T_SIZE, SUI_T_SPACE, "RGB 8bit", color, color, color))
+		if(sw_text_button(input, 0, y, 0, SUI_T_SIZE, SUI_T_SPACE, "RGB 8bit", co_line_color[0], co_line_color[1], co_line_color[2], color))
 		{
 			if(e_nsb_get_layer_by_name(node, "color_r") == NULL)
 				verse_send_b_layer_create(change_b_node_id, -1, "color_r", VN_B_LAYER_UINT8);
@@ -105,7 +108,7 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 			if(e_nsb_get_layer_by_name(node, "color_b") == NULL)
 				verse_send_b_layer_create(change_b_node_id, -3, "color_b", VN_B_LAYER_UINT8);
 		}
-		if(sw_text_button(input, 0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "RGB 16bit", color, color, color))
+		if(sw_text_button(input, 0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "RGB 16bit", co_line_color[0], co_line_color[1], co_line_color[2], color))
 		{
 			if(e_nsb_get_layer_by_name(node, "color_r") == NULL)
 				verse_send_b_layer_create(change_b_node_id, -1, "color_r", VN_B_LAYER_UINT16);
@@ -114,7 +117,7 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 			if(e_nsb_get_layer_by_name(node, "color_b") == NULL)
 				verse_send_b_layer_create(change_b_node_id, -3, "color_b", VN_B_LAYER_UINT16);
 		}
-		if(sw_text_button(input, 0.54, y, 0, SUI_T_SIZE, SUI_T_SPACE, "RGB 32bit", color, color, color))
+		if(sw_text_button(input, 0.54, y, 0, SUI_T_SIZE, SUI_T_SPACE, "RGB 32bit", co_line_color[0], co_line_color[1], co_line_color[2], color))
 		{
 			if(e_nsb_get_layer_by_name(node, "color_r") == NULL)
 				verse_send_b_layer_create(change_b_node_id, -1, "color_r", VN_B_LAYER_REAL32);
@@ -130,17 +133,17 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 			static uint32 popup = ~0;
 			VNBLayerType type;
 
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer name:", color_light, color_light, color_light);  
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer name:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nsb_get_layer_name(layer), 16, rename_b_layer_func, layer, color, color_light);
 
-			if(co_w_close_button(input, 0.635, y, color, color, color))
+			if(co_w_close_button(input, 0.635, y, color))
 				verse_send_b_layer_destroy(change_b_node_id, e_nsb_get_layer_id(layer));
 			y -= 0.05;
 
 			type = e_nsb_get_layer_type(layer);
 			
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer type:", color_light, color_light, color_light);  
-			if(sw_text_button(input, 0.15, y, 0, SUI_T_SIZE, SUI_T_SPACE, names[type], color, color, color))
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer type:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
+			if(sw_text_button(input, 0.15, y, 0, SUI_T_SIZE, SUI_T_SPACE, names[type], co_line_color[0], co_line_color[1], co_line_color[2], color))
 				popup = e_nsb_get_layer_id(layer);
 
 			if(popup == e_nsb_get_layer_id(layer))
@@ -170,7 +173,7 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 			if(input->mouse_button[0] == FALSE && input->last_mouse_button[0] == FALSE)
 				popup = -1;
 			y -= 0.05;
-			sui_draw_rounded_square(-0.3, y + 0.125, 1, -0.09, color_light, color_light, color_light);
+			sui_draw_rounded_square(-0.3, y + 0.125, 1, -0.09, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 		}
 	}
 	glPopMatrix();

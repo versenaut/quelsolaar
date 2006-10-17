@@ -460,27 +460,17 @@ void la_pfx_init(uint particle_count)
 void la_pfx_create_dust(double *pos, double size)
 {
 	DustParticle *p;
-	uint	i;
 	if(GlobalParticleData.dust_count == 0)
 	{
+		uint	i;
+
 		GlobalParticleData.dust = malloc((sizeof *GlobalParticleData.dust) * GlobalParticleData.dust_length);
 		GlobalParticleData.dust_pos = malloc((sizeof *GlobalParticleData.dust_pos) * GlobalParticleData.dust_length * 2 * 3);
 		GlobalParticleData.dust_col = malloc((sizeof *GlobalParticleData.dust_col) * GlobalParticleData.dust_length * 2 * 3);
 		for(i = 0; i < GlobalParticleData.dust_length; i++)
-		{
 			GlobalParticleData.dust[i].age = -2.0;
-			sui_draw_set_vec3(GlobalParticleData.dust_pos, i * 2, 0, 0, 0);
-			sui_draw_set_vec3(GlobalParticleData.dust_col, i * 2, 0, 0, 0);
-			sui_draw_set_vec3(GlobalParticleData.dust_pos, i * 2 + 1, 0, 0, 0);
-			sui_draw_set_vec3(GlobalParticleData.dust_col, i * 2 + 1, 0, 0, 0);
-		}
 	}
-	i = GlobalParticleData.dust_start++ % GlobalParticleData.dust_length;
-	p = &GlobalParticleData.dust[i];
-	sui_draw_set_vec3(GlobalParticleData.dust_pos, i * 2, pos[0], pos[1], pos[2]);
-	sui_draw_set_vec3(GlobalParticleData.dust_col, i * 2, 0, 0, 0);
-	sui_draw_set_vec3(GlobalParticleData.dust_pos, i * 2 + 1, pos[0], pos[1], pos[2]);
-	sui_draw_set_vec3(GlobalParticleData.dust_col, i * 2 + 1, 0, 0, 0);
+	p = &GlobalParticleData.dust[GlobalParticleData.dust_start++ % GlobalParticleData.dust_length];
 	if(p->age < 0.0)
 		GlobalParticleData.dust_count++;
 	p->pos[0] = pos[0];
@@ -663,12 +653,6 @@ void la_pfx_draw(boolean intro)
 					p->age = -2.0;
 					GlobalParticleData.dust_count--;
 				}
-			}
-			else {
-				sui_draw_set_vec3(GlobalParticleData.dust_pos, i * 2, 0, 0, 0);
-				sui_draw_set_vec3(GlobalParticleData.dust_col, i * 2, 0, 0, 0);
-				sui_draw_set_vec3(GlobalParticleData.dust_pos, i * 2 + 1, 0, 0, 0);
-				sui_draw_set_vec3(GlobalParticleData.dust_col, i * 2 + 1, 0, 0, 0);
 			}
 		}
 		if(GlobalParticleData.dust_count == 0)

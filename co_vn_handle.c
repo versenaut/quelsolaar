@@ -19,6 +19,8 @@ static float view_cam_pos[3] = {0, 0, 4};
 static float view_cam_pos_goal[3] = {0, 0, 4};
 static float view_cam_move_start[2];
 static float view_cam_speed = 0.1;
+extern float co_background_color[3];
+extern float co_line_color[3];
 
 void co_handle_view(BInputState *input, float *pos, boolean active)
 {
@@ -109,7 +111,7 @@ void verse_node_create_func(ENode *node, ECustomDataCommand command)
 
 void co_draw_bitmap(ENode *node);
 void co_geometry_destroy(void *g);
-void *co_geometry_draw(ENode *node, void *g, boolean fill, boolean scale, float red, float green, float blue);
+void *co_geometry_draw(ENode *node, void *g, boolean fill, boolean scale, float red, float green, float blue, float alpha);
 
 void p_render_object(ENode *node, boolean transparency);
 
@@ -207,7 +209,7 @@ void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 					glPushMatrix();
 					glRotatef(time * 360, 0, 1, 0);
 					co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
-					co_node->render_cash = co_geometry_draw(node, co_node->render_cash, FALSE, TRUE, 0.7, 0.7, 0.7);
+					co_node->render_cash = co_geometry_draw(node, co_node->render_cash, FALSE, TRUE, co_line_color[0], co_line_color[1], co_line_color[2], 0.7);
 					glPopMatrix();
 				}
 			break;
@@ -281,8 +283,11 @@ extern void co_draw_3d_node_lock(ENode *node);
 extern co_draw_3d_icon_pass(void);
 extern void co_pu_empty(BInputState *input);
 extern void update_bitmap_load(char *name);
+extern void co_clone_node(ENode *node);
+extern void co_clone_node_update(void);
 extern void co_draw_settings(BInputState *input);
 extern boolean co_get_settings(void);
+extern float co_background_color[3];
 
 static const char * compute_link_label(ENode *from, ENode *to)
 {
@@ -319,15 +324,19 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		verse_callback_update(3000);
 		co_material_compute(1);
 		co_vng_update_time();
+		co_clone_node_update();
 #ifdef PERSUADE_H
 		p_task_compute(1);
 #endif
 		return;
 	}
+
 	if(input->mode == BAM_DRAW)
 	{
 		glDisable(GL_DEPTH_TEST);
-//		glEnable(GL_LINE_SMOOTH);
+		glEnable(GL_LINE_SMOOTH);
+
+		glClearColor(co_background_color[0], co_background_color[1], co_background_color[2], 0);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glPushMatrix();
 		p_view_set();
@@ -421,7 +430,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 						{
 							glPushMatrix();
 							glScalef(4, 4, 4);
-							sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), 0, 0, 0);
+							sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), co_line_color[0], co_line_color[1], co_line_color[2], 1);
 							glPopMatrix();
 						}
 						co_node_draw(node, type, FALSE);
@@ -548,25 +557,29 @@ void co_input_handler(BInputState *input, void *user_pointer)
 						{
 							case 1:
 								verse_send_node_destroy(e_ns_get_node_id(node));
+								mode = COIM_VIEW;
 							break;
 							case 2:
 								co_node->hidden = TRUE;
+								mode = COIM_VIEW;
 							break;
 							case 3:
 							{
-							/*	uint i;
+								uint i;
 								ENode *link;
-								for(i = 0; i < V_NT_NUM_TYPES; i++)
+							/*	for(i = 0; i < V_NT_NUM_TYPES; i++)
 								{
 									e_nso_get_link(node, i);
 									link = e_ns_get_node(0, e_nso_get_link(node, i));
 									if(link != NULL && (co_node = e_ns_get_custom_data(link, CONNECTOR_ENOUGH_SLOT)) != NULL)
 										co_node->hidden = TRUE;
 								}*/
+								mode = COIM_VIEW;
 							}
 							break;
 							case 4:
-								co_node->hidden = TRUE;
+								co_clone_node(node);
+								mode = COIM_VIEW;
 							break;
 						}
 					}
@@ -584,7 +597,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 						glScalef(view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move));
 						co_node_draw(node, type, FALSE);
 						glScalef(4, 4, 4);
-						sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), 0.5, 0.5, 0.5);
+						sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), co_line_color[0], co_line_color[1], co_line_color[2], 0.5);
 						glPopMatrix();
 					}
 				}
@@ -625,8 +638,8 @@ void co_input_handler(BInputState *input, void *user_pointer)
 				glPushMatrix();
 				glTranslatef(co_get_pos_x(x), co_get_pos_y(y), 0);
 				glScalef(view_cam_pos[2], view_cam_pos[2] , view_cam_pos[2]);
-				sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, "NEW") * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, "NEW", 0, 0, 0);
-				sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, names[type]) * -0.5, 0.15, SUI_T_SIZE, SUI_T_SPACE, names[type], 0, 0, 0);
+				sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, "NEW") * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, "NEW", co_line_color[0], co_line_color[1], co_line_color[2], 1);
+				sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, names[type]) * -0.5, 0.15, SUI_T_SIZE, SUI_T_SPACE, names[type], co_line_color[0], co_line_color[1], co_line_color[2], 1);
 				glScalef(0.2, 0.2, 0.2);
 				co_node_draw(NULL, type, FALSE);
 				glPopMatrix();
@@ -773,7 +786,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 			float box[8] = {-0.45, 10, 10, 10, 10, -10, -0.45, -10};
 			glTranslatef(co_node->pos_x + 1, co_node->pos_y, 0);
 			sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			sui_draw_gl(GL_QUADS, box, 4, 2, 1, 1, 1, popup_move * 0.7);
+			sui_draw_gl(GL_QUADS, box, 4, 2, co_background_color[0], co_background_color[1], co_background_color[2], popup_move * 0.5);
 		}
 		if((node = e_ns_get_node(0, active)) != NULL)
 		{
@@ -839,14 +852,15 @@ void co_input_handler(BInputState *input, void *user_pointer)
 				glPushMatrix();
 				glTranslatef(0, 0, -1);
 				length = sui_compute_text_length(SUI_T_SIZE * 2, SUI_T_SPACE, search);
-				sui_draw_text(length * -0.5, 0.0, SUI_T_SIZE * 2, SUI_T_SPACE, search, 0, 0, 0);
+				sui_draw_text(length * -0.5, 0.0, SUI_T_SIZE * 2, SUI_T_SPACE, search, co_line_color[0], co_line_color[1], co_line_color[2], 1.0);
 				glPopMatrix();
 			}
 			glPushMatrix();
 			glTranslatef(0, 0, -1);
-			create_scroll = co_w_scroll(input, create_scroll - (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2), create_length + 0.7) + (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2);
-			glPopMatrix();
 		}
+		create_scroll = co_w_scroll(input, create_scroll - (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2), create_length + 0.7) + (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2);
+		if(input->mode == BAM_DRAW)
+			glPopMatrix();
 	}
 
 	co_draw_settings(input);

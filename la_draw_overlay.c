@@ -443,7 +443,6 @@ void draw_persuade_surface(ENode *node)
 	double cam[3];
 	p_get_view_camera(cam);
 	p_lod_set_view_pos(cam);
-
 	if(old_node != NULL && old_node != node && mesh != NULL)
 	{
 		p_rm_destroy(mesh);
@@ -452,9 +451,9 @@ void draw_persuade_surface(ENode *node)
 	old_node = node;
 	if(node == NULL)
 		return;
-
 	if(mesh == NULL)
 		mesh = p_rm_create(node);
+
 	if(mesh != NULL)
 		mesh = p_rm_service(mesh, NULL, e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node,  0)));
 	if(mesh != NULL && p_rm_drawable(mesh))
@@ -543,9 +542,9 @@ void draw_owerlay_tags(void)
 			sui_draw_gl(GL_QUADS, GlobalOverlay.tag_select_shadow, 24 * 4, 2, 0.8, 0.8, 0.8);*/
 		}
 		color = tag[i].select * 0.5 + 0.25;
-		sui_draw_text(0.03, SUI_T_SIZE * -0.5, SUI_T_SIZE, SUI_T_SPACE, tag[i].group, color, color, color);
+		sui_draw_text(0.03, SUI_T_SIZE * -0.5, SUI_T_SIZE, SUI_T_SPACE, tag[i].group, color, color, color, 1.0);
 		f = sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, tag[i].group);
-		sui_draw_text(0.05 + f, SUI_T_SIZE * -0.5, SUI_T_SIZE, SUI_T_SPACE, tag[i].tag, color, color, color);
+		sui_draw_text(0.05 + f, SUI_T_SIZE * -0.5, SUI_T_SIZE, SUI_T_SPACE, tag[i].tag, color, color, color, 1.0);
 		sui_draw_2d_line_gl(0.04 + f, 0.03, 0.04 + f, -0.03, color, color, color, 0.0);
 		glEnable(GL_DEPTH_TEST);
 		glPopMatrix();
@@ -808,6 +807,7 @@ void draw_owerlay_surface(void)
 	glEnable(GL_BLEND);
 	if(GlobalOverlay.tri_count != 0)
 	{
+
 		glCullFace(GL_FRONT);
 		sui_set_blend_gl(GL_ONE, GL_ONE);
 		sui_set_color_array_gl(GlobalOverlay.tri_normal, GlobalOverlay.tri_count, 3);
@@ -1027,3 +1027,5 @@ void la_do_owerlay(void)
 	draw_owerlay_edge();
 	draw_owerlay_vertex();
 }
+
+

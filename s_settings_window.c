@@ -254,14 +254,12 @@ void sui_draw_window(double x_pos, double y_pos, double width, double height, fl
 	back_color = 1.0 - color;
 	width *= 0.5;
 	compute_background(draw, shadow, shadow_color, 0.03, y_pos, y_pos - height, x_pos - width, x_pos + width);
-	sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	sui_set_color_array_gl(shadow_color, 40 * 4 + 16, 4);
 	sui_draw_gl(GL_QUADS, shadow, 40 * 4 + 16, 2, 0.2, 0.5, 0.7, 1);
-	sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	sui_draw_gl(GL_QUADS, draw, 84, 2, color, color, color, 0.5);
 	f = -0.5 * sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE * 8, title);
-	sui_draw_text(x_pos + f, y_pos, SUI_T_SIZE, SUI_T_SPACE * 8, title, back_color, back_color, back_color);
-	sui_draw_2d_line_gl(x_pos - f + 0.02, y_pos - 0.005, x_pos + f - 0.02, y_pos - 0.005, back_color, back_color, back_color, 1);
+	sui_draw_text(x_pos + f, y_pos, SUI_T_SIZE, SUI_T_SPACE * 8, title, back_color, back_color, back_color, 1.0);
+	sui_draw_2d_line_gl(x_pos - f + 0.02, y_pos - 0.005, x_pos + f - 0.02, y_pos - 0.005, back_color, back_color, back_color, 1.0);
 }
 
 boolean sui_draw_setting_view(BInputState *input, double x_pos, double y_pos, double width, SUIViewElement *element, uint element_count, char *title, float back_color)
@@ -285,7 +283,7 @@ boolean sui_draw_setting_view(BInputState *input, double x_pos, double y_pos, do
 		sui_draw_gl(GL_QUADS, draw, 84, 2, back_color, back_color, back_color, 0.5);
 
 		f = -0.5 * sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE * 8, title);
-		sui_draw_text(x_pos + f, y_pos, SUI_T_SIZE, SUI_T_SPACE * 8, title, color, color, color);
+		sui_draw_text(x_pos + f, y_pos, SUI_T_SIZE, SUI_T_SPACE * 8, title, color, color, color, 1);
 		sui_draw_2d_line_gl(x_pos - f + 0.02, y_pos - 0.005, x_pos + f - 0.02, y_pos - 0.005, color, color, color, 1);
 	}
 
@@ -294,7 +292,7 @@ boolean sui_draw_setting_view(BInputState *input, double x_pos, double y_pos, do
 	for(i = 0; i < element_count; i++)
 	{
 		if(input->mode == BAM_DRAW)
-			sui_draw_text(x_pos - width, y_pos, SUI_T_SIZE, SUI_T_SPACE, element[i].text, color, color, color);
+			sui_draw_text(x_pos - width, y_pos, SUI_T_SIZE, SUI_T_SPACE, element[i].text, color, color, color, 1);
 		switch(element[i].type)
 		{
 			case S_VET_SPLIT :
@@ -309,7 +307,7 @@ boolean sui_draw_setting_view(BInputState *input, double x_pos, double y_pos, do
 					if(input->mode == BAM_DRAW)
 					{
 						sui_draw_2d_line_gl(x_pos + f - 0.01, y_pos + 0.007, x_pos + f - 0.02, y_pos + 0.007, color, color, color, 1);
-						sui_draw_text(x_pos + f, y_pos, SUI_T_SIZE, SUI_T_SPACE, nr, color, color, color);
+						sui_draw_text(x_pos + f, y_pos, SUI_T_SIZE, SUI_T_SPACE, nr, color, color, color, 1);
 						f += sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, nr) + 0.03;
 					}else
 					{
@@ -329,7 +327,7 @@ boolean sui_draw_setting_view(BInputState *input, double x_pos, double y_pos, do
 					if(input->mode == BAM_DRAW)
 					{
 						sui_draw_2d_line_gl(x_pos + f - 0.01, y_pos + 0.007, x_pos + f - 0.02, y_pos + 0.007, color, color, color, 1);
-						sui_draw_text(x_pos + f, y_pos, SUI_T_SIZE, SUI_T_SPACE, "Add Del", color, color, color);
+						sui_draw_text(x_pos + f, y_pos, SUI_T_SIZE, SUI_T_SPACE, "Add Del", color, color, color, 1);
 						f += sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, "Add Del") + 0.01;
 					}else
 					{
@@ -372,7 +370,7 @@ boolean sui_draw_setting_view(BInputState *input, double x_pos, double y_pos, do
 				sui_type_number_uint(input, x_pos + width, y_pos, 1, 0.1, SUI_T_SIZE, &element[i].param.integer, &element[i].param.integer, color, color, color);
 			break;
 			case S_VET_REAL :
-				sui_type_number_double(input, x_pos + width, y_pos, 1, 0.1, SUI_T_SIZE, &element[i].param.real, &element[i].param.real, color, color, color);
+				sui_type_number_double(input, x_pos + width, y_pos, 1, 0.1, SUI_T_SIZE, &element[i].param.real, &element[i].param.real, color, color, color, 1.0);
 			break;
 			case S_VET_SLIDER :
 				{				
@@ -415,7 +413,7 @@ boolean sui_draw_setting_view(BInputState *input, double x_pos, double y_pos, do
 					f -= sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].param.select.text[j - 1]);
 					if(input->mode == BAM_DRAW)
 					{
-						sui_draw_text(x_pos + f, y_pos, SUI_T_SIZE, SUI_T_SPACE, element[i].param.select.text[j - 1], color, color, color);
+						sui_draw_text(x_pos + f, y_pos, SUI_T_SIZE, SUI_T_SPACE, element[i].param.select.text[j - 1], color, color, color, 1);
 						if(element[i].param.select.select == j - 1)
 							sui_draw_2d_line_gl(x_pos + f - 0.005, y_pos - 0.02, x_pos + f2 + 0.005, y_pos - 0.02, color, color, color, 1);
 					}else

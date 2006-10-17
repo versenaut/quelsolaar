@@ -10,7 +10,8 @@
 #include "co_widgets.h"
 
 extern boolean co_handle_head(BInputState *input, ENode *node, float *length);
-
+extern float co_background_color[3];
+extern float co_line_color[3];
 
 void compute_spline_pos(double *out, double f, double *pos_0, double *pos_1, double *pos_2, double *pos_3)
 {
@@ -304,11 +305,11 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 	{
 	
 		y -= 0.05;
-		sui_draw_text(-0.27, y, SUI_T_SIZE, SUI_T_SPACE, "Create new Curve", color_light, color_light, color_light); 
+		sui_draw_text(-0.27, y, SUI_T_SIZE, SUI_T_SPACE, "Create new Curve", co_line_color[0], co_line_color[1], co_line_color[2], color_light); 
 		for(i = 0; i < 4; i++)
 		{
 			char *dim[4] = {"1D", "2D", "3D", "4D"};
-			if(sw_text_button(input, -0.0 + (float)i * 0.1, y, 0, SUI_T_SIZE, SUI_T_SPACE, dim[i], color, color, color))
+			if(sw_text_button(input, -0.0 + (float)i * 0.1, y, 0, SUI_T_SIZE, SUI_T_SPACE, dim[i], co_line_color[0], co_line_color[1], co_line_color[2], color))
 			{
 				char nr[32];
 				j = 0;
@@ -322,24 +323,24 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 		{
 			boolean e;
 			uint dim;
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Curve name:", color_light, color_light, color_light);  
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Curve name:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nsc_get_curve_name(curve), 16, rename_c_layer_func, e_nsc_get_curve_name(curve), color, color_light);
 
-			if(co_w_close_button(input, 0.645, y, color, color, color))
+			if(co_w_close_button(input, 0.645, y, color))
 				verse_send_c_curve_destroy(change_c_node_id, e_nsc_get_curve_id(curve));
 			y -= 0.05;
 			dim = e_nsc_get_curve_dimensions(curve);
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Dimensions:", color_light, color_light, color_light); 
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Dimensions:", co_line_color[0], co_line_color[1], co_line_color[2], color_light); 
 			if(sui_type_number_uint(input, 0.15, y, 0, 0.5, SUI_T_SIZE, &dim, curve, color, color, color))
 				if(dim > 0 && dim < 5)
 					verse_send_c_curve_create(change_c_node_id, e_nsc_get_curve_id(curve), e_nsc_get_curve_name(curve), dim);
 			y -= 0.05;
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Edit:", color_light, color_light, color_light);  
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Edit:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 			e = curve_edit_id != e_nsc_get_curve_id(curve);
-			if(co_w_checkbox(input, 0.17, y, &e, color, color, color) && !e)
+			if(co_w_checkbox(input, 0.17, y, &e, color) && !e)
 				curve_edit_id = e_nsc_get_curve_id(curve);
 			y -= 0.05;
-			sui_draw_rounded_square(-0.3, y + 0.175, 1, -0.14, color_light, color_light, color_light);
+			sui_draw_rounded_square(-0.3, y + 0.175, 1, -0.14, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 		}
 	}
 	glPopMatrix();
@@ -355,9 +356,9 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 			j = 0;
 			j = e_nsc_get_curve_point_count(curve);
 			sprintf(nr, "curve count %u", j);
-			sui_draw_text(-0.27, y, SUI_T_SIZE, SUI_T_SPACE, nr, color_light, color_light, color_light); 
+			sui_draw_text(-0.27, y, SUI_T_SIZE, SUI_T_SPACE, nr, co_line_color[0], co_line_color[1], co_line_color[2], color_light); 
 		}
-		sui_draw_text(0.0, y - 0.05, SUI_T_SIZE, SUI_T_SPACE, "Vertex", color_light, color_light, color_light);  
+		sui_draw_text(0.0, y - 0.05, SUI_T_SIZE, SUI_T_SPACE, "Vertex", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 		if((curve = e_nsc_get_curve_by_id(node, curve_edit_id)) != NULL)
 		{
 			static float scale, pan;
@@ -376,7 +377,7 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 	{
 		uint16 bone;
 		y -= 0.05;
-		if(sw_text_button(input, -0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new Bone", color, color, color))
+		if(sw_text_button(input, -0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new Bone", co_line_color[0], co_line_color[1], co_line_color[2], color))
 		{
 			uint i;
 			char nr[32];
@@ -399,7 +400,7 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Bone Weight:", color_light, color_light, color_light);  
 			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nsg_get_bone_weight(node, bone), 16, rename_g_layer_func, e_nsg_get_bone_weight(node, bone), color, color_light);
 
-			if(co_w_close_button(input, 0.645, y, color, color, color))
+			if(co_w_close_button(input, 0.645, y, color))
 				verse_send_g_bone_destroy(change_g_node_id, bone);
 			y -= 0.05;
 			ref = e_nsg_get_bone_reference(node, bone);
@@ -420,13 +421,13 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 			for(i = 0; i < 7; i++)
 			{	
 				sui_draw_text(0.0, y, 0, SUI_T_SIZE, SUI_T_SPACE, text[i], color_light, color_light, color_light);  
-				if(sui_type_number_double(input, 0.15, y, 0.15, SUI_T_SIZE, &t[i], &ref[i], color, color, color))
+				if(sui_type_number_double(input, 0.15, y, 0.15, SUI_T_SIZE, &t[i], &ref[i], co_line_color[0], co_line_color[1], co_line_color[2], color))
 					verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], t[3], t[4], t[5], t[6]);
 				if(co_w_slider(input, 0.3, y, 0.35, &t[i], color, color, color))
 					verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], t[3], t[4], t[5], t[6]);
 				y -= 0.05;
 			}
-			sui_draw_rounded_square(-0.3, y + 0.525, 1, -0.49, color_light, color_light, color_light);
+			sui_draw_rounded_square(-0.3, y + 0.525, 1, -0.49, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
 		}
 	}*/
 	glPopMatrix();

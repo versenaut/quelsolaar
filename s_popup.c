@@ -83,15 +83,7 @@ void sui_draw_popup_angle_line(float x, float y, float angle)
 
 void sui_draw_popup_square(float pos_x, float pos_y, float size_x, float size_y, float color)
 {
-	static float color_array[4 * 4] = {0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4};
 	float array[8];
-
-	if(color_array[3] != color)
-	{
-		uint i;
-		for(i = 0; i < 4; i++)
-			sui_draw_set_vec4(color_array, i, color, color, color, 0.4);
-	}
 	array[0] = pos_x;
 	array[1] = pos_y;
 	array[2] = pos_x + size_x;
@@ -101,8 +93,7 @@ void sui_draw_popup_square(float pos_x, float pos_y, float size_x, float size_y,
 	array[6] = pos_x;
 	array[7] = pos_y + size_y;
 	sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	sui_set_color_array_gl(color_array, 8, 4);
-	sui_draw_gl(GL_QUADS, array, 4, 2, color, color, color, 1);
+	sui_draw_gl(GL_QUADS, array, 4, 2, color, color, color, 0.8);
 }
 
 
@@ -152,7 +143,7 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 		back_color = 1 - back_color;
 		for(i = 0; i < element_count && element[i].type != PU_T_ANGLE; i++);
 		if(i < element_count)
-			sui_draw_background_ring(pos_x, pos_y, 0);
+			sui_draw_background_ring(pos_x, pos_y, 1 - back_color);
 
 		for(i = 0; i < element_count; i++)
 			if(element[i].type == PU_T_TOP)
@@ -173,12 +164,12 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 				case PU_T_TOP :
 					if(sui_box_click_test(pos_x - 0.125, pos_y + (float)(top) * 0.05 + 0.075, 0.25, 0.05))
 						sui_draw_popup_square(pos_x - 0.125, pos_y + (float)(top) * 0.05 + 0.125, 0.25, -0.05, 1 - back_color);
-					sui_draw_text(pos_x + sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].text) * -0.5, pos_y + (float)(top++) * 0.05 + 0.1 - SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color);
+					sui_draw_text(pos_x + sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].text) * -0.5, pos_y + (float)(top++) * 0.05 + 0.1 - SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color, 1.0);
 				break;
 				case PU_T_BOTTOM :
 					if(sui_box_click_test(pos_x - 0.125, pos_y + (float)(bottom) * -0.05 - 0.125, 0.25, 0.05))
 						sui_draw_popup_square(pos_x - 0.125, pos_y + (float)(bottom) * -0.05 - 0.075, 0.25, -0.05, 1 - back_color);
-					sui_draw_text(pos_x + sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].text) * -0.5, pos_y + (float)(bottom++) * -0.05 - 0.1 - SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color);
+					sui_draw_text(pos_x + sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].text) * -0.5, pos_y + (float)(bottom++) * -0.05 - 0.1 - SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color, 1.0);
 				break;
 				case PU_T_ANGLE :
 					for(j = 0; j < i; j++)
@@ -195,23 +186,23 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 
 					if(element[i].data.angle[0] < 0)
 					{
-						sui_draw_text(pos_x + sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].text) * -0.5, pos_y + 0.15, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color);
+						sui_draw_text(pos_x + sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].text) * -0.5, pos_y + 0.15, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color, 1.0);
 					}else if(element[i].data.angle[0] < 180 && element[i].data.angle[1] > 180)
 					{
-						sui_draw_text(pos_x + sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].text) * -0.5, pos_y - 0.15, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color);
+						sui_draw_text(pos_x + sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].text) * -0.5, pos_y - 0.15, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color, 1.0);
 					}else if(element[i].data.angle[0] + element[i].data.angle[1] < 360)
 					{
 						glPushMatrix();
 						glTranslatef(pos_x, pos_y, 0);
 						glRotatef(90 - (element[i].data.angle[0] + element[i].data.angle[1]) * 0.5, 0, 0, 1);
-						sui_draw_text(0.15, -SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color);
+						sui_draw_text(0.15, -SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color, 1.0);
 						glPopMatrix();
 					}else if(element[i].data.angle[0] + element[i].data.angle[1] > 360)
 					{
 						glPushMatrix();
 						glTranslatef(pos_x, pos_y, 0);
 						glRotatef(270 - (element[i].data.angle[0] + element[i].data.angle[1]) * 0.5, 0, 0, 1);
-						sui_draw_text(-0.15 - sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].text), -SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color);
+						sui_draw_text(-0.15 - sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].text), -SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color, 1.0);
 						glPopMatrix();
 					}
 					break;
@@ -224,7 +215,7 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 					if(sui_box_click_test(pos_x + element[i].data.square.square[0], pos_y + element[i].data.square.square[1] + element[i].data.square.square[3], element[i].data.square.square[2], -element[i].data.square.square[3]))
 						sui_draw_popup_square(pos_x + element[i].data.square.square[0] - 0.005, pos_y + element[i].data.square.square[1] + 0.005, element[i].data.square.square[2] + 0.01, element[i].data.square.square[3] - 0.01, 1 - back_color);
 
-					sui_draw_text(pos_x + element[i].data.square.square[0] + element[i].data.square.square[2] * 0.5 - sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].text) * 0.5, -SUI_T_SIZE + pos_y + element[i].data.square.square[1] + element[i].data.square.square[3] * 0.5, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color);
+					sui_draw_text(pos_x + element[i].data.square.square[0] + element[i].data.square.square[2] * 0.5 - sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].text) * 0.5, -SUI_T_SIZE + pos_y + element[i].data.square.square[1] + element[i].data.square.square[3] * 0.5, SUI_T_SIZE, SUI_T_SPACE, element[i].text, back_color, back_color, back_color, 1.0);
 					break;
 				case PU_T_ICON :
 					element[i].data.icon.draw_func(element[i].data.icon.pos[0], element[i].data.icon.pos[1], 1 - back_color);

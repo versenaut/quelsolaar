@@ -3,7 +3,7 @@
 
 #include "seduce.h"
 
-void sui_draw_text(float pos_x, float pos_y, float size, float spacing, const char *text, float red, float green, float blue)
+void sui_draw_text(float pos_x, float pos_y, float size, float spacing, const char *text, float red, float green, float blue, float alpha)
 {
 	uint i;
 	if(text == NULL || *text == '\0')
@@ -18,7 +18,7 @@ void sui_draw_text(float pos_x, float pos_y, float size, float spacing, const ch
 	glScalef(size, size, 1);
 	for(i = 0; text[i] != 0; i++)
 	{
-		sui_draw_letter(text[i], red, green, blue);
+		sui_draw_letter(text[i], red, green, blue, alpha);
 		glTranslatef(sui_get_letter_size(text[i]) + spacing, 0, 0);
 	}
 	glPopMatrix();
@@ -54,16 +54,16 @@ void sui_draw_code(float pos_x, float pos_y, float size, float spacing, char *te
 		{
 			glPushMatrix();
 			glScalef(0.24000 / f, 1, 1);
-			sui_draw_letter(text[i], 0.5, 0.5, 0.5);
+			sui_draw_letter(text[i], 0.5, 0.5, 0.5, 1.0);
 			glPopMatrix();
 		}else if(f < 0.23999)
 		{
 			glPushMatrix();
 			glTranslatef((0.240000 - f) * 0.5, 0, 0);
-			sui_draw_letter(text[i], 0.5, 0.5, 0.5);
+			sui_draw_letter(text[i], 0.5, 0.5, 0.5, 1.0);
 			glPopMatrix();
 		}else
-			sui_draw_letter(text[i], 0.5, 0.5, 0.5);
+			sui_draw_letter(text[i], 0.5, 0.5, 0.5, 1.0);
 		glTranslatef(0.240000 + 0.05, 0, 0);
 	}
 	glPopMatrix();
@@ -71,13 +71,13 @@ void sui_draw_code(float pos_x, float pos_y, float size, float spacing, char *te
 	glDisable(GL_LINE_SMOOTH);
 }*/
 
-boolean sw_text_button(BInputState *input, float pos_x, float pos_y, float center, float size, float spacing, const char *text, float red, float green, float blue)
+boolean sw_text_button(BInputState *input, float pos_x, float pos_y, float center, float size, float spacing, const char *text, float red, float green, float blue, float alpha)
 {
 	if(input->mode == BAM_DRAW)
 	{
 		if(center > 0.0001)
 			center *= sui_compute_text_length(size, spacing, text);
-		sui_draw_text(pos_x - center, pos_y, size, spacing, text, red, green, blue);
+		sui_draw_text(pos_x - center, pos_y, size, spacing, text, red, green, blue, alpha);
 	}else if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
 	{
 		spacing	= sui_compute_text_length(size, spacing, text);
@@ -109,8 +109,7 @@ void sui_end_type_func(void *user, boolean cancel)
 }
 
 
-boolean sui_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size,
-		    void (*done_func)(void *user, char *text), void* user, float red, float green, float blue)
+boolean sui_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size, void (*done_func)(void *user, char *text), void* user, float red, float green, float blue, float alpha)
 {
 	int i;
 	float pos;
@@ -122,13 +121,13 @@ boolean sui_type_in(BInputState *input, float pos_x, float pos_y, float length, 
 		else
 			t = text;
 
-		sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, t, red, green, blue);
+		sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, t, red, green, blue, alpha);
 		if(sui_type_in_text == text)
 		{
 			pos = pos_x;
 			for(i = 0; i < sui_type_in_cursor && t[i] != 0; i++)
 				pos += (sui_get_letter_size(t[i]) / sui_get_letter_size(97) + SUI_T_SPACE) * size;
-			sui_draw_text(pos + SUI_T_SPACE * 0.5 * size, pos_y, size, SUI_T_SPACE, "|", red, green, blue);
+			sui_draw_text(pos + SUI_T_SPACE * 0.5 * size, pos_y, size, SUI_T_SPACE, "|", red, green, blue, alpha);
 		}
 	}
 	else
@@ -182,7 +181,7 @@ void sui_end_type_number_func(void *user, boolean cancel)
 }
 
 
-boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, float center, float length, float size, double *number, void *id, float red, float green, float blue)
+boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, float center, float length, float size, double *number, void *id, float red, float green, float blue, float alpha)
 {
 	int i;
 	float pos;
@@ -191,17 +190,17 @@ boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, flo
 		if(sui_type_in_number_text != NULL && sui_type_in_number_id == id)
 		{
 			pos_x -= sui_compute_text_length(size, SUI_T_SPACE, sui_type_in_number_text) * center;
-			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, sui_type_in_number_text, red, green, blue);
+			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, sui_type_in_number_text, red, green, blue, alpha);
 			pos = pos_x;
 			for(i = 0; i < sui_type_in_cursor && sui_type_in_number_text[i] != 0; i++)
 				pos += (sui_get_letter_size(sui_type_in_number_text[i]) / sui_get_letter_size(97) + SUI_T_SPACE) * size;
-			sui_draw_text(pos + SUI_T_SPACE * 0.5 * size, pos_y, size, SUI_T_SPACE, "|", red, green, blue);
+			sui_draw_text(pos + SUI_T_SPACE * 0.5 * size, pos_y, size, SUI_T_SPACE, "|", red, green, blue, alpha);
 		}else
 		{
 			char nr[64];
 			sprintf(nr, "%.3f", *number);
 			pos_x -= sui_compute_text_length(size, SUI_T_SPACE, nr) * center;
-			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, nr, red, green, blue);
+			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, nr, red, green, blue, alpha);
 		}
 	}
 	else
@@ -240,17 +239,17 @@ boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float
 		if(sui_type_in_number_text != NULL && sui_type_in_number_id == id)
 		{
 			pos_x -= sui_compute_text_length(size, SUI_T_SPACE, sui_type_in_number_text) * center;
-			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, sui_type_in_number_text, red, green, blue);
+			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, sui_type_in_number_text, red, green, blue, 1.0);
 			pos = pos_x;
 			for(i = 0; i < sui_type_in_cursor && sui_type_in_number_text[i] != 0; i++)
 				pos += (sui_get_letter_size(sui_type_in_number_text[i]) / sui_get_letter_size(97) + SUI_T_SPACE) * size;
-			sui_draw_text(pos + SUI_T_SPACE * 0.5 * size, pos_y, size, SUI_T_SPACE, "|", red, green, blue);
+			sui_draw_text(pos + SUI_T_SPACE * 0.5 * size, pos_y, size, SUI_T_SPACE, "|", red, green, blue, 1.0);
 		}else
 		{
 			char nr[64];
 			sprintf(nr, "%u", *number);
 			pos_x -= sui_compute_text_length(size, SUI_T_SPACE, nr) * center;
-			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, nr, red, green, blue);
+			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, nr, red, green, blue, 1.0);
 		}
 	}
 	else

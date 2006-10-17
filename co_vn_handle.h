@@ -35,7 +35,6 @@ extern boolean co_handle_curve(BInputState *input, ENode *node);
 extern boolean co_handle_audio(BInputState *input, ENode *node);
 
 extern boolean co_handle_return(BInputState *input);
-extern void sui_draw_symb_close(float pos_x, float pos_y, float red, float green, float blue);
 
 extern void co_draw_material(ENode *node);
 

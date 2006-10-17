@@ -72,7 +72,7 @@ void draw_la_star_wire(double open)
 	uint i;
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glPushMatrix();
-	sui_draw_text(0.1, 0.1, SUI_T_SIZE, SUI_T_SPACE, "LOQ AIROU", 0, 0, 0);
+	sui_draw_text(0.1, 0.1, SUI_T_SIZE, SUI_T_SPACE, "LOQ AIROU", 0, 0, 0, 1);
 	glRotated(20 * open, 0, 0, 1);
 	sui_draw_gl(GL_QUADS, GlobalIntro.ring, CIRCLE_SEGMENTS * 4, 2, 0, 0, 0, 0.0);
 	glPopMatrix();

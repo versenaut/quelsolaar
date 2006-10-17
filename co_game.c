@@ -15,6 +15,9 @@
 #define GAME_DUST_COUNT 3200
 #define GAME_REVIVE_TIME 2
 
+extern float co_background_color[3];
+extern float co_line_color[3];
+
 typedef struct{
 	float pos[3];
 	float vec[3];
@@ -149,79 +152,79 @@ void	co_draw_pebble_1(float pos_x, float pos_y, float red, float green, float bl
 	glPopMatrix();
 }*/
 
-void co_draw_pebble1(float pos_x, float pos_y, float red, float green, float blue)
+void co_draw_pebble1(float pos_x, float pos_y, float alpha)
 {
 	static float array[] = {-0.380000, -0.120000, -0.240000, -0.420000, -0.240000, -0.420000, 0.060000, -0.480000, 0.060000, -0.480000, 0.140000, -0.400000, 0.140000, -0.400000, 0.300000, -0.460000, 0.300000, -0.440000, 0.480000, -0.100000, 0.480000, -0.100000, 0.380000, 0.120000, 0.380000, 0.120000, 0.400000, 0.300000, 0.400000, 0.300000, 0.040000, 0.440000, 0.040000, 0.440000, -0.240000, 0.400000, -0.240000, 0.400000, -0.220000, 0.300000, -0.220000, 0.300000, -0.380000, 0.220000, -0.380000, 0.220000, -0.380000, -0.120000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 24, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 24, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 
-void co_draw_pebble2(float pos_x, float pos_y, float red, float green, float blue)
+void co_draw_pebble2(float pos_x, float pos_y, float alpha)
 {
 	static float array[] = {-0.100000, 0.420000, -0.380000, 0.220000, -0.380000, 0.220000, -0.240000, 0.060000, -0.260000, 0.060000, -0.440000, -0.020000, -0.440000, -0.020000, -0.300000, -0.360000, -0.300000, -0.360000, 0.100000, -0.500000, 0.100000, -0.500000, 0.320000, -0.360000, 0.320000, -0.360000, 0.340000, -0.040000, 0.340000, -0.040000, 0.460000, 0.040000, 0.460000, 0.040000, 0.380000, 0.240000, 0.380000, 0.240000, 0.140000, 0.420000, 0.040000, 0.340000, -0.100000, 0.420000, 0.140000, 0.420000, 0.040000, 0.340000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 24, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 24, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 
-void co_draw_pebble3(float pos_x, float pos_y, float red, float green, float blue)
+void co_draw_pebble3(float pos_x, float pos_y, float alpha)
 {
 	static float array[] = {-0.100000, 0.420000, -0.460000, 0.160000, -0.460000, 0.160000, -0.500000, -0.140000, -0.500000, -0.140000, -0.320000, -0.280000, -0.320000, -0.280000, -0.160000, -0.480000, -0.160000, -0.480000, 0.120000, -0.340000, 0.120000, -0.340000, 0.260000, -0.400000, 0.260000, -0.400000, 0.480000, -0.100000, 0.480000, -0.100000, 0.360000, 0.240000, -0.100000, 0.420000, 0.360000, 0.240000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 18, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 18, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 
-void co_draw_pebble4(float pos_x, float pos_y, float red, float green, float blue)
+void co_draw_pebble4(float pos_x, float pos_y, float alpha)
 {
 	static float array[] = {-0.400000, -0.320000, -0.460000, 0.040000, -0.460000, 0.040000, -0.180000, 0.120000, -0.180000, 0.120000, -0.020000, 0.400000, -0.020000, 0.400000, 0.360000, 0.280000, 0.480000, -0.080000, 0.400000, -0.340000, 0.360000, 0.280000, 0.480000, -0.080000, 0.400000, -0.340000, 0.060000, -0.500000, 0.060000, -0.500000, -0.080000, -0.340000, -0.080000, -0.340000, -0.400000, -0.320000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 18, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 18, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 
 
 
-void	co_draw_ship_engine(float pos_x, float pos_y, float red, float green, float blue)
+void	co_draw_ship_engine(float pos_x, float pos_y, float alpha)
 {
 	static float array[] = {-0.000000, 0.024000, -0.018000, -0.020000, -0.000000, 0.024000, 0.018000, -0.020000, -0.004000, -0.012000, -0.018000, -0.020000, -0.004000, -0.012000, 0.004000, -0.012000, 0.004000, -0.012000, 0.018000, -0.020000, -0.018000, -0.038000, -0.012000, -0.020000, -0.006000, -0.024000, -0.018000, -0.038000, -0.006000, -0.024000, -0.000000, -0.050000, -0.000000, -0.050000, 0.006000, -0.024000, 0.012000, -0.020000, 0.018000, -0.038000, 0.018000, -0.038000, 0.006000, -0.024000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 22, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 22, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 
-void	co_draw_ship(float pos_x, float pos_y, float red, float green, float blue)
+void	co_draw_ship(float pos_x, float pos_y, float alpha)
 {
 	static float array[] = {0.018000, -0.020000, -0.000000, 0.024000, -0.000000, 0.024000, -0.018000, -0.020000, -0.004000, -0.012000, -0.018000, -0.020000, 0.004000, -0.012000, -0.004000, -0.012000, 0.004000, -0.012000, 0.018000, -0.020000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 10, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 10, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 
 
-void co_draw_game_over(float pos_x, float pos_y, float red, float green, float blue)
+void co_draw_game_over(float pos_x, float pos_y, float alpha)
 {
 	static float array[] = {-0.500000, -0.080000, -0.580000, -0.080000, 0.080000, 0.080000, 0.080000, -0.080000, -0.580000, -0.080000, -0.580000, 0.080000, -0.580000, 0.080000, -0.500000, 0.080000, 0.220000, 0.080000, 0.260000, -0.080000, 0.260000, -0.080000, 0.300000, 0.080000, 0.360000, 0.080000, 0.360000, -0.080000, 0.360000, -0.080000, 0.440000, -0.080000, 0.440000, 0.080000, 0.360000, 0.080000, 0.160000, 0.080000, 0.080000, 0.080000, -0.160000, 0.080000, -0.160000, -0.080000, 0.160000, -0.080000, 0.160000, 0.080000, 0.080000, -0.080000, 0.160000, -0.080000, 0.420000, 0.000000, 0.360000, 0.000000, 0.500000, 0.080000, 0.500000, -0.080000, -0.080000, -0.080000, -0.160000, -0.080000, -0.160000, 0.080000, -0.080000, 0.080000, -0.160000, 0.000000, -0.100000, 0.000000, 0.520000, 0.000000, 0.580000, -0.080000, -0.260000, 0.040000, -0.220000, 0.080000, -0.300000, 0.080000, -0.300000, -0.080000, -0.220000, 0.080000, -0.220000, -0.080000, -0.260000, 0.040000, -0.300000, 0.080000, -0.360000, 0.080000, -0.440000, 0.080000, -0.360000, -0.080000, -0.360000, 0.080000, -0.440000, 0.080000, -0.440000, -0.080000, -0.440000, 0.000000, -0.360000, 0.000000, -0.500000, 0.000000, -0.500000, -0.080000, 0.500000, 0.080000, 0.580000, 0.080000, 0.580000, 0.080000, 0.580000, 0.000000, 0.580000, 0.000000, 0.500000, 0.000000, -0.540000, 0.000000, -0.500000, 0.000000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, 0);
-	sui_draw_gl(GL_LINES, array, 64, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 64, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 
 
-void co_game_draw_ship1(float pos_x, float pos_y, float red, float green, float blue)
+void co_game_draw_ship1(float pos_x, float pos_y, float alpha)
 {
 	static float array[] = {-0.040000, -0.020000, 0.040000, -0.020000, 0.040000, -0.020000, 0.080000, 0.000000, 0.080000, 0.000000, 0.040000, 0.020000, -0.080000, 0.000000, -0.040000, -0.020000, -0.040000, 0.020000, -0.080000, 0.000000, 0.040000, 0.020000, -0.040000, 0.020000, -0.040000, 0.020000, -0.020000, 0.040000, -0.020000, 0.040000, 0.020000, 0.040000, 0.020000, 0.040000, 0.040000, 0.020000};
 	glPushMatrix();
 	glTranslatef(pos_x, pos_y, -1);
-	sui_draw_gl(GL_LINES, array, 18, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 18, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 /*
@@ -243,7 +246,7 @@ void co_game_draw_ship2(float pos_x, float pos_y, float rot, float red, float gr
 }*/
 
 
-void co_game_draw_lander(float pos_x, float pos_y, float rot, float red, float green, float blue)
+void co_game_draw_lander(float pos_x, float pos_y, float rot, float alpha)
 {
 	static float array[] = {0.020000, 0.020000, 0.020000, 0.040000, 0.020000, 0.040000, -0.020000, 0.040000, -0.020000, 0.040000, -0.020000, 0.020000, -0.020000, 
 0.020000, -0.060000, -0.040000, -0.060000, -0.040000, -0.040000, -0.060000, -0.040000, -0.060000, -0.060000, -0.080000, -0.060000, -0.080000, -0.060000, -0.200000,
@@ -264,11 +267,11 @@ void co_game_draw_lander(float pos_x, float pos_y, float rot, float red, float g
 	glTranslatef(pos_x, pos_y, -1);
 	glScalef(0.2, 0.2, 0.2);
 	glRotatef(rot, 0, 0, 1);
-	sui_draw_gl(GL_LINES, array, 106, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 106, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 
-void co_game_draw_station(float pos_x, float pos_y, float rot, float red, float green, float blue)
+void co_game_draw_station(float pos_x, float pos_y, float rot, float alpha)
 {
 	static float array[] = {-0.020000, 0.180000, -0.040000, 0.174641, -0.040000, 0.174641, -0.054641, 0.160000, -0.054641, 0.160000, -0.060000, 0.140000, 0.020000, 
 0.180000, 0.040000, 0.174641, 0.040000, 0.174641, 0.054641, 0.160000, 0.054641, 0.160000, 0.060000, 0.140000, 0.020000, 0.060000, 0.040000, 0.065359, 0.040000, 
@@ -319,11 +322,11 @@ void co_game_draw_station(float pos_x, float pos_y, float rot, float red, float 
 	glTranslatef(pos_x, pos_y, -1);
 	glScalef(0.2, 0.2, 0.2);
 	glRotatef(rot, 0, 0, 1);
-	sui_draw_gl(GL_LINES, array, 352, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 352, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 
-void co_game_draw_sputnik(float pos_x, float pos_y, float rot, float red, float green, float blue)
+void co_game_draw_sputnik(float pos_x, float pos_y, float rot, float alpha)
 {
 	static float array[] = {-0.000000, -0.100000, 0.050000, -0.086603, 0.050000, -0.086603, 0.086603, -0.050000, 0.086603, -0.050000, 0.100000, 0.000000, -0.000000, 
 0.100000, 0.050000, 0.086603, 0.050000, 0.086603, 0.086603, 0.050000, 0.086603, 0.050000, 0.100000, 0.000000, -0.000000, 0.100000, -0.050000, 0.086603, -0.050000, 
@@ -336,11 +339,11 @@ void co_game_draw_sputnik(float pos_x, float pos_y, float rot, float red, float 
 	glTranslatef(pos_x, pos_y, -1);
 	glScalef(0.2, 0.2, 0.2);
 	glRotatef(rot, 0, 0, 1);
-	sui_draw_gl(GL_LINES, array, 48, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 48, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 
-void co_game_draw_rocket(float pos_x, float pos_y, float rot, float red, float green, float blue)
+void co_game_draw_rocket(float pos_x, float pos_y, float rot, float alpha)
 {
 	static float array[] = {-0.040000, 0.000000, 0.040000, 0.000000, 0.040000, 0.000000, 0.080000, -0.040000, 0.080000, -0.040000, 0.080000, -0.100000, 0.080000, -0.100000, 0.040000, -0.140000, -0.000000, 
 -0.180000, 0.020000, -0.185359, 0.020000, -0.185359, 0.034641, -0.200000, 0.034641, -0.200000, 0.040000, -0.220000, 0.060000, -0.140000, 0.100000, -0.180000, 0.100000, -0.180000, -0.100000, -0.180000, 
@@ -357,7 +360,7 @@ void co_game_draw_rocket(float pos_x, float pos_y, float rot, float red, float g
 	glTranslatef(pos_x, pos_y, -1);
 	glScalef(0.2, 0.2, 0.2);
 	glRotatef(rot, 0, 0, 1);
-	sui_draw_gl(GL_LINES, array, 98, 2, red, green, blue, 1);
+	sui_draw_gl(GL_LINES, array, 98, 2, co_line_color[0], co_line_color[1], co_line_color[2], alpha);
 	glPopMatrix();
 }
 
@@ -411,16 +414,16 @@ boolean co_draw_ships(BInputState *input)
 			switch(rand[i] % 4)
 			{
 				case 0 :
-				co_game_draw_lander(pos[i][0], pos[i][1], rot[i], 0.8, 0.8, 0.8);
+				co_game_draw_lander(pos[i][0], pos[i][1], rot[i], 0.2);
 				break;
 				case 1 :
-				co_game_draw_station(pos[i][0], pos[i][1], rot[i], 0.8, 0.8, 0.8);
+				co_game_draw_station(pos[i][0], pos[i][1], rot[i], 0.2);
 				break;
 				case 2 :
-				co_game_draw_sputnik(pos[i][0], pos[i][1], rot[i], 0.8, 0.8, 0.8);
+				co_game_draw_sputnik(pos[i][0], pos[i][1], rot[i], 0.2);
 				break;
 				case 3 :
-				co_game_draw_rocket(pos[i][0], pos[i][1], rot[i], 0.8, 0.8, 0.8);
+				co_game_draw_rocket(pos[i][0], pos[i][1], rot[i], 0.2);
 				break;
 			}
 		}
@@ -460,7 +463,7 @@ void co_draw_dust(void)
 		if(p->time < 1)
 		{
 			color = 1 - COGame.dust[i].time;
-			sui_draw_3d_line_gl(p->pos[0], p->pos[1], p->pos[2], p->pos[0] + p->vec[0] * 0.2 * color, p->pos[1] + p->vec[1] * 0.2 * color, p->pos[2] + p->vec[2] * 0.2 * color, p->time, p->time, p->time, 1);
+			sui_draw_3d_line_gl(p->pos[0], p->pos[1], p->pos[2], p->pos[0] + p->vec[0] * 0.2 * color, p->pos[1] + p->vec[1] * 0.2 * color, p->pos[2] + p->vec[2] * 0.2 * color,  co_line_color[0], co_line_color[1], co_line_color[2], color);
 			alive = TRUE;
 		}
 	}
@@ -481,7 +484,7 @@ void co_play_game(BInputState *input)
 		{
 			glPushMatrix();
 			glTranslatef(0, 0, -1);
-			co_draw_game_over(0, 0, 0, 0, 0);
+			co_draw_game_over(0, 0, 1.0);
 			glPopMatrix();
 			return;
 		}
@@ -503,13 +506,13 @@ void co_play_game(BInputState *input)
 			glTranslatef(COGame.player_pos[0], COGame.player_pos[1], 0);
 			glRotatef(COGame.player_rot, 0, 0, 1);
 			if(COGame.engine)
-				co_draw_ship_engine(0, 0, 0, 0, 0);
+				co_draw_ship_engine(0, 0, 1.0);
 			else
-				co_draw_ship(0, 0, 0, 0, 0);
+				co_draw_ship(0, 0, 1.0);
 			glPopMatrix();
 		}
 		for(i = 0; i < COGame.lives; i++)
-			co_draw_ship(0.95 - 0.04 * (float)i, COGame.aspect - 0.05, 0, 0, 0);
+			co_draw_ship(0.95 - 0.04 * (float)i, COGame.aspect - 0.05, 1.0);
 		for(i = 0; i < COGame.pebble_count; i++)
 		{
 			glPushMatrix();
@@ -521,16 +524,16 @@ void co_play_game(BInputState *input)
 				switch(i % 4)
 				{
 					case 0 :
-					co_draw_pebble1(0, 0, 0, 0, 0);
+					co_draw_pebble1(0, 0, 1.0);
 					break;
 					case 1 :
-					co_draw_pebble2(0, 0, 0, 0, 0);
+					co_draw_pebble2(0, 0, 1.0);
 					break;
 					case 2 :
-					co_draw_pebble3(0, 0, 0, 0, 0);
+					co_draw_pebble3(0, 0, 1.0);
 					break;
 					case 3 :
-					co_draw_pebble4(0, 0, 0, 0, 0);
+					co_draw_pebble4(0, 0, 1.0);
 					break;
 				}
 
@@ -569,7 +572,7 @@ void co_play_game(BInputState *input)
 				sui_draw_2d_line_gl(COGame.fire[i].pos[0],
 					COGame.fire[i].pos[1],
 					COGame.fire[i].pos[0] + COGame.fire[i].vec[0] * 0.05,
-					COGame.fire[i].pos[1] + COGame.fire[i].vec[1] * 0.05, 0, 0, 0, 1);
+					COGame.fire[i].pos[1] + COGame.fire[i].vec[1] * 0.05, co_line_color[0], co_line_color[1], co_line_color[2], 1);
 		}
 	/*	for(i = 0; i < GAME_DUST_COUNT; i++)
 		{

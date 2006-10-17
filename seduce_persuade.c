@@ -54,7 +54,59 @@ void sp_settings_pre(SUIViewElement *element)
 	element[11].type = S_VET_BOOLEAN;
 	element[11].text = "Draw flares";
 	element[11].param.checkbox = p_render_get_flare();
+
+	element[12].type = S_VET_INTEGER;
+	element[12].text = "Light Count";
+	element[12].param.checkbox = p_render_get_light_count();
 }
+
+void sp_settings_init(void)
+{
+	p_geo_set_sds_level(sui_get_setting_int("P_BASE_TESSELATION", 3));
+	p_geo_set_sds_poly_cap(sui_get_setting_int("P_POLY_CAP", 100000));
+	p_geo_set_sds_mesh_factor(sui_get_setting_double("P_FACTOR_TESSELATION", 1));
+	p_geo_set_sds_force_level(sui_get_setting_int("P_FORCE_TESSELATION", 0));
+	p_render_set_impostor_size(sui_get_setting_double("P_IMPOSTOR_SIZE", 0.03));
+	p_render_set_impostor_resolution(sui_get_setting_int("P_IMPOSTOR_RESOLUTION", 128));
+	p_render_set_shadows(sui_get_setting_int("P_RENDER_SHADOWS", TRUE));
+	p_render_set_wireframe(sui_get_setting_int("P_RENDER_WIREFRAME", FALSE));
+	p_th_set_sds_use_hdri(sui_get_setting_int("P_HDRI_TEXTURE", FALSE));
+	p_render_set_flare(sui_get_setting_int("P_RENDER_FLARE", TRUE));
+	p_render_set_light_count(sui_get_setting_int("P_LIGHT_COUNT", 2));
+	
+}
+
+void sp_settings_post(SUIViewElement *element)
+{
+	sui_set_setting_int("P_BASE_TESSELATION", element[1].param.integer);
+	p_geo_set_sds_level(element[1].param.integer);
+	sui_set_setting_int("P_POLY_CAP", element[2].param.integer);
+	p_geo_set_sds_poly_cap(element[2].param.integer);
+	sui_set_setting_double("P_FACTOR_TESSELATION", element[3].param.slider * element[3].param.slider * 1000.0);
+	p_geo_set_sds_mesh_factor(element[3].param.slider * element[3].param.slider * 1000.0);
+	sui_set_setting_int("P_FORCE_TESSELATION", element[4].param.integer);
+	p_geo_set_sds_force_level(element[4].param.integer);
+	sui_set_setting_double("P_IMPOSTOR_SIZE", element[6].param.real);
+	p_render_set_impostor_size(element[6].param.real);
+	sui_set_setting_int("P_IMPOSTOR_RESOLUTION", element[7].param.integer);
+	p_render_set_impostor_resolution(element[7].param.integer);
+	sui_set_setting_int("P_RENDER_SHADOWS", element[8].param.integer);
+	p_render_set_shadows(element[8].param.checkbox);
+	sui_set_setting_int("P_RENDER_WIREFRAME", element[9].param.checkbox);
+	p_render_set_wireframe(element[9].param.checkbox);
+	sui_set_setting_int("P_HDRI_TEXTURE", element[10].param.checkbox);
+	if(element[10].param.checkbox != p_th_get_sds_use_hdri())
+	{
+		p_th_set_sds_use_hdri(element[10].param.checkbox);
+		p_context_update();
+	}
+	sui_set_setting_int("P_RENDER_FLARE", element[11].param.checkbox);
+	p_render_set_flare(element[11].param.checkbox);
+	sui_set_setting_int("P_LIGHT_COUNT", element[12].param.integer);
+	p_render_set_light_count(element[12].param.integer);
+	
+}
+/*
 
 void sp_settings_post(SUIViewElement *element)
 {
@@ -72,5 +124,6 @@ void sp_settings_post(SUIViewElement *element)
 		p_context_update();
 	}
 	p_render_set_flare(element[11].param.checkbox);
+	p_render_set_light_count(element[12].param.checkbox);
 	
-}
+}*/

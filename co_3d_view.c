@@ -10,7 +10,7 @@
 #include "co_vn_handle.h"
 
 void co_geometry_destroy(void *g);
-void *co_geometry_draw(ENode *node, void *g, boolean fill, boolean scale, float red, float green, float blue);
+void *co_geometry_draw(ENode *node, void *g, boolean fill, boolean scale, float red, float green, float blue, float alpha);
 void co_vng_ring(void);
 
 uint select_node = -1;
@@ -21,6 +21,9 @@ extern float co_get_view_x(float x);
 extern float co_get_view_y(float y);
 extern void co_draw_summary(ENode *node, float x, float y);
 extern void p_get_projection_screen(double *output, double x, double y, double z);
+
+extern float co_background_color[3];
+extern float co_line_color[3];
 
 boolean co_draw_3d_click_test_node(float x, float y)
 {
@@ -129,6 +132,9 @@ ENode *co_draw_3d_test(float x, float y)
 	return NULL;
 }
 
+extern float co_background_color[3];
+extern float co_line_color[3];
+
 void co_draw_3d_view_pass(boolean fill, float color)
 {
 
@@ -164,11 +170,11 @@ void co_draw_3d_view_pass(boolean fill, float color)
 
 					co_g_node = e_ns_get_custom_data(g_node, CONNECTOR_ENOUGH_SLOT);
 					if((!co_node->hidden || select_node == e_ns_get_node_id(node)) && !fill)
-						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, FALSE, 0, 0, 0);
+						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, FALSE, co_line_color[0], co_line_color[1], co_line_color[2], 1.0);
 					else if(!co_g_node->hidden && !fill)
-						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, FALSE, 0.7, 0.7, 0.7);
+						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, FALSE, co_line_color[0] * 0.3 + co_background_color[0] * 0.7, co_line_color[1] * 0.3 + co_background_color[1] * 0.7, co_line_color[2] * 0.3 + co_background_color[2] * 0.7, 1.0);
 					else
-						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, FALSE, color, color, color);
+						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, FALSE, co_line_color[0] * (1.0 - color) + co_background_color[0] * color, co_line_color[1] * (1.0 - color) + co_background_color[1] * color, co_line_color[2] * (1.0 - color) + co_background_color[2] * color, 1.0);
 					glPopMatrix();
 					draw = TRUE;
 				}
@@ -228,9 +234,9 @@ void co_draw_3d_icon_pass(void)
 					glTranslatef(-pos[0], -pos[1], -1);
 					sui_draw_gl(GL_LINES, shine, 16, 2, light[0] / f, light[1] / f, light[2] / f, 0);
 					if(!co_node->hidden)
-						sui_draw_gl(GL_LINES, sun, 16, 2, 0, 0, 0, 0);
+						sui_draw_gl(GL_LINES, sun, 16, 2, co_background_color[0], co_background_color[1], co_background_color[2], 1.0);
 					else
-						sui_draw_gl(GL_LINES, sun, 16, 2, 0.7, 0.7, 0.7, 0);
+						sui_draw_gl(GL_LINES, sun, 16, 2, co_background_color[0], co_background_color[1], co_background_color[2], 0.5);
 					glPopMatrix();
 				}
 			}
@@ -297,6 +303,7 @@ void co_draw_3d_persuade_set(boolean set)
 	draw_3d_persuade = set;
 }
 
+
 void co_draw_3d_view(float x, float y)
 {
 
@@ -314,20 +321,24 @@ void co_draw_3d_view(float x, float y)
 			betray_get_screen_mode(&x, &y, NULL);
 			betray_reshape_view(x, y);
 		}
-		glClearColor(1, 1, 1, 0);
+		sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//	glPushMatrix();
 #endif
 	}
 	else
 	{
+	//	sui_set_blend_gl(GL_ONE, GL_ONE);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
-		co_draw_3d_view_pass(TRUE, 0.99);
+		co_draw_3d_view_pass(TRUE, 0.9);
+		glPolygonOffset(1.0, 1.0);
+		glDepthFunc(GL_LEQUAL);
 		glPolygonOffset(0, 0);
+		sui_set_blend_gl(GL_ONE, GL_ONE);
 		co_draw_3d_view_pass(FALSE, 0.9);
 		glDisable(GL_POLYGON_OFFSET_FILL);
+		sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 //	glDepthRange(0.0, 0.5);
 	glDisable(GL_DEPTH_TEST);
-	
 }
