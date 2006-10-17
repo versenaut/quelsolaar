@@ -39,7 +39,7 @@ ALL:		$(APPS)
 
 # -----------------------------------------------
 
-connector:	co_3d_view.o co_main.o co_game.o co_intro.o co_popup.o co_projection.o co_summary.o co_vn_audio.o co_vn_bitmap.o \
+connector:	co_3d_view.o co_clone.o co_main.o co_game.o co_intro.o co_popup.o co_projection.o co_summary.o co_vn_audio.o co_vn_bitmap.o \
 		co_vn_curve.o co_vn_geometry.o co_vn_graphics.o co_vn_handle.o co_vn_head.o co_vn_mat_render.o co_vn_material.o \
 		co_vn_object.o co_vn_search.o co_vn_text.o co_widgets.o \
 		st_matrix_operations.o $(LIBPERSUADE) seduce_persuade.o \
