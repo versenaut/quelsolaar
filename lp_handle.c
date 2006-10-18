@@ -30,8 +30,10 @@ void lp_input_handler(BInputState *input, void *user)
 {
 	static double slider[3] = {0, 0, 0};
 	static uint node_id = -1, integer = 0;
+	static boolean now_plus = FALSE, now_minus = FALSE, last_plus = FALSE, last_minus = FALSE;
 	ENode *node;
 	node = e_ns_get_node(0, node_id);
+	uint i;
 
 	if(V_NT_GEOMETRY != e_ns_get_node_type(node))
 		node = NULL;
@@ -94,7 +96,25 @@ void lp_input_handler(BInputState *input, void *user)
 			}
 			if(input->mouse_button[2] && !input->last_mouse_button[2])
 				input_mode = PLIM_POPUP;
-			
+			if(lp_layer_current_is_integer())
+			{
+				/* Number keys 0..9 set the integer directly. Loads quicker than clicking, typing, and hitting enter. */
+				for(i = '0'; i <= '9'; i++)
+				{
+					if(betray_get_key(i))
+					{
+						integer = i - '0';
+						break;
+					}
+				}
+				/* Plus and minus keys increase/decrease the integer by one. Handy when creasing. */
+				betray_get_key_up_down(&now_plus, &last_plus, '+');
+				if(now_plus && !last_plus)
+					integer++;
+				betray_get_key_up_down(&now_minus, &last_minus, '-');
+				if(now_minus && !last_minus)
+					integer--;
+			}
 		break;
 		case PLIM_VIEW :
 			p_view_change(input);
