@@ -57,7 +57,7 @@ void sp_settings_pre(SUIViewElement *element)
 
 	element[12].type = S_VET_INTEGER;
 	element[12].text = "Light Count";
-	element[12].param.checkbox = p_render_get_light_count();
+	element[12].param.integer = p_render_get_light_count();
 }
 
 void sp_settings_init(void)
