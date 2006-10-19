@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "enough.h"
 #include "p_sds_geo.h"
 #include "p_sds_table.h"
@@ -154,6 +156,7 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 		buf = malloc((sizeof *buf) * ref_count);
 		for(i = 0; i < ref_count; i++)
 			buf[i] = mat[0].id;
+	//	mesh->render.mat_count = 1;
 		for(i = mesh->render.mat_count - 1; i < mesh->render.mat_count; i--)
 		{
 			layer = e_nsg_get_layer_by_id(node, mesh->render.mat[i].layer);
@@ -175,10 +178,19 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 							buf[j] = k;
 			}
 		}
-/*
-		uint32 *order_temp_mesh;  how the PMesh polys refers to the geometry mesh polygs (deleted once used)
-		uint32 *order_temp_mesh_rev;  how the geometry mesh polys refers to the PMesh polys (deleted once used)	
-*/
+		for(i = 1; i < mesh->render.mat_count; i++)
+		{
+			for(j = 0; j < i; j++)
+				if(mat[j].id == mat[i].id)
+					break;
+			if(j < i)
+			{
+				for(j = i + 1; j < mesh->render.mat_count; j++)
+					mat[j - 1] = mat[j];
+				mesh->render.mat_count--;
+				i--;
+			}
+		}
 		ref_count *= 4;
 		mesh->sub_stages[2] = 0;
 		for(i = 0; i < mesh->render.mat_count; i++)
@@ -187,10 +199,14 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 		//	k = geometry->base_quad_count;
 			for(stage = mesh->sub_stages[1]; stage < ref_count /*&& stage < MAX_COUNT_STAGE_LOOPS*/ ; stage += 4)
 			{
+				
 				if(ref[stage] < vertex_count && ref[stage + 1] < vertex_count &&  ref[stage + 2] < vertex_count && v[ref[stage] * 3] != E_REAL_MAX && v[ref[stage + 1] * 3] != E_REAL_MAX && v[ref[stage + 2] * 3] != E_REAL_MAX)
 				{
+				//	printf("ref = %u %u %u %u - %u\n", ref[stage], ref[stage + 1], ref[stage + 2], ref[stage + 3], vertex_count);
+				//	printf("vertex = %f %f %f\n", v[ref[stage + 0] * 3], v[ref[stage + 1] * 3], v[ref[stage + 2] * 3]);
 					if(ref[stage + 3] < vertex_count && v[ref[stage + 3] * 3] != E_REAL_MAX)
 					{
+
 						if(mesh->render.mat[i].id == buf[stage / 4])
 						{
 							mesh->tess.order_temp_mesh[mesh->sub_stages[2]] = j;
@@ -222,13 +238,14 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 		}
 		if(mesh->render.mat[i - 1].tri_end != mesh->tess.tri_count + mesh->tess.quad_count)
 		{
-//			printf("error: %u %u - %u %u\n", mesh->render.mat[i - 1].tri_end, mesh->tess.tri_count + mesh->tess.quad_count, mesh->tess.tri_count, mesh->tess.quad_count);
+		//	error: 87 58 - 8 50
+			printf("error: %u %u %u - %u %u\n", mesh->render.mat[i - 1].quad_end, mesh->render.mat[i - 1].tri_end, mesh->tess.tri_count + mesh->tess.quad_count, mesh->tess.tri_count, mesh->tess.quad_count);
 		//	error: 7 10 - 0 10
-				   {
+		/*		   {
 					   int *a = NULL;
 					   a[0] = 0;
 				   }
-			exit(0);
+		*/	exit(0);
 		}
 	//	if(mesh->render.mat_count > 1)
 	//		exit(0);
