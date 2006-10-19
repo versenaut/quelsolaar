@@ -244,6 +244,7 @@ void p_shader_init(void)
 {
 	uint length;
 	char *code;
+
 	if(p_extension_test("GL_ARB_shading_language_100"))
 	{
 		p_glCreateShaderObjectARB = p_extension_get_address("glCreateShaderObjectARB");
