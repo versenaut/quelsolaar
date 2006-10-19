@@ -770,7 +770,7 @@ void material_func(ENode *node, VNMFragmentID frag, ECustomDataCommand command)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, TEXTURE_RESOLUTION, TEXTURE_RESOLUTION, 0, GL_RGB, GL_FLOAT, buf);
 		free(buf);
 	}
-	if(command == E_CDC_DESTROY && (data = e_ns_get_custom_data(node, CO_ENOUGH_NODE_SLOT)) != NULL)
+	if(command == E_CDC_DESTROY && (data = e_nsm_get_custom_data(node, frag, CO_ENOUGH_NODE_SLOT)) != NULL)
 	{
 		glDeleteTextures(1, &data->texture_id);
 		free(data);
