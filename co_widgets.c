@@ -550,6 +550,7 @@ float co_w_scroll(BInputState *input, float pos, float size)
 {
 	static boolean drag = FALSE;
 	float aspect, p;
+
 	aspect = betray_get_screen_mode(NULL, NULL, NULL);
 	p = (1 - pos / -size) * aspect;
 	if(input->mode == BAM_DRAW)
@@ -560,9 +561,8 @@ float co_w_scroll(BInputState *input, float pos, float size)
 	}
 	else
 	{
-
 		if(input->mouse_button[0] == TRUE && input->click_pointer_x > 0.95 && (input->pointer_y - input->delta_pointer_y) < p && (input->pointer_y - input->delta_pointer_y) > p - 5.0 / (size * aspect))
-			pos += input->delta_pointer_y * size / aspect;
+			pos += (input->delta_pointer_y * size) / aspect;
 	}
 	return pos;
 }
