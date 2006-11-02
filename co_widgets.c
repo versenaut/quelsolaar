@@ -552,7 +552,7 @@ float co_w_scroll(BInputState *input, float pos, float size)
 	float aspect, p;
 
 	aspect = betray_get_screen_mode(NULL, NULL, NULL);
-	p = (1 - pos / -size) * aspect;
+	p = (1.0f - (pos / -size)) * aspect;
 	if(input->mode == BAM_DRAW)
 	{
 		sui_draw_2d_line_gl(0.98, p, 0.98, p - 5.0 / (size * aspect), 0.5, 0.5, 0.5, 1);
