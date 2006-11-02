@@ -39,7 +39,7 @@ void betray_set_context_update_func(void (*context_func)(void))
 	sdl_context_func = context_func;
 }
 
-void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, char *caption) 
+void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, const char *caption)
 {  
 	if(SDL_Init(SDL_INIT_VIDEO) < 0 )
 	{
@@ -61,8 +61,7 @@ void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, char *cap
 	SDL_EnableUNICODE(TRUE); 
 	SDL_ShowCursor(TRUE);
 
-/*
-	out_going_data.clear = TRUE;
+/*	out_going_data.clear = TRUE;
 	out_going_data.event_count = 0;
 	for(i = 0 ; i < AXIS_COUNT; i++)
 	{

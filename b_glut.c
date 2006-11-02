@@ -189,7 +189,7 @@ boolean b_glut_system_wrapper_set_display(uint x_size, uint y_size, boolean full
 	return TRUE;
 }
 
-boolean b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, char *caption)
+boolean b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, const char *caption)
 {
 	 glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STENCIL);
