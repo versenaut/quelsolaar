@@ -97,7 +97,7 @@ void uv_draw_menu_tool_help(float aspect, float pos, float length, char *text)
 	if(sui_box_click_test(pos - length * 0.5, aspect - 0.05, length, 0.05))
 	{
 		sui_draw_2d_line_gl(pos, -0.06, pos * 0.8, -0.18, 0.2, 0.6, 1, 1.0f);
-		sui_draw_text(pos * 0.8 - sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, text) * 0.5, -0.2, SUI_T_SIZE, SUI_T_SPACE, text, 0.2, 0.6, 1);
+		sui_draw_text(pos * 0.8 - sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, text) * 0.5, -0.2, SUI_T_SIZE, SUI_T_SPACE, text, 0.2, 0.6, 1, 1.0);
 	}
 }
 
@@ -124,7 +124,7 @@ void uv_draw_menu(BInputState *input)
 		sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		sui_draw_gl(GL_QUADS, vertex, 4, 2, 1, 1, 1, 1.0f);
 		
-		sui_draw_text(-0.98, -0.03, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), 0.2, 0.6, 1);
+		sui_draw_text(-0.98, -0.03, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), 0.2, 0.6, 1, 1.0);
 
 		sui_prev_node(-0.56, -0.025, 0.2, 0.6, 1);
 		uv_draw_menu_tool_help(aspect, -0.56, 0.03, "Previous Node");

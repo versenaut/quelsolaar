@@ -60,18 +60,18 @@ void uv_intro_handler(BInputState *input, void *user)
 		if(e_vc_check_connected_slot(0))
 		{
 			if(input->mode == BAM_DRAW)
-				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECTING") * -0.5, -0.35, 0.02, 2, "CONNECTING", 0, 0, 0);    
+				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECTING") * -0.5, -0.35, 0.02, 2, "CONNECTING", 0, 0, 0, 1.0);
 		}
 		else
 		{
-			sui_type_in(input, -0.2, -0.45, 0.4, SUI_T_SIZE, connect_type_in, 48, connect_type_in_func, NULL, 0, 0, 0);
+			sui_type_in(input, -0.2, -0.45, 0.4, SUI_T_SIZE, connect_type_in, 48, connect_type_in_func, NULL, 0, 0, 0, 1.0);
 			sui_draw_2d_line_gl(-0.2, -0.45, 0.2, -0.45, 0, 0, 0, 1.0f);
 			if(input->mode == BAM_DRAW)
-				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECT") * -0.5, 0.35, 0.02, 2, "CONNECT", 0, 0, 0);
+				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECT") * -0.5, 0.35, 0.02, 2, "CONNECT", 0, 0, 0, 1.0);
 
-			if(sw_text_button(input, -0.2, -0.35 - 2 * 0.02, 0, 0.02, 0.3, "Localhost", 0, 0, 0))
+			if(sw_text_button(input, -0.2, -0.35 - 2 * 0.02, 0, 0.02, 0.3, "Localhost", 0, 0, 0, 1.0))
 				e_vc_connect("localhost", "somepass", "somepass", NULL);
-			if(sw_text_button(input, 0.2, -0.35 - 2 * 0.02, 1, 0.02, 0.3, "Exit", 0, 0, 0))
+			if(sw_text_button(input, 0.2, -0.35 - 2 * 0.02, 1, 0.02, 0.3, "Exit", 0, 0, 0, 1.0))
 			{
 				sui_save_settings("co_config.cfg");
 				exit(0);
