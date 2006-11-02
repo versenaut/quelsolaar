@@ -52,7 +52,7 @@ void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, char *cap
 		size_y /= 2;
 		if(b_sdl_system_wrapper_set_display(size_x, size_y, FALSE))
 		{
-			fprintf(stderr, "Unable to open SDL display of %ux%u pixels, aborting\n", size_x, size_y);
+			fprintf(stderr, "Unable to open %ux%u display: %s\n", size_x, size_y, SDL_GetError());
 			exit(EXIT_FAILURE);
 		}
 	}
