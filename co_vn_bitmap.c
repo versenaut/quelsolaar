@@ -19,7 +19,7 @@ void co_draw_bitmap(ENode *node)
 {
 #ifdef PERSUADE_H
 	float vertex[8] = {-0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, 0.5};
-	float uv[8] = {1, 1, 0, 1, 0, 0, 1, 0};
+	float uv[8] = {0, 1, 1, 1, 1, 0, 0, 0};
 	PTextureHandle *h;
 	h = p_th_create_texture_handle(e_ns_get_node_id(node), "color_r", "color_g", "color_b");
 	sui_set_texture2D_array_gl(uv, 4, 2, p_th_get_texture_id(h));
