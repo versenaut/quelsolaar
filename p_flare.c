@@ -50,6 +50,7 @@ void p_create_flare(void)
 			data[(i * flare_size + j) * 3 + 2] = r * 2;
 		}
 	}
+	printf(__FILE__ ": allocating texture at line %u\n", __LINE__);
 	glGenTextures(1, &flare_texture);
 	glBindTexture(GL_TEXTURE_2D, flare_texture);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

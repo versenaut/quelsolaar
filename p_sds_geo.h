@@ -15,7 +15,7 @@ typedef struct{
 }PDepend;
 
 extern void		p_sds_add_depend(PDepend *dep, PDepend *add, egreal mult);
-extern PDepend	*p_sds_allocate_depend_first(uint length);
+ extern PDepend	*p_sds_allocate_depend_first(uint length);
 extern PDepend	*p_sds_allocate_depend(uint length);
 extern void		p_sds_free_depend(PDepend *dep, uint length);
 
@@ -31,6 +31,7 @@ typedef struct{
 	uint poly_per_base;
 	uint open_edges;
 	PDepend *vertex_dependency;
+	uint vertex_dependency_length;
 	uint vertex_count;
 	uint geometry_version;
 	void *next;	

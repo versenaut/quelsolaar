@@ -343,7 +343,7 @@ boolean p_lod_compute_lod_update(ENode *o_node, ENode *g_node, uint32 time_s, ui
 
 void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 {
-	egreal *vertex, *v, *v2, *v3, f, temp[3], limit[7] = {0.0001, 0.05, 0.17, 1.0, 5.0, 25, 125}; // limit[6] = {2, 5, 17, 40, 80, 160};
+	egreal *vertex, *v, *v2, *v3, f, temp[3], limit[7] = {0.0001, 0.05, 0.17, 1.0, 5.0, 25, 125};
 	PDepend *dep;
 	uint poly, i, j, stage;
 
@@ -352,9 +352,8 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 		mesh->temp = vertex = malloc((sizeof *vertex) * mesh->anim.cv_count * 3);
 		mesh->sub_stages[0]++;
 		mesh->sub_stages[1] = 0;
-		if(mesh->tess.force > smesh->level - 1)
-			mesh->tess.force = smesh->level - 1;
-		mesh->tess.force = 0;
+		if(mesh->tess.force > smesh->level)
+			mesh->tess.force = smesh->level;
 	}
 	if(mesh->sub_stages[0] == 1)
 	{
@@ -362,7 +361,6 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 		v = &vertex[mesh->sub_stages[1] * 3];
 		for(i = 0; i + mesh->sub_stages[1] < mesh->anim.cv_count; i++)
 		{
-		//	v = &vertex[(mesh->sub_stages[1] + 1) * 3];
 			v[0] = 0;
 			v[1] = 0;
 			v[2] = 0;
@@ -413,6 +411,8 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 							level[i] = get_dynamic_table_quad_level(smesh->level, mesh->tess.tess[mesh->tess.order_temp_mesh_rev[j / 4]], j % 4);
 						else
 							level[i] = get_dynamic_table_tri_level(smesh->level, mesh->tess.tess[mesh->tess.order_temp_mesh_rev[mesh->tess.quad_count + (j - mesh->tess.quad_count * 4) / 3]], (j - mesh->tess.quad_count * 4) % 3);
+						v = v2;
+						v2 = &vertex[smesh->ref[poly + quad_table->reference[((i + 1) % 4) * 2]] * 3];
 					}else
 					{
 						temp[0] = 0;
@@ -433,7 +433,7 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 						v = v2;
 						v2 = &vertex[smesh->ref[poly + quad_table->reference[((i + 1) % 4) * 2]] * 3];
 						f = p_sds_edge_tesselation_global_func_new(v, v2, temp, mesh->tess.eay, mesh->tess.factor);
-						for(j = mesh->tess.force; j < smesh->level - 1 && limit[j] < f; j++);
+						for(j = mesh->tess.force; j < smesh->level && limit[j] < f; j++);
 						level[i] = j;
 					}
 				}
@@ -446,6 +446,7 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 			}else
 			{
 				poly = smesh->quad_length + (stage - smesh->base_quad_count) * smesh->poly_per_base * 3;
+				poly = smesh->base_quad_count * smesh->poly_per_base * 4 + (stage - smesh->base_quad_count) * smesh->poly_per_base * 3;
 				v2 = &vertex[smesh->ref[poly + tri_table->reference[0]] * 3];
 				for(i = 0; i < 3; i++)
 				{
@@ -457,6 +458,8 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 							level[i] = get_dynamic_table_quad_level(smesh->level, mesh->tess.tess[mesh->tess.order_temp_mesh_rev[j / 4]], j % 4);
 						else
 							level[i] = get_dynamic_table_tri_level(smesh->level, mesh->tess.tess[mesh->tess.order_temp_mesh_rev[mesh->tess.quad_count + (j - mesh->tess.quad_count * 4) / 3]], (j - mesh->tess.quad_count * 4) % 3);
+						v = v2;
+						v2 = &vertex[smesh->ref[poly + tri_table->reference[(i + 1) % 3 * 2]] * 3];
 					}else
 					{
 						temp[0] = 0;
@@ -477,7 +480,7 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 						v = v2;
 						v2 = &vertex[smesh->ref[poly + tri_table->reference[(i + 1) % 3 * 2]] * 3];
 						f = p_sds_edge_tesselation_global_func_new(v, v2, temp, mesh->tess.eay, mesh->tess.factor);
-						for(j = mesh->tess.force; j < smesh->level - 1 && limit[j] < f; j++);
+						for(j = mesh->tess.force; j < smesh->level && limit[j] < f; j++);
 						level[i] = j;
 					}
 				}
@@ -491,6 +494,7 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 			mesh->tess.tess[mesh->tess.order_temp_mesh_rev[stage]] = table;
 			mesh->render.element_count += table->element_count;
 			mesh->render.vertex_count += table->vertex_count;
+
 		}
 		mesh->sub_stages[1] = stage;
 		if(mesh->sub_stages[1] == mesh->tess.tri_count + mesh->tess.quad_count)

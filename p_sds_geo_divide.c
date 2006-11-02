@@ -70,7 +70,7 @@ uint p_sds_get_vertex(PPolyStore *old_mesh, uint corner)
 	PDepend *dep;
 	dep = &((PPolyStore *)old_mesh->next)->vertex_dependency[old_mesh->ref[corner]];
 
-	if(dep->length == 0)
+	if(dep->element[0].vertex == -1)
 	{
 //		PSDSVertexSet list[2000];
 		uint	vertex[2000];

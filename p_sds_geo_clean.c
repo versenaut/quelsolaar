@@ -5,6 +5,9 @@
 #include "p_sds_geo.h"
 extern double get_rand(uint32 index);
 
+#define INIT_DEPEND_LENGTH 8
+#define INIT_DEPEND_EXTEND 8
+
 
 void p_sds_add_depend(PDepend *dep, PDepend *add, egreal mult)
 {
@@ -12,23 +15,49 @@ void p_sds_add_depend(PDepend *dep, PDepend *add, egreal mult)
 	float f;
 	if(mult < 0.001)
 		return;
-	for(i = 0; i < add->length; i++)
+	for(i = 0; i < add->element[i].vertex != -1 && i < add->length; i++)
 	{
 		for(j = 0; j < dep->length && dep->element[j].vertex != add->element[i].vertex && dep->element[j].vertex != -1; j++);
 		if(j == dep->length)
 		{
-			dep->length += 32; // FIX ME should be 8
-			dep->element = realloc(dep->element, (sizeof *dep->element) * dep->length);
-			for(k = j; k < dep->length; k++)
+			if(dep->length <= INIT_DEPEND_LENGTH)
 			{
-				dep->element[k].value = 0;
-				dep->element[k].vertex = -1;
+				PDependElement *e;
+				e = malloc((sizeof *dep->element) * (dep->length + INIT_DEPEND_EXTEND));
+				for(k = 0; k < dep->length; k++)
+				{
+					e[k].value = dep->element[k].value;
+					e[k].vertex = dep->element[k].vertex;
+				}
+				dep->length += INIT_DEPEND_EXTEND;
+				for(; k < dep->length; k++)
+				{
+					e[k].value = 0;
+					e[k].vertex = -1;
+				}
+				dep->element = e;
+			}else
+			{
+				dep->length += INIT_DEPEND_EXTEND;
+				dep->element = realloc(dep->element, (sizeof *dep->element) * dep->length);
+				for(k = j; k < dep->length; k++)
+				{
+					dep->element[k].value = 0;
+					dep->element[k].vertex = -1;
+				}
 			}
 		}
 		f = (add->element[i].value / add->sum) * mult;
+//		printf("f = %f %f %f %f\n", f, add->element[i].value, add->sum, mult);
+
 		dep->element[j].value += f;
-		dep->element[j].vertex = add->element[i].vertex;
+		dep->element[j].vertex = add->element[i].vertex;	
 		dep->sum += f;
+	}
+	if(dep->sum < 0.001)
+	{
+		uint *a = NULL;
+		a[0] = 1;
 	}
 }
 
@@ -45,9 +74,8 @@ PDepend *p_sds_allocate_depend_first(uint length)
 	PDependElement *e;
 	PDepend *d;
 	uint i;
-	length++;
 	e = malloc((sizeof *e) * length);
-	d = malloc((sizeof *d) * length);
+	d = malloc((sizeof *d) * (length + 1));
 	for(i = 0; i < length; i++)
 	{
 		d[i].sum = 1;
@@ -56,36 +84,48 @@ PDepend *p_sds_allocate_depend_first(uint length)
 		e[i].value = 1;
 		e[i].vertex = i;
 	}
-	d[length - 1].length = (unsigned short)~0;
+	d[length].length = 1;
+	d[length].element = e;
 	return d;
 }
 
 PDepend *p_sds_allocate_depend(uint length)
 {
+	PDependElement *e;
 	PDepend *d;
 	uint i;
-	length++;
-	d = malloc((sizeof *d) * length);
+	e = malloc((sizeof *e) * length * INIT_DEPEND_LENGTH);
+	for(i = 0; i < length * INIT_DEPEND_LENGTH; i++)
+	{
+		e[i].value = 0;
+		e[i].vertex = -1;
+	}
+	d = malloc((sizeof *d) * (length + 1));
 	for(i = 0; i < length; i++)
 	{
-		d[i].length = 0;
+		d[i].length = INIT_DEPEND_LENGTH;
 		d[i].sum = 0;
-		d[i].element = NULL;
+		d[i].element = &e[INIT_DEPEND_LENGTH * i];
 	}
+	d[length].length = INIT_DEPEND_LENGTH;
+	d[length].element = e;
 	return d;
 }
 
 
 void p_sds_free_depend(PDepend *dep, uint length)
 {
-	uint i;
-	if(dep[length].length != (unsigned short) ~0)
+	PDependElement *e;
+	uint i, dist;
+	dist = dep[length].length;
+	e = dep[length].element;
+	if(dist != 1 && dist != -1)
 	{
 		for(i = 0; i < length; i++)
-			if(dep[i].element != NULL);
+			if(dep[i].element != &e[i * dist])
 				free(dep[i].element);
-	}else
-		free(dep[0].element);
+	}
+	free(dep[length].element);
 	free(dep);
 }
 /*
@@ -323,7 +363,8 @@ PPolyStore *p_sds_create(uint *ref, uint ref_count, egreal *vertex, uint vertex_
 	mesh->poly_per_base = 1;
 	mesh->vertex_count = vertex_count;
 	mesh->geometry_version = version;
-	mesh->vertex_dependency = p_sds_allocate_depend_first(vertex_count);
+	mesh->vertex_dependency_length = vertex_count;
+	mesh->vertex_dependency = p_sds_allocate_depend_first(mesh->vertex_dependency_length);
 	mesh->next = NULL;
 	mesh->level = 0;
 	mesh->stage[0] = 0;	
@@ -345,18 +386,7 @@ void p_sds_free(PPolyStore *mesh, boolean limited)
 	if(!limited && mesh->base_neighbor != NULL)
 		free(mesh->base_neighbor);
 	if(mesh->vertex_dependency != NULL)
-	{
-		uint i;
-		if(mesh->level != 0)
-		{
-			for(i = 0; i < mesh->vertex_count; i++)
-				if(mesh->vertex_dependency[i].element != NULL)
-					free(mesh->vertex_dependency[i].element);
-		}
-		else
-			free(mesh->vertex_dependency->element);
-		free(mesh->vertex_dependency);
-	}
+		p_sds_free_depend(mesh->vertex_dependency, mesh->vertex_dependency_length);
 	free(mesh);
 }
 
@@ -503,7 +533,6 @@ egreal p_sds_get_crease(PPolyStore *mesh, uint edge)
 //		return mesh->crease[edge / mesh->poly_per_base + (edge - mesh->quad_length * mesh->poly_per_base) % 3];
 
 
-
 void p_sds_final_clean(PPolyStore *mesh)
 {
 	PDepend *dep;
@@ -513,8 +542,51 @@ void p_sds_final_clean(PPolyStore *mesh)
 		dep = &mesh->vertex_dependency[i];
 		for(j = 0; j < dep->length && dep->element[j].vertex != -1; j++)
 			dep->element[j].value /= dep->sum;
+		dep->sum = 1.0;
 		dep->length = j;
 	}
+	mesh->stage[0]++;
+}
+
+
+void p_sds_final_clean_new(PPolyStore *mesh)
+{
+	PDependElement *e, *old_e;
+	PDepend *dep, *new_dep;
+	uint i, j, k, length = 0, gap;
+	for(i = 0; i < mesh->vertex_count; i++)
+	{
+		dep = &mesh->vertex_dependency[i];
+		for(j = 0; j < dep->length && dep->element[j].vertex != -1; j++);
+		length += j;
+	}
+	gap = mesh->vertex_dependency[mesh->vertex_dependency_length].length;
+	old_e = mesh->vertex_dependency[mesh->vertex_dependency_length].element;
+	e = malloc((sizeof *e) * length);
+	new_dep = malloc((sizeof *new_dep) * (mesh->vertex_count + 1));
+	new_dep[mesh->vertex_count].length = -1;
+	new_dep[mesh->vertex_count].element = e;
+	dep = mesh->vertex_dependency;
+	mesh->vertex_dependency = new_dep;
+
+	for(i = 0; i < mesh->vertex_count; i++)
+	{
+		new_dep->element = e;
+		for(j = 0; j < dep->length && dep->element[j].vertex != -1; j++)
+		{
+			e->value = dep->element[j].value / dep->sum;
+			e->vertex = dep->element[j].vertex;
+			e++;
+		}
+		new_dep->sum = 1.0;
+		new_dep->length = j;
+		if(dep->element != &old_e[gap * i])
+			free(dep->element);
+		dep++;
+		new_dep++;
+	}
+	free(dep[mesh->vertex_dependency_length - mesh->vertex_count].element);
+	mesh->vertex_dependency_length = mesh->vertex_count;
 	mesh->stage[0]++;
 }
 
@@ -535,7 +607,8 @@ PPolyStore *p_sds_allocate_next(PPolyStore *pre)
 	mesh->poly_per_base = pre->poly_per_base * 4;
 	mesh->open_edges = pre->open_edges * 2; 
 	mesh->vertex_count = pre->vertex_count;
-	mesh->vertex_dependency = p_sds_allocate_depend(2 * (pre->vertex_count + (mesh->tri_length + mesh->quad_length - mesh->open_edges) / 2 + mesh->open_edges + (mesh->quad_length / 4)));
+	mesh->vertex_dependency_length = 2 * (pre->vertex_count + (mesh->tri_length + mesh->quad_length - mesh->open_edges) / 2 + mesh->open_edges + (mesh->quad_length / 4));
+	mesh->vertex_dependency = p_sds_allocate_depend(mesh->vertex_dependency_length);
 	mesh->next = NULL;
 	mesh->level = pre->level + 1;
 	mesh->stage[0] = 0;

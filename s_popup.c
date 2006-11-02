@@ -61,7 +61,7 @@ void sui_draw_popup_angle_line(float x, float y, float angle)
 
 	glPushMatrix();
 	glTranslatef(x, y, 0);
-	glRotatef(angle + 90, 0, 0, 1);
+	glRotatef(angle - 90, 0, 0, 1);
 	glTranslatef(0.1, 0, 0);
 	sui_draw_gl(GL_QUADS, end_sides, S_POPUP_ANGLE_END_SECTIONS * 4, 2, 0, 0, 0, 1);
 	sui_draw_gl(GL_TRIANGLES, end_mid, S_POPUP_ANGLE_END_SECTIONS * 3, 2, 1, 1, 1, 1);

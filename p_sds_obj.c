@@ -52,7 +52,7 @@ PMesh *p_rm_create(ENode *node)
 	mesh->sub_stages[2] = 0;
 	mesh->sub_stages[3] = 0;
 	mesh->tess.force = p_sds_force_level;
-	mesh->tess.factor = p_sds_force_level;
+	mesh->tess.factor = p_sds_mesh_factor;
 	mesh->tess.edge_tess_func = p_sds_edge_tesselation_global_func;
 	mesh->temp = NULL;
 	mesh->next = NULL;
@@ -234,6 +234,52 @@ uint p_rm_get_param_count(PMesh *mesh)
 boolean p_lod_material_test(PMesh *mesh, ENode *o_node);
 double *p_lod_get_view_pos(void);
 
+
+				
+
+void p_rm_test(PMesh *mesh, PPolyStore *smesh)
+{
+	PDepend *dep;
+	ENode *g_node;
+	PMesh *store = NULL;
+	PTessTableElement *table;
+	PTimer timer;
+	uint i, j, k, poly, temp, temp2, length;
+	double *eye;
+	uint32 seconds, fractions;
+return;
+	i = 0;
+	j = 0;
+	k = 0;
+	temp = 0;
+	temp2 = 0;
+
+	for(; i < mesh->tess.tri_count + mesh->tess.quad_count; i++)
+	{
+		table = mesh->tess.tess[i];
+
+		if(i == mesh->render.mat[j].tri_end)
+			j++;
+		if(i < mesh->render.mat[j].quad_end)
+			poly = mesh->tess.order_temp_mesh[i] * smesh->poly_per_base * 4;
+		else
+			poly = smesh->base_quad_count * smesh->poly_per_base * 4 + (mesh->tess.order_temp_mesh[i] - smesh->base_quad_count) * smesh->poly_per_base * 3;
+		for(j = 0; j < table->vertex_count; j++)
+		{
+			temp++;
+			dep = &smesh->vertex_dependency[smesh->ref[table->reference[j] + poly]];
+			length += dep->length;
+		}
+		k += table->vertex_count;
+	}
+	printf("p_rm_test = %u %u %u\n", temp, length, k);
+	printf("p_rm_test = %u %u %u\n", mesh->render.vertex_count, mesh->depend.length, mesh->render.element_count);
+
+	if(mesh->render.mat_count > 4)
+		exit(0);
+	 
+}
+
 PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 {
 	ENode *g_node;
@@ -329,6 +375,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 			case POS_TESS_SELECT : /* choosing quad split tesselation */
 
 				p_lod_select_tesselation(mesh, smesh, vertex);
+				p_rm_test(mesh, smesh);
 /*				for(i = 0; i < mesh->tess.tri_count + mesh->tess.quad_count; i++)
 					fprintf(stderr, "%p \n", mesh->tess.tess[i]);
 */				break;
@@ -342,6 +389,9 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 
 				mesh->depend.reference = malloc((sizeof *mesh->depend.reference) * mesh->depend.length);
 				mesh->depend.weight = malloc((sizeof *mesh->depend.weight) * mesh->depend.length);
+				mesh->depend.length_temp = mesh->depend.length;
+				mesh->depend.length_temp2 = mesh->render.vertex_count;
+				mesh->depend.length_temp3 = mesh->render.element_count;
 				mesh->depend.ref_count = malloc((sizeof *mesh->depend.ref_count) * mesh->render.vertex_count);
 				mesh->render.element_count = 0;
 				mesh->render.vertex_count = 0;
@@ -379,7 +429,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 			case POS_CREATE_DEPEND : /* building depend */
 				{
 					PDepend *dep;
-					uint poly;
+					uint poly, temp = 0;
 					for(; mesh->sub_stages[0] < mesh->tess.tri_count + mesh->tess.quad_count; mesh->sub_stages[0]++)
 					{
 						table = mesh->tess.tess[mesh->sub_stages[0]];
@@ -389,11 +439,13 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 						if(mesh->sub_stages[0] < mesh->render.mat[mesh->sub_stages[1]].quad_end)
 							poly = mesh->tess.order_temp_mesh[mesh->sub_stages[0]] * smesh->poly_per_base * 4;
 						else
-							poly = smesh->quad_length / 4 + mesh->tess.order_temp_mesh[mesh->sub_stages[0]] * smesh->poly_per_base * 3;
-
+					//		poly = smesh->quad_length / 4 + mesh->tess.order_temp_mesh[mesh->sub_stages[0]] * smesh->poly_per_base * 3;
+							poly = smesh->base_quad_count * smesh->poly_per_base * 4 + (mesh->tess.order_temp_mesh[mesh->sub_stages[0]] - smesh->base_quad_count) * smesh->poly_per_base * 3;
+//							poly = smesh->quad_length / 4 + mesh->tess.order_temp_mesh[mesh->sub_stages[0]] * smesh->poly_per_base * 3;
+//mesh->depend.length += smesh->vertex_dependency[smesh->ref[poly + table->reference[j]]].length;
 						for(j = 0; j < table->vertex_count; j++)
 						{
-							
+							temp++;
 							dep = &smesh->vertex_dependency[smesh->ref[table->reference[j] + poly]];
 							mesh->depend.ref_count[mesh->render.vertex_count++] = dep->length;
 							for(k = 0; k < dep->length; k++)

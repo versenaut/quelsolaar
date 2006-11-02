@@ -29,7 +29,7 @@ extern void		qs_set_camera(void);
 extern void		qs_compute_camera(BInputState *input, float delta_time);
 extern void		qs_settings_get_background_color(float *color);
 extern void		p_context_update(void);
-extern void		qs_draw_settings(BInputState *input);
+extern boolean	qs_draw_settings(BInputState *input);
 
 void qs_draw_handler(BInputState *input, void *user)
 {
@@ -68,7 +68,7 @@ void qs_draw_handler(BInputState *input, void *user)
 			qs_compute_camera(input, betray_get_delta_time());
 	}
 	if(settings)
-		qs_draw_settings(input);
+		settings = qs_draw_settings(input);
 	if(input->mode == BAM_DRAW)
 		glPopMatrix();
 }
@@ -112,7 +112,7 @@ void qs_intro_handler(BInputState *input, void *user)
 		if(e_vc_check_connected_slot(0))
 		{
 			if(input->mode == BAM_DRAW)
-				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECTING...") * -0.5, -0.3, 0.02, 2, "CONNECTING...", 0, 0, 0);    
+				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECTING...") * -0.5, -0.3, 0.02, 2, "CONNECTING...", 0, 0, 0, 1.0);    
 		}
 		else
 		{
@@ -137,25 +137,25 @@ void qs_intro_handler(BInputState *input, void *user)
 				text_init = TRUE;
 			}
 			if(input->mode == BAM_DRAW)
-				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECT") * -0.5, 0.35, 0.02, 2, "CONNECT", 0, 0, 0);
+				sui_draw_text(sui_compute_text_length(0.02, 2, "CONNECT") * -0.5, 0.35, 0.02, 2, "CONNECT", 0, 0, 0, 1.0);
 
-			if(sw_text_button(input, -0.2, 0.25 - 2 * 0.02, 0, 0.02, 0.3, "Localhost", 0, 0, 0))
+			if(sw_text_button(input, -0.2, 0.25 - 2 * 0.02, 0, 0.02, 0.3, "Localhost", 0, 0, 0, 1.0))
 				e_vc_connect("localhost", "somepass", "somepass", NULL);
-			if(sw_text_button(input, 0.2, 0.25 - 2 * 0.02, 1, 0.02, 0.3, "Exit", 0, 0, 0))
+			if(sw_text_button(input, 0.2, 0.25 - 2 * 0.02, 1, 0.02, 0.3, "Exit", 0, 0, 0, 1.0))
 			{
 				sui_save_settings("qs_config.cfg");
 				exit(0);
 			}
 			
-			sui_type_in(input, -0.2, -0.2, 0.4, SUI_T_SIZE, address, 64, NULL, NULL, 0, 0, 0);
+			sui_type_in(input, -0.2, -0.2, 0.4, SUI_T_SIZE, address, 64, NULL, NULL, 0, 0, 0, 1.0);
 			sui_draw_2d_line_gl(-0.2, -0.2, 0.2, -0.2, 0, 0, 0, 0);
-			sui_type_in(input, -0.2, -0.25, 0.4, SUI_T_SIZE, name, 64, NULL, NULL, 0, 0, 0);
+			sui_type_in(input, -0.2, -0.25, 0.4, SUI_T_SIZE, name, 64, NULL, NULL, 0, 0, 0, 1.0);
 			sui_draw_2d_line_gl(-0.2, -0.25, 0.2, -0.25, 0, 0, 0, 0);
-			sui_type_in(input, -0.2, -0.3, 0.4, SUI_T_SIZE, pass, 64, NULL, NULL, 0, 0, 0);
+			sui_type_in(input, -0.2, -0.3, 0.4, SUI_T_SIZE, pass, 64, NULL, NULL, 0, 0, 0, 1.0);
 			sui_draw_2d_line_gl(-0.2, -0.3, 0.2, -0.3, 0, 0, 0, 0);
 
 
-			if(sw_text_button(input, -0.2, -0.325 - 2 * 0.02, 0, 0.02, 0.3, "OK", 0, 0, 0))
+			if(sw_text_button(input, -0.2, -0.325 - 2 * 0.02, 0, 0.02, 0.3, "OK", 0, 0, 0, 1.0))
 			{
 				sui_set_setting_text("address", address);
 				sui_set_setting_text("name", name);
@@ -163,7 +163,7 @@ void qs_intro_handler(BInputState *input, void *user)
 				sui_save_settings("qs_config.cfg");
 				e_vc_connect(address, name, pass, NULL);
 			}
-			if(sw_text_button(input, 0.2, -0.325 - 2 * 0.02, 1, 0.02, 0.3, "Cancel", 0, 0, 0))
+			if(sw_text_button(input, 0.2, -0.325 - 2 * 0.02, 1, 0.02, 0.3, "Cancel", 0, 0, 0, 1.0))
 			{
 				address[0] = 0;
 				name[0] = 0;
@@ -185,6 +185,7 @@ void qs_intro_handler(BInputState *input, void *user)
 extern void *se_symbol_editor_func(BInputState *input, void *user_pointer);
 extern void *se_font_editor_func(BInputState *input, void *user_pointer);
 extern void qs_intro_init(void);
+extern void sp_settings_init(void);
 extern void p_init_render_to_texture(void);
 
 int main(int argc, char **argv)
@@ -200,6 +201,7 @@ int main(int argc, char **argv)
 #ifdef PERSUADE_H
 	persuade_init(4, betray_get_gl_proc_address());
 	p_geo_set_sds_level(4);
+	sp_settings_init();
 #endif
 	qs_intro_init();
 //	betray_set_mouse_warp(TRUE);

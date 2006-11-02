@@ -66,6 +66,9 @@ typedef struct{
 		egreal	*weight;
 		uint32	*ref_count;
 		uint	length;
+		uint	length_temp;
+		uint	length_temp2;
+		uint	length_temp3;
 	}depend;
 	struct{
 		uint32	*normal_ref;	

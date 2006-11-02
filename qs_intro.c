@@ -250,13 +250,13 @@ void qs_intro_draw(void *user)
 		glTranslatef(-1 + (1 - t) * (1 - t) * 4 , 0.3, -1);
 		glScalef(3, 3, 3);
 	//	mui_draw_text("QUEL", UITM_INTRO, NULL, NULL, 1 - (1 - t) * (1 - t) * (1 - t), position);
-		sui_draw_text(0, 0, 0.02, 2, "QUEL", 0, 0, 0);   
+		sui_draw_text(0, 0, 0.02, 2, "QUEL", 0, 0, 0, 1.0);   
 	glPopMatrix();
 		glPushMatrix();
 		glTranslatef(0.8 - (1 - t) * (1 - t) * 8 , -0.25, -1);
 		glScalef(3, 3, 3);
 	//	mui_draw_text("SOLAAR", UITM_INTRO, NULL, NULL, 1 - (1 - t) * (1 - t) * (1 - t), position);	
-		sui_draw_text(0, 0, 0.02, 2, "SOLAAR", 0, 0, 0);  
+		sui_draw_text(0, 0, 0.02, 2, "SOLAAR", 0, 0, 0, 1.0);  
 	glPopMatrix();	
 
 	if(GlobalIntro.intro_t < 1)
