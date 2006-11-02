@@ -168,7 +168,7 @@ ESBitmapNode *e_create_b_node(VNodeID node_id, VNodeOwner owner)
 	return node;
 }
 
-void callback_send_b_layer_create(void *user_data, VNodeID node_id, VLayerID layer_id, const char *name, VNBLayerType type)
+static void callback_send_b_layer_create(void *user_data, VNodeID node_id, VLayerID layer_id, const char *name, VNBLayerType type)
 {
 	ESBitmapNode	*node;
 	ESBitmapLayer	*layer;
@@ -198,7 +198,7 @@ void callback_send_b_layer_create(void *user_data, VNodeID node_id, VLayerID lay
 	e_ns_update_node_version_struct(node);
 }
 
-void callback_send_b_layer_destroy(void *user_data, VNodeID node_id, VLayerID layer_id)
+static void callback_send_b_layer_destroy(void *user_data, VNodeID node_id, VLayerID layer_id)
 {
 	ESBitmapNode	*node;
 	ESBitmapLayer	*layer;
@@ -214,7 +214,7 @@ void callback_send_b_layer_destroy(void *user_data, VNodeID node_id, VLayerID la
 	e_ns_update_node_version_struct(node);
 }
 
-void callback_send_b_dimensions_set(void *user_data, VNodeID node_id, uint16 width, uint16 height, uint16 depth)
+static void callback_send_b_dimensions_set(void *user_data, VNodeID node_id, uint16 width, uint16 height, uint16 depth)
 {
 	ESBitmapNode	*node;
 	ESBitmapLayer	*layer;
@@ -329,23 +329,27 @@ void callback_send_b_dimensions_set(void *user_data, VNodeID node_id, uint16 wid
 	e_ns_update_node_version_struct(node);
 }
 
-ebreal read_pixel_int_eight_func(void *data, uint pixel)
+static ebreal read_pixel_int_eight_func(void *data, uint pixel)
 {
 	return (ebreal)((uint8 *)data)[pixel] / 255.0;
 }
-ebreal read_pixel_int_sixteen_func(void *data, uint pixel)
+
+static ebreal read_pixel_int_sixteen_func(void *data, uint pixel)
 {
 	return (ebreal)((uint16 *)data)[pixel] / (255.0 * 255.0 - 1);
 }
-ebreal read_pixel_float_func(void *data, uint pixel)
+
+static ebreal read_pixel_float_func(void *data, uint pixel)
 {
 	return (ebreal)((float *)data)[pixel];
 }
-ebreal read_pixel_double_func(void *data, uint pixel)
+
+static ebreal read_pixel_double_func(void *data, uint pixel)
 {
 	return (ebreal)((double *)data)[pixel];
 }
-ebreal read_pixel_empty_func(void *data, uint pixel)
+
+static ebreal read_pixel_empty_func(void *data, uint pixel)
 {
 	return 0.5;
 }
@@ -387,7 +391,6 @@ static void update_bitmap_image_handle(EBMHandle *handle)
 			}
 		}
 	}
-
 }
 
 EBMHandle *e_nsb_get_image_handle(VNodeID node_id, const char *layer_r, const char *layer_g, const char *layer_b)
@@ -405,8 +408,6 @@ EBMHandle *e_nsb_get_image_handle(VNodeID node_id, const char *layer_r, const ch
 	update_bitmap_image_handle(handle);
 	return handle;
 }
-
-
 
 void update_bitmap_image_handle_time(EBMHandle *handle, ESBitmapNode *node, uint channel, uint ofset_x, uint ofset_y, uint ofset_z, float *data)
 {
@@ -466,7 +467,6 @@ void update_bitmap_image_handle_data(EBMHandle *handle, uint ofset_x, uint ofset
 					update_bitmap_image_handle_time(handle, node, i, x, y, z, data);
 }
 
-
 void e_nsb_destroy_image_handle(EBMHandle *handle)
 {
 	free(handle);
@@ -512,7 +512,7 @@ void e_nsb_evaluate_image_handle_tile(EBMHandle *handle, ebreal *output, ebreal 
 	output[2] = handle->func[2](handle->data[2], i);
 }
 
-void callback_send_b_tile_set(void *user_data, VNodeID node_id, VLayerID layer_id, uint16 tile_x, uint16 tile_y, uint16 z, VNBLayerType type, VNBTile *tile)
+static void callback_send_b_tile_set(void *user_data, VNodeID node_id, VLayerID layer_id, uint16 tile_x, uint16 tile_y, uint16 z, VNBLayerType type, VNBTile *tile)
 {
 	ESBitmapNode		*node;
 	ESBitmapLayer		*layer;
