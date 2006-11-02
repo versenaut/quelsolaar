@@ -500,9 +500,9 @@ void e_nsb_evaluate_image_handle_tile(EBMHandle *handle, ebreal *output, ebreal 
 	uint i;
 	if(handle->global_version != global_version)
 		update_bitmap_image_handle(handle);
-	x += 100;
-	y += 100;
-	z += 100;
+	x += 100.0;
+	y += 100.0;
+	z += 100.0;
 	x -= (int)x;
 	y -= (int)y;
 	z -= (int)z;
