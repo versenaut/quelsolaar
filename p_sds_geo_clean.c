@@ -1,4 +1,6 @@
 
+#include <stdio.h>
+
 #include "verse.h"
 #include "enough.h"
 
