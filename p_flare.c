@@ -15,10 +15,10 @@
 
 extern uint p_th_get_hdri_token(boolean alpha);
 
-uint flare_texture = 0;
-uint flare_size = 128;
+static uint flare_texture = 0;
+static uint flare_size = 128;
 
-boolean p_display_flare = TRUE;
+static boolean p_display_flare = TRUE;
 
 void p_render_set_flare(boolean draw)
 {
