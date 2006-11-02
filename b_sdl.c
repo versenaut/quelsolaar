@@ -44,14 +44,17 @@ void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, char *cap
 	if(SDL_Init(SDL_INIT_VIDEO) < 0 )
 	{
 		fprintf(stderr, "Unable to initialize SDL: %s\n", SDL_GetError());
-		exit(0);
+		exit(EXIT_FAILURE);
 	}
 	if(b_sdl_system_wrapper_set_display(size_x, size_y, full_screen))
 	{
 		size_x /= 2;
 		size_y /= 2;
 		if(b_sdl_system_wrapper_set_display(size_x, size_y, FALSE))
-			exit(0);
+		{
+			fprintf(stderr, "Unable to open SDL display of %ux%u pixels, aborting\n", size_x, size_y);
+			exit(EXIT_FAILURE);
+		}
 	}
 	betray_reshape_view(size_x, size_y);
 	SDL_WM_SetCaption(caption, NULL);
