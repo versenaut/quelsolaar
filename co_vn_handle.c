@@ -858,7 +858,9 @@ void co_input_handler(BInputState *input, void *user_pointer)
 			glPushMatrix();
 			glTranslatef(0, 0, -1);
 		}
-		create_scroll = co_w_scroll(input, create_scroll - (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2), create_length + 0.7) + (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2);
+		create_scroll = co_w_scroll(input,
+					    create_scroll - (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2),
+					    create_length + 0.7) + (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2);
 		if(input->mode == BAM_DRAW)
 			glPopMatrix();
 	}
