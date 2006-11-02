@@ -350,7 +350,7 @@ ebreal read_pixel_empty_func(void *data, uint pixel)
 	return 0.5;
 }
 
-void uppdate_bitmap_image_handle(EBMHandle *handle)
+static void update_bitmap_image_handle(EBMHandle *handle)
 {
 	uint i, j;
 	ESBitmapNode	*node;
@@ -402,7 +402,7 @@ EBMHandle *e_nsb_get_image_handle(VNodeID node_id, const char *layer_r, const ch
 	sprintf(handle->layers[0], "%s", layer_r);
 	sprintf(handle->layers[1], "%s", layer_g);
 	sprintf(handle->layers[2], "%s", layer_b);
-	uppdate_bitmap_image_handle(handle);
+	update_bitmap_image_handle(handle);
 	return handle;
 }
 
@@ -476,7 +476,7 @@ void e_nsb_evaluate_image_handle_clamp(EBMHandle *handle, ebreal *pixel, ebreal 
 {
 	uint i;
 	if(handle->global_version != global_version)
-		uppdate_bitmap_image_handle(handle);
+		update_bitmap_image_handle(handle);
 	if(x > 1);
 		x = 1;
 	if(x < 0);
@@ -499,7 +499,7 @@ void e_nsb_evaluate_image_handle_tile(EBMHandle *handle, ebreal *output, ebreal 
 {
 	uint i;
 	if(handle->global_version != global_version)
-		uppdate_bitmap_image_handle(handle);
+		update_bitmap_image_handle(handle);
 	x += 100;
 	y += 100;
 	z += 100;
