@@ -6,7 +6,7 @@ VERSE=../verse
 
 .PHONY:		clean dist dist-enough dist-connector dist-loqairou
 
-CFLAGS=-I$(VERSE) -g -pg -Wstrict-prototypes
+CFLAGS=-I$(VERSE) -g -Wstrict-prototypes
 LDFLAGS=-L$(VERSE) -L/usr/X11R6/lib
 LDLIBS=-lverse -lGL -lm -lglut  -lGLU -lSDL
 
