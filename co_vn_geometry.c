@@ -317,23 +317,26 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 
 			if(popup == e_nsg_get_layer_id(layer))
 			{
-				SUIPUElement e[8];
+				SUIPUElement e[7];
 				uint i, output;
-				for(i = 0; i < 8; i++)
-					e[i].text = names[i]; 
 				for(i = 0; i < 3; i++)
 				{
 					e[i].type = PU_T_ANGLE; 
 					e[i].data.angle[0] = 45 + (float)i * 30;
 					e[i].data.angle[1] = 45 + (float)(i + 1) * 30;
+					e[i].text = names[i]; 
 				}
-				for(; i < 8; i++)
+				for(; i < 7; i++)
 				{
 					e[i].type = PU_T_ANGLE; 
 					e[i].data.angle[0] = 180 + 45 + (float)(i - 3) * 22.5;
 					e[i].data.angle[1] = 180 + 45 + (float)(i - 2) * 22.5;
+					e[i].text = names[i]; 
 				}
-				output = sui_draw_popup(input, 0.15, y, e, 8, 0, 0.9);
+				if(co_background_color[0] + co_background_color[1] + co_background_color[2] > 1.5)
+					output = sui_draw_popup(input, 0.15, y, e, 7, 0, 1.0);
+				else
+					output = sui_draw_popup(input, 0.15, y, e, 7, 0, 0.0);
 				if(output != -1 && output != type)
 				{
 					if(output > VN_G_LAYER_VERTEX_REAL)

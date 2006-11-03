@@ -279,7 +279,7 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 
 	if(input->mode == BAM_DRAW)
 		sui_draw_text(0.0, y - 0.075, SUI_T_SIZE, SUI_T_SPACE, "Name:", co_line_color[0], co_line_color[1], co_line_color[2], 1.0 - 1.0 / 4.0);  
-	co_w_type_in(input, 0.15, y - 0.075, 0.5, SUI_T_SIZE, e_ns_get_node_name(node), 16, rename_node_func, NULL, 0, 0.4);
+	co_w_type_in(input, 0.15, y - 0.075, 0.5, SUI_T_SIZE, e_ns_get_node_name(node), 16, rename_node_func, NULL, 1.0, 1.0 - 0.4);
 	if(input->mode == BAM_DRAW)
 	{
 		sui_draw_text(0.0, y - 0.125, SUI_T_SIZE, SUI_T_SPACE, "Type:", co_line_color[0], co_line_color[1], co_line_color[2], 1.0 - 1.0 / 4.0); 
@@ -364,7 +364,10 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 						e[l].data.angle[0] = 180 + 45 + (float)(l - 4) * 22.5;
 						e[l].data.angle[1] = 180 + 45 + (float)(l - 3) * 22.5;
 					}
-					output = sui_draw_popup(input, 0.15, y + size, e, 8, 0, 0.9);
+					if(co_background_color[0] + co_background_color[1] + co_background_color[2] > 1.5)
+						output = sui_draw_popup(input, 0.15, y + size, e, 8, 0, 1.0);
+					else
+						output = sui_draw_popup(input, 0.15, y + size, e, 8, 0, 0.0);
 					clear_tag(&t, output);
 					if(output != -1 && output != k)
 						verse_send_tag_create(e_ns_get_node_id(node), i, j, e_ns_get_tag_name(node, i, j), output, &t);

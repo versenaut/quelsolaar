@@ -272,8 +272,10 @@ boolean co_handle_object(BInputState *input, ENode *node)
 							element[j].data.square.square[2] = 0.2;
 							element[j].data.square.square[3] = -0.1;
 						}
-
-						output = sui_draw_popup(input, 0.15, y_meth, element, VN_O_METHOD_PTYPE_LAYER + 1, 0, 0.9);
+						if(co_background_color[0] + co_background_color[1] + co_background_color[2] > 1.5)
+							output = sui_draw_popup(input, 0.15, y_meth, element, VN_O_METHOD_PTYPE_LAYER + 1, 0, 1.0);
+						else
+							output = sui_draw_popup(input, 0.15, y_meth, element, VN_O_METHOD_PTYPE_LAYER + 1, 0, 0.0);
 						if(output <= VN_O_METHOD_PTYPE_REAL64_MAT16)
 						{
 							VNOParamType temp;

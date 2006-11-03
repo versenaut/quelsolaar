@@ -768,6 +768,7 @@ void material_func(ENode *node, VNMFragmentID frag, ECustomDataCommand command)
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, TEXTURE_RESOLUTION, TEXTURE_RESOLUTION, 0, GL_RGB, GL_FLOAT, buf);
+		glBindTexture(GL_TEXTURE_2D, 0);
 		free(buf);
 	}
 	if(command == E_CDC_DESTROY && (data = e_nsm_get_custom_data(node, frag, CO_ENOUGH_NODE_SLOT)) != NULL)
@@ -826,6 +827,7 @@ void co_draw_material_texture(COVNMaterial *mat, float x, float y)
 	sui_set_texture2D_array_gl(uv, 65, 2, mat->texture_id);
 //	sui_draw_gl(GL_TRIANGLES, vertex, 65, 2, 0, 0, 0);
 	sui_draw_elements_gl(GL_TRIANGLES, vertex, ref, 64 * 3, 2, 1, 1, 1, 1);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glPopMatrix();
 }
 
@@ -1044,7 +1046,10 @@ boolean co_handle_material(BInputState *input, ENode *node)
 									e[j].data.square.square[2] = 0.2;
 									e[j].data.square.square[3] = -0.1;
 								}
-								output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 6, 0, 0.9);
+								if(co_background_color[0] + co_background_color[1] + co_background_color[2] > 1.5)
+									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 6, 0, 1.0);
+								else
+									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 6, 0, 0.0);
 								if(output < 6 && output != frag->light.type)
 								{
 									f.light.type = output;
@@ -1275,7 +1280,10 @@ boolean co_handle_material(BInputState *input, ENode *node)
 										e[j].data.square.square[2] = 0.2;
 										e[j].data.square.square[3] = -0.1;
 									}
-									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 4, 0, 0.9);
+									if(co_background_color[0] + co_background_color[1] + co_background_color[2] > 1.5)
+										output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 4, 0, 1.0);
+									else
+										output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 4, 0, 0.0);
 									if(output < 4 && output != frag->noise.type)
 									{
 										f.noise.type = output;
@@ -1325,7 +1333,10 @@ boolean co_handle_material(BInputState *input, ENode *node)
 										e[j].data.square.square[2] = 0.2;
 										e[j].data.square.square[3] = -0.1;
 									}
-									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 6, 0, 0.9);
+									if(co_background_color[0] + co_background_color[1] + co_background_color[2] > 1.5)
+										output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 6, 0, 1.0);
+									else
+										output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 6, 0, 0.0);
 									if(output < 6 && output != frag->blender.type)
 									{
 										f.blender.type = output;
@@ -1376,7 +1387,10 @@ boolean co_handle_material(BInputState *input, ENode *node)
 										e[j].data.square.square[2] = 0.2;
 										e[j].data.square.square[3] = -0.1;
 									}
-									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 6, 0, 0.9);
+									if(co_background_color[0] + co_background_color[1] + co_background_color[2] > 1.5)
+										output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 6, 0, 1.0);
+									else
+										output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 6, 0, 0.0);
 									if(output < 2 && output != f.clamp.min)
 									{
 										f.clamp.min = output;
@@ -1459,7 +1473,10 @@ boolean co_handle_material(BInputState *input, ENode *node)
 										e[j].data.square.square[2] = 0.2;
 										e[j].data.square.square[3] = -0.1;
 									}
-									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 3, 0, 0.9);
+									if(co_background_color[0] + co_background_color[1] + co_background_color[2] > 1.5)
+										output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 3, 0, 1.0);
+									else
+										output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 3, 0, 0.0);
 									if(output < 3)
 										mode = output;
 								}
@@ -1626,7 +1643,10 @@ boolean co_handle_material(BInputState *input, ENode *node)
 										e[j].data.square.square[2] = 0.2;
 										e[j].data.square.square[3] = -0.1;
 									}
-									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 3, 0, 0.9);
+									if(co_background_color[0] + co_background_color[1] + co_background_color[2] > 1.5)
+										output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 3, 0, 1.0);
+									else
+										output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.1, e, 3, 0, 0.0);
 									f.ramp.channel = output; 
 									if(output < 3 && output != frag->ramp.channel)
 										verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_RAMP, &f);
@@ -1650,7 +1670,10 @@ boolean co_handle_material(BInputState *input, ENode *node)
 										e[j].data.square.square[2] = 0.2;
 										e[j].data.square.square[3] = -0.1;
 									}
-									output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.15, e, 3, 0, 0.9);
+									if(co_background_color[0] + co_background_color[1] + co_background_color[2] > 1.5)
+										output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.15, e, 3, 0, 1.0);
+									else
+										output = sui_draw_popup(input, place[0] - 0.12, place[1] - 0.15, e, 3, 0, 0.0);
 									f.ramp.type = output; 
 									if(output < 3 && output != frag->ramp.type)
 										verse_send_m_fragment_create(e_ns_get_node_id(node), i, VN_M_FT_RAMP, &f);
@@ -1920,7 +1943,10 @@ boolean co_handle_material(BInputState *input, ENode *node)
 				e[i].type = PU_T_BOTTOM; 
 				e[i].text = material_type_names[i];
 			}
-			output = sui_draw_popup(input, -0.2, y - 0.05, e, VN_M_FT_OUTPUT + 1, 0, 0.9);
+			if(co_background_color[0] + co_background_color[1] + co_background_color[2] > 1.5)
+				output = sui_draw_popup(input, -0.2, y - 0.05, e, VN_M_FT_OUTPUT + 1, 0, 1.0);
+			else
+				output = sui_draw_popup(input, -0.2, y - 0.05, e, VN_M_FT_OUTPUT + 1, 0, 0.0);
 			if(output <= VN_M_FT_OUTPUT)
 			{
 				if(output == VN_M_FT_LIGHT)
