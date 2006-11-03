@@ -77,7 +77,7 @@ extern uint		p_rm_get_material_range(PMesh *mesh, uint mat); /* what is the last
 extern uint		p_rm_get_material(PMesh *mesh, uint mat); /* what is the id of the material */
 extern uint		p_rm_get_param_count(PMesh *mesh);
 extern void		*p_rm_get_param(PMesh *mesh);
-
+extern egreal	*p_rm_get_param_data(PMesh *mesh, uint id);
 extern boolean	p_rm_get_shadow(PMesh *mesh);
 
 extern void		p_lod_set_view_pos(double *view_cam);
