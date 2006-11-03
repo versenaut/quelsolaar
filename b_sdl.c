@@ -17,6 +17,7 @@ boolean b_sdl_system_wrapper_set_display(uint size_x, uint size_y, boolean full_
 {  
 	uint video_flags;
 	video_flags = SDL_OPENGL;
+
 	if(full_screen)
 		video_flags |= SDL_FULLSCREEN;
 	video_flags |= SDL_RESIZABLE;
@@ -29,6 +30,7 @@ boolean b_sdl_system_wrapper_set_display(uint size_x, uint size_y, boolean full_
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	screen_size_x = size_x;
 	screen_size_y = size_y;
+
 	return SDL_SetVideoMode(size_x, size_y, 0, video_flags) == NULL;
 }
 
