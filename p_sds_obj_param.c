@@ -740,16 +740,17 @@ boolean p_lod_update_shadow(ENode *g_node, PMesh *mesh)
 	if(mesh->render.shadows)
 	{
 		for(i = 0; i < mesh->render.mat_count; i++)
-		{
 			if(p_shader_transparancy(mesh->render.mat[i].material))
 				break;
-		}if(i == mesh->render.mat_count)
+		if(i != mesh->render.mat_count)
 			mesh->geometry_version--;
-	}else
+	}else if(mesh->render.open_edges == FALSE)
 	{
 		for(i = 0; i < mesh->render.mat_count; i++)
 			if(p_shader_transparancy(mesh->render.mat[i].material))
-				mesh->geometry_version--;
+				break;
+		if(i == mesh->render.mat_count)
+			mesh->geometry_version--;
 	}
 	return mesh->render.shadows;
 }
