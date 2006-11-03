@@ -105,21 +105,19 @@ char p_standard_fragment_shader_code[2048] =
 "	v = normalize(v);"
 "	f = max(0.0, dot(normal, v)) / dist;"
 "	light += gl_LightSource[0].diffuse.rgb * vec3(f, f, f);"
-
 "	v = gl_LightSource[1].position.xyz - pixel_pos.xyz;"
 "	dist = length(v);"
 "	v = normalize(v);"
 "	f = max(0.0, dot(normal, v)) / dist;"
 "	light += gl_LightSource[1].diffuse.rgb * vec3(f, f, f);"
-
 "	v = gl_LightSource[2].position.xyz - pixel_pos.xyz;"
 "	dist = length(v);"
 "	v = normalize(v);"
 "	f = max(0.0, dot(normal, v)) / dist;"
 "	light += gl_LightSource[2].diffuse.rgb * vec3(f, f, f);"
-
-"	ambient = textureCube(diffuse_environment, gl_NormalMatrix * reflect(pixel_pos.xyz, normal.xyz)).xyz;"
-"	gl_FragColor = vec4(light + ambient, 0);"
+//"	ambient = textureCube(diffuse_environment, (normal * gl_NormalMatrix)).xyz;"
+"	gl_FragColor = vec4(light, 0);"
+//"	gl_FragColor = vec4(light + ambient, 0);"
 "}";
 
 char p_standard_vertex_shader_code[256] = 
@@ -244,7 +242,6 @@ void p_shader_init(void)
 {
 	uint length;
 	char *code;
-
 	if(p_extension_test("GL_ARB_shading_language_100"))
 	{
 		p_glCreateShaderObjectARB = p_extension_get_address("glCreateShaderObjectARB");
@@ -512,6 +509,7 @@ VMatFrag *p_shader_get_param(ENode *node, uint nr)
 		for(id = e_nsm_get_fragment_next(node, 0); id != (uint16)-1; id = e_nsm_get_fragment_next(node, id + 1))
 			if(e_nsm_get_fragment_type(node, id) == VN_M_FT_GEOMETRY && i++ == nr)
 				return e_nsm_get_fragment(node, id);
+	return NULL;
 }
 
 
@@ -540,11 +538,9 @@ void p_shader_bind(uint32 node_id)
 		s = p_standard_shader;
 		node = e_ns_get_node(0, node_id);
 		if(node != NULL && V_NT_MATERIAL == e_ns_get_node_type(node))
-		{
 			s = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
-			glBlendFunc(s->src, s->dest);
-			p_glUseProgramObjectARB(s->prog_obj);
-		}
+		glBlendFunc(s->src, s->dest);
+		p_glUseProgramObjectARB(s->prog_obj);
 	}else
 		p_shader_bind_fallback(node_id);
 }
