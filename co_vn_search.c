@@ -12,6 +12,7 @@
 boolean co_text_search(const char *text, const char *search)
 {
 	uint i, j;
+
 	for(i = 0; text[i] != 0; i++)
 	{
 		if(text[i] == search[0] || search[0] + 32 == text[i] || search[0] - 32 == text[i])
@@ -100,10 +101,17 @@ boolean co_search_node(ENode *node, char *search)
 				{
 					VNMFragmentType type;
 					VMatFrag *frag;
-					char *frag_type[VN_M_FT_OUTPUT + 1] = {"VN_M_FT_COLOR", "VN_M_FT_LIGHT", "VN_M_FT_REFLECTION", "VN_M_FT_TRANSPARENCY", "VN_M_FT_VOLUME", "VN_M_FT_GEOMETRY", "VN_M_FT_TEXTURE", "VN_M_FT_NOISE", "VN_M_FT_BLENDER", "VN_M_FT_MATRIX", "VN_M_FT_RAMP", "VN_M_FT_ANIMATION", "VN_M_FT_ALTERNATIVE", "VN_M_FT_OUTPUT"};
-			
+					static const char *frag_type[] = { "VN_M_FT_COLOR", "VN_M_FT_LIGHT", "VN_M_FT_REFLECTION", "VN_M_FT_TRANSPARENCY",
+						"VN_M_FT_VOLUME", "VN_M_FT_VIEW", "VN_M_FT_GEOMETRY", "VN_M_FT_TEXTURE", "VN_M_FT_NOISE", "VN_M_FT_BLENDER",
+						"VN_M_FT_CLAMP", "VN_M_FT_MATRIX", "VN_M_FT_RAMP", "VN_M_FT_ANIMATION", "VN_M_FT_ALTERNATIVE", "VN_M_FT_OUTPUT"};
+
 					frag = e_nsm_get_fragment(node, i);
 					type = e_nsm_get_fragment_type(node, i);
+					if(type >= sizeof frag_type / sizeof *frag_type)
+					{
+						fprintf(stderr, "Connector: Unable to search material fragment type %u, only know of %u types\n", type, sizeof frag_type / sizeof *frag_type);
+						return FALSE;
+					}
 					if(co_text_search(frag_type[type], search))
 						return TRUE;
 					switch(type)
@@ -190,6 +198,7 @@ void co_search_clear(void)
 	ENode *node;
 	COVerseNode *co_node;
 	uint i, type;
+
 	for(type = 0; type < V_NT_NUM_TYPES; type++)
 		for(node = e_ns_get_node_next(0, 0, type); node != 0; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, type))
 			if((co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT)) != NULL)
@@ -203,9 +212,10 @@ void co_search_update(char *search)
 	ENode *node;
 	COVerseNode *co_node;
 	uint i, type;
+
 	for(i = 0; search[i] == co_compare[i] && i < 64; i++)
-	if(search[i] == co_compare[i])
-		return;
+		if(search[i] == co_compare[i])
+			return;
 	co_search_clear();
 
 	for(type = 0; type < V_NT_NUM_TYPES; type++)
