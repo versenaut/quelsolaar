@@ -99,6 +99,33 @@ COVerseNode *create_verse_node(ENode *node)
 	return co_node;
 }
 
+void co_unhide_recursevly(uint node_id, float x, float y)
+{
+	COVerseNode *co_node;
+	EObjLink *link;
+	ENode *node;
+	float dist = 0;
+	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != 0; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
+	{
+		co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
+		if(co_node->hidden)
+		{
+			for(link = e_nso_get_next_link(node, 0); link != NULL; link = e_nso_get_next_link(node, e_nso_get_link_id(link) + 1))
+			{
+				COVerseNode *co_link = NULL;
+				ENode *link_node;
+				if(node_id == e_nso_get_link_node(link))
+				{
+					co_node->hidden = FALSE;
+					co_node->pos_x = x - 1.8;
+					co_node->pos_y = y + dist;
+					dist -= 1.0;
+				}
+			}
+		}
+	}
+}
+
 
 void verse_node_create_func(ENode *node, ECustomDataCommand command)
 {
@@ -585,20 +612,23 @@ void co_input_handler(BInputState *input, void *user_pointer)
 					}
 					if(input->mode == BAM_DRAW)
 						glPopMatrix();
-				}else if(input->mode == BAM_DRAW && mode == COIM_CREATE)
+				}else
 				{
-					float y;
-					y = /*co_get_pos_y*/((float)type_count * -0.2);
-					if(y < 2 && y > -2)
+					if(input->mode == BAM_DRAW && mode == COIM_CREATE)
 					{
-						glPushMatrix();
-						glTranslatef(co_get_pos_x(((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8),
-							co_get_pos_y((float)type_count * -0.2), 0);
-						glScalef(view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move));
-						co_node_draw(node, type, FALSE);
-						glScalef(4, 4, 4);
-						sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), co_line_color[0], co_line_color[1], co_line_color[2], 0.5);
-						glPopMatrix();
+						float y;
+						y = /*co_get_pos_y*/((float)type_count * -0.2);
+						if(y < 2 && y > -2)
+						{
+							glPushMatrix();
+							glTranslatef(co_get_pos_x(((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8),
+								co_get_pos_y((float)type_count * -0.2), 0);
+							glScalef(view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move));
+							co_node_draw(node, type, FALSE);
+							glScalef(4, 4, 4);
+							sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), co_line_color[0], co_line_color[1], co_line_color[2], 0.5);
+							glPopMatrix();
+						}
 					}
 				}
 			}
@@ -649,7 +679,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 				{
 					if((input->pointer_x - x) * (input->pointer_x - x) + (input->pointer_y - y) * (input->pointer_y - y) < 0.2 * 0.2 * 0.4 * 0.4)
 					{
-						verse_send_node_create(-1, type, 0);
+						verse_send_node_create(-1, type, VN_OWNER_MINE);
 						mode = COIM_NONE;
 						search[0] = 0;
 					}
@@ -675,10 +705,12 @@ void co_input_handler(BInputState *input, void *user_pointer)
 							x = ((float)type - ((float)(V_NT_NUM_TYPES) / 2) + 0.5) / V_NT_NUM_TYPES * 1.8;
 							if((input->pointer_x - x) * (input->pointer_x - x) + (input->pointer_y - (type_count * -0.2)) * (input->pointer_y - (type_count * -0.2)) < 0.2 * 0.2 * 0.4 * 0.4)
 							{
+								
 								co_node->hidden = FALSE;
 								co_node->viewlock = FALSE;
 								co_node->pos_x = co_get_pos_x(x);
-								co_node->pos_y = co_get_pos_y(type_count * -0.2);				
+								co_node->pos_y = co_get_pos_y(type_count * -0.2);
+								co_unhide_recursevly(e_ns_get_node_id(node), co_node->pos_x, co_node->pos_y);
 							}
 							type_count++;
 						}
@@ -707,8 +739,6 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		if(mode == COIM_CREATE)
 			create_scroll = -5 * betray_get_screen_mode(NULL, NULL, NULL) + 2;
 	}
-
-	
 
 	if(mode == COIM_POPUP)
 	{
@@ -821,8 +851,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 						mode = COIM_NONE;
 					break;
 			}
-		}else
-			mode == COIM_NONE;
+		}
 
 		if(mode == COIM_NONE && betray_is_type_in())
 			betray_end_type_in_mode(TRUE);
@@ -858,9 +887,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 			glPushMatrix();
 			glTranslatef(0, 0, -1);
 		}
-		create_scroll = co_w_scroll(input,
-					    create_scroll - (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2),
-					    create_length + 0.7) + (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2);
+		create_scroll = co_w_scroll(input, create_scroll - (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2), create_length + 0.7) + (-5 * betray_get_screen_mode(NULL, NULL, NULL) + 2);
 		if(input->mode == BAM_DRAW)
 			glPopMatrix();
 	}
