@@ -59,6 +59,7 @@ typedef struct{
 		uint32 element_count; /* the length of the reference array */
 		PMeshMaterial *mat; /*the materials and their ranges */
 		uint mat_count; /* number of ranges */
+		boolean open_edges;
 		boolean shadows;
 	}render;
 	struct{
