@@ -400,7 +400,7 @@ void p_env_destroy(PObjEnv *env)
 
 void p_env_init(unsigned int size)
 {
-	PObjEnv *env = NULL;
+/*	PObjEnv *env = NULL;
 	p_std_env_size = size;
 	p_vec_buffer = malloc((sizeof *p_vec_buffer) * size * size * 6 * 4);
 	p_env_create_vector_cube(p_vec_buffer, size);
@@ -408,7 +408,7 @@ void p_env_init(unsigned int size)
 		env = p_env_compute(env);
 	p_std_environment_id = env->environment_id;
 	p_std_diffuse_environment_id = env->diffuse_environment_id;
-	p_env_destroy(env);
+	p_env_destroy(env);*/
 }
 
 uint p_env_get_environment(PObjEnv *env)
