@@ -22,6 +22,7 @@
 #include "st_types.h"
 
 extern void p_init_impostor(PObjImpostor *imp);
+extern void p_free_impostor(PObjImpostor *imp);
 
 void p_object_func(ENode *node, ECustomDataCommand command)
 {	
@@ -40,13 +41,14 @@ void p_object_func(ENode *node, ECustomDataCommand command)
 			for(i = 0; i < LIGHTS_PER_OBJECT; i++) 
 				o->light.lights[i] = -1;
 			o->light.lightfade = 1;
-			o->environment = p_env_compute(NULL);
+		//	o->environment = p_env_compute(NULL);
 			o->version = -1;
 			p_init_impostor(&o->impostor);
 			break;
 		case E_CDC_DESTROY :
 			o = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
 			p_env_destroy(o->environment);
+			p_free_impostor(&o->impostor);
 			free(o);
 		break;
 	}
