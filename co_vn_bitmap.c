@@ -164,7 +164,10 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 					e[i].data.angle[0] = 180 + 45 + (float)(i - 3) * 45;
 					e[i].data.angle[1] = 180 + 45 + (float)(i - 2) * 45;
 				}
-				output = sui_draw_popup(input, 0.15, y, e, 5, 0, 0.9);
+				if(co_background_color[0] + co_background_color[1] + co_background_color[2] > 1.5)
+					output = sui_draw_popup(input, 0.15, y, e, 5, 0, 1.0);
+				else
+					output = sui_draw_popup(input, 0.15, y, e, 5, 0, 0.0);
 				if(output != -1 && output != type)
 				{
 					verse_send_b_layer_create(e_ns_get_node_id(node), popup, e_nsb_get_layer_name(layer), output);
