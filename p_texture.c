@@ -66,6 +66,7 @@ uint p_th_create_std_texture(void)
 	uint i, j, texture;
 	float *buf;
 	glGenTextures(1, &texture);
+	printf("create std texture\n");
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -183,7 +184,6 @@ void p_th_create_new_texture(ENode *node, PTextureHandle *handle)
 	handle->size_version = p_th_compute_size_check_sum(handle->size);
 	if(handle->size[0] * handle->size[1] * handle->size[2] != 0)
 	{
-		glGenTextures(1, &handle->texture_id);
 		if(handle->size[2] != 1 && FALSE /* we do suport 3d textures*/)
 		{
 			if(TRUE)/* we dont handle any sized textures*/
@@ -213,6 +213,7 @@ void p_th_create_new_texture(ENode *node, PTextureHandle *handle)
 				handle->size[0] = i;
 				handle->size[1] = i;
 			}
+			printf("new texture!\n");
 			glGenTextures(1, &handle->texture_id);
 			glBindTexture(GL_TEXTURE_2D, handle->texture_id);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
