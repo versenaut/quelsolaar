@@ -72,7 +72,7 @@ void d_add_address(DConnectMode mode, char *address, char *description, char *na
 	for(i = 0; i < MAX_ADDRESS_SIZE - 1 && address[i] != 0;i++)
 		a->address[i] = address[i];
 	a->address[i] = 0;
-	for(i = 0; i < MAX_MESSAGE_SIZE - 1 && address[i] != 0;i++)
+	for(i = 0; i < MAX_MESSAGE_SIZE - 1 && description[i] != 0;i++)
 		a->message[i] = description[i];
 	a->message[i] = 0;
 
