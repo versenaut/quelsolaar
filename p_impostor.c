@@ -65,6 +65,7 @@ uint create_environment(uint size, float *buf)
 	uint format = p_th_get_hdri_token(FALSE);
 	glEnable(GL_TEXTURE_CUBE_MAP_EXT);
 	glGenTextures(1, &environment);
+	printf("yet an other cube map\n");
 	glBindTexture(GL_TEXTURE_CUBE_MAP_EXT, environment);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -180,6 +181,7 @@ uint p_blur_object_environment(ENode *node, uint blur, uint texture, uint size, 
 	if(blur == -1)
 	{
 		blur = create_environment(size, NULL);
+		printf("blur node = %s\n", e_ns_get_node_name(node));
 	}
 	glLoadIdentity();
 	glPushMatrix();
@@ -273,6 +275,14 @@ void p_init_impostor(PObjImpostor *imp)
 	imp->size = 1;
 	imp->environment = -1;
 	imp->blur = -1;
+}
+
+
+void p_free_impostor(PObjImpostor *imp)
+{
+	glDeleteTextures(1, &imp->texture);
+	glDeleteTextures(1, &imp->environment);
+	glDeleteTextures(1, &imp->blur);
 }
 void p_render_lit_and_transformed_object(ENode *node, boolean transparency);
 double *p_lod_get_view_pos(void);
@@ -452,7 +462,10 @@ uint update_object_environment(ENode *node, uint texture, uint size, uint side)
 	e_nso_get_pos_time(node, objpos, 0, 0);
 
 	if(texture == -1)
+	{
 		texture = create_environment(size, NULL);
+		printf("texture node = %s\n", e_ns_get_node_name(node));
+	}
 	glPushMatrix();
 	glLoadIdentity();
 	glClearColor(0, 0, 0, 0);
