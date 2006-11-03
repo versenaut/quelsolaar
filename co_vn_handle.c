@@ -99,12 +99,13 @@ COVerseNode *create_verse_node(ENode *node)
 	return co_node;
 }
 
-void co_unhide_recursevly(uint node_id, float x, float y)
+void co_unhide_recursively(uint node_id, float x, float y)
 {
 	COVerseNode *co_node;
 	EObjLink *link;
 	ENode *node;
 	float dist = 0;
+
 	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != 0; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 	{
 		co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
@@ -126,7 +127,6 @@ void co_unhide_recursevly(uint node_id, float x, float y)
 	}
 }
 
-
 void verse_node_create_func(ENode *node, ECustomDataCommand command)
 {
 	if(command == E_CDC_CREATE)
@@ -134,7 +134,6 @@ void verse_node_create_func(ENode *node, ECustomDataCommand command)
 	if(command == E_CDC_DESTROY)
 		free(e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT));
 }
-
 
 void co_draw_bitmap(ENode *node);
 void co_geometry_destroy(void *g);
@@ -144,7 +143,6 @@ void p_render_object(ENode *node, boolean transparency);
 
 void co_search_clear(void);
 void co_search_update(char *search);
-
 
 void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 {
@@ -710,7 +708,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 								co_node->viewlock = FALSE;
 								co_node->pos_x = co_get_pos_x(x);
 								co_node->pos_y = co_get_pos_y(type_count * -0.2);
-								co_unhide_recursevly(e_ns_get_node_id(node), co_node->pos_x, co_node->pos_y);
+								co_unhide_recursively(e_ns_get_node_id(node), co_node->pos_x, co_node->pos_y);
 							}
 							type_count++;
 						}

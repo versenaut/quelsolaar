@@ -493,7 +493,7 @@ uint co_vng_render_name(BInputState *input, const char *name, float pos_x, float
 		}
 		if((pos_x - 0.64 - pointer_x) * (pos_x - 0.64 - pointer_x) + (pos_y - pointer_y) * (pos_y - pointer_y) < 0.04 * 0.04)
 		{
-			sui_draw_text(-1.1, 0.21 + 0.5 * SUI_T_SIZE * 2, SUI_T_SIZE * 2, SUI_T_SPACE * 2, "Hide recursevly", co_line_color[0], co_line_color[1], co_line_color[2], color);
+			sui_draw_text(-1.1, 0.21 + 0.5 * SUI_T_SIZE * 2, SUI_T_SIZE * 2, SUI_T_SPACE * 2, "Hide recursively", co_line_color[0], co_line_color[1], co_line_color[2], color);
 			sui_draw_set_vec2(COVNGraphicsData.moon_line, 3, pointer_x - pos_x, 0.06);
 			sui_draw_gl(GL_LINES, COVNGraphicsData.moon_line, 4, 2, co_line_color[0], co_line_color[1], co_line_color[2], color);
 		}
