@@ -98,6 +98,7 @@ void p_rm_set_eay(PMesh *mesh, egreal *eay)
 
 void p_rm_destroy(PMesh *mesh)
 {
+	uint i;
 	if(mesh->temp != NULL)
 		free(mesh->temp);
 	if(mesh->tess.tess != NULL)
@@ -110,6 +111,7 @@ void p_rm_destroy(PMesh *mesh)
 		free(mesh->tess.order_temp_mesh_rev);
 	if(mesh->tess.order_temp_poly_start != NULL)
 		free(mesh->tess.order_temp_poly_start);
+
 	if(mesh->render.vertex_array != NULL)
 		free(mesh->render.vertex_array);
 	if(mesh->render.normal_array != NULL)
@@ -118,24 +120,33 @@ void p_rm_destroy(PMesh *mesh)
 		free(mesh->render.reference);
 	if(mesh->render.mat != NULL)
 		free(mesh->render.mat);
+
 	if(mesh->depend.reference != NULL)
 		free(mesh->depend.reference);
 	if(mesh->depend.weight != NULL)
 		free(mesh->depend.weight);
 	if(mesh->depend.ref_count != NULL)
 		free(mesh->depend.ref_count);
+
 	if(mesh->normal.normal_ref != NULL)
 		free(mesh->normal.normal_ref);	
 	if(mesh->normal.normals != NULL)
 		free(mesh->normal.normals);
-	if(mesh->displacement.displacement != NULL)
-		free(mesh->displacement.displacement);
 	if(mesh->normal.draw_normals != NULL)
 		free(mesh->normal.draw_normals);
+
+	if(mesh->displacement.displacement != NULL)
+		free(mesh->displacement.displacement);
+
 	if(mesh->param.array != NULL)
+	{
+		for(i = 0; i < mesh->param.array_count; i++)
+			p_ra_free_array(&mesh->param.array[i]);
 		free(mesh->param.array);
+	}
 	if(mesh->param.version != NULL)
 		free(mesh->param.version);
+
 	if(mesh->anim.layers.layers != NULL)
 		free(mesh->anim.layers.layers);
 	if(mesh->anim.bones.bonereference != NULL)
@@ -220,6 +231,13 @@ void *p_rm_get_param(PMesh *mesh)
 {
 	return mesh->param.array;
 }
+
+
+egreal *p_rm_get_param_data(PMesh *mesh, uint id)
+{
+	return ((PRenderArray *)mesh->param.array)[id].array.real;
+}
+
 
 uint p_rm_get_param_count(PMesh *mesh)
 {
@@ -307,6 +325,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 		mesh->geometry_version--;
 	if(smesh->geometry_version != mesh->geometry_version && mesh->next == NULL)
 	{
+		printf("recomputing node = %u, (%u %u)\n", mesh->geometry_id, smesh->geometry_version, mesh->geometry_version);
 		if(mesh->stage != POS_DONE)
 		{
 			p_rm_destroy(mesh);
@@ -347,6 +366,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 				mesh->temp = NULL;
 				mesh->render.element_count = 0;
 				mesh->render.vertex_count = 0;
+				mesh->render.open_edges = smesh->open_edges != 0;
 				mesh->render.shadows = smesh->open_edges == 0;
 				mesh->depend.length = 0;
 				mesh->anim.cv_count = e_nsg_get_vertex_length(g_node);
