@@ -74,6 +74,7 @@ void callback_send_tag_create(void *user, VNodeID node_id, uint16 group_id, uint
 	ENodeHead *node;
 	ETag *t = NULL;
 	uint i;
+
 	if((node = (ENodeHead *)e_ns_get_node_networking(node_id)) == NULL)
 		return;
 	if(group_id >= node->group_count || ((ETagGroup *)node->tag_groups)[group_id].group_name[0] == 0)
@@ -132,6 +133,7 @@ void callback_send_tag_create(void *user, VNodeID node_id, uint16 group_id, uint
 				((char *)t->tag.vblob.blob)[i] = ((char *)tag->vblob.blob)[i];
 		break;
 	}
+	e_ns_update_node_version_data(node);
 }
 
 /*
@@ -316,6 +318,7 @@ VNTag *e_ns_get_tag_by_type_and_group(const ENodeHead *node, char *group_name, c
 {
 	uint i;
 	uint16 g, t;
+
 	for(g = 0; g < node->group_count; g++)
 	{
 		for(i = 0; ((ETagGroup *)node->tag_groups)[g].group_name[i] != 0 && ((ETagGroup *)node->tag_groups)[g].group_name[i] == group_name[i]; i++);
