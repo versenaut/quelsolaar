@@ -290,22 +290,23 @@ void e_ns_get_tag_by_name_and_group(const ENodeHead *node, char *group_name, cha
 {
 	uint i;
 	uint16 g, t;
+
 	for(g = 0; g < node->group_count; g++)
 	{
-		for(i = 0; ((ETagGroup *)node->tag_groups)[g].group_name[i] != 0 && ((ETagGroup *)node->tag_groups)[g].group_name[i] == group_name[i]; i++);
-		if(((ETagGroup *)node->tag_groups)[g].group_name[i] == group_name[i])
+		if(strcmp(((ETagGroup *) node->tag_groups)[g].group_name, group_name) == 0)
 		{
 			for(t = 0; t < ((ETagGroup *)node->tag_groups)[g].tag_count; t++)
 			{
-				for(i = 0; ((ETagGroup *)node->tag_groups)[g].tags[t].tag_name[i] != 0 && ((ETagGroup *)node->tag_groups)[g].tags[t].tag_name[i] == tag_name[i]; i++);
-				if(((ETagGroup *)node->tag_groups)[g].tags[t].tag_name[i] == tag_name[i])
+				if(strcmp(((ETagGroup *) node->tag_groups)[g].tags[t].tag_name, tag_name) == 0)
 				{
 					if(group_id != NULL)
 						*group_id = g;
 					if(tag_id != NULL)
 						*tag_id = t;
+					return;
 				}
 			}
+			/* Don't break here, tag group names are not unique. */
 		}
 	}
 	if(group_id != NULL)
@@ -358,7 +359,8 @@ void callback_send_node_name_set(void *user, VNodeID node_id, const char *name)
 		return;
 	for(i = 0; name[i] != 0 && i < 48; i++)
 		node->node_name[i] = name[i];
-	node->node_name[i] = name[i];
+	node->node_name[i] = '\0';
+	e_ns_update_node_version_data(node);
 }
 
 void es_head_init(void)
