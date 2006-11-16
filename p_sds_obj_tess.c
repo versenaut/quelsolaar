@@ -439,9 +439,8 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 				}
 				table = get_dynamic_table_quad(smesh->level, level);
 
-				for(i = 0; i < 4; i++)
-					if(smesh->crease[stage * 4 + i] > 0.1)
-						mesh->render.element_count += (table->edges[i + 1] - table->edges[i]);
+		//		for(i = 0; i < 4; i++)
+		//			mesh->render.element_count += p_lod_handle_edge_count(smesh, mesh, stage, i);
 
 			}else
 			{
@@ -485,9 +484,8 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 					}
 				}
 				table = get_dynamic_table_tri(smesh->level, level);
-				for(i = 0; i < 3; i++)
-					if(smesh->crease[smesh->base_quad_count * 4 + (stage - smesh->base_quad_count) * 3 + i] > 0.1)
-						mesh->render.element_count += (table->edges[i + 1] - table->edges[i]);
+	//			for(i = 0; i < 3; i++)
+	//				mesh->render.element_count += p_lod_handle_edge_count(smesh, mesh, stage, i);
 			}
 			for(j = 0; j < table->vertex_count; j++)
 				mesh->depend.length += smesh->vertex_dependency[smesh->ref[poly + table->reference[j]]].length;
@@ -499,6 +497,20 @@ void p_lod_select_tesselation(PMesh *mesh, PPolyStore *smesh, egreal *cvs)
 		mesh->sub_stages[1] = stage;
 		if(mesh->sub_stages[1] == mesh->tess.tri_count + mesh->tess.quad_count)
 		{
+
+			for(j = 0; j < mesh->tess.tri_count + mesh->tess.quad_count; j++) /* FIX ME */
+			{
+				if(stage < mesh->tess.quad_count)
+				{
+					for(i = 0; i < 4; i++)
+						mesh->render.element_count += p_lod_handle_edge_count(smesh, mesh, j, i);
+				}else
+				{
+					for(i = 0; i < 3; i++)
+						mesh->render.element_count += p_lod_handle_edge_count(smesh, mesh, j, i);
+				}
+			}
+
 			mesh->stage++;
 			mesh->sub_stages[0] = 0;
 			mesh->sub_stages[1] = 0;
