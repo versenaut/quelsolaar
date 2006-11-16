@@ -221,6 +221,49 @@ boolean p_lod_handle_edge(PPolyStore *smesh, PMesh *mesh, uint current_poly, uin
 mesh->tess.order_temp_mesh_ref[mesh->sub_stages[0]]
 */
 
+uint p_lod_handle_edge_count(PPolyStore *smesh, PMesh *mesh, uint current_poly, uint current_edge)
+{
+	PTessTableElement *current_table, *table;
+	uint poly, edge, i, j, wrap, current_wrap;
+	boolean crease;
+
+	if(mesh->tess.order_temp_mesh[current_poly] > smesh->base_quad_count)
+		poly = smesh->base_neighbor[smesh->base_quad_count * 4 + (mesh->tess.order_temp_mesh[current_poly] - smesh->base_quad_count) * 3 + current_edge];
+	else
+		poly = smesh->base_neighbor[mesh->tess.order_temp_mesh[current_poly] * 4 + current_edge];
+	if(poly == -1)
+		return FALSE;
+	if(poly / 4 < smesh->base_quad_count)
+	{
+		crease = smesh->crease[poly] > 0.1;
+		edge = poly % 4;
+		poly /= 4;
+	}else
+	{
+		crease = smesh->crease[poly] > 0.1;
+		edge = (poly - smesh->base_quad_count * 4) % 3;
+		poly = smesh->base_quad_count + (poly - smesh->base_quad_count * 4) / 3;
+	}
+	poly = mesh->tess.order_temp_mesh_rev[poly];
+	if(poly > current_poly)
+		return 0;
+	table = mesh->tess.tess[poly];
+	current_table = mesh->tess.tess[current_poly];
+	wrap = table->edges[4];
+	current_wrap = current_table->edges[4];
+	j = table->edges[edge + 1];
+
+	if(crease)
+	{
+		return 0;
+	}
+	else
+	{
+		return (current_table->edges[current_edge + 1] - current_table->edges[current_edge]) * 6;
+	}
+	return 0;
+}
+
 void p_rm_create_vertex_normals(uint *output, PMesh *mesh, uint poly, uint corner)
 {
 	PTessTableElement *corner_table;
