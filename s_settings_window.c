@@ -66,7 +66,7 @@ float sui_setting_view_size(SUIViewElement *element)
 	if(element->type == S_VET_COLOR)
 		return 0.15;
 	if(element->type == S_VET_CUSTOM)
-		return element->param.custom.length;
+		return element->param.custom.length + 0.05;
 	return 0.05;
 }
 
@@ -302,7 +302,7 @@ boolean sui_draw_setting_view(BInputState *input, double x_pos, double y_pos, do
 			case S_VET_SPLIT_MULTI :
 				{
 					char nr[64];
-					sprintf(nr, "<%u/%u>", element[i].param.split_multi.current,element[i].param.split_multi.count);
+					sprintf(nr, "<%u/%u>", element[i].param.split_multi.current + 1, element[i].param.split_multi.count);
 					f = sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].text) + 0.03 - width;
 					if(input->mode == BAM_DRAW)
 					{
@@ -318,7 +318,7 @@ boolean sui_draw_setting_view(BInputState *input, double x_pos, double y_pos, do
 								y_pos - 0.025 < input->click_pointer_y && y_pos + 0.025 > input->click_pointer_y && element[i].param.split_multi.current != 0)
 								element[i].param.split_multi.current--;
 							if(input->pointer_x > x_pos + f + f2 * 0.5 && input->pointer_x < x_pos + f + f2 &&
-								y_pos - 0.025 < input->click_pointer_y && y_pos + 0.025 > input->click_pointer_y && element[i].param.split_multi.current != element[i].param.split_multi.count)
+								y_pos - 0.025 < input->click_pointer_y && y_pos + 0.025 > input->click_pointer_y && element[i].param.split_multi.current != element[i].param.split_multi.count - 1)
 								element[i].param.split_multi.current++;
 						}
 						f += f2 + 0.03; 
@@ -379,6 +379,15 @@ boolean sui_draw_setting_view(BInputState *input, double x_pos, double y_pos, do
 				}
 			break;
 			case S_VET_TEXT :
+			//	
+				if(element[i].param.text.text[0] == 0)
+				{
+					sui_type_in(input, x_pos, y_pos, width, SUI_T_SIZE, element[i].param.text.text, element[i].param.text.length, NULL, NULL, color, color, color, 1.0);
+				}else
+				{
+					f = sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, element[i].param.text.text);
+					sui_type_in(input, x_pos + width - f, y_pos, f, SUI_T_SIZE, element[i].param.text.text, element[i].param.text.length, NULL, NULL, color, color, color, 1.0);
+				}
 			break;
 			case S_VET_COLOR :
 				{				
@@ -426,8 +435,9 @@ boolean sui_draw_setting_view(BInputState *input, double x_pos, double y_pos, do
 				}
 			break;
 			case S_VET_CUSTOM :
-				element[i].param.custom.func(element[i].param.custom.user, x_pos - width, y_pos, width * 2, element[i].param.custom.length);
-				y_pos -= element[i].param.custom.length - 0.05;
+				if(element[i].param.custom.func != NULL)
+					element[i].param.custom.func(input, element[i].param.custom.user, x_pos - width, y_pos, width * 2, element[i].param.custom.length);
+				y_pos -= element[i].param.custom.length + 0.05;
 			break;
 		}
 		y_pos -= 0.05;
