@@ -166,7 +166,7 @@ LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 HWND  hWnd;				/* window */
 
-boolean b_win32_init_display(uint size_x, uint size_y, boolean full_screen, char *caption) 
+boolean b_win32_init_display(uint size_x, uint size_y, boolean full_screen, const char *caption) 
 {
     int n, pf;
     HGLRC hRC;				/* opengl context */

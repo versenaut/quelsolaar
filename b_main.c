@@ -87,12 +87,12 @@ double betray_get_screen_mode(uint *x_size, uint *y_size, boolean *fullscreen)
 	return (double)BGlobal.screen_mode.y_size / (double)BGlobal.screen_mode.x_size;
 }
 
-extern void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, char *caption);
-extern void b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, char *caption);
-extern boolean b_win32_init_display(uint size_x, uint size_y, boolean full_screen, char *caption);
+extern void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, const char *caption);
+extern void b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, const char *caption);
+extern boolean b_win32_init_display(uint size_x, uint size_y, boolean full_screen, const char *caption);
 
 
-void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, boolean window_fullscreen, char *name)
+void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, boolean window_fullscreen, const char *name)
 {
 	#ifdef BETRAY_SDL_SYSTEM_WRAPPER
 	b_sdl_init_display(window_size_x, window_size_y, window_fullscreen, name);
