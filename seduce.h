@@ -14,10 +14,6 @@ extern void	sui_draw_pointer(float x, float y);
 extern boolean	sui_box_click_test(float x_pos, float y_pos, float x_size, float y_size);
 extern boolean	sui_box_down_click_test(float x_pos, float y_pos, float x_size, float y_size);
 
-/* the symbol and font editors built in to seduce */
-
-void *sui_symbol_editor_func(BInputState *input, void *user_pointer);
-void *sui_font_editor_func(BInputState *input, void *user_pointer);
 
 /* GL draw helpers */
 
@@ -170,7 +166,7 @@ typedef struct{
 			boolean	del;
 		}split_multi;
 		struct{
-			void (*func)(void *user, double x_pos, double y_pos, double width, double length);
+			void (*func)(BInputState *input, void *user, double x_pos, double y_pos, double width, double length);
 			void *user;
 			double length;
 		}custom;
@@ -178,5 +174,44 @@ typedef struct{
 }SUIViewElement;
 
 extern boolean sui_draw_setting_view(BInputState *input, double x_pos, double y_pos, double width, SUIViewElement *element, uint element_count, char *title, float back_color);
+extern float sui_setting_view_size(SUIViewElement *element);
+/* --------------------------------------- */
+
+typedef enum{
+	SE_LT_LINE,
+	SE_LT_CURVE,
+	SE_LT_DRAG
+}SELineMode;
+
+typedef enum{
+	SE_FT_ICON,
+	SE_FT_LINE,
+	SE_FT_SQUARE,
+}SEFuncType;
+
+typedef struct{
+	SELineMode	type;
+	float		pos_one[2];
+	float		pos_two[2];
+}SEditorLine;
+
+typedef struct{
+	char		name[64];
+	SEditorLine *lines;
+	uint		line_allocate;
+	uint		line_count;
+}SDrawing;
+
+extern void se_editor(BInputState *input, SDrawing *d, float pos_x, float pos_y, float size_x, float size_y, float *color_drawing, float *color_interface,  SELineMode mode);
+
+/* the symbol and font editors built in to seduce */
+
+extern void *sui_symbol_editor_func(BInputState *input, void *user_pointer);
+extern void *sui_font_editor_func(BInputState *input, void *user_pointer);
+
+
+extern void se_save_drawing_binary(FILE *file, SDrawing *d, uint draw_count);
+extern SDrawing *se_load_drawing_binary(FILE *file, uint *draw_count);
+
 
 #endif
