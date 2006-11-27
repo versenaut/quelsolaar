@@ -39,7 +39,7 @@ ALL:		$(APPS)
 
 # -----------------------------------------------
 
-connector:	co_3d_view.o co_clone.o co_main.o co_game.o co_intro.o co_popup.o co_projection.o co_summary.o co_vn_audio.o co_vn_bitmap.o \
+connector:	co_3d_view.o co_clone.o co_main.o co_game.o co_intro.o co_popup.o co_projection.o co_summary.o co_symbols.o co_vn_audio.o co_vn_bitmap.o \
 		co_vn_curve.o co_vn_geometry.o co_vn_graphics.o co_vn_handle.o co_vn_head.o co_vn_mat_render.o co_vn_material.o \
 		co_vn_object.o co_vn_search.o co_vn_text.o co_widgets.o \
 		st_matrix_operations.o $(LIBPERSUADE) seduce_persuade.o \
@@ -77,7 +77,7 @@ pngsave:	pngsave.c libenough.a
 
 # -----------------------------------------------
 
-libseduce.a:	s_background.o s_draw.o   s_line_font.o s_main.o s_popup.o s_settings.o s_settings_window.o s_text.o
+libseduce.a:	s_background.o s_draw.o s_editor.o s_line_font.o s_main.o s_popup.o s_settings.o s_settings_window.o s_text.o
 		ar -cr $@ $^
 
 libbetray.a:	b_glfw.o b_glut.o b_main.o b_sdl.o
