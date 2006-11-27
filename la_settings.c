@@ -59,7 +59,7 @@ void la_draw_settings_menu(BInputState *input, void *user)
 
 	element[3].type = S_VET_INTEGER;
 	element[3].text = "maximum Tesselation";
-	element[3].param.integer = sui_get_setting_int("MAX_TESS_LEVEL", 4);
+	element[3].param.integer = sui_get_setting_int("MAX_TESS_LEVEL", 2);
 
 	element[4].type = S_VET_INTEGER;
 	element[4].text = "minimum Tesselation";
