@@ -14,7 +14,7 @@
 /*#define BETRAY_GLUT_SYSTEM_WRAPPER*/
 /*#define BETRAY_GLFW_SYSTEM_WRAPPER*/
 #define BETRAY_SDL_SYSTEM_WRAPPER
-
+/*#define BETRAY_WIN32_SYSTEM_WRAPPER*/
 
 /* On Windows, we also need the main platform header file. */
 #if defined _WIN32
@@ -52,7 +52,8 @@
 
 #elif defined BETRAY_GLFW_SYSTEM_WRAPPER
 #include <GL/glfw.h>
-
+#elif defined BETRAY_WIN32_SYSTEM_WRAPPER
+#include <GL/gl.h>
 #else
 #error "Please choose a system wrapper to use."
 #endif

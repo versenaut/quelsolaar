@@ -8,6 +8,8 @@
 
 extern boolean b_sdl_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
 extern boolean b_glut_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
+extern boolean b_win32_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
+
 
 typedef struct{
 	uint		x_size;
@@ -59,6 +61,13 @@ boolean betray_set_screen_mode(uint x_size, uint y_size, boolean fullscreen)
 	if(b_glfw_system_wrapper_set_display(x_size, y_size, fullscreen) != TRUE)
 		return FALSE;
 	#endif
+/*
+	#ifdef BETRAY_WIN32_SYSTEM_WRAPPER
+	if(b_win32_init_display(x_size, y_size, fullscreen) != TRUE)
+		return FALSE;
+	#endif*/
+
+
 
 	BGlobal.screen_mode.x_size = x_size;
 	BGlobal.screen_mode.y_size = y_size;
@@ -78,10 +87,12 @@ double betray_get_screen_mode(uint *x_size, uint *y_size, boolean *fullscreen)
 	return (double)BGlobal.screen_mode.y_size / (double)BGlobal.screen_mode.x_size;
 }
 
-extern void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, const char *caption);
-extern void b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, const char *caption);
+extern void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, char *caption);
+extern void b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, char *caption);
+extern boolean b_win32_init_display(uint size_x, uint size_y, boolean full_screen, char *caption);
 
-void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, boolean window_fullscreen, const char *name)
+
+void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, boolean window_fullscreen, char *name)
 {
 	#ifdef BETRAY_SDL_SYSTEM_WRAPPER
 	b_sdl_init_display(window_size_x, window_size_y, window_fullscreen, name);
@@ -94,6 +105,16 @@ void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, 
 	#ifdef BETRAY_GLFW_SYSTEM_WRAPPER
 	b_glfw_init_display(argc, argv, window_size_x, window_size_y, window_fullscreen, name);
 	#endif
+
+	#ifdef BETRAY_WIN32_SYSTEM_WRAPPER
+
+	if(!b_win32_init_display(window_size_x, window_size_y, window_fullscreen, name))
+	{
+		int *a = NULL;
+		a[0] = 0;
+	}
+	#endif
+
 
 	betray_get_current_time(&BGlobal.time[0], &BGlobal.time[1]);
 	BGlobal.screen_mode.x_size = window_size_x;
@@ -117,6 +138,9 @@ void betray_set_action_func(void (*action_func)(BInputState *data, void *user_po
 	BGlobal.action_func_data = user_pointer;
 }
 
+extern void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end_x, float end_y, float end_z, float red, float green, float blue, float alpha);
+
+
 void betray_action(BActionMode mode)
 {
 	BGlobal.input.mode = mode;
@@ -131,7 +155,20 @@ void betray_action(BActionMode mode)
 	if(BGlobal.action_func != NULL)
 		BGlobal.action_func(&BGlobal.input, BGlobal.action_func_data);
 	if(mode == BAM_DRAW)
+	{
 		glPopMatrix();
+	/*	glPushMatrix();
+		if(BGlobal.input.mouse_button[0])
+			sui_draw_3d_line_gl(BGlobal.input.pointer_x + 0.1, BGlobal.input.pointer_y + 0.05,  -1, BGlobal.input.pointer_x + 0.15, BGlobal.input.pointer_y + 0.05, -1, 1, 0.5, 0.5, 1);
+		if(BGlobal.input.mouse_button[1])
+			sui_draw_3d_line_gl(BGlobal.input.pointer_x + 0.1, BGlobal.input.pointer_y + 0.10,  -1, BGlobal.input.pointer_x + 0.15, BGlobal.input.pointer_y + 0.10, -1, 0.5, 1, 0.5, 1);
+		if(BGlobal.input.mouse_button[2])
+			sui_draw_3d_line_gl(BGlobal.input.pointer_x + 0.1, BGlobal.input.pointer_y + 0.15,  -1, BGlobal.input.pointer_x + 0.15, BGlobal.input.pointer_y + 0.15, -1, 0.5, 0.5, 1, 1);
+		
+		sui_draw_3d_line_gl(BGlobal.input.pointer_x - 0.1, BGlobal.input.pointer_y,  -1, BGlobal.input.pointer_x + 0.1, BGlobal.input.pointer_y, -1, 0.5, 0.5, 0.5, 1);
+		sui_draw_3d_line_gl(BGlobal.input.pointer_x, BGlobal.input.pointer_y - 0.1,  -1, BGlobal.input.pointer_x, BGlobal.input.pointer_y + 0.1, -1, 0.5, 0.5, 0.5, 1);
+		glPopMatrix();*/
+	}
 }
 
 boolean betray_get_key(uint key)
