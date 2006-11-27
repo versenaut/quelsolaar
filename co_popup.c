@@ -29,51 +29,74 @@ void sp_settings_post(SUIViewElement *element);
 float co_background_color[3] = {1.0, 1.0, 1.0};
 float co_line_color[3] = {0.0, 0.0, 0.0};
 
+extern void co_symbols_get_interface(SUIViewElement *elements);
+extern void co_symbols_set_interface(SUIViewElement *elements);
+extern void co_save_symb_settings(char *file_name);
+
+
 boolean co_draw_settings(BInputState *input)
 {
+	static float y = 0;
+	float aspect;
+	aspect = betray_get_screen_mode(NULL, NULL, NULL);
 	if(co_settings == TRUE)
 	{
-		SUIViewElement element[15];
+		SUIViewElement element[15 + 50];
 		glPushMatrix();
 		glTranslatef(0, 0, -1);
 		sp_settings_pre(element);
-		element[13].type = S_VET_COLOR;
-		element[13].text = "background";
-		element[13].param.color[0] = co_background_color[0];
-		element[13].param.color[1] = co_background_color[1];
-		element[13].param.color[2] = co_background_color[2];
 		element[14].type = S_VET_COLOR;
-		element[14].text = "lines";
-		element[14].param.color[0] = co_line_color[0];
-		element[14].param.color[1] = co_line_color[1];
-		element[14].param.color[2] = co_line_color[2];
+		element[14].text = "background";
+		element[14].param.color[0] = co_background_color[0];
+		element[14].param.color[1] = co_background_color[1];
+		element[14].param.color[2] = co_background_color[2];
+		element[15].type = S_VET_COLOR;
+		element[15].text = "lines";
+		element[15].param.color[0] = co_line_color[0];
+		element[15].param.color[1] = co_line_color[1];
+		element[15].param.color[2] = co_line_color[2];
+		co_symbols_get_interface(&element[16]);
 		glDisable(GL_DEPTH_TEST);
 		if(co_background_color[0] + co_background_color[1] + co_background_color[2] > 1.5)
-			co_settings = !sui_draw_setting_view(input, 0, 0.3, 0.5, element, 15, "SETTINGS", 1.0);
+			co_settings = !sui_draw_setting_view(input, 0, y, 0.5, element, 16 + 11, "SETTINGS", 1.0);
 		else
-			co_settings = !sui_draw_setting_view(input, 0, 0.3, 0.5, element, 15, "SETTINGS", 0.0);
+			co_settings = !sui_draw_setting_view(input, 0, y, 0.5, element, 16 + 11, "SETTINGS", 0.0);
+		if(input->mode == BAM_EVENT)
+		{
+			if(input->pointer_y > aspect - 0.2)
+				y -= 0.1 * (input->pointer_y - aspect + 0.2);
+			if(input->pointer_y < 0.2 - aspect)
+				y -= 0.1 * (input->pointer_y - 0.2 + aspect);
+			if(y < aspect - 0.1)
+				y = aspect - 0.1;
+			if(y > 2 - aspect + 0.1)
+				y = 2 - aspect + 0.1;
+		}
 		glEnable(GL_DEPTH_TEST);
 		sp_settings_post(element);
-		co_background_color[0] = element[13].param.color[0];
-		co_background_color[1] = element[13].param.color[1];
-		co_background_color[2] = element[13].param.color[2];
-		co_line_color[0] = element[14].param.color[0];
-		co_line_color[1] = element[14].param.color[1];
-		co_line_color[2] = element[14].param.color[2];
+		co_background_color[0] = element[14].param.color[0];
+		co_background_color[1] = element[14].param.color[1];
+		co_background_color[2] = element[14].param.color[2];
+		co_line_color[0] = element[15].param.color[0];
+		co_line_color[1] = element[15].param.color[1];
+		co_line_color[2] = element[15].param.color[2];
 		if(!co_settings)
 		{
-			sui_set_setting_double("BACKGROUND_COLOR_R", element[13].param.color[0]);
-			sui_set_setting_double("BACKGROUND_COLOR_G", element[13].param.color[1]);
-			sui_set_setting_double("BACKGROUND_COLOR_B", element[13].param.color[2]);
-			sui_set_setting_double("LINE_COLOR_R", element[14].param.color[0]);
-			sui_set_setting_double("LINE_COLOR_G", element[14].param.color[1]);
-			sui_set_setting_double("LINE_COLOR_B", element[14].param.color[2]);
+			sui_set_setting_double("BACKGROUND_COLOR_R", element[14].param.color[0]);
+			sui_set_setting_double("BACKGROUND_COLOR_G", element[14].param.color[1]);
+			sui_set_setting_double("BACKGROUND_COLOR_B", element[14].param.color[2]);
+			sui_set_setting_double("LINE_COLOR_R", element[15].param.color[0]);
+			sui_set_setting_double("LINE_COLOR_G", element[15].param.color[1]);
+			sui_set_setting_double("LINE_COLOR_B", element[15].param.color[2]);
 			sui_save_settings("co_config.cfg");
+			co_save_symb_settings("symbols_settings.bin");
 		}
+		co_symbols_set_interface(&element[16]);
 		glPopMatrix();
 		return TRUE;
 	}else
 	{
+		y = aspect - 0.1;
 		co_background_color[0] = sui_get_setting_double("BACKGROUND_COLOR_R", 1.0);
 		co_background_color[1] = sui_get_setting_double("BACKGROUND_COLOR_G", 1.0);
 		co_background_color[2] = sui_get_setting_double("BACKGROUND_COLOR_B", 1.0);
