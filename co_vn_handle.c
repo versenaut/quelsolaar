@@ -98,14 +98,12 @@ COVerseNode *create_verse_node(ENode *node)
 	e_ns_set_custom_data(node, CONNECTOR_ENOUGH_SLOT, co_node);
 	return co_node;
 }
-
-void co_unhide_recursively(uint node_id, float x, float y)
+void co_unhide_recursevly(uint node_id, float x, float y)
 {
 	COVerseNode *co_node;
 	EObjLink *link;
 	ENode *node;
 	float dist = 0;
-
 	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != 0; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 	{
 		co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
@@ -127,6 +125,7 @@ void co_unhide_recursively(uint node_id, float x, float y)
 	}
 }
 
+
 void verse_node_create_func(ENode *node, ECustomDataCommand command)
 {
 	if(command == E_CDC_CREATE)
@@ -134,6 +133,7 @@ void verse_node_create_func(ENode *node, ECustomDataCommand command)
 	if(command == E_CDC_DESTROY)
 		free(e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT));
 }
+
 
 void co_draw_bitmap(ENode *node);
 void co_geometry_destroy(void *g);
@@ -143,6 +143,7 @@ void p_render_object(ENode *node, boolean transparency);
 
 void co_search_clear(void);
 void co_search_update(char *search);
+
 
 void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 {
@@ -456,6 +457,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 							glPushMatrix();
 							glScalef(4, 4, 4);
 							sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), co_line_color[0], co_line_color[1], co_line_color[2], 1);
+
 							glPopMatrix();
 						}
 						co_node_draw(node, type, FALSE);
@@ -624,6 +626,11 @@ void co_input_handler(BInputState *input, void *user_pointer)
 							glScalef(view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move), view_cam_pos[2] / 5 * create_move + (1 - create_move));
 							co_node_draw(node, type, FALSE);
 							glScalef(4, 4, 4);
+							{
+								char text[46];
+								sprintf(text, "id = %u", e_ns_get_node_id(node));
+								sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, text) * -0.5, -0.04, SUI_T_SIZE, SUI_T_SPACE, text, co_line_color[0], co_line_color[1], co_line_color[2], 1);
+							}
 							sui_draw_text(sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node)) * -0.5, 0, SUI_T_SIZE, SUI_T_SPACE, e_ns_get_node_name(node), co_line_color[0], co_line_color[1], co_line_color[2], 0.5);
 							glPopMatrix();
 						}
@@ -708,7 +715,8 @@ void co_input_handler(BInputState *input, void *user_pointer)
 								co_node->viewlock = FALSE;
 								co_node->pos_x = co_get_pos_x(x);
 								co_node->pos_y = co_get_pos_y(type_count * -0.2);
-								co_unhide_recursively(e_ns_get_node_id(node), co_node->pos_x, co_node->pos_y);
+								co_unhide_recursevly(e_ns_get_node_id(node), co_node->pos_x, co_node->pos_y);
+								
 							}
 							type_count++;
 						}
@@ -719,6 +727,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 					betray_end_type_in_mode(TRUE);
 					mode = COIM_NONE;
 					search[0] = 0;
+					
 				}
 			}
 		}
@@ -737,6 +746,8 @@ void co_input_handler(BInputState *input, void *user_pointer)
 		if(mode == COIM_CREATE)
 			create_scroll = -5 * betray_get_screen_mode(NULL, NULL, NULL) + 2;
 	}
+
+	
 
 	if(mode == COIM_POPUP)
 	{
