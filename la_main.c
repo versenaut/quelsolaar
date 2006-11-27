@@ -41,8 +41,8 @@ int main(int argc, char **argv)
 {
 	betray_init(argc, argv, 720, 576, FALSE, "Loq Airou");
 	deceive_set_arg(argc, argv);
-	sui_load_settings("la_config.cfg");
 	sui_init();
+	sui_load_settings("la_config.cfg");
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);	
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 	la_pfx_init(sui_get_setting_int("PARTICLE_COUNT", 512));
 #ifdef PERSUADE_H
 	persuade_init(4, betray_get_gl_proc_address());
-	p_geo_set_sds_level(sui_get_setting_int("MAX_TESS_LEVEL", 4));
+	p_geo_set_sds_level(sui_get_setting_int("MAX_TESS_LEVEL", 2));
 	p_geo_set_sds_force_level(sui_get_setting_int("MIN_TESS_LEVEL", 0));
 	p_geo_set_sds_mesh_factor(sui_get_setting_double("GEOMETRY_COMPLEXITY", 40));
 #endif
