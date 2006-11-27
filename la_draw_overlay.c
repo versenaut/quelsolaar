@@ -824,19 +824,19 @@ void draw_owerlay_surface(void)
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if(GlobalOverlay.tri_count != 0)
 	{
-		glCullFace(GL_FRONT);
 		sui_set_blend_gl(GL_ONE, GL_ONE);
-		sui_draw_gl(GL_TRIANGLES, GlobalOverlay.tri, GlobalOverlay.tri_count, 3, 0.05, 0.1, 0.15, 0.0);
+		glCullFace(GL_FRONT);
+		sui_draw_gl(GL_TRIANGLES, GlobalOverlay.tri, GlobalOverlay.tri_count, 3, 0.1, 0.2, 0.3, 0.0);
 		glCullFace(GL_BACK);
-		sui_draw_gl(GL_TRIANGLES, GlobalOverlay.tri, GlobalOverlay.tri_count, 3, 0.05, 0.05, 0.05, 0.0);
+		sui_draw_gl(GL_TRIANGLES, GlobalOverlay.tri, GlobalOverlay.tri_count, 3, 0.035, 0.035, 0.035, 0.0);
 	}	
 	if(GlobalOverlay.quad_count != 0)
 	{
 		sui_set_blend_gl(GL_ONE, GL_ONE);
 		glCullFace(GL_FRONT);
-		sui_draw_gl(GL_QUADS, GlobalOverlay.quad, GlobalOverlay.quad_count, 3, 0.05, 0.1, 0.15, 0.0);
+		sui_draw_gl(GL_QUADS, GlobalOverlay.quad, GlobalOverlay.quad_count, 3, 0.1, 0.2, 0.3, 0.0);
 		glCullFace(GL_BACK);
-		sui_draw_gl(GL_QUADS, GlobalOverlay.quad, GlobalOverlay.quad_count, 3, 0.05, 0.05, 0.05, 0.0);
+		sui_draw_gl(GL_QUADS, GlobalOverlay.quad, GlobalOverlay.quad_count, 3, 0.035, 0.035, 0.035, 0.0);
 	}
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

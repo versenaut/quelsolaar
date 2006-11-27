@@ -74,7 +74,7 @@ void draw_la_star_wire(double open)
 	glPushMatrix();
 	sui_draw_text(0.1, 0.1, SUI_T_SIZE, SUI_T_SPACE, "LOQ AIROU", 0, 0, 0, 1);
 	glRotated(20 * open, 0, 0, 1);
-	sui_draw_gl(GL_QUADS, GlobalIntro.ring, CIRCLE_SEGMENTS * 4, 2, 0, 0, 0, 0.0);
+	sui_draw_gl(GL_QUADS, GlobalIntro.ring, CIRCLE_SEGMENTS * 4, 2, 0, 0, 0, 1.0);
 	glPopMatrix();
 	for(i = 0; i < 4; i++)
 	{
@@ -82,7 +82,7 @@ void draw_la_star_wire(double open)
 		glRotated(90 * (double)i, 0, 0, 1);
 		glTranslated(0, 0.1, 0);
 		glRotated(open * 100, 1, 0, 0);
-		sui_draw_gl(GL_QUADS, GlobalIntro.blade, 28, 2, 0, 0, 0, 0.0);
+		sui_draw_gl(GL_QUADS, GlobalIntro.blade, 28, 2, 0, 0, 0, 1.0);
 		glPopMatrix();
 	}
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -92,7 +92,7 @@ void draw_la_star(double open)
 {
 	uint i;
 	glPushMatrix();
-	sui_draw_gl(GL_QUADS, GlobalIntro.ring, CIRCLE_SEGMENTS * 4, 2, 0, 0, 0, 0.0);
+	sui_draw_gl(GL_QUADS, GlobalIntro.ring, CIRCLE_SEGMENTS * 4, 2, 0, 0, 0, 1.0);
 	glPopMatrix();
 	for(i = 0; i < 4; i++)
 	{
@@ -100,7 +100,7 @@ void draw_la_star(double open)
 		glRotated(90 * (double)i, 0, 0, 1);
 		glTranslated(0, 0.1, 0);
 		glRotated(open * 100, 1, 0, 0);
-		sui_draw_gl(GL_QUADS, GlobalIntro.blade, 28, 2, 0, 0, 0, 0.0);
+		sui_draw_gl(GL_QUADS, GlobalIntro.blade, 28, 2, 0, 0, 0, 1.0);
 		glPopMatrix();
 	}
 
@@ -141,7 +141,6 @@ void la_intro_draw(void *user)
 	static double t = -100, rot = 1;
 	static uint spark = 0;
 	double r;
-
 	glPushMatrix();
 	if(betray_get_delta_time() < 1.0 / 60.0)
 		t += betray_get_delta_time() * 60.0;
