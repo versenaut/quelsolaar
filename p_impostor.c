@@ -65,7 +65,7 @@ uint create_environment(uint size, float *buf)
 	uint format = p_th_get_hdri_token(FALSE);
 	glEnable(GL_TEXTURE_CUBE_MAP_EXT);
 	glGenTextures(1, &environment);
-	printf("yet an other cube map\n");
+//	printf("yet an other cube map\n");
 	glBindTexture(GL_TEXTURE_CUBE_MAP_EXT, environment);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -181,7 +181,7 @@ uint p_blur_object_environment(ENode *node, uint blur, uint texture, uint size, 
 	if(blur == -1)
 	{
 		blur = create_environment(size, NULL);
-		printf("blur node = %s\n", e_ns_get_node_name(node));
+//		printf("blur node = %s\n", e_ns_get_node_name(node));
 	}
 	glLoadIdentity();
 	glPushMatrix();
@@ -464,7 +464,7 @@ uint update_object_environment(ENode *node, uint texture, uint size, uint side)
 	if(texture == -1)
 	{
 		texture = create_environment(size, NULL);
-		printf("texture node = %s\n", e_ns_get_node_name(node));
+	//	printf("texture node = %s\n", e_ns_get_node_name(node));
 	}
 	glPushMatrix();
 	glLoadIdentity();
@@ -612,6 +612,17 @@ void update_object_impostor(ENode *node, double *pos, uint texture)
 boolean p_render_to_texture_suported(void);
 uint p_blur_intermidiet = -1;
 uint p_blur_intermidiet2 = -1;
+boolean fbo_enabled = TRUE;
+
+void p_render_set_fbo_enable(uint fbo)
+{
+	fbo_enabled = fbo;
+}
+
+uint p_render_get_fbo_enable(void)
+{
+	return fbo_enabled;
+}
 
 void p_update_object_impostors(void)
 {
@@ -621,7 +632,7 @@ void p_update_object_impostors(void)
 	PObject *o;
 	double matrix[16];
 
-	if(!p_render_to_texture_suported())
+	if(!p_render_to_texture_suported() || !fbo_enabled)
 		return;
 	for(node = e_ns_get_node_next(node_id, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 	{		
