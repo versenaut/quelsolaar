@@ -1,6 +1,3 @@
-
-#include <stdio.h>
-
 #include "enough.h"
 #include "p_sds_geo.h"
 #include "p_sds_table.h"
@@ -106,8 +103,6 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 			mat[mesh->render.mat_count].material_version = 0;
 			mesh->render.mat_count++;
 		}
-
-
 
 		if(param_count != 0)
 		{
