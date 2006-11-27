@@ -1,5 +1,4 @@
-#include <stdio.h>
-
+ 
 #include "enough.h"
 
 #include "p_sds_geo.h"
@@ -323,7 +322,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 	verse_session_get_time(&seconds, &fractions);
 	if(mesh->stage == POS_DONE && mesh->next == NULL && (p_lod_compute_lod_update(o_node, g_node, seconds, fractions, mesh->tess.factor / p_sds_mesh_factor) || p_lod_material_test(mesh, o_node)))
 		mesh->geometry_version--;
-	if(smesh->geometry_version != mesh->geometry_version && mesh->next == NULL)
+/*	if(smesh->geometry_version != mesh->geometry_version && mesh->next == NULL)
 	{
 		printf("recomputing node = %u, (%u %u)\n", mesh->geometry_id, smesh->geometry_version, mesh->geometry_version);
 		if(mesh->stage != POS_DONE)
@@ -334,7 +333,7 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 		{
 			mesh->next = p_rm_create(g_node);
 		}
-	}
+	}*/
 
 	if(mesh->next != NULL)
 	{
