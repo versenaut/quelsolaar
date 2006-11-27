@@ -1,6 +1,4 @@
 
-#include <stdio.h>
-
 #include "verse.h"
 #include "enough.h"
 
@@ -183,7 +181,7 @@ float p_sds_compute_neighbor(PPolyStore *poly)
 				{	/* other poly is a tri */
 					a = (i / 4) * 4;
 					b = poly->quad_length + ((cor - poly->quad_length) / 3) * 3;
-					if((n[cor] == -1 || n[a + (i + 3) % 4] == -1) && ref[a + (i + 3) % 4] == ref[b + (cor - b + 1) % 3])
+					if((n[cor] == -1 && n[a + (i + 3) % 4] == -1) && ref[a + (i + 3) % 4] == ref[b + (cor - b + 1) % 3])
 					{
 						n[a + (i + 3) % 4] = cor;
 						n[cor] = a + (i + 3) % 4;
@@ -197,7 +195,7 @@ float p_sds_compute_neighbor(PPolyStore *poly)
 								v[ref[i]] = -1;
 						}
 					}
-					if((n[i] == -1 || n[b + (cor - b + 2) % 3] == -1) && ref[a + (i + 1) % 4] == ref[b + (cor - b + 2) % 3])
+					if((n[i] == -1 && n[b + (cor - b + 2) % 3] == -1) && ref[a + (i + 1) % 4] == ref[b + (cor - b + 2) % 3])
 					{
 						n[i] = b + (cor - b + 2) % 3;						
 						n[b + (cor - b + 2) % 3] = i;
@@ -217,7 +215,7 @@ float p_sds_compute_neighbor(PPolyStore *poly)
 					/* other poly is a quad */
 					a = (i / 4) * 4;
 					b = (cor / 4) * 4;
-					if((n[cor] == -1 || n[a + (i + 3) % 4] == -1) && ref[a + (i + 3) % 4] == ref[b + (cor + 1) % 4])
+					if((n[cor] == -1 && n[a + (i + 3) % 4] == -1) && ref[a + (i + 3) % 4] == ref[b + (cor + 1) % 4])
 					{
 						n[a + (i + 3) % 4] = cor;
 						n[cor] = a + (i + 3) % 4;
@@ -232,7 +230,7 @@ float p_sds_compute_neighbor(PPolyStore *poly)
 								v[ref[i]] = -1;
 						}
 					}
-					if((n[i] == -1 || n[b + (cor + 3) % 4] == -1) && ref[a + (i + 1) % 4] == ref[b + (cor + 3) % 4])
+					if((n[i] == -1 && n[b + (cor + 3) % 4] == -1) && ref[a + (i + 1) % 4] == ref[b + (cor + 3) % 4])
 					{
 						n[i] = b + (cor + 3) % 4;
 						n[b + (cor + 3) % 4] = i;
@@ -266,7 +264,7 @@ float p_sds_compute_neighbor(PPolyStore *poly)
 				{	/* other poly is a tri */
 					a = poly->quad_length + ((i - poly->quad_length) / 3) * 3;
 					b = poly->quad_length + ((cor - poly->quad_length) / 3) * 3;
-					if((n[cor] == -1 || n[a + (i - a + 2) % 3] == -1) && ref[a + (i - a + 2) % 3] == ref[b + (cor - b + 1) % 3])
+					if((n[cor] == -1 && n[a + (i - a + 2) % 3] == -1) && ref[a + (i - a + 2) % 3] == ref[b + (cor - b + 1) % 3])
 					{
 						n[a + (i - a + 2) % 3] = cor;
 						n[cor] = a + (i - a + 2) % 3;
@@ -281,7 +279,7 @@ float p_sds_compute_neighbor(PPolyStore *poly)
 						}
 //						v[ref[i]] = -1;
 					}
-					if((n[i] == -1 || n[b + (cor - b + 2) % 3] == -1) && ref[a + (i - a + 1) % 3] == ref[b + (cor - b + 2) % 3])
+					if((n[i] == -1 && n[b + (cor - b + 2) % 3] == -1) && ref[a + (i - a + 1) % 3] == ref[b + (cor - b + 2) % 3])
 					{
 						n[i] = b + (cor - b + 2) % 3;						
 						n[b + (cor - b + 2) % 3] = i;
@@ -301,7 +299,7 @@ float p_sds_compute_neighbor(PPolyStore *poly)
 					/* other poly is a quad */
 					a = poly->quad_length + ((i - poly->quad_length) / 3) * 3;
 					b = (cor / 4) * 4;
-					if((n[cor] == -1 || n[a + (i - a + 2) % 3] == -1) && ref[a + (i - a + 2) % 3] == ref[b + (cor + 1) % 4])
+					if((n[cor] == -1 && n[a + (i - a + 2) % 3] == -1) && ref[a + (i - a + 2) % 3] == ref[b + (cor + 1) % 4])
 					{
 						n[a + (i - a + 2) % 3] = cor;
 						n[cor] = a + (i - a + 2) % 3;
@@ -316,7 +314,7 @@ float p_sds_compute_neighbor(PPolyStore *poly)
 						}
 //						v[ref[i]] = -1;
 					}
-					if((n[i] == -1 || n[(cor - b + 3) % 4] == -1) && ref[a + (i - a + 1) % 3] == ref[b + (cor + 3) % 4])
+					if((n[i] == -1 && n[(cor - b + 3) % 4] == -1) && ref[a + (i - a + 1) % 3] == ref[b + (cor + 3) % 4])
 					{
 						n[i] = b + (cor + 3) % 4;
 						n[b + (cor + 3) % 4] = i;				
@@ -340,6 +338,12 @@ float p_sds_compute_neighbor(PPolyStore *poly)
 		
 	}
 	counter = 0;
+/*	for(i = 0; i < (poly->quad_length + poly->tri_length); i++)
+		printf("n %u = %u\n", i, n[i]);
+	for(i = 0; i < (poly->quad_length + poly->tri_length); i++)
+		printf("p %u = %u\n", i, poly->ref[i]);
+*/
+
 	for(i = 0; i < (poly->quad_length + poly->tri_length); i++)
 		if(n[i] == -1)
 			counter++;
@@ -397,6 +401,61 @@ float p_sds_stage_count_poly(PPolyStore *mesh, uint *ref, uint ref_count, egreal
 {
 	uint stage, i = 0;
 	ref_count *= 4;
+/*	{
+		uint j, k ,l;
+		for(j = 0; j < ref_count; j += 4)
+		if(ref[j] < vertex_count && ref[j + 1] < vertex_count &&  ref[j + 2] < vertex_count && vertex[ref[j] * 3] != E_REAL_MAX && vertex[ref[j + 1] * 3] != E_REAL_MAX && vertex[ref[j + 2] * 3] != E_REAL_MAX)
+		{
+			if(ref[j + 3] < vertex_count && vertex[ref[j + 3] * 3] != E_REAL_MAX)
+			{
+				for(k = 0; k < 4; k++)
+					for(l = 0; l < ref_count; l += 4)
+						if(j != l)
+							if((ref[j + k] == ref[l + 0] && ref[j + (k + 1) % 4] == ref[l + 1]) ||
+								(ref[j + k] == ref[l + 1] && ref[j + (k + 1) % 4] == ref[l + 2]) ||
+								(ref[j + k] == ref[l + 2] && ref[j + (k + 1) % 4] == ref[l + 3]) ||
+								(ref[j + k] == ref[l + 3] && ref[j + (k + 1) % 4] == ref[l + 0]) ||
+								(ref[j + k] == ref[l + 2] && ref[j + (k + 1) % 4] == ref[l + 0]))
+								printf("A horror found!!!!!!!!!");
+			}
+			else
+				for(k = 0; k < 3; k++)
+					for(l = 0; l < ref_count; l += 4)
+						if(j != l)
+							if((ref[j + k] == ref[l + 0] && ref[j + (k + 1) % 4] == ref[l + 1]) ||
+								(ref[j + k] == ref[l + 1] && ref[j + (k + 1) % 4] == ref[l + 2]) ||
+								(ref[j + k] == ref[l + 2] && ref[j + (k + 1) % 4] == ref[l + 3]) ||
+								(ref[j + k] == ref[l + 3] && ref[j + (k + 1) % 4] == ref[l + 0]) ||
+								(ref[j + k] == ref[l + 2] && ref[j + (k + 1) % 4] == ref[l + 0]))
+								printf("B horror found!!!!!!!!!");			
+		}
+	}*/
+	{
+		uint j, k ,l;
+		for(j = 0; j < ref_count; j += 4)
+		if(ref[j] < vertex_count && ref[j + 1] < vertex_count &&  ref[j + 2] < vertex_count && vertex[ref[j] * 3] != E_REAL_MAX && vertex[ref[j + 1] * 3] != E_REAL_MAX && vertex[ref[j + 2] * 3] != E_REAL_MAX)
+		{
+			if(ref[j + 3] < vertex_count && vertex[ref[j + 3] * 3] != E_REAL_MAX)
+			{
+				for(l = 0; l < ref_count; l += 4)
+					if(j != l)
+						for(k = 0; k < 3; k++)
+							if(ref[l + 0] == ref[j + k] &&
+								ref[l + 1] == ref[j + (k + 1) % 3] &&
+								ref[l + 2] == ref[j + (k + 2) % 3])
+									printf("A horror found!!!!!!!!!\n");
+			}
+			else
+				for(l = 0; l < ref_count; l += 4)
+					if(j != l)
+						for(k = 0; k < 3; k++)
+							if(ref[l + 0] == ref[j + k] &&
+								ref[l + 1] == ref[j + (k + 1) % 3] &&
+								ref[l + 2] == ref[j + (k + 2) % 3])
+									printf("A horror found!!!!!!!!!\n");
+		}
+	}
+
 	for(stage = mesh->stage[1]; stage < ref_count && i < MAX_COUNT_STAGE_LOOPS ; stage += 4)
 	{
 //		printf("ref%u = %u %u %u %u\n", stage / 4, ref[stage], ref[stage + 1], ref[stage + 2], ref[stage + 3]);
