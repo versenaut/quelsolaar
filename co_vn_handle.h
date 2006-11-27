@@ -7,6 +7,7 @@ typedef struct{
 	uint		node_id;
 	float		pos_x;
 	float		pos_y;
+	float		color[3];
 	boolean		search;	
 	boolean		viewlock;	
 	boolean		hidden;
