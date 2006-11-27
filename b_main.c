@@ -348,7 +348,7 @@ void betray_time_update(void)
 {
 	uint32 seconds, fractions;
 	betray_get_current_time(&seconds, &fractions);
-	BGlobal.delta_time = (double)seconds - (double)BGlobal.time[0] + ((double)fractions - (double)BGlobal.time[1]) / (double)(0xffffffff);
+	BGlobal.delta_time = (double)seconds - (double)BGlobal.time[0] + ((double)fractions - (double)BGlobal.time[1]) / (double)(0xffffffffu);
 	BGlobal.time[0] = seconds;
 	BGlobal.time[1] = fractions;
 }
