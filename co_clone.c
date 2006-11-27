@@ -12,11 +12,9 @@ boolean co_clone_method_sub = FALSE;
 boolean co_clone_layer_sub = FALSE;
 
 
-boolean co_compare_text(char *a, char *b)
+boolean co_compare_text(const char *a, const char *b)
 {
-	uint i;
-	for(i = 0; a[i] != 0 && a[i] == b[i]; i++);
-	return a[i] == b[i];
+	return strcmp(a, b) == 0;
 }
 
 void co_clone_head(ENode *node, ENode *clone)
@@ -100,10 +98,9 @@ void co_clone_object(ENode *node, ENode *clone)
 				for(j = e_nso_get_next_method_group(clone, 0); j != (uint16)-1; j = e_nso_get_next_method_group(clone, j + 1))
 					if(co_compare_text(e_nso_get_method_group(node, i), e_nso_get_method_group(clone, j)))
 						break;
-				if(j != (uint16) -1)
-					for(k = e_nso_get_next_method(node, i, 0); k != (uint16)-1; k = e_nso_get_next_method(node, i, k + 1))
-						verse_send_o_method_create(id, j, -1, e_nso_get_method(node, i, k), e_nso_get_method_param_count(node, i, k),
-									   e_nso_get_method_param_types(node, i, k), e_nso_get_method_param_names(node, i, k));
+				if(j != (uint16)-1)
+				for(k = e_nso_get_next_method(node, i, 0); k != (uint16)-1; k = e_nso_get_next_method(node, i, k + 1))
+					verse_send_o_method_create(id, j, -1, e_nso_get_method(node, i, k), e_nso_get_method_param_count(node, i, k), e_nso_get_method_param_types(node, i, k), e_nso_get_method_param_names(node, i, k));
 			}
 			co_clone_method_sub = TRUE;
 		}
