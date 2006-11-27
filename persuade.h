@@ -45,6 +45,9 @@ extern boolean	p_render_get_wireframe(void);
 extern void		p_render_set_light_count(uint light);
 extern uint		p_render_get_light_count(void);
 
+extern void		p_render_set_fbo_enable(uint fbo);
+extern uint		p_render_get_fbo_enable(void);
+
 extern void		p_th_set_sds_use_hdri(boolean hdri);
 extern boolean	p_th_get_sds_use_hdri(void);
 
