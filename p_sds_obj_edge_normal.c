@@ -217,9 +217,7 @@ boolean p_lod_handle_edge(PPolyStore *smesh, PMesh *mesh, uint current_poly, uin
 	}
 	return FALSE;
 }
-/*
-mesh->tess.order_temp_mesh_ref[mesh->sub_stages[0]]
-*/
+
 
 uint p_lod_handle_edge_count(PPolyStore *smesh, PMesh *mesh, uint current_poly, uint current_edge)
 {
@@ -256,13 +254,15 @@ uint p_lod_handle_edge_count(PPolyStore *smesh, PMesh *mesh, uint current_poly, 
 	if(crease)
 	{
 		return 0;
-	}
-	else
+	}else
 	{
 		return (current_table->edges[current_edge + 1] - current_table->edges[current_edge]) * 6;
 	}
 	return 0;
 }
+/*
+mesh->tess.order_temp_mesh_ref[mesh->sub_stages[0]]
+*/
 
 void p_rm_create_vertex_normals(uint *output, PMesh *mesh, uint poly, uint corner)
 {
