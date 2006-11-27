@@ -604,7 +604,6 @@ VNMFragmentID p_shader_compute_get_fragment_color_front(ENode *node, uint *dest,
 			}
 			if((ta == VN_M_FT_TRANSPARENCY && fa->transparency.refraction_index > 0.99 && fa->transparency.refraction_index < 1.01) || (tb == VN_M_FT_TRANSPARENCY && fb->transparency.refraction_index > 0.99 && fb->transparency.refraction_index < 1.01))
 			{
-					printf("p_shader_compute_get_fragment_color_front F\n");
 				if(frag->blender.type == VN_M_BLEND_MULTIPLY)
 				{
 					*dest = GL_SRC_COLOR;

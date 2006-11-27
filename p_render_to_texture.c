@@ -239,6 +239,7 @@ uint p_create_renderable_texture(uint size, uint format)
 {
 	uint texture;
 	glGenTextures(1, &texture);
+//	printf("creating new renderable texture\n");
 	glBindTexture(GL_TEXTURE_2D, texture);
 	{
 		float *buffer;

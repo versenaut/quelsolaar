@@ -639,8 +639,8 @@ boolean p_shader_compute(uint node_id)
 
 		break;
 		case 2 :
-			printf("\n%s\n", t->f_shader);
-			printf("\n%s\n", t->v_shader);
+		//	printf("\n%s\n", t->f_shader);
+		//	printf("\n%s\n", t->v_shader);
 
 			p_glShaderSourceARB(t->s->vertex_obj, 1, (const char **) &t->v_shader, &t->v_length);
 			p_glCompileShaderARB(t->s->vertex_obj);
@@ -648,7 +648,7 @@ boolean p_shader_compute(uint node_id)
 				char buf[2000];
 				GLsizei length;
 				p_glGetInfoLogARB(t->s->vertex_obj, 2000, &length, buf);
-				printf("Vertex Errors: (node id = %u)\n%s\n", node_id, buf);
+			//	printf("Vertex Errors: (node id = %u)\n%s\n", node_id, buf);
 			}
 			t->stage = 3;
 		break;
@@ -659,7 +659,7 @@ boolean p_shader_compute(uint node_id)
 				char buf[2000];
 				GLsizei length;
 				p_glGetInfoLogARB(t->s->fragment_obj, 2000, &length, buf);
-				printf("Fragment Errors: (node id = %u)\n%s\n", node_id, buf);
+			//	printf("Fragment Errors: (node id = %u)\n%s\n", node_id, buf);
 			}
 			t->stage = 4;
 		break;
@@ -669,7 +669,7 @@ boolean p_shader_compute(uint node_id)
 				char buf[2000];
 				GLsizei length;
 				p_glGetInfoLogARB(t->s->prog_obj, 2000, &length, buf);
-				printf("Link Errors: (node id = %u)\n%s\n", node_id, buf);
+			//	printf("Link Errors: (node id = %u)\n%s\n", node_id, buf);
 			}
 			t->stage = 5;
 		break;
