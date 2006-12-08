@@ -65,7 +65,11 @@ uint create_environment(uint size, float *buf)
 	uint format = p_th_get_hdri_token(FALSE);
 	glEnable(GL_TEXTURE_CUBE_MAP_EXT);
 	glGenTextures(1, &environment);
+<<<<<<< p_impostor.c
+	printf("creating yet another cube map\n");
+=======
 //	printf("yet an other cube map\n");
+>>>>>>> 1.11
 	glBindTexture(GL_TEXTURE_CUBE_MAP_EXT, environment);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -134,7 +138,7 @@ void p_create_cube_blur_shader(void)
 	"	color += textureCube(environment, normal + vec3(-0.482868, -0.387759, -0.479857) * vec3(scale, scale, scale));\n"
 	"	color += textureCube(environment, normal + vec3(0.161984, -0.218762, -0.293495) * vec3(scale, scale, scale));\n"
 	"	color += textureCube(environment, normal + vec3(-0.492634, 0.166669, -0.325802) * vec3(scale, scale, scale));\n"
-	"	gl_FragColor += color / vec4(40.0, 40.0, 40.0, 1.0);\n"
+	"	gl_FragColor = color / vec4(40.0, 40.0, 40.0, 1.0);\n"
 //	"	gl_FragColor = vec4(normal, 1.0);\n"
 	"}\n";
 
@@ -259,8 +263,6 @@ uint p_render_get_impostor_resolution(void)
 	return p_impostor_resolution;
 }
 
-
-
 void p_init_impostor(PObjImpostor *imp)
 {
 	static uint i = 0;
@@ -277,13 +279,13 @@ void p_init_impostor(PObjImpostor *imp)
 	imp->blur = -1;
 }
 
-
 void p_free_impostor(PObjImpostor *imp)
 {
 	glDeleteTextures(1, &imp->texture);
 	glDeleteTextures(1, &imp->environment);
 	glDeleteTextures(1, &imp->blur);
 }
+
 void p_render_lit_and_transformed_object(ENode *node, boolean transparency);
 double *p_lod_get_view_pos(void);
 double *p_lod_get_view_matrix(void);
@@ -536,6 +538,7 @@ void update_object_impostor(ENode *node, double *pos, uint texture)
 	PObjImpostor *imp;
 	PObject *o;
 	uint i;
+
 	o = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
 	point_b[0] = pos[0];
 	point_b[1] = pos[1] + 1;
@@ -609,7 +612,7 @@ void update_object_impostor(ENode *node, double *pos, uint texture)
 	reverse_matrix(matrix);
 }
 
-boolean p_render_to_texture_suported(void);
+boolean p_render_to_texture_supported(void);
 uint p_blur_intermidiet = -1;
 uint p_blur_intermidiet2 = -1;
 boolean fbo_enabled = TRUE;
@@ -632,7 +635,7 @@ void p_update_object_impostors(void)
 	PObject *o;
 	double matrix[16];
 
-	if(!p_render_to_texture_suported() || !fbo_enabled)
+	if(!p_render_to_texture_supported() || !fbo_enabled)
 		return;
 	for(node = e_ns_get_node_next(node_id, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 	{		
