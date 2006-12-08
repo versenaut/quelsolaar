@@ -31,15 +31,15 @@ typedef struct{
 
 extern float co_line_color[3];
 
-COSymbSetting *co_symbols = NULL;
-uint  co_symbol_count;
-uint  co_symbol_allocated = 0;
+static COSymbSetting *co_symbols = NULL;
+static uint  co_symbol_count;
+static uint  co_symbol_allocated = 0;
 static uint co_current_edit_cymbol = 0;
 
 
-SDrawing *co_symbol_icons = NULL;
-uint  co_symbol_icon_count = 0;
-uint  co_symbol_icon_allocated = 0;
+static SDrawing *co_symbol_icons = NULL;
+static uint  co_symbol_icon_count = 0;
+static uint  co_symbol_icon_allocated = 0;
 
 void co_pack_binary_uint32(FILE *f, const uint32 data)
 {
@@ -125,6 +125,8 @@ boolean co_load_symb_settings(char *file_name)
 	if(f == NULL)
 		return FALSE;
 	co_symbol_count = co_unpack_binary_uint32(f);
+	if(feof(f))	/* After first read, check if file is already over. Catches 0-length file, at least. */
+		return;
 	if(co_symbols != NULL)
 		free(co_symbols);
 	co_symbol_allocated = co_symbol_count + 16;
@@ -274,6 +276,10 @@ void co_draw_symbols(ENode *node, float *color, float pos_x, float pos_y, float 
 	float line = 0;
 	char text[64];
 	co_init_symbols();
+
+	if(co_symbols == NULL)
+		return;
+
 	if(co_symbol_count != 0)
 	{
 		glPushMatrix();
