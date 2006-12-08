@@ -65,11 +65,7 @@ uint create_environment(uint size, float *buf)
 	uint format = p_th_get_hdri_token(FALSE);
 	glEnable(GL_TEXTURE_CUBE_MAP_EXT);
 	glGenTextures(1, &environment);
-<<<<<<< p_impostor.c
 	printf("creating yet another cube map\n");
-=======
-//	printf("yet an other cube map\n");
->>>>>>> 1.11
 	glBindTexture(GL_TEXTURE_CUBE_MAP_EXT, environment);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_EXT, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
