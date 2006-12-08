@@ -111,17 +111,17 @@ typedef struct {
 
 static RenderSetup g_global_fbos[2] = {{ 128, -1, -1, -1 }, { 128, -1, -1, -1 }};
 
-boolean fbo_suported = FALSE;
+static boolean fbo_supported = FALSE;
 
-boolean p_render_to_texture_suported(void)
+boolean p_render_to_texture_supported(void)
 {
-	return fbo_suported;
+	return fbo_supported;
 }
 
 void p_init_render_to_texture(void)
 {
-	fbo_suported = FALSE;
-	if(p_extension_test("GL_EXT_framebuffer_object"))
+	fbo_supported = FALSE;
+	if(1 && p_extension_test("GL_EXT_framebuffer_object"))
 	{
 		p_glBindFramebufferEXT = p_extension_get_address("glBindFramebufferEXT");
 		p_glDeleteFramebuffersEXT = p_extension_get_address("glDeleteFramebuffersEXT");
@@ -133,7 +133,7 @@ void p_init_render_to_texture(void)
 		p_glRenderbufferStorageEXT = p_extension_get_address("glRenderbufferStorageEXT");
 		p_glFramebufferTexture2DEXT = p_extension_get_address("glFramebufferTexture2DEXT");
 		p_glFramebufferRenderbufferEXT = p_extension_get_address("glFramebufferRenderbufferEXT");
-		fbo_suported = TRUE;
+		fbo_supported = TRUE;
 	}
 }
 
@@ -173,7 +173,7 @@ void p_checks_framebuffer_status(void)
      //   default:
        //     assert(0);
     }
-	fbo_suported = FALSE;
+	fbo_supported = FALSE;
 }
 
 void p_texture_render_bind(uint texture, uint size, uint target)
