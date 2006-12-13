@@ -15,8 +15,6 @@
 #endif
 #endif
 
-
-
 #define GL_FRAMEBUFFER_EXT                     0x8D40
 
 #define GL_RENDERBUFFER_EXT                    0x8D41
@@ -109,7 +107,7 @@ typedef struct {
 	uint stencil;
 } RenderSetup;
 
-static RenderSetup g_global_fbos[2] = {{ 128, -1, -1, -1 }, { 128, -1, -1, -1 }};
+static RenderSetup g_global_fbos[2] = {{ 128, 0, 0, 0 }, { 128, 0, 0, 0 }};
 
 static boolean fbo_supported = FALSE;
 
@@ -170,17 +168,15 @@ void p_checks_framebuffer_status(void)
         case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
             printf("Framebuffer incomplete, missing read buffer\n");
             break;
-     //   default:
-       //     assert(0);
     }
-	fbo_supported = FALSE;
+    fbo_supported = FALSE;
 }
 
 void p_texture_render_bind(uint texture, uint size, uint target)
 {
 	RenderSetup *fbo;
 
-	if (!p_glBindFramebufferEXT)
+	if(!p_glBindFramebufferEXT)
 		return;
 
 	if(target == GL_TEXTURE_2D)
@@ -190,11 +186,18 @@ void p_texture_render_bind(uint texture, uint size, uint target)
 
 	if(fbo->size != size)
 	{
-		if(fbo->fbo != -1)
+		if(fbo->fbo != 0)
+		{
 			p_glDeleteFramebuffersEXT(1, &fbo->fbo);
-		fbo->fbo = -1;
+			fbo->fbo = 0;
+		}
+		if(fbo->depth != 0)
+		{
+			p_glDeleteRenderbuffersEXT(1, &fbo->depth);
+			fbo->depth = 0;
+		}
 	}
-	if(fbo->fbo == -1)
+	if(fbo->fbo == 0)
 	{
 		fbo->size = size;
 		p_glGenFramebuffersEXT(1, &fbo->fbo);
@@ -212,12 +215,12 @@ void p_texture_render_bind(uint texture, uint size, uint target)
 		p_glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_STENCIL_INDEX8, size, size);
 		p_glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, p_global_stencil);
 
-        p_glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, p_global_stencil);
-        p_glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_STENCIL_INDEX, size, size);
-        p_glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, p_global_stencil);
-*/
-	//	p_glCheckFramebufferStatusEXT();
-		p_checks_framebuffer_status();
+	        p_glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, p_global_stencil);
+	        p_glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_STENCIL_INDEX, size, size);
+		p_glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, p_global_stencil);
+
+		p_glCheckFramebufferStatusEXT();
+*/		p_checks_framebuffer_status();
 	}else
 	{
 		p_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo->fbo);    
@@ -293,6 +296,3 @@ void p_post_fbo_draw(void)
 {
 	p_texture_render_unbind();
 }
-
-
-
