@@ -294,12 +294,12 @@ void betray_launch_main_loop(void)
 		float x, y;
 		input->delta_pointer_x = -input->pointer_x;
 		input->delta_pointer_y = -input->pointer_y;
-		while (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE))
+		while(PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
 		{
-			if (!GetMessage (&msg, NULL, 0, 0))
+			if(!GetMessage(&msg, NULL, 0, 0))
 				;
-			TranslateMessage (&msg);
-   			DispatchMessage (&msg);
+			TranslateMessage(&msg);
+   			DispatchMessage(&msg);
 		}
 		input->delta_pointer_x += input->pointer_x;
 		input->delta_pointer_y += input->pointer_y;
