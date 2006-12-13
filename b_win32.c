@@ -1,3 +1,7 @@
+/*
+ * 
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -10,9 +14,10 @@ static boolean	input_focus = TRUE;
 static uint	screen_size_x = 800;
 static uint	screen_size_y = 600;
 static boolean	mouse_warp = FALSE;
-HDC hDC;				/* device context */
+static HDC	hDC;				/* device context */
+static HWND	hWnd;
+
 extern void sui_get_input(BInputState *data);
-HWND    hWnd;
 
 boolean b_win32_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen) 
 {  
@@ -26,17 +31,15 @@ void betray_set_context_update_func(void (*context_func)(void))
 	sdl_context_func = context_func;
 }
 
-
-
 LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 { 
-    static PAINTSTRUCT ps;
-    static int omx, omy, mx, my;
+	static PAINTSTRUCT ps;
+	static int omx, omy, mx, my;
 	BInputState *input;
 	int i;
 
 	input = betray_get_input_state();
-    switch(uMsg)
+	switch(uMsg)
 	{
 		case WM_PAINT :
 			betray_action(BAM_DRAW);
@@ -157,10 +160,8 @@ LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 	    case WM_CLOSE:
 			exit(0);
-
-
 	}
-    return DefWindowProc(hWnd, uMsg, wParam, lParam); 
+	return DefWindowProc(hWnd, uMsg, wParam, lParam); 
 }
 
 
@@ -168,14 +169,15 @@ HWND  hWnd;				/* window */
 
 boolean b_win32_init_display(uint size_x, uint size_y, boolean full_screen, const char *caption) 
 {
-    int n, pf;
-    HGLRC hRC;				/* opengl context */
-    WNDCLASS    wc;
-    LOGPALETTE* lpPal;
-    PIXELFORMATDESCRIPTOR pfd;
-    static HINSTANCE hInstance = 0;
-    /* only register the window class once - use hInstance as a flag. */
-    if(!hInstance)
+	int n, pf;
+	HGLRC hRC;				/* opengl context */
+	WNDCLASS    wc;
+	LOGPALETTE* lpPal;
+	PIXELFORMATDESCRIPTOR pfd;
+	static HINSTANCE hInstance = 0;
+
+	/* only register the window class once - use hInstance as a flag. */
+	if(!hInstance)
 	{
 		hInstance = GetModuleHandle(NULL);
 		wc.style = CS_OWNDC;
@@ -194,49 +196,49 @@ boolean b_win32_init_display(uint size_x, uint size_y, boolean full_screen, cons
 			printf("Betray: RegisterClass() failed: Cannot register window class.\n");
 			return FALSE;
 		}
-    }
+	}
 
-    hWnd = CreateWindow("OpenGL", caption, WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 10, 10, size_x, size_y, NULL, NULL, hInstance, NULL);
+	hWnd = CreateWindow("OpenGL", caption, WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 10, 10, size_x, size_y, NULL, NULL, hInstance, NULL);
 
-    if(hWnd == NULL)
+	if(hWnd == NULL)
 	{
 		printf("Betray: CreateWindow() failed:  Cannot create a window.\n");
 		return FALSE;
-    }
+	}
 
-    hDC = GetDC(hWnd);
+	hDC = GetDC(hWnd);
 
-    /* there is no guarantee that the contents of the stack that become
-       the pfd are zeroed, therefore _make sure_ to clear these bits. */
-    memset(&pfd, 0, sizeof(pfd));
-    pfd.nSize = sizeof(pfd);
-    pfd.nVersion = 1;
-    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-    pfd.iPixelType = PFD_TYPE_RGBA;
-    pfd.cStencilBits = 8;
-    pfd.cDepthBits = 24;
-    pfd.cColorBits = 32;
+	/* there is no guarantee that the contents of the stack that become
+	the pfd are zeroed, therefore _make sure_ to clear these bits. */
+	memset(&pfd, 0, sizeof(pfd));
+	pfd.nSize = sizeof(pfd);
+	pfd.nVersion = 1;
+	pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+	pfd.iPixelType = PFD_TYPE_RGBA;
+	pfd.cStencilBits = 8;
+	pfd.cDepthBits = 24;
+	pfd.cColorBits = 32;
 
-    pf = ChoosePixelFormat(hDC, &pfd);
-    if(pf == 0)
+	pf = ChoosePixelFormat(hDC, &pfd);
+	if(pf == 0)
 	{
 		printf("Betray: ChoosePixelFormat() failed: Cannot find a suitable pixel format.\n"); 
 		return FALSE;
-    } 
- 
-    if(SetPixelFormat(hDC, pf, &pfd) == FALSE)
+	} 
+	if(SetPixelFormat(hDC, pf, &pfd) == FALSE)
 	{
 		printf("Betray: SetPixelFormat() failed: Cannot set format specified.\n");
 		return FALSE;
-    } 
+	} 
 
-    DescribePixelFormat(hDC, pf, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
-    ReleaseDC(hDC, hWnd);
+	DescribePixelFormat(hDC, pf, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
+	ReleaseDC(hDC, hWnd);
 
-    hDC = GetDC(hWnd);
-    hRC = wglCreateContext(hDC);
-    wglMakeCurrent(hDC, hRC);
-    return TRUE;
+	hDC = GetDC(hWnd);
+	hRC = wglCreateContext(hDC);
+	wglMakeCurrent(hDC, hRC);
+
+	return TRUE;
 }    
 
 void system_wrapper_endframe(void)
@@ -272,21 +274,22 @@ void betray_launch_main_loop(void)
 {
 	MSG   msg;				/* message */
 	BInputState *input;
-	input = betray_get_input_state();
-    ShowWindow(hWnd, my_nCmdShow);
 
-  /*  while(GetMessage(&msg, hWnd, 0, 0)) {
-	TranslateMessage(&msg);
-	DispatchMessage(&msg);
-    }*/
-//    while(GetMessage(&msg, hWnd, 0, 0))
-/*  while(GetMessage(&msg, NULL, 0, 0))
+	input = betray_get_input_state();
+	ShowWindow(hWnd, my_nCmdShow);
+
+/*	while(GetMessage(&msg, hWnd, 0, 0)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	while(GetMessage(&msg, NULL, 0, 0))
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
-
+	}
 */
-    while(TRUE)
+	while(TRUE)
 	{
 		float x, y;
 		input->delta_pointer_x = -input->pointer_x;
@@ -326,10 +329,12 @@ extern int main(int argc, char **argv);
 
 int APIENTRY WinMain(HINSTANCE hCurrentInst, HINSTANCE hPreviousInst, LPSTR lpszCmdLine, int nCmdShow)
 {
-	char *argument = "file.exe";
+	char *argv[] = { "file.exe", NULL };
+
 	my_nCmdShow = nCmdShow;
 	main(1, &argument);
-    return TRUE;
+
+	return TRUE;
 }
 
 #endif
