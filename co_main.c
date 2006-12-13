@@ -67,5 +67,6 @@ int main(int argc, char **argv)
 //	e_vc_set_auto_subscribe(V_NT_GEOMETRY, FALSE);
 //	e_vc_set_auto_subscribe(V_NT_MATERIAL, FALSE);
 	betray_launch_main_loop();
+
 	return 0;
 }
