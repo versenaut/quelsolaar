@@ -29,7 +29,7 @@ void sp_settings_pre(SUIViewElement *element)
 	element[4].param.integer = p_geo_get_sds_force_level();
 
 	element[5].type = S_VET_SPLIT;
-	element[5].text = "render to texture";
+	element[5].text = "Render to texture";
 
 	element[6].type = S_VET_BOOLEAN;
 	element[6].text = "Enable";
