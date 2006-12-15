@@ -23,7 +23,7 @@ TARGETS=connector.exe loqairou.exe quelsolaar.exe uvedit.exe lpaint.exe
 
 ALL:		$(TARGETS)
 
-CFLAGS=/nologo /I$(VERSE) /DUNDEF_MAIN
+CFLAGS=/nologo /I$(VERSE) /DUNDEF_MAIN /Zi /D_CRT_SECURE_NO_DEPRECATE
 LIBEXE=link /lib
 LIBFLAGS=/nologo /out:
 VERSELIB=$(VERSE)\verse.lib
@@ -37,7 +37,7 @@ connector.exe:	co_3d_view.obj co_clone.obj co_main.obj co_game.obj co_intro.obj 
 		st_matrix_operations.obj seduce_persuade.obj \
 		resources\connector.res \
 		seduce.lib betray.lib enough.lib $(PERSUADE) deceive.lib
-		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
+		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib user32.lib gdi32.lib
 
 loqairou.exe:	la_cache.obj la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.obj la_hole.obj la_input_parser.obj la_intro.obj la_key_input.obj \
 		la_main.obj la_neighbor.obj la_particle_fx.obj la_pop_up.obj la_projection.obj la_reference.obj la_save.obj \
@@ -47,34 +47,33 @@ loqairou.exe:	la_cache.obj la_draw_overlay.obj la_flare_fx.obj la_geometry_undo.
 		st_math.obj st_matrix_operations.obj st_text.obj \
 		resources\loqairou.res \
 		seduce.lib betray.lib enough.lib deceive.lib $(PERSUADE)
-		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
+		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib user32.lib gdi32.lib
 
 quelsolaar.exe:	qs_camera.obj qs_intro.obj qs_main.obj qs_settings.obj \
 		st_math.obj st_matrix_operations.obj st_text.c st_types.obj seduce_persuade.obj \
 		resources\quelsolaar.res \
 		$(PERSUADE) seduce.lib betray.lib deceive.lib enough.lib
-		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
+		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib user32.lib gdi32.lib
 
 uvedit.exe:	uv_main.obj uv_draw.obj uv_edge_collapse.obj uv_geometry.obj uv_menu.obj uv_overlay.obj uv_popup.obj uv_texture.obj uv_tool_corner.obj \
 		uv_tool_edge.obj uv_tool_polygon.obj uv_transform.obj uv_tool_select.obj uv_tool_strip.obj uv_unfold.obj \
 		uv_view.obj uv_input_parse.obj \
 		st_matrix_operations.obj \
 		betray.lib enough.lib deceive.lib seduce.lib $(PERSUADE)
-		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
+		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib user32.lib gdi32.lib
 
 lpaint.exe:	lp_geometry.obj lp_handle.obj lp_layer_group.obj lp_main.obj lp_menu.obj lp_paint.obj lp_popup.obj \
 		lp_projection.obj \
 		st_matrix_operations.obj \
 		betray.lib deceive.lib enough.lib seduce.lib
-		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib sdl.lib
-
+		$(CC) $(CFLAGS) /Fe$@ $** $(VERSELIB) wsock32.lib winmm.lib opengl32.lib user32.lib gdi32.lib
 
 # -------------------------------------------------------------
 
 seduce.lib:	s_background.obj s_draw.obj s_editor.obj s_line_font.obj s_main.obj s_popup.obj s_settings.obj s_settings_window.obj s_text.obj
 		$(LIBEXE) $(LIBFLAGS)$@ $**
 
-betray.lib:	b_glut.obj b_main.obj b_sdl.obj
+betray.lib:	b_glut.obj b_main.obj b_sdl.obj b_win32.obj
 		$(LIBEXE) $(LIBFLAGS)$@ $**
 
 enough.lib:	e_storage_audio.obj e_storage_bitmap.obj e_storage_curve.obj e_storage_geometry.obj e_storage_head.obj e_storage_material.obj \
