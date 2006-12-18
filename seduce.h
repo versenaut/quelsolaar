@@ -1,6 +1,8 @@
 #if !defined(SEDUCE_H)
 #define	SEDUCE_H
 
+#include <stdio.h>
+
 /*
 This is the new and improved .h file for the "ui tool kit" used in varius verse related applications.
 */
