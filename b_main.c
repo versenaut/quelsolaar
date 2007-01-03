@@ -110,11 +110,10 @@ void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, 
 
 	if(!b_win32_init_display(window_size_x, window_size_y, window_fullscreen, name))
 	{
-		int *a = NULL;
-		a[0] = 0;
+		fprintf(stderr, "Betray couldn't initialize Win32 display\n");
+		exit(1);
 	}
 	#endif
-
 
 	betray_get_current_time(&BGlobal.time[0], &BGlobal.time[1]);
 	BGlobal.screen_mode.x_size = window_size_x;
