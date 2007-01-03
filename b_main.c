@@ -1,6 +1,7 @@
 
 /*#include "opengl3.0.h"*/
 
+#include <sstdio.h>
 #include <stdlib.h>
 
 #include "betray.h"
