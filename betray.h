@@ -6,15 +6,25 @@
 
 /* ----------------------------------------------------------------------------------------- */
 
-/* Define BETRAY_SDL_SYSTEM_WRAPPER to use SDL for system access, or
- * define BETRAY_GLUT_SYSTEM_WRAPPER to use plain old GLUT, or
- * define BETRAY_GLFW_SYSTEM_WRAPPER to use GLFW.
-*/
 
-/*#define BETRAY_GLUT_SYSTEM_WRAPPER*/
-/*#define BETRAY_GLFW_SYSTEM_WRAPPER*/
-#define BETRAY_SDL_SYSTEM_WRAPPER
-/*#define BETRAY_WIN32_SYSTEM_WRAPPER*/
+/* These symbols control which back-end wrapper we use for Betray. Only one can be
+ * defined at a time.
+*/
+#undef BETRAY_GLUT_SYSTEM_WRAPPER
+#undef BETRAY_GLFW_SYSTEM_WRAPPER
+#undef BETRAY_SDL_SYSTEM_WRAPPER
+#undef BETRAY_WIN32_SYSTEM_WRAPPER
+
+/* On Windows, we really want to use the native (Win32) wrapper. On other platforms,
+ * you can pick the one that works best, with SDL being the recommended default.
+*/
+#if defined _WIN32
+#define	BETRAY_WIN32_SYSTEM_WRAPPER
+#else
+#define	BETRAY_SDL_SYSTEM_WRAPPER
+#endif
+
+
 
 /* On Windows, we also need the main platform header file. */
 #if defined _WIN32
