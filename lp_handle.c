@@ -32,8 +32,9 @@ void lp_input_handler(BInputState *input, void *user)
 	static uint node_id = -1, integer = 0;
 	static boolean now_plus = FALSE, now_minus = FALSE, last_plus = FALSE, last_minus = FALSE;
 	ENode *node;
-	node = e_ns_get_node(0, node_id);
 	uint i;
+
+	node = e_ns_get_node(0, node_id);
 
 	if(V_NT_GEOMETRY != e_ns_get_node_type(node))
 		node = NULL;
