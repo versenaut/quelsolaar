@@ -62,28 +62,6 @@ void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, const cha
 	SDL_WM_SetCaption(caption, NULL);
 	SDL_EnableUNICODE(TRUE); 
 	SDL_ShowCursor(TRUE);
-
-/*	out_going_data.clear = TRUE;
-	out_going_data.event_count = 0;
-	for(i = 0 ; i < AXIS_COUNT; i++)
-	{
-		out_going_data.axis_state[i] = 0.0;
-		out_going_data.axis_update_flag[i] = FALSE;
-	}
-	for(i = 0; i < DEVICE_BUTTONS_COUNT; i++)
-		out_going_data.device_buttons[i] = FALSE;
-	out_going_data.axis_name[AXIS_MOUSE_X] = "mouse x";
-	out_going_data.axis_name[AXIS_MOUSE_Y] = "mouse y";
-	out_going_data.axis_name[AXIS_MOUSE_LOOK_VECTOR_X] = "mouselook vector x";
-	out_going_data.axis_name[AXIS_MOUSE_LOOK_VECTOR_Y] = "mouselook vector y";
-	out_going_data.axis_name[AXIS_MOUSE_LOOK_VECTOR_Z] = "mouselook vector z";
-	out_going_data.axis_name[AXIS_BUTTON_VECTOR_1_X] = "button vector 1 x";
-	out_going_data.axis_name[AXIS_BUTTON_VECTOR_1_Y] = "button vector 1 y";
-	out_going_data.axis_name[AXIS_BUTTON_VECTOR_1_Z] = "button vector 1 z";
-	out_going_data.axis_name[AXIS_BUTTON_VECTOR_2_X] = "button vector 2 x";
-	out_going_data.axis_name[AXIS_BUTTON_VECTOR_2_Y] = "button vector 2 y";
-	out_going_data.axis_name[AXIS_BUTTON_VECTOR_2_Z] = "button vector 2 z";
-*/
 }
 
 void system_wrapper_endframe(void)
