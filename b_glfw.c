@@ -54,7 +54,7 @@ void b_glfw_keyboard_func(int key, int state)
 
   if (state == GLFW_RELEASE)
   {
-    if (input->event_count >= MAX_EVENT_COUNT)
+    if (input->event_count >= BETRAY_MAX_EVENT_COUNT)
       return;
     input->event[input->event_count].button = key;
     input->event[input->event_count].state = FALSE;
@@ -99,7 +99,7 @@ void b_glfw_keyboard_func(int key, int state)
     }
     else
     {
-      if(input->event_count >= MAX_EVENT_COUNT)
+      if(input->event_count >= BETRAY_MAX_EVENT_COUNT)
 	return;
       input->event[input->event_count].button = key;
       input->event[input->event_count].state = TRUE;

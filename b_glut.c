@@ -128,7 +128,7 @@ void b_glut_keyboard_func(unsigned char key, int x, int y)
 			betray_insert_character(key);
 	}else
 	{
-		if(input->event_count >= MAX_EVENT_COUNT)
+		if(input->event_count >= BETRAY_MAX_EVENT_COUNT)
 			return;
 		input->event[input->event_count].button = key;
 		input->event[input->event_count].state = TRUE;
@@ -141,7 +141,7 @@ void b_glut_keyboard_up_func(unsigned char key, int x, int y)
 	BInputState *input;
 	input = betray_get_input_state();
 	b_glut_passive_mouse_func(x, y);
-	if(input->event_count >= MAX_EVENT_COUNT)
+	if(input->event_count >= BETRAY_MAX_EVENT_COUNT)
 		return;
 	input->event[input->event_count].button = key;
 	input->event[input->event_count].state = FALSE;

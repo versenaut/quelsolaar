@@ -188,7 +188,7 @@ static int x11_event_handler(BInputState *input)
 					else
 						betray_insert_character(sym);
 				}
-				else if(input->event_count < MAX_EVENT_COUNT)
+				else if(input->event_count < BETRAY_MAX_EVENT_COUNT)
 				{
 					input->event[input->event_count].state = TRUE;
 					input->event[input->event_count++].button = sym;
@@ -196,7 +196,7 @@ static int x11_event_handler(BInputState *input)
 			}
 			break;
 		case KeyRelease:
-			if(!betray_is_type_in() && input->event_count < MAX_EVENT_COUNT)
+			if(!betray_is_type_in() && input->event_count < BETRAY_MAX_EVENT_COUNT)
 			{
 				KeySym	sym = XLookupKeysym(&ev.xkey, 0);
 

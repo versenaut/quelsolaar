@@ -126,7 +126,7 @@ static LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				}
 				else
 				{
-					if(input->event_count < MAX_EVENT_COUNT)
+					if(input->event_count < BETRAY_MAX_EVENT_COUNT)
 					{
 						input->event[input->event_count].state = TRUE;
 						input->event[input->event_count++].button = key;
@@ -136,7 +136,7 @@ static LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			break;
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
-			if(!betray_is_type_in() && input->event_count < MAX_EVENT_COUNT)
+			if(!betray_is_type_in() && input->event_count < BETRAY_MAX_EVENT_COUNT)
 			{
 				input->event[input->event_count].state = FALSE;
 				input->event[input->event_count++].button = lParam;
