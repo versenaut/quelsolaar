@@ -110,7 +110,7 @@ void betray_set_mouse_warp(boolean warp)
 	mouse_warp = warp;
 }
 
-uint system_wrapper_eventloop(BInputState *input)
+static uint system_wrapper_eventloop(BInputState *input)
 {
 	SDL_Event	event;
 	uint		i;
@@ -167,9 +167,8 @@ uint system_wrapper_eventloop(BInputState *input)
 			case SDL_MOUSEBUTTONDOWN: 
 			{				
 				if(event.button.button == SDL_BUTTON_LEFT)
-				{
 					input->mouse_button[0] = TRUE;
-				}else if(event.button.button == SDL_BUTTON_MIDDLE)
+				else if(event.button.button == SDL_BUTTON_MIDDLE)
 					input->mouse_button[2] = TRUE;
 				else if(event.button.button == SDL_BUTTON_RIGHT)
 					input->mouse_button[1] = TRUE;
