@@ -1,6 +1,3 @@
-
-/*#include "opengl3.0.h"*/
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -10,7 +7,6 @@
 extern boolean b_sdl_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
 extern boolean b_glut_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
 extern boolean b_win32_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen);
-
 
 typedef struct{
 	uint		x_size;
@@ -36,7 +32,7 @@ void betray_reshape_view(uint x_size, uint y_size)
 	BGlobal.screen_mode.y_size = y_size;
 	w = BGlobal.screen_mode.x_size;
 	h = BGlobal.screen_mode.y_size;
-//	fov = atan(90 / 180 * 3.14 );
+/*	fov = atan(90 / 180 * 3.14 );*/
 	fov = 1;
 	glMatrixMode(GL_PROJECTION);
 	aspect = w / h;
@@ -89,7 +85,6 @@ extern void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, co
 extern void b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, const char *caption);
 extern boolean b_win32_init_display(uint size_x, uint size_y, boolean full_screen, const char *caption);
 
-
 void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, boolean window_fullscreen, const char *name)
 {
 #if defined BETRAY_SDL_SYSTEM_WRAPPER
@@ -139,7 +134,6 @@ void betray_set_action_func(void (*action_func)(BInputState *data, void *user_po
 }
 
 extern void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end_x, float end_y, float end_z, float red, float green, float blue, float alpha);
-
 
 void betray_action(BActionMode mode)
 {
@@ -195,7 +189,6 @@ void betray_get_key_up_down(boolean *press, boolean *last_press, uint key)
 
 extern void b_glut_main_loop(void);
 
-
 static char *type_in_string = NULL;
 static uint type_in_alocated = 0;
 static int cursor_pos = 0;
@@ -219,7 +212,6 @@ void betray_start_type_in(char *string, uint length, void (*done_func)(void *use
 		;
 /*	for(i = AXIS_BUTTON_VECTOR_1_X; i <= AXIS_BUTTON_VECTOR_2_Z; i++)
 		out_going_data.axis_state[i] = 0;*/
-
 }
 
 void betray_end_type_in_mode(boolean cancel)
@@ -285,7 +277,7 @@ void betray_move_cursor(int move)
 
 static char betray_debug_text[256];
 
-char *betray_debug(void)
+char * betray_debug(void)
 {
 	if(type_in_string != NULL)
 		sprintf(betray_debug_text, "pos %u length %u alloc %u", *cursor_pos_pointer, type_in_length, type_in_alocated);
@@ -298,8 +290,6 @@ boolean betray_is_type_in(void)
 {
 	return type_in_string != NULL;
 }
-
-
 
 #if defined _WIN32
 
