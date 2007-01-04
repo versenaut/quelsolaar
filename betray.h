@@ -6,20 +6,22 @@
 
 /* ----------------------------------------------------------------------------------------- */
 
-
-/* These symbols control which back-end wrapper we use for Betray. Only one can be
- * defined at a time.
+/* These symbols control which back-end wrapper we use for Betray.
+ * Only one can be defined at a time.
 */
 #undef BETRAY_GLUT_SYSTEM_WRAPPER
 #undef BETRAY_GLFW_SYSTEM_WRAPPER
 #undef BETRAY_SDL_SYSTEM_WRAPPER
 #undef BETRAY_WIN32_SYSTEM_WRAPPER
+#undef BETRAY_X11_SYSTEM_WRAPPER
 
-/* On Windows, we really want to use the native (Win32) wrapper. On other platforms,
- * you can pick the one that works best, with SDL being the recommended default.
+/* On Windows, we really want to use the native (Win32) wrapper. On Linux,
+ * we use the native X11 wrapper. On other platforms, SDL is the default.
 */
 #if defined _WIN32
 #define	BETRAY_WIN32_SYSTEM_WRAPPER
+#elif defined __linux__
+#define	BETRAY_X11_SYSTEM_WRAPPER
 #else
 #define	BETRAY_SDL_SYSTEM_WRAPPER
 #endif
@@ -64,15 +66,18 @@
 #include <GL/glfw.h>
 #elif defined BETRAY_WIN32_SYSTEM_WRAPPER
 #include <GL/gl.h>
+
+#elif defined BETRAY_X11_SYSTEM_WRAPPER
+/* do nothing */
 #else
 #error "Please choose a system wrapper to use."
 #endif
 
 /* ----------------------------------------------------------------------------------------- */
 
-#define DEVICE_BUTTONS_COUNT 16
-#define MAX_EVENT_COUNT 64
-#define BUTTONS_COUNT (256 + 16) 
+#define BETRAY_DEVICE_BUTTONS_COUNT	16
+#define BETRAY_MAX_EVENT_COUNT		64
+#define BETRAY_BUTTONS_COUNT		(256 + 16) 
 
 typedef enum{
 	BAM_DRAW,
@@ -86,8 +91,8 @@ typedef struct{
 }BButtonEvent;
 
 typedef struct{
-	boolean			mouse_button[DEVICE_BUTTONS_COUNT];
-	boolean			last_mouse_button[DEVICE_BUTTONS_COUNT];
+	boolean			mouse_button[BETRAY_DEVICE_BUTTONS_COUNT];
+	boolean			last_mouse_button[BETRAY_DEVICE_BUTTONS_COUNT];
 	float			pointer_x;
 	float			pointer_y;
 	float			click_pointer_x;
