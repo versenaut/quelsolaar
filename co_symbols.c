@@ -117,16 +117,17 @@ void co_unpack_binary_string(FILE *f, char *text)
 	while((*text++ = fgetc(f)) != 0);
 }
 
-boolean co_load_symb_settings(char *file_name)
+static boolean co_load_symb_settings(char *file_name)
 {
 	uint i;
 	FILE *f;
+
 	f = fopen(file_name, "rb");
 	if(f == NULL)
 		return FALSE;
 	co_symbol_count = co_unpack_binary_uint32(f);
 	if(feof(f))	/* After first read, check if file is already over. Catches 0-length file, at least. */
-		return;
+		return FALSE;
 	if(co_symbols != NULL)
 		free(co_symbols);
 	co_symbol_allocated = co_symbol_count + 16;
@@ -205,13 +206,14 @@ void co_init_symbols(void)
 {
 	static boolean init_symbols = FALSE;
 	uint i;
+
 	if(init_symbols)
 		return;
 	init_symbols = TRUE;
 	if(co_load_symb_settings("symbols_settings.bin"))
 		return;
 	co_symbol_allocated = 64;
-	co_symbols = malloc((sizeof *co_symbols) * co_symbol_allocated);
+	co_symbols = malloc(co_symbol_allocated * sizeof *co_symbols);
 	co_set_values(&co_symbols[0], TRUE, 1, 0, 0, TRUE, "asset", "priority",		"critical",		CO_SM_COLOR);
 	co_set_values(&co_symbols[1], TRUE, 1, 1, 1, FALSE, "asset", "author",			"",				CO_SM_PRINT);
 	co_set_values(&co_symbols[2], TRUE, 0, 0, 1, FALSE, "asset", "approved",		"",				CO_SM_PRINT);
