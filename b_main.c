@@ -68,8 +68,6 @@ boolean betray_set_screen_mode(uint x_size, uint y_size, boolean fullscreen)
 		return FALSE;
 	#endif*/
 
-
-
 	BGlobal.screen_mode.x_size = x_size;
 	BGlobal.screen_mode.y_size = y_size;
 	BGlobal.screen_mode.fullscreen = fullscreen;
@@ -114,6 +112,10 @@ void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, 
 		fprintf(stderr, "Betray couldn't initialize Win32 display\n");
 		exit(1);
 	}
+	#endif
+
+	#ifdef BETRAY_X11_SYSTEM_WRAPPER
+	b_x11_init_display(window_size_x, window_size_y, window_fullscreen, name);
 	#endif
 
 	betray_get_current_time(&BGlobal.time[0], &BGlobal.time[1]);
