@@ -268,6 +268,9 @@ void betray_launch_main_loop(void)
 		input->last_mouse_button[2] = input->mouse_button[2];
 		betray_action(BAM_MAIN);
 	}
+	/* Assume we're done, and close window and X11 server connection. */
+	XDestroyWindow(x11info.dpl, x11info.win);
+	XCloseDisplay(x11info.dpl);
 }
 
 #endif	/* BETRAY_X11_SYSTEM_WRAPPER */
