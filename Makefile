@@ -80,7 +80,7 @@ pngsave:	pngsave.c libenough.a
 libseduce.a:	s_background.o s_draw.o s_editor.o s_line_font.o s_main.o s_popup.o s_settings.o s_settings_window.o s_text.o
 		ar -cr $@ $^
 
-libbetray.a:	b_glfw.o b_glut.o b_main.o b_sdl.o
+libbetray.a:	b_glfw.o b_glut.o b_main.o b_sdl.o b_x11.o
 		ar -cr $@ $^
 
 libenough.a:	e_storage_audio.o e_storage_bitmap.o e_storage_curve.o e_storage_geometry.o e_storage_head.o e_storage_material.o \
