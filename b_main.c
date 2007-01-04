@@ -48,26 +48,25 @@ void betray_reshape_view(uint x_size, uint y_size)
 
 boolean betray_set_screen_mode(uint x_size, uint y_size, boolean fullscreen)
 {
-	#ifdef BETRAY_SDL_SYSTEM_WRAPPER
+#if defined BETRAY_SDL_SYSTEM_WRAPPER
 	if(b_sdl_system_wrapper_set_display(x_size, y_size, fullscreen) != TRUE)
 		return FALSE;
-	#endif 
+#endif 
 
-	#ifdef BETRAY_GLUT_SYSTEM_WRAPPER
+#if defined BETRAY_GLUT_SYSTEM_WRAPPER
 	if(b_glut_system_wrapper_set_display(x_size, y_size, fullscreen) != TRUE)
 		return FALSE;
-	#endif
+#endif
 
-	#ifdef BETRAY_GLFW_SYSTEM_WRAPPER
+#if defined BETRAY_GLFW_SYSTEM_WRAPPER
 	if(b_glfw_system_wrapper_set_display(x_size, y_size, fullscreen) != TRUE)
 		return FALSE;
-	#endif
-/*
-	#ifdef BETRAY_WIN32_SYSTEM_WRAPPER
+#endif
+/*	#ifdef BETRAY_WIN32_SYSTEM_WRAPPER
 	if(b_win32_init_display(x_size, y_size, fullscreen) != TRUE)
 		return FALSE;
-	#endif*/
-
+	#endif
+*/
 	BGlobal.screen_mode.x_size = x_size;
 	BGlobal.screen_mode.y_size = y_size;
 	BGlobal.screen_mode.fullscreen = fullscreen;
@@ -93,30 +92,29 @@ extern boolean b_win32_init_display(uint size_x, uint size_y, boolean full_scree
 
 void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, boolean window_fullscreen, const char *name)
 {
-	#ifdef BETRAY_SDL_SYSTEM_WRAPPER
+#if defined BETRAY_SDL_SYSTEM_WRAPPER
 	b_sdl_init_display(window_size_x, window_size_y, window_fullscreen, name);
-	#endif 
+#endif 
 
-	#ifdef BETRAY_GLUT_SYSTEM_WRAPPER
+#if defined BETRAY_GLUT_SYSTEM_WRAPPER
 	b_glut_init_display(argc, argv, window_size_x, window_size_y, window_fullscreen, name);
-	#endif
+#endif
 
-	#ifdef BETRAY_GLFW_SYSTEM_WRAPPER
+#if defined BETRAY_GLFW_SYSTEM_WRAPPER
 	b_glfw_init_display(argc, argv, window_size_x, window_size_y, window_fullscreen, name);
-	#endif
+#endif
 
-	#ifdef BETRAY_WIN32_SYSTEM_WRAPPER
-
+#if defined BETRAY_WIN32_SYSTEM_WRAPPER
 	if(!b_win32_init_display(window_size_x, window_size_y, window_fullscreen, name))
 	{
 		fprintf(stderr, "Betray couldn't initialize Win32 display\n");
 		exit(1);
 	}
-	#endif
+#endif
 
-	#ifdef BETRAY_X11_SYSTEM_WRAPPER
+#if defined BETRAY_X11_SYSTEM_WRAPPER
 	b_x11_init_display(window_size_x, window_size_y, window_fullscreen, name);
-	#endif
+#endif
 
 	betray_get_current_time(&BGlobal.time[0], &BGlobal.time[1]);
 	BGlobal.screen_mode.x_size = window_size_x;
