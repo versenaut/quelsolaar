@@ -444,9 +444,6 @@ void compute_fov(ENode *node, double *matrix, PObject *o, double *fov_v, double 
 }
 // uint p_env_get_environment(PObjEnv *env)
 
-
-
-
 void p_draw_reflection_flares(double *view);
 
 uint update_object_environment(ENode *node, uint texture, uint size, uint side)
@@ -529,7 +526,7 @@ uint update_object_environment(ENode *node, uint texture, uint size, uint side)
 void update_object_impostor(ENode *node, double *pos, uint texture)
 {
 	double matrix[16], objpos[3], point_a[3], point_b[3];
-	double fov_v, fov_h;
+	double fov_v = 0.0, fov_h = 0.0;
 	static float time = 0;
 	PObjImpostor *imp;
 	PObject *o;
