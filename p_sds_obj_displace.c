@@ -335,6 +335,7 @@ boolean p_lod_displacement_version(ENode *m_node, ENode *g_node, uint16 id, uint
 	EGeoLayer *layer;
 	VMatFrag *frag;
 	boolean output = FALSE;
+
 	if((frag = e_nsm_get_fragment(m_node, id)) == NULL)
 		return FALSE;
 	if(!e_nsm_enter_fragment(m_node, id))
@@ -345,14 +346,12 @@ boolean p_lod_displacement_version(ENode *m_node, ENode *g_node, uint16 id, uint
 	switch(e_nsm_get_fragment_type(m_node, id))
 	{
 
-		case VN_M_FT_REFLECTION :
-		output = TRUE;
+		case VN_M_FT_REFLECTION :	/* Fall-throughs. */
 		case VN_M_FT_TRANSPARENCY :
-		output = TRUE;
 		case VN_M_FT_VIEW :
-		output = TRUE;
 		case VN_M_FT_VOLUME :
 		output = TRUE;
+		break;
 		case VN_M_FT_GEOMETRY :
 			if((layer = e_nsg_get_layer_by_name(g_node, frag->geometry.layer_r)) != NULL)
 				*version += e_nsg_get_layer_version(layer);
@@ -360,6 +359,7 @@ boolean p_lod_displacement_version(ENode *m_node, ENode *g_node, uint16 id, uint
 				*version += e_nsg_get_layer_version(layer);
 			if((layer = e_nsg_get_layer_by_name(g_node, frag->geometry.layer_b)) != NULL)
 				*version += e_nsg_get_layer_version(layer);
+			output = TRUE;
 		break;
 		case VN_M_FT_TEXTURE :
 			if((b_node = e_ns_get_node(0, frag->texture.bitmap)) != NULL && V_NT_BITMAP == e_ns_get_node_type(b_node))
@@ -439,8 +439,10 @@ boolean p_lod_displacement_update_test(PMesh *mesh)
 		{
 			mesh->displacement.node_version += e_ns_get_node_version_data(m_node);
 			if(p_lod_displacement_version(m_node, g_node, e_nsm_get_fragment_color_displacement(m_node), &tmp))
+			{
 				mesh->displacement.live = TRUE;
-			version += tmp;
+				version += tmp;
+			}
 		}
 	}
 	if(mesh->displacement.tree_version != version)
