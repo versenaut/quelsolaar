@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-//#include "ngl.h"
 
 #ifdef _WIN32
 	#include <windows.h>
@@ -162,6 +161,7 @@ void p_set_shadow_light(uint32 time_s, uint32 time_f)
 	{
 		double pos[3], color[3];
 		float f_pos[4] = {0, 0, 0, 1}, f_color[3], mult = 1, zero[3] = {0, 0, 0};
+
 		e_nso_get_pos_time(node, pos, time_s, time_f);
 		e_nso_get_pos(node, pos, NULL, NULL, NULL, NULL, NULL);
 		e_nso_get_light(node, color);
@@ -185,6 +185,7 @@ void p_set_light(PObjLight *light, uint light_count, uint32 time_s, uint32 time_
 	float f_pos[4] = {0, 0, 0, 1}, f_color[3], mult = 1;
 	ENode *node;
 	uint i;
+
 	if(light_fade_up)
 		current_light_fade -= 0.001;
 	else
@@ -216,7 +217,7 @@ void p_set_light(PObjLight *light, uint light_count, uint32 time_s, uint32 time_
 			e_nso_get_pos_time(node, pos, time_s, time_f);
 			e_nso_get_pos(node, pos, NULL, NULL, NULL, NULL, NULL);
 			e_nso_get_light(node, color);
-		/*	if(i == light_count - 1)
+/*			if(i == light_count - 1)
 				mult = light->lightfade;
 			else*/
 			if(current_shadow_light == light->lights[i])
