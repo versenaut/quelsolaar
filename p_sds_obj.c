@@ -77,7 +77,8 @@ PMesh *p_rm_create(ENode *node)
 	mesh->displacement.tree_version = 0;
 	mesh->normal.draw_normals = NULL;
 	mesh->param.array = NULL;
-	mesh->param.version = NULL;
+	mesh->param.version = 0;
+	mesh->param.data_version = 0;
 	mesh->anim.layers.layers = NULL;
 	mesh->anim.bones.bonereference = NULL;
 	mesh->anim.bones.ref_count = NULL;
