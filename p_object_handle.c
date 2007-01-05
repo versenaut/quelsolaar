@@ -38,6 +38,7 @@ void p_object_func(ENode *node, ECustomDataCommand command)
 				o->meshes[i] = NULL;
 			o->task = FALSE;
 			e_ns_set_custom_data(node, P_ENOUGH_SLOT, o);
+			o->light.node_id = e_ns_get_node_id(node);
 			for(i = 0; i < LIGHTS_PER_OBJECT; i++) 
 				o->light.lights[i] = -1;
 			o->light.lightfade = 1;
