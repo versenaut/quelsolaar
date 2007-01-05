@@ -6,10 +6,10 @@
 void init_dlut(DynLookUpTable *table)
 {
 	void **data, **end;
-	table->data = malloc((sizeof *table->data) * ARRAY_CHUNK_SIZE);
+	table->data = malloc(ARRAY_CHUNK_SIZE * sizeof *table->data);
 	table->allocated = ARRAY_CHUNK_SIZE;
 	data = table->data;
-	for(end = data + ARRAY_CHUNK_SIZE; data < end; data++)
+	for(end = data + table->allocated; data < end; data++)
 		*data = NULL;
 }
 
@@ -87,9 +87,10 @@ uint count_entry_dlut(DynLookUpTable *table)
 void clean_dlut(DynLookUpTable *table)
 {
 	int i;
+
 	for(i = table->allocated - 1; i > 1 && table->data[i] == NULL; i--);
 	if(i + ARRAY_CHUNK_SIZE < table->allocated)
-	table->data = realloc(table->data,(sizeof *table->data) * (i + ARRAY_CHUNK_SIZE));
+		table->data = realloc(table->data,(sizeof *table->data) * (i + ARRAY_CHUNK_SIZE));
 }
 
 void foreach_remove_dlut(DynLookUpTable *table, void (*func)(uint key, void *pointer, void *user_data), void *user_data)
