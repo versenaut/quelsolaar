@@ -761,9 +761,8 @@ boolean p_lod_update_layer_param(ENode *g_node, PMesh *mesh)
 	ENode *m_node;
 	VMatFrag *frag;
 	EGeoLayer *layer;
+
 	p_lod_update_material_param_count(g_node, mesh);
-
-
 
 	if(mesh->param.data_version == e_ns_get_node_version_data(g_node))
 		return FALSE;
