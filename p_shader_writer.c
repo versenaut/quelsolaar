@@ -745,15 +745,3 @@ void p_shader_write_destroy_temp(PCodeGenTemp *t)
 	if(t->stage > 0)
 		free(t->data);
 }
-
-
-
-
-
-
-
-
-
-
-
-
