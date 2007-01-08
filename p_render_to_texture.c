@@ -100,6 +100,8 @@ void (APIENTRY *p_glRenderbufferStorageEXT)(GLenum target, GLenum internalformat
 void (APIENTRY *p_glFramebufferTexture2DEXT)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level) = NULL;
 void (APIENTRY *p_glFramebufferRenderbufferEXT)(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer) = NULL;
 
+extern egreal p_noise_function(egreal *vec, uint level);
+
 typedef struct {
 	uint size;
 	uint fbo;
@@ -232,44 +234,50 @@ void p_texture_render_unbind(void)
 {
 	if(!p_glBindFramebufferEXT)
 		return;
+	p_glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 	p_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
-egreal p_noise_function(egreal *vec, uint level);
-
-
 uint p_create_renderable_texture(uint size, uint format)
 {
-	uint texture;
+	uint	texture;
+	float	*buffer;
+
 	glGenTextures(1, &texture);
-//	printf("creating new renderable texture\n");
+	if(texture == 0)
+		return 0;
 	glBindTexture(GL_TEXTURE_2D, texture);
+	if((buffer = malloc(3 * size * size * sizeof *buffer)) != NULL)
 	{
-		float *buffer;
-		egreal vec[3] = {0, 0, 0}, f;
-		uint i, j; 
-		buffer = malloc((sizeof *buffer) * 3 * size * size);
+		egreal	vec[] = { 0, 0, 0 }, f;
+		uint	i, j;
+
 		for(i = 0; i < size; i++)
 		{
 			for(j = 0; j < size; j++)
 			{
-				vec[0] = (float)i / (float)size;
-				vec[1] = (float)j / (float)size;
+				vec[0] = (egreal) i / size;
+				vec[1] = (egreal) j / size;
 				f = p_noise_function(vec, 7);
 				f += p_noise_function(vec, 17) * 0.5;
 				f += p_noise_function(vec, 31) * 0.25;
-				buffer[(i * size + j) * 3 + 0] = f;
-				buffer[(i * size + j) * 3 + 1] = f;
-				buffer[(i * size + j) * 3 + 2] = f;
+				buffer[3 * (i * size + j) + 0] = f;
+				buffer[3 * (i * size + j) + 1] = f;
+				buffer[3 * (i * size + j) + 2] = f;
 			}
 		}
 		glTexImage2D(GL_TEXTURE_2D, 0, format, size, size, 0, GL_RGB, GL_FLOAT, buffer);
 		free(buffer);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	}
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	else
+	{
+		glDeleteTextures(1, &texture);
+		texture = 0;
+	}
 	return texture;
 }
 
