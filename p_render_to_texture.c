@@ -281,12 +281,11 @@ uint p_create_renderable_texture(uint size, uint format)
 	return texture;
 }
 
-static uint my_test_texture = -1; 
+static uint my_test_texture = 0;
 
 void p_pre_fbo_draw(float fov)
 {
-//	float fov;
-	if(my_test_texture == -1)
+	if(my_test_texture == 0)
 	{
 		p_init_render_to_texture();
 		my_test_texture = p_create_renderable_texture(128, GL_RGBA8);
