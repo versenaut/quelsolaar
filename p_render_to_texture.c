@@ -109,7 +109,7 @@ typedef struct {
 	uint stencil;
 } RenderSetup;
 
-static RenderSetup g_global_fbos[2] = {{ 128, 0, 0, 0 }, { 128, 0, 0, 0 }};
+static RenderSetup g_global_fbos[10];	/* One for TEXTURE_2D, then one for each size in 1..256 range. */
 
 static boolean fbo_supported = FALSE;
 
@@ -123,6 +123,8 @@ void p_init_render_to_texture(void)
 	fbo_supported = FALSE;
 	if(1 && p_extension_test("GL_EXT_framebuffer_object"))
 	{
+		int	i;
+
 		p_glBindFramebufferEXT = p_extension_get_address("glBindFramebufferEXT");
 		p_glDeleteFramebuffersEXT = p_extension_get_address("glDeleteFramebuffersEXT");
 		p_glGenFramebuffersEXT = p_extension_get_address("glGenFramebuffersEXT");
@@ -134,6 +136,16 @@ void p_init_render_to_texture(void)
 		p_glFramebufferTexture2DEXT = p_extension_get_address("glFramebufferTexture2DEXT");
 		p_glFramebufferRenderbufferEXT = p_extension_get_address("glFramebufferRenderbufferEXT");
 		fbo_supported = TRUE;
+
+		/* Initialize statically-sized textures. */
+		g_global_fbos[0].size = 128;
+		for(i = 1; i < sizeof g_global_fbos / sizeof *g_global_fbos; i++)
+		{
+			RenderSetup	*su = g_global_fbos + i;
+
+			su->size = 1 << (i - 1);
+			su->fbo = su->depth = su->stencil = 0;
+		}
 	}
 }
 
@@ -175,6 +187,24 @@ static void p_check_framebuffer_status(void)
 	fbo_supported = FALSE;
 }
 
+/* Map texture size to index into array. This might be slow, but I think we'll manage. */
+static int size_to_index(uint size)
+{
+	switch(size)
+	{
+	case 1:		return 1;
+	case 2:		return 2;
+	case 4:		return 3;
+	case 8:		return 4;
+	case 16:	return 5;
+	case 32:	return 6;
+	case 64:	return 7;
+	case 128:	return 8;
+	case 256:	return 9;
+	}
+	return -1;
+}
+
 void p_texture_render_bind(uint texture, uint size, uint target)
 {
 	RenderSetup *fbo;
@@ -184,9 +214,18 @@ void p_texture_render_bind(uint texture, uint size, uint target)
 
 	if(target == GL_TEXTURE_2D)
 		fbo = &g_global_fbos[0];
-	else
-		fbo = &g_global_fbos[1];
+	else	/* Look up a statically sized slot, based on the requested texture size. */
+	{
+		int	index = size_to_index(size);
 
+		if(size == -1)
+			return;
+		fbo = &g_global_fbos[index];
+	}
+
+	/* If the above slot-selection code works properly, this part is never needed.
+	 * Which is a very good thing, since it causes rendering to flicker on Linux.
+	*/
 	if(fbo->size != size)
 	{
 		if(fbo->fbo != 0)
