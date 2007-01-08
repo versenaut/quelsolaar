@@ -175,16 +175,19 @@ uint p_shader_create(char *vertex, char *fragment)
 	p_glCompileShaderARB(vertex_obj);
 	p_glGetInfoLogARB(vertex_obj, 2000, &i, buf);
 	printf("%s\n", vertex);
-	printf("Shadow Errors:\n%s\n", buf);
+	if(buf[0] != '\0')
+		printf("Shadow Errors:\n%s\n", buf);
 	i = strlen(fragment);
 	p_glShaderSourceARB(fragment_obj, 1, (const char **) &fragment, &i);
 	p_glCompileShaderARB(fragment_obj);
 	p_glGetInfoLogARB(fragment_obj, 2000, &i, buf);
 	printf("%s\n", fragment);
-	printf("Shadow Errors:\n%s\n", buf);
+	if(buf[0] != '\0')
+		printf("Shadow Errors:\n%s\n", buf);
 	p_glLinkProgramARB(prog_obj);
 	p_glGetInfoLogARB(prog_obj, 2000, &i, buf);
-	printf("Errors:\n%s\n", buf);
+	if(buf[0] != '\0')
+		printf("Errors:\n%s\n", buf);
 	return prog_obj;
 }
 
@@ -227,13 +230,15 @@ void p_shader_init_shadow(void)
 
 	p_glGetInfoLogARB(vertex_obj, 2000, &i, buf);
 	printf("%s\n", v_shader);
-	printf("Shadow Errors:\n%s\n", buf);
+	if(buf[0] != '\0')
+		printf("Shadow Errors:\n%s\n", buf);
 	i = strlen(f_shader);
 	p_glShaderSourceARB(fragment_obj, 1, (const char **) &f_shader, &i);
 	p_glCompileShaderARB(fragment_obj);
 	p_glGetInfoLogARB(fragment_obj, 2000, &i, buf);
 	printf("%s\n", f_shader);
-	printf("Shadow Errors:\n%s\n", buf);
+	if(buf[0] != '\0')
+		printf("Shadow Errors:\n%s\n", buf);
 
 	p_glLinkProgramARB(shadow_prog_obj);
 }
@@ -276,7 +281,8 @@ void p_shader_init(void)
 				char buf[2000];
 				GLsizei length;
 				p_glGetInfoLogARB(p_standard_shader->vertex_obj, 2000, &length, buf);
-				printf("1STD Errors:\n%s\n", buf);
+				if(buf[0] != '\0')
+					printf("1STD Errors:\n%s\n", buf);
 			}
 		length = strlen(p_standard_fragment_shader_code);
 		code = p_standard_fragment_shader_code;
@@ -286,7 +292,8 @@ void p_shader_init(void)
 				char buf[2000];
 				GLsizei length;
 				p_glGetInfoLogARB(p_standard_shader->fragment_obj, 2000, &length, buf);
-				printf("2STD Errors:\n%s\n", buf);
+				if(buf[0] != '\0')
+					printf("2STD Errors:\n%s\n", buf);
 			}
 		p_glLinkProgramARB(p_standard_shader->prog_obj);
 		e_ns_set_custom_func(P_ENOUGH_SLOT, V_NT_MATERIAL, p_shader_func);
@@ -294,7 +301,8 @@ void p_shader_init(void)
 				char buf[2000];
 				GLsizei length;
 				p_glGetInfoLogARB(p_standard_shader->prog_obj, 2000, &length, buf);
-				printf("3STD Errors:\n%s\n", buf);
+				if(buf[0] != '\0')
+					printf("3STD Errors:\n%s\n", buf);
 			}
 			p_standard_shader->src = GL_ONE;
 			p_standard_shader->dest = GL_ZERO;
