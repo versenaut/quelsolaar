@@ -112,6 +112,7 @@ typedef struct {
 static RenderSetup g_global_fbos[10];	/* One for TEXTURE_2D, then one for each size in 1..256 range. */
 
 static boolean fbo_supported = FALSE;
+static uint my_test_texture = 0;
 
 boolean p_render_to_texture_supported(void)
 {
@@ -135,7 +136,6 @@ void p_init_render_to_texture(void)
 		p_glRenderbufferStorageEXT = p_extension_get_address("glRenderbufferStorageEXT");
 		p_glFramebufferTexture2DEXT = p_extension_get_address("glFramebufferTexture2DEXT");
 		p_glFramebufferRenderbufferEXT = p_extension_get_address("glFramebufferRenderbufferEXT");
-		fbo_supported = TRUE;
 
 		/* Initialize statically-sized textures. */
 		g_global_fbos[0].size = 128;
@@ -146,6 +146,7 @@ void p_init_render_to_texture(void)
 			su->size = 1 << (i - 1);
 			su->fbo = su->depth = su->stencil = 0;
 		}
+		fbo_supported = TRUE;
 	}
 }
 
@@ -153,7 +154,7 @@ static void p_check_framebuffer_status(void)
 {
 	GLenum status;
 
-	if (!p_glBindFramebufferEXT)
+	if(!p_glBindFramebufferEXT)
 		return;
 
 	status = (GLenum) p_glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
@@ -263,7 +264,8 @@ void p_texture_render_bind(uint texture, uint size, uint target)
 
 		p_glCheckFramebufferStatusEXT();
 */		p_check_framebuffer_status();
-	}else
+	}
+	else
 	{
 		p_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo->fbo);    
 		p_glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, target, texture, 0);
@@ -320,8 +322,6 @@ uint p_create_renderable_texture(uint size, uint format)
 	}
 	return texture;
 }
-
-static uint my_test_texture = 0;
 
 void p_pre_fbo_draw(float fov)
 {
