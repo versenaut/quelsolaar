@@ -137,17 +137,18 @@ void p_init_render_to_texture(void)
 	}
 }
 
-void p_checks_framebuffer_status(void)
+static void p_check_framebuffer_status(void)
 {
-    GLenum status;
+	GLenum status;
 
-    if (!p_glBindFramebufferEXT)
-        return;
+	if (!p_glBindFramebufferEXT)
+		return;
 
-    status = (GLenum) p_glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-    switch(status) {
+	status = (GLenum) p_glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+	switch(status)
+	{
         case GL_FRAMEBUFFER_COMPLETE_EXT:
-			return;
+	    return;
             break;
         case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
             printf("Unsupported framebuffer format\n");
@@ -155,7 +156,7 @@ void p_checks_framebuffer_status(void)
         case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
             printf("Framebuffer incomplete, missing attachment\n");
             break;
-    /*	case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT:
+/*	case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT:
             printf("Framebuffer incomplete, duplicate attachment\n");
             break;*/
         case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
@@ -170,8 +171,8 @@ void p_checks_framebuffer_status(void)
         case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
             printf("Framebuffer incomplete, missing read buffer\n");
             break;
-    }
-    fbo_supported = FALSE;
+	}
+	fbo_supported = FALSE;
 }
 
 void p_texture_render_bind(uint texture, uint size, uint target)
@@ -222,7 +223,7 @@ void p_texture_render_bind(uint texture, uint size, uint target)
 		p_glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, p_global_stencil);
 
 		p_glCheckFramebufferStatusEXT();
-*/		p_checks_framebuffer_status();
+*/		p_check_framebuffer_status();
 	}else
 	{
 		p_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo->fbo);    
@@ -295,9 +296,6 @@ void p_pre_fbo_draw(float fov)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glClearColor(0.2, 0.2, 0.2, 0);
 }
-
-static float color_array[8] = {0, 0, 1, 0, 1, 1, 0, 1};
-static float vertex_array[12] = {-0.25, -0.25, -1, 0.25, -0.25, -1, 0.25, 0.25, -1, -0.25, 0.25, -1};
 
 void p_post_fbo_draw(void)
 {
