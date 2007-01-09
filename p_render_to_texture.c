@@ -112,7 +112,6 @@ typedef struct {
 static RenderSetup g_global_fbos[10];	/* One for TEXTURE_2D, then one for each size in 1..256 range. */
 
 static boolean fbo_supported = FALSE;
-static uint my_test_texture = 0;
 
 boolean p_render_to_texture_supported(void)
 {
@@ -321,22 +320,4 @@ uint p_create_renderable_texture(uint size, uint format)
 		texture = 0;
 	}
 	return texture;
-}
-
-void p_pre_fbo_draw(float fov)
-{
-	if(my_test_texture == 0)
-	{
-		p_init_render_to_texture();
-		my_test_texture = p_create_renderable_texture(128, GL_RGBA8);
-	}
-	p_texture_render_bind(my_test_texture, 128, GL_TEXTURE_2D);
-	glClearColor(0.1, 0.2, 0.2, 0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glClearColor(0.2, 0.2, 0.2, 0);
-}
-
-void p_post_fbo_draw(void)
-{
-	p_texture_render_unbind();
 }

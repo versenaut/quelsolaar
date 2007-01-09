@@ -47,8 +47,6 @@ extern void p_texture_render_unbind(void);
 extern void p_render_set_transform(ENode *node);
 
 extern uint p_create_renderable_texture(uint size, uint format);
-extern void p_pre_fbo_draw(float fov);
-extern void p_post_fbo_draw(void);
 extern void p_render_object(ENode *node, boolean transparency, boolean test);
 extern uint p_shader_create(char *vertex, char *fragment);
 extern uint p_th_get_hdri_token(boolean alpha);
