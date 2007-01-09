@@ -87,18 +87,18 @@
 	#define APIENTRY
 #endif
 
-void (APIENTRY *p_glBindFramebufferEXT)(GLenum target, GLuint framebuffer) = NULL;
-void (APIENTRY *p_glDeleteFramebuffersEXT)(GLsizei n, const GLuint *framebuffers) = NULL;
-void (APIENTRY *p_glGenFramebuffersEXT)(GLsizei n, GLuint *framebuffers) = NULL;
+static void (APIENTRY *p_glBindFramebufferEXT)(GLenum target, GLuint framebuffer) = NULL;
+static void (APIENTRY *p_glDeleteFramebuffersEXT)(GLsizei n, const GLuint *framebuffers) = NULL;
+static void (APIENTRY *p_glGenFramebuffersEXT)(GLsizei n, GLuint *framebuffers) = NULL;
 
-void (APIENTRY *p_glBindRenderbufferEXT)(GLenum target, GLuint renderbuffer) = NULL;
-void (APIENTRY *p_glDeleteRenderbuffersEXT)(GLsizei n, const GLuint *renderbuffers) = NULL;
-void (APIENTRY *p_glGenRenderbuffersEXT)(GLsizei n, GLuint *renderbuffers) = NULL;
-GLenum (APIENTRY *p_glCheckFramebufferStatusEXT)(GLenum target) = NULL;
-void (APIENTRY *p_glRenderbufferStorageEXT)(GLenum target, GLenum internalformat, GLsizei width, GLsizei height) = NULL;
+static void (APIENTRY *p_glBindRenderbufferEXT)(GLenum target, GLuint renderbuffer) = NULL;
+static void (APIENTRY *p_glDeleteRenderbuffersEXT)(GLsizei n, const GLuint *renderbuffers) = NULL;
+static void (APIENTRY *p_glGenRenderbuffersEXT)(GLsizei n, GLuint *renderbuffers) = NULL;
+static GLenum (APIENTRY *p_glCheckFramebufferStatusEXT)(GLenum target) = NULL;
+static void (APIENTRY *p_glRenderbufferStorageEXT)(GLenum target, GLenum internalformat, GLsizei width, GLsizei height) = NULL;
 
-void (APIENTRY *p_glFramebufferTexture2DEXT)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level) = NULL;
-void (APIENTRY *p_glFramebufferRenderbufferEXT)(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer) = NULL;
+static void (APIENTRY *p_glFramebufferTexture2DEXT)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level) = NULL;
+static void (APIENTRY *p_glFramebufferRenderbufferEXT)(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer) = NULL;
 
 extern egreal p_noise_function(egreal *vec, uint level);
 
