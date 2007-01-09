@@ -185,10 +185,10 @@ static int x11_event_handler(BInputState *input)
 						betray_move_cursor(32000);
 					else if(sym == XK_Home)
 						betray_move_cursor(-32000);
-					else
+					else if(sym < 256)
 						betray_insert_character(sym);
 				}
-				else if(input->event_count < BETRAY_MAX_EVENT_COUNT)
+				else if(input->event_count < BETRAY_MAX_EVENT_COUNT && sym < 256)
 				{
 					input->event[input->event_count].state = TRUE;
 					input->event[input->event_count++].button = sym;
