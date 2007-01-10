@@ -15,6 +15,7 @@ static boolean	input_focus = TRUE;
 static uint	screen_size_x = 800;
 static uint	screen_size_y = 600;
 static boolean	mouse_warp = FALSE;
+static uint	warp_x, warp_y;
 static HWND	hWnd;
 static HDC	hDC;				/* device context */
 static boolean	busy;
@@ -32,6 +33,21 @@ boolean b_win32_system_wrapper_set_display(uint size_x, uint size_y, boolean ful
 void betray_set_context_update_func(void (*context_func)(void))
 {
 	win32_context_func = context_func;
+}
+
+/* Warp mouse pointer to center of client area. */
+static void do_warp_mouse(void)
+{
+	WINDOWINFO	winf;
+
+	winf.cbSize = sizeof winf;
+
+	if(GetWindowInfo(hWnd, &winf))
+	{
+		warp_x = (winf.rcClient.left + winf.rcClient.right) / 2;
+		warp_y = (winf.rcClient.top + winf.rcClient.bottom) / 2;
+		SetCursorPos(warp_x, warp_y);
+	}
 }
 
 static LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -75,8 +91,12 @@ static LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				input->mouse_button[2] = TRUE;
 			else if(uMsg == WM_MBUTTONUP)
 				input->mouse_button[2] = FALSE;
+			input->delta_pointer_x = -input->pointer_x;
 			input->pointer_x = (float)LOWORD(lParam) / (float)screen_size_x * 2.0f - 1.0f;
+			input->delta_pointer_x += input->pointer_x;
+			input->delta_pointer_y -= input->pointer_y;
 			input->pointer_y = (1.0f - (float)HIWORD(lParam) / (float)screen_size_y * 2.0f) * (float)screen_size_y / (float)screen_size_x;
+			input->delta_pointer_y += input->pointer_y;
 			return 0;
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
@@ -256,15 +276,14 @@ extern void betray_time_update(void);
 void betray_launch_main_loop(void)
 {
 	MSG		msg;				/* message */
-	BInputState	*input;
+	BInputState	*input = betray_get_input_state();
 
-	input = betray_get_input_state();
 	ShowWindow(hWnd, my_nCmdShow);
 	busy = TRUE;
 	while(busy)
 	{
-		input->delta_pointer_x = -input->pointer_x;
-		input->delta_pointer_y = -input->pointer_y;
+		if(mouse_warp)
+			input->pointer_x = input->pointer_y = 0.0;
 		while(PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
 		{
 			if(GetMessage(&msg, NULL, 0, 0) > 0)
@@ -273,9 +292,6 @@ void betray_launch_main_loop(void)
    				DispatchMessage(&msg);
    			}
 		}
-		input->delta_pointer_x += input->pointer_x;
-		input->delta_pointer_y += input->pointer_y;
-
 		if(input->mouse_button[0] == FALSE && input->last_mouse_button[0] == FALSE)
 		{
 			input->click_pointer_x = input->pointer_x;
@@ -284,8 +300,7 @@ void betray_launch_main_loop(void)
 		betray_time_update();
 		betray_action(BAM_EVENT);	
 		betray_action(BAM_DRAW);
-		input->delta_pointer_x = 0;
-		input->delta_pointer_y = 0;	
+		input->delta_pointer_x = input->delta_pointer_y = 0.0;
 		input->event_count = 0;
 		glFlush();
 		SwapBuffers(hDC);
@@ -294,6 +309,8 @@ void betray_launch_main_loop(void)
 		input->last_mouse_button[1] = input->mouse_button[1];
 		input->last_mouse_button[2] = input->mouse_button[2];
 		betray_action(BAM_MAIN);
+		if(mouse_warp && (input->pointer_x != 0.0 || input->pointer_y != 0.0))
+			do_warp_mouse();
 	}
 	glFlush();
 	fprintf(stderr, "deleting context\n");
