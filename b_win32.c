@@ -15,7 +15,6 @@ static boolean	input_focus = TRUE;
 static uint	screen_size_x = 800;
 static uint	screen_size_y = 600;
 static boolean	mouse_warp = FALSE;
-static uint	warp_x, warp_y;
 static HWND	hWnd;
 static HDC	hDC;				/* device context */
 static boolean	busy;
@@ -43,11 +42,9 @@ static void do_warp_mouse(void)
 	winf.cbSize = sizeof winf;
 
 	if(GetWindowInfo(hWnd, &winf))
-	{
-		warp_x = (winf.rcClient.left + winf.rcClient.right) / 2;
-		warp_y = (winf.rcClient.top + winf.rcClient.bottom) / 2;
-		SetCursorPos(warp_x, warp_y);
-	}
+		SetCursorPos((winf.rcClient.left + winf.rcClient.right) / 2,
+			     (winf.rcClient.top + winf.rcClient.bottom) / 2);
+			     
 }
 
 static LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
