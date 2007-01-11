@@ -23,10 +23,10 @@
 */
 #if defined _WIN32
 #define	BETRAY_WIN32_SYSTEM_WRAPPER
-/*#elif defined __linux__
+#elif defined __linux__
 #define	BETRAY_X11_SYSTEM_WRAPPER
-*/#else
-#define	BETRAY_GLFW_SYSTEM_WRAPPER
+#else
+#define	BETRAY_SDL_SYSTEM_WRAPPER
 #endif
 
 
