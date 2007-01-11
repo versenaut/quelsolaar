@@ -13,7 +13,7 @@ static boolean	mouse_warp = FALSE;
 
 extern void sui_get_input(BInputState *data);
 
-boolean b_sdl_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen) 
+boolean betray_internal_set_display(uint size_x, uint size_y, boolean full_screen) 
 {  
 	uint video_flags;
 	video_flags = SDL_OPENGL;
@@ -41,27 +41,29 @@ void betray_set_context_update_func(void (*context_func)(void))
 	sdl_context_func = context_func;
 }
 
-void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, const char *caption)
+boolean betray_internal_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, const char *caption)
 {  
 	if(SDL_Init(SDL_INIT_VIDEO) < 0 )
 	{
 		fprintf(stderr, "Unable to initialize SDL: %s\n", SDL_GetError());
-		exit(EXIT_FAILURE);
+		return FALSE;
 	}
-	if(b_sdl_system_wrapper_set_display(size_x, size_y, full_screen))
+	if(betray_internal_set_display(size_x, size_y, full_screen))
 	{
 		size_x /= 2;
 		size_y /= 2;
-		if(b_sdl_system_wrapper_set_display(size_x, size_y, FALSE))
+		if(betray_internal_set_display(size_x, size_y, FALSE))
 		{
 			fprintf(stderr, "Unable to open %ux%u display: %s\n", size_x, size_y, SDL_GetError());
-			exit(EXIT_FAILURE);
+			return FALSE;
 		}
 	}
 	betray_reshape_view(size_x, size_y);
 	SDL_WM_SetCaption(caption, NULL);
 	SDL_EnableUNICODE(TRUE); 
 	SDL_ShowCursor(TRUE);
+
+	return TRUE;
 }
 
 void system_wrapper_endframe(void)
@@ -168,7 +170,7 @@ static uint system_wrapper_eventloop(BInputState *input)
 				return FALSE;
 			break;
 			case SDL_VIDEORESIZE :
-				b_sdl_system_wrapper_set_display(event.resize.w, event.resize.h, FALSE);
+				betray_internal_set_display(event.resize.w, event.resize.h, FALSE);
 				betray_reshape_view(event.resize.w, event.resize.h);
 				if(sdl_context_func != NULL)
 					sdl_context_func();

@@ -47,6 +47,10 @@ void *betray_get_gl_proc_address()
   return glfwGetProcAddress;
 }
 
+void betray_set_context_update_func(void (*update)(void))
+{
+}
+
 void b_glfw_keyboard_func(int key, int state)
 {
   BInputState *input;
@@ -116,13 +120,13 @@ void b_glfw_char_func(int character, int state)
 
 extern void betray_time_update(void);
 
-boolean b_glfw_system_wrapper_set_display(uint x_size, uint y_size, boolean fullscreen)
+boolean betray_internal_set_display(uint x_size, uint y_size, boolean fullscreen)
 {
   glfwSetWindowSize(x_size, y_size);
   return TRUE;
 }
 
-boolean b_glfw_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, char *caption)
+boolean betray_internal_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, const char *caption)
 {
   if (!glfwInit())
     return FALSE;

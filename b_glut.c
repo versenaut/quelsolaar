@@ -183,15 +183,15 @@ void b_glut_display_func(void)
 glutWarpPointer(int x, int y);
 */
 
-boolean b_glut_system_wrapper_set_display(uint x_size, uint y_size, boolean fullscreen)
+boolean betray_internal_set_display(uint x_size, uint y_size, boolean fullscreen)
 {
 	glutReshapeWindow(x_size, y_size);
 	return TRUE;
 }
 
-boolean b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, const char *caption)
+boolean betray_internal_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, const char *caption)
 {
-	 glutInit(&argc, argv);
+	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STENCIL);
 //	glutInitDisplayString("stencil>=1 rgb depth double");
 	glutInitWindowPosition(10, 10);

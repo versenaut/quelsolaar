@@ -34,14 +34,16 @@ void betray_set_context_update_func(void (*context_func)(void))
 	x11info.context = context_func;
 }
 
-void b_x11_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen)
+boolean betray_internal_set_display(uint size_x, uint size_y, boolean full_screen)
 {
 	betray_reshape_view(size_x, size_y);	/* Just resize, and be done. */
 	x11info.warp_x = size_x / 2;
 	x11info.warp_y = size_y / 2;
+
+	return TRUE;
 }
 
-void b_x11_init_display(uint size_x, uint size_y, boolean full_screen, const char *caption)
+boolean betray_internal_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, const char *caption)
 {
 	int		attrs[] = { GLX_RGBA, GLX_DOUBLEBUFFER,
 					GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8, GLX_BLUE_SIZE, 8,
@@ -52,7 +54,7 @@ void b_x11_init_display(uint size_x, uint size_y, boolean full_screen, const cha
 	if((x11info.dpl = XOpenDisplay(NULL)) == NULL)
 	{
 		fprintf(stderr, "Betray: Unable to open X11 display connection, aborting\n");
-		exit(EXIT_FAILURE);
+		return FALSE;
 	}
 	if((x11info.win = XCreateSimpleWindow(x11info.dpl, DefaultRootWindow(x11info.dpl),
 					  0, 0, size_x, size_y,
@@ -61,7 +63,7 @@ void b_x11_init_display(uint size_x, uint size_y, boolean full_screen, const cha
 					  BlackPixel(x11info.dpl, DefaultScreen(x11info.dpl)))) == None)
 	{
 		fprintf(stderr, "Betray: Unable to open X11 window, aborting\n");
-		exit(EXIT_FAILURE);
+		return FALSE;
 	}
 	XSelectInput(x11info.dpl, x11info.win,
 		     ButtonPressMask | ButtonReleaseMask |
@@ -76,7 +78,7 @@ void b_x11_init_display(uint size_x, uint size_y, boolean full_screen, const cha
 	if((x11info.wmproto = XInternAtom(x11info.dpl, "WM_PROTOCOLS", False)) == None)
 	{
 		fprintf(stderr, "Betray: Unable to look up atom WM_PROTOCOLS\n");
-		exit(EXIT_FAILURE);
+		return FALSE;
 	}
 	if((x11info.wmdel = XInternAtom(x11info.dpl, "WM_DELETE_WINDOW", False)) != None)
 		XSetWMProtocols(x11info.dpl, x11info.win, &x11info.wmdel, 1);
@@ -87,7 +89,7 @@ void b_x11_init_display(uint size_x, uint size_y, boolean full_screen, const cha
 	if((x11info.visual = glXChooseVisual(x11info.dpl, DefaultScreen(x11info.dpl), attrs)) == NULL)
 	{
 		fprintf(stderr, "Betray: Unable to choose a suitable X Visual\n");
-		exit(EXIT_FAILURE);
+		return FALSE;
 	}
 	if((x11info.ctx = glXCreateContext(x11info.dpl,
 					   x11info.visual,
@@ -95,14 +97,15 @@ void b_x11_init_display(uint size_x, uint size_y, boolean full_screen, const cha
 					   True)) == NULL)
 	{
 		fprintf(stderr, "Betray: Unable to create X11 rendering context\n");
-		exit(EXIT_FAILURE);
+		return FALSE;
 	}
 	if(glXMakeCurrent(x11info.dpl, x11info.win, x11info.ctx) == False)
 	{
 		fprintf(stderr, "Betray: Unable to make X11 window current\n");
-		exit(EXIT_FAILURE);
+		return FALSE;
 	}
-	b_x11_system_wrapper_set_display(size_x, size_y, full_screen);
+	betray_internal_set_display(size_x, size_y, full_screen);
+	return TRUE;
 }
 
 void * betray_get_gl_proc_address(void)
@@ -232,7 +235,7 @@ static int x11_event_handler(BInputState *input)
 */			}
 			break;
 		case ConfigureNotify:
-			b_x11_system_wrapper_set_display(ev.xconfigure.width, ev.xconfigure.height, FALSE);
+			betray_internal_set_display(ev.xconfigure.width, ev.xconfigure.height, FALSE);
 			if(x11info.context != NULL)	/* If user has a context function registered, call it. */
 				x11info.context();
 			break;

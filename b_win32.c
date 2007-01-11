@@ -24,7 +24,7 @@ static HGLRC	hRC = NULL;			/* opengl context */
 
 extern void sui_get_input(BInputState *data);
 
-boolean b_win32_system_wrapper_set_display(uint size_x, uint size_y, boolean full_screen) 
+boolean betray_internal_set_display(uint size_x, uint size_y, boolean full_screen) 
 {
 	return TRUE;
 }
@@ -166,7 +166,7 @@ static LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	return DefWindowProc(hWnd, uMsg, wParam, lParam); 
 }
 
-boolean b_win32_init_display(uint size_x, uint size_y, boolean full_screen, const char *caption) 
+boolean betray_internal_init_display(uint size_x, uint size_y, boolean full_screen, const char *caption) 
 {
 	int n, pf;
 	WNDCLASS    wc;
