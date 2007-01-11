@@ -25,6 +25,18 @@ struct{
 	double			delta_time;
 }BGlobal;
 
+/* Some internal functions, mainly used by back-end implementations (and thus needing to be shared across them). */
+
+boolean betray_internal_key_add(BInputState *input, uint key, boolean pressed)
+{
+	if(input->event_count >= BETRAY_MAX_EVENT_COUNT)
+		return FALSE;
+	input->event[input->event_count].state = pressed;
+	input->event[input->event_count++].button = key;
+}
+
+/* End of internal functions. */
+
 void betray_reshape_view(uint x_size, uint y_size)
 {
 	float w, h, fov, aspect;
@@ -44,25 +56,9 @@ void betray_reshape_view(uint x_size, uint y_size)
 
 boolean betray_set_screen_mode(uint x_size, uint y_size, boolean fullscreen)
 {
-#if defined BETRAY_SDL_SYSTEM_WRAPPER
-	if(b_sdl_system_wrapper_set_display(x_size, y_size, fullscreen) != TRUE)
+	if(!betray_internal_set_display(x_size, y_size, fullscreen))
 		return FALSE;
-#endif 
 
-#if defined BETRAY_GLUT_SYSTEM_WRAPPER
-	if(b_glut_system_wrapper_set_display(x_size, y_size, fullscreen) != TRUE)
-		return FALSE;
-#endif
-
-#if defined BETRAY_GLFW_SYSTEM_WRAPPER
-	if(b_glfw_system_wrapper_set_display(x_size, y_size, fullscreen) != TRUE)
-		return FALSE;
-#endif
-/*	#ifdef BETRAY_WIN32_SYSTEM_WRAPPER
-	if(b_win32_init_display(x_size, y_size, fullscreen) != TRUE)
-		return FALSE;
-	#endif
-*/
 	BGlobal.screen_mode.x_size = x_size;
 	BGlobal.screen_mode.y_size = y_size;
 	BGlobal.screen_mode.fullscreen = fullscreen;
@@ -81,35 +77,13 @@ double betray_get_screen_mode(uint *x_size, uint *y_size, boolean *fullscreen)
 	return (double)BGlobal.screen_mode.y_size / (double)BGlobal.screen_mode.x_size;
 }
 
-extern void b_sdl_init_display(uint size_x, uint size_y, boolean full_screen, const char *caption);
-extern void b_glut_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, const char *caption);
-extern boolean b_win32_init_display(uint size_x, uint size_y, boolean full_screen, const char *caption);
-
 void betray_init(int argc, char **argv, uint window_size_x, uint window_size_y, boolean window_fullscreen, const char *name)
 {
-#if defined BETRAY_SDL_SYSTEM_WRAPPER
-	b_sdl_init_display(window_size_x, window_size_y, window_fullscreen, name);
-#endif 
-
-#if defined BETRAY_GLUT_SYSTEM_WRAPPER
-	b_glut_init_display(argc, argv, window_size_x, window_size_y, window_fullscreen, name);
-#endif
-
-#if defined BETRAY_GLFW_SYSTEM_WRAPPER
-	b_glfw_init_display(argc, argv, window_size_x, window_size_y, window_fullscreen, name);
-#endif
-
-#if defined BETRAY_WIN32_SYSTEM_WRAPPER
-	if(!b_win32_init_display(window_size_x, window_size_y, window_fullscreen, name))
+	if(!betray_internal_init_display(argc, argv, window_size_x, window_size_y, window_fullscreen, name))
 	{
-		fprintf(stderr, "Betray couldn't initialize Win32 display\n");
+		fprintf(stderr, "Betray couldn't initialize display, aborting\n");	/* This is a bit radical. */
 		exit(1);
 	}
-#endif
-
-#if defined BETRAY_X11_SYSTEM_WRAPPER
-	b_x11_init_display(window_size_x, window_size_y, window_fullscreen, name);
-#endif
 
 	betray_get_current_time(&BGlobal.time[0], &BGlobal.time[1]);
 	BGlobal.screen_mode.x_size = window_size_x;
