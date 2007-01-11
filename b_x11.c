@@ -191,22 +191,18 @@ static int x11_event_handler(BInputState *input)
 					else if(sym < 256)
 						betray_insert_character(sym);
 				}
-				else if(input->event_count < BETRAY_MAX_EVENT_COUNT && sym < 256)
-				{
-					input->event[input->event_count].state = TRUE;
-					input->event[input->event_count++].button = sym;
-				}
+				else
+					betray_internal_key_add(input, sym, TRUE);
 			}
 			break;
 		case KeyRelease:
-			if(!betray_is_type_in() && input->event_count < BETRAY_MAX_EVENT_COUNT)
+			if(!betray_is_type_in())
 			{
 				KeySym	sym = XLookupKeysym(&ev.xkey, 0);
 
 				if(ev.xkey.state & (LockMask | ShiftMask))
 					XConvertCase(sym, &sym, &sym);
-				input->event[input->event_count].state = FALSE;
-				input->event[input->event_count++].button = sym;
+				betray_internal_key_add(input, sym, FALSE);
 			}
 			break;
 		case MotionNotify:

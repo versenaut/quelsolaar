@@ -142,22 +142,13 @@ static LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 						betray_insert_character(key);
 				}
 				else
-				{
-					if(input->event_count < BETRAY_MAX_EVENT_COUNT)
-					{
-						input->event[input->event_count].state = TRUE;
-						input->event[input->event_count++].button = key;
-					}
-				}
+					betray_internal_key_add(input, key, TRUE);
 			}
 			break;
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
-			if(!betray_is_type_in() && input->event_count < BETRAY_MAX_EVENT_COUNT)
-			{
-				input->event[input->event_count].state = FALSE;
-				input->event[input->event_count++].button = lParam;
-			}
+			if(!betray_is_type_in())
+				betray_internal_key_add(input, lParam, FALSE);
 			break;
 		case WM_CLOSE:
 			busy = 0;
