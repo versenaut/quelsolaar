@@ -125,24 +125,16 @@ static LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				else if(wParam == 36) /* HOME */
 					betray_move_cursor(-32000);
 			}
+			else
+				betray_internal_key_add(input, wParam, TRUE);
 			break;
 		case WM_CHAR:
 			{
-				uint key = wParam;
-/*				{
-					FILE *f;
-					f = fopen("key_output.txt", "at");
-					fprintf(f, "char pressed = %u\n", wParam); 
-					fclose(f);
-				}
-*/
 				if(betray_is_type_in())
 				{
-					if(key >= ' ' && key < 128)
-						betray_insert_character(key);
+					if(wParam >= ' ' && wParam < 128)
+						betray_insert_character(wParam);
 				}
-				else
-					betray_internal_key_add(input, key, TRUE);
 			}
 			break;
 		case WM_SYSKEYUP:
