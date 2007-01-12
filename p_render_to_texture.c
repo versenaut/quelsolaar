@@ -153,7 +153,7 @@ static void p_check_framebuffer_status(void)
 {
 	GLenum status;
 
-	if(!p_glBindFramebufferEXT)
+	if(!p_glCheckFramebufferStatusEXT)
 		return;
 
 	status = (GLenum) p_glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
