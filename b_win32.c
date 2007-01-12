@@ -157,7 +157,7 @@ static LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	return DefWindowProc(hWnd, uMsg, wParam, lParam); 
 }
 
-boolean betray_internal_init_display(uint size_x, uint size_y, boolean full_screen, const char *caption) 
+boolean betray_internal_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, const char *caption) 
 {
 	int n, pf;
 	WNDCLASS    wc;
