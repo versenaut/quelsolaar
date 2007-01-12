@@ -33,6 +33,7 @@ boolean betray_internal_key_add(BInputState *input, uint key, boolean pressed)
 		return FALSE;
 	input->event[input->event_count].state = pressed;
 	input->event[input->event_count++].button = key;
+	return TRUE;
 }
 
 /* End of internal functions. */
