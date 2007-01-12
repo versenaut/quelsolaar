@@ -43,11 +43,23 @@ boolean betray_internal_set_display(uint size_x, uint size_y, boolean full_scree
 	return TRUE;
 }
 
+/* This is an atexit() callback, registered by internal_init_display(), below. Clean-up time. */
+static void cb_exit(void)
+{
+	if(x11info.dpl != NULL)
+	{
+		XAutoRepeatOn(x11info.dpl);
+		if(x11info.win != None)
+			XDestroyWindow(x11info.dpl, x11info.win);
+		XCloseDisplay(x11info.dpl);
+	}
+}
+
 boolean betray_internal_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, const char *caption)
 {
 	int		attrs[] = { GLX_RGBA, GLX_DOUBLEBUFFER,
 					GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8, GLX_BLUE_SIZE, 8,
-					/*GLX_ALPHA_SIZE, 8,*/ GLX_STENCIL_SIZE, 8, GLX_DEPTH_SIZE, 8,
+					GLX_STENCIL_SIZE, 8, GLX_DEPTH_SIZE, 8,
 					None };
 	XTextProperty	prop;
 
@@ -105,6 +117,9 @@ boolean betray_internal_init_display(int argc, char **argv, uint size_x, uint si
 		return FALSE;
 	}
 	betray_internal_set_display(size_x, size_y, full_screen);
+	atexit(cb_exit);
+	XAutoRepeatOff(x11info.dpl);	/* This is needed to get sensible keyboard events. */
+
 	return TRUE;
 }
 
@@ -267,9 +282,7 @@ void betray_launch_main_loop(void)
 		input->last_mouse_button[2] = input->mouse_button[2];
 		betray_action(BAM_MAIN);
 	}
-	/* Assume we're done, and close window and X11 server connection. */
-	XDestroyWindow(x11info.dpl, x11info.win);
-	XCloseDisplay(x11info.dpl);
+	/* We don't bother with closing the window, the exit handler does that. */
 }
 
 #endif	/* BETRAY_X11_SYSTEM_WRAPPER */
