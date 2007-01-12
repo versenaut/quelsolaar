@@ -151,12 +151,24 @@ boolean betray_get_key(uint key)
 void betray_get_key_up_down(boolean *press, boolean *last_press, uint key)
 {
 	uint i;
+
+#if defined _WIN32
+	/* In Windows, keys when not in type-in mode are reported as upper-case.
+	 * This is an ugly hack, if that wasn't obvious, and should be replaced
+	 * by a proper keycode table for Betray. In the meantime, this is better
+	 * than changing it at the application level.
+	*/
+	key = toupper(key);
+#endif
+
 	for(i = 0; i < BGlobal.input.event_count; i++)
 	{
 		if(BGlobal.input.event[i].button == key)
 		{
-			*last_press = *press;
-			*press = BGlobal.input.event[i].state;
+			if(last_press != NULL)
+				*last_press = *press;
+			if(press != NULL)
+				*press = BGlobal.input.event[i].state;
 		}
 	}
 }
