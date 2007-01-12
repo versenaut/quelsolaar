@@ -148,7 +148,7 @@ static LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
 			if(!betray_is_type_in())
-				betray_internal_key_add(input, lParam, FALSE);
+				betray_internal_key_add(input, wParam, FALSE);
 			break;
 		case WM_CLOSE:
 			busy = 0;
