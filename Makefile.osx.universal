@@ -8,9 +8,9 @@ VERSE=../verse
 
 CFLAGS=-I$(VERSE) -I/usr/local/include -g -Wstrict-prototypes -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386
 LDFLAGS=-L$(VERSE) -L/usr/local/lib -Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386
-LDLIBS=-lverse -lglfw -framework AGL -framework Carbon -framework OpenGL
+#LDLIBS=-lverse -lglfw -framework AGL -framework Carbon -framework OpenGL
 #LDLIBS=-lverse -lSDLMain -framework SDL -framework OpenGL -framework Cocoa
-#LDLIBS=-lverse -framework GLUT -framework OpenGL -framework Cocoa
+LDLIBS=-lverse -framework GLUT -framework OpenGL -framework Cocoa
 
 DATE=`date "+%Y%m%d"`
 SYS=`uname -s | tr -d ' ' | tr [A-Z] [a-z]`-`uname -m | tr -d ' '`
@@ -67,7 +67,7 @@ Quelsolaar.app: Quelsolaar.app/Contents/MacOS/quelsolaar
 Quelsolaar.app/Contents/MacOS/quelsolaar: quelsolaar
 		./bundle.sh "Quelsolaar" quelsolaar
 
-connector:	co_3d_view.o co_main.o co_game.o co_intro.o co_popup.o co_projection.o co_summary.o co_vn_audio.o co_vn_bitmap.o \
+connector:	co_3d_view.o co_clone.o co_main.o co_game.o co_intro.o co_popup.o co_projection.o co_summary.o co_symbols.o co_vn_audio.o co_vn_bitmap.o \
 		co_vn_curve.o co_vn_geometry.o co_vn_graphics.o co_vn_handle.o co_vn_head.o co_vn_mat_render.o co_vn_material.o \
 		co_vn_object.o co_vn_search.o co_vn_text.o co_widgets.o \
 		st_matrix_operations.o $(LIBPERSUADE) seduce_persuade.o \
@@ -82,9 +82,9 @@ uvedit:		uv_draw.o uv_edge_collapse.o uv_geometry.o uv_main.o uv_menu.o uv_overl
 
 loqairou:	la_cache.o la_draw_overlay.o la_flare_fx.o la_geometry_undo.o la_hole.o la_input_parser.o la_intro.o la_key_input.o \
 		la_main.o la_neighbor.o la_particle_fx.o la_pop_up.o la_projection.o la_reference.o la_save.o \
-		la_settings.o la_tool_collapse.o la_tool_center.o la_tool_deploy.o la_tool_draw.o la_tool_edge_connector.o \
+		la_settings.o la_tool_collapse.o la_tool_center.o la_tool_cut_paste.o la_tool_deploy.o la_tool_draw.o la_tool_edge_connector.o \
 		la_tool_manipulator.o la_tool_poly_select.o la_tool_reshape.o la_tool_revolve.o la_tool_select.o \
-		la_tool_slice.o la_tool_splitter.o la_tool_subdivide.o la_tool_cut_paste.o \
+		la_tool_slice.o la_tool_splitter.o la_tool_subdivide.o \
 		st_math.o st_matrix_operations.o st_text.o $(LIBPERSUADE) \
 		libseduce.a libbetray.a libenough.a libdeceive.a $(LIBPERSUADE)
 		gcc -o $@ $^ $(LDFLAGS) $(LDLIBS)
@@ -105,7 +105,7 @@ pngsave:	pngsave.c libenough.a
 
 # -----------------------------------------------
 
-libseduce.a:	s_background.o s_draw.o   s_line_font.o s_main.o s_popup.o s_settings.o s_settings_window.o s_text.o
+libseduce.a:	s_background.o s_draw.o s_editor.o s_line_font.o s_main.o s_popup.o s_settings.o s_settings_window.o s_text.o
 		rm -f $@
 		ar -csr $@ $^
 
@@ -127,7 +127,7 @@ libpersuade.a:	p_extension.o p_flare.o p_geometry.o p_impostor.o p_noise.o p_obj
 		rm -f $@
 		ar -csr $@ $^
 
-libdeceive.a:	d_main.o
+libdeceive.a:	d_main.o d_master.o
 		rm -f $@
 		ar -csr $@ $^
 

@@ -10,12 +10,15 @@
 static uint screen_size_x = 0;
 static uint screen_size_y = 0;
 static boolean mouse_warp = FALSE;
+static void (*glfw_context_func)(void) = NULL;
 
 void b_glfw_reshape_func(int width, int height)
 {
   screen_size_x = width;
   screen_size_y = height;
   betray_reshape_view(width, height);
+  if (glfw_context_func != NULL)
+    glfw_context_func();
 }
 
 void b_glfw_mouse_pos_func(int x, int y)
@@ -148,7 +151,12 @@ boolean betray_internal_init_display(int argc, char **argv, uint size_x, uint si
 
 void betray_set_mouse_warp(boolean warp)
 {
-	mouse_warp = warp;
+  mouse_warp = warp;
+}
+
+void betray_set_context_update_func(void (*context_func)(void))
+{
+  glfw_context_func = context_func;
 }
 
 void betray_launch_main_loop(void)
