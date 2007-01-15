@@ -185,6 +185,7 @@ void qs_intro_handler(BInputState *input, void *user)
 extern void *se_symbol_editor_func(BInputState *input, void *user_pointer);
 extern void *se_font_editor_func(BInputState *input, void *user_pointer);
 extern void qs_intro_init(void);
+extern void qs_settings_init(void);
 extern void sp_settings_init(void);
 extern void p_init_render_to_texture(void);
 
@@ -193,6 +194,7 @@ int main(int argc, char **argv)
 	betray_init(argc, argv, 800, 600, FALSE, "Quel Solaar");
 	deceive_set_arg(argc, argv);
 	sui_load_settings("qs_config.cfg");
+	qs_settings_init();
 	sui_init();
 	qs_camera_init();
 	glClearColor(1, 1, 1, 0);
