@@ -28,7 +28,13 @@ void b_glut_idle_func(void)
 }
 
 
-void (*glut_context_func)(void) = NULL;
+static void (*glut_context_func)(void) = NULL;
+
+/* This is kind of tame, since we cannot (afaik) actually implement mouse warping on top of GLUT. */
+void betray_set_mouse_warp(boolean warp)
+{
+	/* Sometimes, nothing is all you can do. Very Ghandi, or something. */
+}
 
 void betray_set_context_update_func(void (*context_func)(void))
 {
