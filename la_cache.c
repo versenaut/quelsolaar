@@ -4,7 +4,8 @@
 
 uint la_create_particle_material(uint size, float *data)
 {
-	uint texture_id, i;
+	uint texture_id;
+
 	glEnable(GL_TEXTURE_2D);
 	glGenTextures(1, &texture_id);
 	glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -23,7 +24,7 @@ boolean la_load_targa(char *file_name, uint *texture_id)
 {
 	FILE *image;
 	float *draw = NULL;
-	unsigned int i, j, identfeald, type, x_size, y_size, alpha;
+	unsigned int i, identfeald, type, x_size, y_size, alpha;
 
 	if((image = fopen(file_name, "rb")) == NULL)
 	{
@@ -96,7 +97,7 @@ uint la_save_targa(char *file_name, float *data, unsigned int size)
 {
 	FILE *image;
 	char *foot = "TRUEVISION-XFILES.";
-	unsigned int i, j;
+	unsigned int i;
 
 	if((image = fopen(file_name, "wb")) == NULL)
 	{

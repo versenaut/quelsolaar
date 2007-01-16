@@ -218,7 +218,6 @@ static void callback_send_b_dimensions_set(void *user_data, VNodeID node_id, uin
 {
 	ESBitmapNode	*node;
 	ESBitmapLayer	*layer;
-	float			*data;
 	uint i, j, k;
 	node = e_create_b_node(node_id, 0);
 
@@ -514,10 +513,9 @@ void e_nsb_evaluate_image_handle_tile(EBMHandle *handle, ebreal *output, ebreal 
 
 static void callback_send_b_tile_set(void *user_data, VNodeID node_id, VLayerID layer_id, uint16 tile_x, uint16 tile_y, uint16 z, VNBLayerType type, VNBTile *tile)
 {
-	ESBitmapNode		*node;
-	ESBitmapLayer		*layer;
-	float			*buf;
-	uint32			i, x, y, x_offset, y_offset, z_offset, pixel_id, x_tilesize, y_tilesize, tw, th;
+	ESBitmapNode	*node;
+	ESBitmapLayer	*layer;
+	uint32		x, y, x_offset, y_offset, z_offset, pixel_id, x_tilesize, y_tilesize, tw, th;
 
 	node = e_create_b_node(node_id, 0);
 	layer = find_dlut(&node->layertables, layer_id);
