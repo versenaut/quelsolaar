@@ -43,10 +43,10 @@ void print_neighbor(void)
 	uint i;
 	printf("list 0 has %u entries\n", GlobalSurfaceCreate.list_length[0]);
 	for(i = 0; i < GlobalSurfaceCreate.list_length[0]; i++)
-		printf("list 0 entry %i is = %i balance = %i\n", i, GlobalSurfaceCreate.list[0][i].vertex, GlobalSurfaceCreate.list[0][i].turn);
+		printf("list 0 entry %i is = %i balance = %u\n", i, GlobalSurfaceCreate.list[0][i].vertex, *GlobalSurfaceCreate.list[0][i].turn);
 	printf("list 1 has %u entries\n", GlobalSurfaceCreate.list_length[1]);
 	for(i = 0; i < GlobalSurfaceCreate.list_length[1]; i++)
-		printf("list 1 entry %i is = %i balance = %i\n", i, GlobalSurfaceCreate.list[1][i].vertex, GlobalSurfaceCreate.list[1][i].turn);
+		printf("list 1 entry %i is = %i balance = %u\n", i, GlobalSurfaceCreate.list[1][i].vertex, *GlobalSurfaceCreate.list[1][i].turn);
 }
 
 void print_edge_list(uint *edge, uint length)
@@ -103,8 +103,8 @@ void add_neighbor(uint list, uint vertex, uint turn, uint32 crease, uint32 primi
 
 void find_neighbor_polygon(uint *ref, uint length, uint vertex_length, uint *vertex)
 {
-	boolean output = TRUE;
 	int i, j, poly;
+
 	length *= 4; 
 	for(i = 0; i < length; i++)
 	{
@@ -182,7 +182,7 @@ void create_polygon(uint *vertex, uint list_a, uint list_b, uint destroy_a, uint
 
 void find_triangles(uint *vertex)
 {
-	int i, j, k, third;
+	int i, j;
 	for(i = 0; i < GlobalSurfaceCreate.list_length[0]; i++)
 		for(j = 0; j < GlobalSurfaceCreate.list_length[1]; j++)
 			if(GlobalSurfaceCreate.list[0][i].vertex == GlobalSurfaceCreate.list[1][j].vertex)
@@ -200,7 +200,7 @@ boolean polygon_culling(double *vertex, uint vertex_0, uint vertex_1, uint verte
 
 void find_quads(uint *vertex, uint *ref, uint ref_length, uint *edge, uint edge_length)
 {
-	int i, j, k, third, prev, next;
+	int i, j, k, prev, next;
 
 	ref_length *= 4;
 	for(i = 0; i < ref_length; i++)
@@ -311,7 +311,8 @@ void select_found(double *array, uint *edge_vertex, uint *create_final)
 
 void destroy_surface(uint *ref, uint *crease, uint vertex_length, uint ref_length, uint *create_ref, uint *create_crease)
 {
-	uint vertex, i, next;
+	uint i, next;
+
 	ref_length *= 4;
 	for(i = 0; i < ref_length; i++)
 	{
