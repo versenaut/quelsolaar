@@ -511,7 +511,7 @@ printf("H\n");
 						tag.vreal64_vec3[1] = event->event[direction].tag.vec[1];
 						tag.vreal64_vec3[2] = event->event[direction].tag.vec[2];
 						verse_send_tag_create(UNDOGlobal.g_node, 0, tag_id, event->event[direction].tag.tag, VN_TAG_REAL64_VEC3, &tag);
-				/*	}else
+					}else
 					{
 						printf("H\n");
 						verse_send_tag_group_create(UNDOGlobal.g_node, -1, event->event[direction].tag.group);
