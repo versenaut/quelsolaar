@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "enough.h"
 #include "p_sds_geo.h"
 #include "p_sds_table.h"

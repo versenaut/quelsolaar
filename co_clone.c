@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "st_matrix_operations.h"
 #include "enough.h"
 #include "seduce.h"
