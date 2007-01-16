@@ -168,6 +168,8 @@ boolean co_search_node(ENode *node, char *search)
 							if(co_text_search(frag->output.label, search))
 								return TRUE;
 							break;
+						default:
+							break;
 					}
 				}
 			}
@@ -180,11 +182,7 @@ boolean co_search_node(ENode *node, char *search)
 						return TRUE;
 			}
 		break;
-		case V_NT_TEXT :
-		break;
-/*		case V_NT_PARTICLE :
-		break;
-*/		case V_NT_CURVE :
+		default:
 		break;
 	}
 
