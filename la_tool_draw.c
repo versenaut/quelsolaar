@@ -160,7 +160,6 @@ boolean la_t_draw_select_menu_test(void)
 
 boolean la_t_draw_line_test_delete(void)
 {
-	ENode *node;
 	double *vertex, a[3], b[3], c[3], d[3];
 	boolean del = FALSE;
 	uint vertex_length, *ref, ref_length, i;
@@ -217,7 +216,6 @@ boolean la_t_draw_line_test_delete(void)
 
 boolean la_t_draw_line_draw_delete_overlay(void)
 {
-	ENode *node;
 	double *vertex,	a[3], b[3], c[3], d[3];
 	boolean del = FALSE;
 	uint vertex_length, *ref, ref_length, i, local[4];
@@ -289,7 +287,7 @@ boolean la_t_draw_line_test_select(SelectionMode mode)
 {
 	double *vertex, pos[3];
 	boolean output = FALSE;
-	uint length, i, k, front, *ref;
+	uint length, i, k, front;
 	UNDOTag	*tag;
     udg_get_geometry(&length, NULL, &vertex, NULL, NULL);
     GlobalDrawLine.array[GlobalDrawLine.array_length * 2] = GlobalDrawLine.array[0];

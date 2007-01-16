@@ -64,11 +64,11 @@ boolean p_geo_sds_compute_func(uint id)
 	PPolyStore *mesh;
 	uint *ref, ref_count, vertex_count, *edge_crease, version; 
 	egreal *vertex;
-	PPolyStore *old = NULL;
 	ENode *node;
 	EGeoLayer *p, *v, *e;
 	PTimer ttimer;
 	float timer = 0;
+
 	if((node = e_ns_get_node(0, id)) == NULL || e_ns_get_node_type(node) != V_NT_GEOMETRY)
 		return TRUE;
 
@@ -175,6 +175,8 @@ void p_geometry_func(ENode *node, ECustomDataCommand command)
 			geometry = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
 			if(geometry != NULL)
 				p_sds_free(geometry, FALSE);
+		break;
+		default:
 		break;
 	}
 }

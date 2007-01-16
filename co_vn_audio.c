@@ -50,7 +50,7 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 	EAudioBuffer *buffer;
 	EAudioStream *stream;
 	double frequency;
-	float pos = 1, y, pre_expander, color, color_light;
+	float y, pre_expander, color, color_light;
 	uint i;
 
 	y = co_handle_node_head(input, node, change_a_node_id != e_ns_get_node_id(node));
@@ -165,7 +165,6 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 
 		for(stream = e_nsa_get_stream_next(node, 0); stream != NULL ; stream = e_nsa_get_stream_next(node, e_nsa_get_stream_id(stream) + 1))
 		{
-			boolean e;
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Stream name:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nsa_get_stream_name(stream), 16, rename_a_stream_func, stream, color, color_light);
 			if(co_w_close_button(input, 0.635, y, color))

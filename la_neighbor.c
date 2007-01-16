@@ -7,7 +7,7 @@
 uint *la_compute_neighbor(uint *ref, uint ref_count, uint vertex_count, egreal *vertex)
 {
 	uint i, j, cor, clear = 0, *n, *v, a, b;
-	uint laps = 0, tq1, tq2;
+	uint tq1, tq2;
 	n = malloc((sizeof *n) * ref_count * 4);
 	for(i = 0; i < ref_count * 4; i++)
 		n[i] = -1;
@@ -189,7 +189,7 @@ uint la_t_poly_quad_corner_test(double *a, double *b, double *c)
 
 void la_t_poly_find_quads(void)
 {
-	uint i, j, other, otherj, t;
+	uint i, j, other, otherj;
 	uint32 vertex_count, ref_count, *n, *ref, *crease;
 	double *vertex;
 	udg_get_geometry(&vertex_count, &ref_count, &vertex, &ref, &crease);

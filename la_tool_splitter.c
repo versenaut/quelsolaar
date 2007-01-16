@@ -225,7 +225,6 @@ void la_t_edge_splitter_start(BInputState *input, uint *edge)
 }
 void final_edge_split(uint poly, uint edge)
 {
-	uint poly_id;
 	if(GlobalSplitData.ref[poly][3] != -1)
 	{
 		if(edge == 0)
@@ -298,7 +297,7 @@ void final_middle_split(uint poly)
 
 void la_t_edge_splitter(BInputState *input)
 {
-	uint i, j, k, j2, new_vertex, poly; 
+	uint i, j, k, j2, poly;
 	double vertex[4][3], start[2], mouse[2], a, b;
 	la_pfx_create_spark(GlobalSplitData.pos);
 

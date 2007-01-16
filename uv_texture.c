@@ -12,9 +12,8 @@
 
 boolean poly_texture_hit_test(uint id, egreal x, egreal y)
 {
-	egreal x0, y0, x1, y1, x2, y2, x3, y3, r;
+	egreal x0, y0, x1, y1, x2, y2, x3, y3;
 	egreal uv[8];
-
 
 	uvg_get_uve(uv, id);
 	x0 = uv[0] - x; 
@@ -138,6 +137,8 @@ void uv_draw_texture(ENode *node)
 				{
 					switch(e_nsb_get_layer_type(layer[k]))
 					{
+						case VN_B_LAYER_UINT1 :
+						break;
 						case VN_B_LAYER_UINT8 :
 							for(l = 0 ; l < VN_B_TILE_SIZE * VN_B_TILE_SIZE; l++)
 							{

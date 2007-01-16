@@ -124,8 +124,9 @@ boolean light_fade_up = TRUE;
 void p_set_enable_shadow(uint id)
 {
 	double color[3], f, best = 0;
-	uint32 found;
+	uint32 found = ~0u;
 	ENode *node;
+
 	if(id != -1)
 	{
 		if(current_light_fade < 0.01 || current_light_fade > 0.99)
@@ -160,7 +161,7 @@ void p_set_shadow_light(uint32 time_s, uint32 time_f)
 	if(node != NULL)
 	{
 		double pos[3], color[3];
-		float f_pos[4] = {0, 0, 0, 1}, f_color[3], mult = 1, zero[3] = {0, 0, 0};
+		float f_pos[4] = {0, 0, 0, 1}, f_color[3];
 
 		e_nso_get_pos_time(node, pos, time_s, time_f);
 		e_nso_get_pos(node, pos, NULL, NULL, NULL, NULL, NULL);
