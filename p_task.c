@@ -34,12 +34,15 @@ struct{
 	boolean	init;
 }PGlobalTaskManager;
 
+extern void p_shader_fallback_func(ENode *node, ECustomDataCommand command);
+
 void p_task_add(uint id, float importance, boolean (*func)(uint id))
 {
 	PTask *t;
 	{
 		ENode *n; 
-		uint *a = NULL, i;
+		uint i;
+
 		n = e_ns_get_node(0, id);
 		for(i = 0; i < PGlobalTaskManager.count; i++)
 		{
@@ -71,7 +74,6 @@ void p_task_compute(uint count)
 {
 	PTimer timer;
 	PTask *t;
-	uint i;
 /*	if(PGlobalTaskManager.init == FALSE)
 	{
 		for(i = 0; i < count && !PGlobalTaskManager.init; i++)
