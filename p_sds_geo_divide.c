@@ -308,7 +308,7 @@ uint p_sds_get_middle(PPolyStore *old_mesh, uint poly)
 
 uint p_sds_get_edge(PPolyStore *old_mesh, uint edge)
 {
-	static tri_edge[3] = {1, 5, 2}, quad_edge[4] = {1, 6, 11, 3};
+	static uint32 tri_edge[3] = {1, 5, 2}, quad_edge[4] = {1, 6, 11, 3};
 	PPolyStore *mesh;
 	egreal crease;
 	uint a;
@@ -337,9 +337,9 @@ uint p_sds_get_edge(PPolyStore *old_mesh, uint edge)
 
 float p_sds_divide(PPolyStore *mesh)
 {
-	static quad_first[4] = {4, 9, 14, 3}, quad_second[4] = {0, 5, 10, 15};
-	static tri_first[3] = {3, 7, 2}, tri_second[3] = {0, 4, 8};
-	static quad_edge[8] = {0, 4, 5, 9, 10, 14, 15, 3}, tri_edge[6] = {0, 3, 4, 7, 8, 2};
+	static uint32 quad_first[4] = {4, 9, 14, 3}, quad_second[4] = {0, 5, 10, 15};
+	static uint32 tri_first[3] = {3, 7, 2}, tri_second[3] = {0, 4, 8};
+	static uint32 quad_edge[8] = {0, 4, 5, 9, 10, 14, 15, 3}, tri_edge[6] = {0, 3, 4, 7, 8, 2};
 	PPolyStore *new_mesh;
 	uint i,  j, stage, *ref, *n;
 	new_mesh = mesh->next;
