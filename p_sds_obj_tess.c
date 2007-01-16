@@ -4,6 +4,8 @@
 #include "p_sds_table.h"
 #include "p_sds_obj.h"
 
+extern uint p_lod_handle_edge_count(PPolyStore *smesh, PMesh *mesh, uint current_poly, uint current_edge);
+
 egreal p_sds_edge_tesselation_global_func(egreal *v_0, egreal *v_1, egreal *e_0, egreal *eay)
 {
 	egreal length, edge, vector[3];
@@ -265,7 +267,6 @@ PTessTableElement	*p_select_quad_tesselation(const PPolyStore *mesh, const egrea
 
 static double view_cam_lod_eye_pos[3];
 static double view_cam_lod_eye_matrix[16];
-static double view_cam_lod_factor = 0.01;
 static double view_cam_lod_limit = 1.5;
 static double view_cam_lod_geometry_only = 1000;
 
