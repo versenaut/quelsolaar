@@ -23,7 +23,7 @@ static struct{
 
 static void qs_set_tag(void)
 {
-	static boolean group_done = FALSE, tag_done = FALSE;
+	static boolean group_done = FALSE/*, tag_done = FALSE*/;
 
 	if(!group_done)
 	{
@@ -138,7 +138,7 @@ void qs_compute_camera(BInputState *input, float delta_time)
 {
 	static real64 old_pos[3] = { 0.0f };
 	static boolean w = FALSE, lw = FALSE, s = FALSE, ls = FALSE, a = FALSE, la = FALSE, d = FALSE, ld = FALSE;
-	double x, y, z;
+	double x, y;
 
 	qs_set_tag();
 

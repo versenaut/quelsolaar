@@ -43,8 +43,9 @@ char deceive_select_node[64] = {0};
 
 void deceive_set_arg(int argc, char **argv)
 {
-	char address[64] = {0}, name[64] = {0}, pass[64] = {0}, node[64] = {0}, *input;
+	char address[64] = "", name[64] = "", pass[64] = "", *input;
 	uint i, j, k;
+
 	if(argc > 1)
 	{
 		printf("Command line usage:\n");
@@ -191,7 +192,6 @@ void hidden_type_in(BInputState *input, float pos_x, float pos_y, float length, 
 	static uint cursor;
 	char zeros[256];
 	int i;
-	float pos;
 	
 	if(input->mode == BAM_DRAW)
 	{
@@ -227,10 +227,9 @@ void deceive_set_intro_draw_func(void (*draw_func)(void *user_pointer), void *us
 
 void deceive_intro_handler(BInputState *input, void *application_handler_func)
 {
-	DLoginLink *link = NULL;
 	static boolean active = FALSE, init = FALSE;
 	static char connect_type_in[48];
-	uint i, j;
+
 	if(init == FALSE)
 	{
 		d_init_master();

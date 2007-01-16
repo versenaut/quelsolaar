@@ -7,8 +7,9 @@
 
 double sui_draw_slider(BInputState *input, double x_pos, double y_pos, double width, double value, float *start_color, float *end_color, float *color)
 {
-	float line[16], col[8 * 3], f;
-	uint i, j;
+	float line[16], col[8 * 3];
+	uint i;
+
 	if(input->mode == BAM_DRAW)
 	{
 		for(i = 1; i < 7; i++)
@@ -460,7 +461,6 @@ void draw_settings_test(BInputState *input)
 	static SUIViewElement element[10];
 	static boolean init = FALSE;
 	static float time = 0;
-	double pos = 0.3;
 
 	if(init == FALSE)
 	{

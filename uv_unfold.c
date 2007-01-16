@@ -45,7 +45,7 @@ void find_unfold_vertex(egreal *edge_vertex, egreal *edge_vertex2, egreal *verte
 
 void find_unfold_uv(egreal *prev_edge1, egreal *prev_edge2, uint id, uint edge)
 {
-	egreal u, v, r,  *vertex, vec[3];
+	egreal u, v, *vertex, vec[3];
 	uint *ref;
 	unfold_uv[edge * 2] = prev_edge2[0];
 	unfold_uv[edge * 2 + 1] = prev_edge2[1];
@@ -94,7 +94,7 @@ uint uv_polygon_unfold(uint id, float x, float y)
 {
 	egreal uv[8];
 	boolean in[4];
-	uint i, *ref, id2, count = 0, edge[2], pass_edge;
+	uint i, *ref, id2, edge[2], pass_edge;
 
 	if(id == -1 || id != uvg_get_next_polygon(id))
 		return -1;

@@ -360,8 +360,9 @@ void uv_tool_poly_project(uint poly)
 
 void uv_tool_project(uint u, uint v, boolean unselected)
 {
-	uint *ref, id, i;
-	egreal uv[8], *vertex, *select, center[4], scale;
+	uint *ref, id, i = 0;
+	egreal uv[8], *vertex, *select, center[4] = { 0 }, scale;
+
 	ref = uvg_get_ref();
 	vertex = uvg_get_vertex();
 	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))

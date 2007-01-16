@@ -80,7 +80,7 @@ PlaneStatus poly_to_poly_test(uint *polygon, egreal *vertex, uint *test)
 {
 	egreal *origo, normal[3], *v1, *v2, *v3, f;
 	uint inside = 0, outside = 0;
-	PlaneStatus output = PS_FULL;
+
 	compute_normal(normal, vertex, polygon);
 	origo = &vertex[polygon[0] * 3];
 	v1 = &vertex[test[0] * 3];
@@ -335,7 +335,7 @@ PlaneStatus hull_poly_test(uint *ref, PlaneStatus *status, uint ref_length, egre
 boolean colision_point(float *pos, float *vector, float *normal, float *dist, float size)
 {
 	uint i, j;
-	CPlane *best = NULL, *best2 = NULL, *p;
+	CPlane *best = NULL, *p;
 	CHull *h;
 	float f, f2;
 	f2 = 10000;
@@ -868,8 +868,8 @@ void create_hulls2(uint *ref, uint *n, uint ref_length, egreal *vertex)
 {
 	uint i, j, key, tmp, best;
 	egreal normal[3];
-	boolean found;
-	PlaneStatus *status, *accepted, *group, s;
+	PlaneStatus *status, *accepted, *group;
+
 	accepted = malloc((sizeof *accepted) * ref_length);
 	status = malloc((sizeof *status) * ref_length);
 	group = malloc((sizeof *group) * ref_length);
@@ -1058,7 +1058,7 @@ void save_volumes(FILE *f)
 
 void c_create_volumes(FILE *f, uint *ref, uint ref_count, uint vertex_count, egreal *vertex)
 {
-	uint *map, *tri, tri_count, *n;
+	uint *tri, tri_count, *n;
 	global_planes_used = 0;
 	global_hulls_used = 0;
 	tri = c_triangelize(&tri_count, ref, ref_count, vertex, vertex_count);
