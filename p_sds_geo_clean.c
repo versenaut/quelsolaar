@@ -430,7 +430,7 @@ float p_sds_stage_count_poly(PPolyStore *mesh, uint *ref, uint ref_count, egreal
 								printf("B horror found!!!!!!!!!");			
 		}
 	}*/
-	{
+/*	{
 		uint j, k ,l;
 		for(j = 0; j < ref_count; j += 4)
 		if(ref[j] < vertex_count && ref[j + 1] < vertex_count &&  ref[j + 2] < vertex_count && vertex[ref[j] * 3] != E_REAL_MAX && vertex[ref[j + 1] * 3] != E_REAL_MAX && vertex[ref[j + 2] * 3] != E_REAL_MAX)
@@ -455,7 +455,7 @@ float p_sds_stage_count_poly(PPolyStore *mesh, uint *ref, uint ref_count, egreal
 									printf("A horror found!!!!!!!!!\n");
 		}
 	}
-
+*/
 	for(stage = mesh->stage[1]; stage < ref_count && i < MAX_COUNT_STAGE_LOOPS ; stage += 4)
 	{
 //		printf("ref%u = %u %u %u %u\n", stage / 4, ref[stage], ref[stage + 1], ref[stage + 2], ref[stage + 3]);
