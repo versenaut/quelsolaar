@@ -166,12 +166,7 @@ uint p_blur_object_environment(ENode *node, uint blur, uint texture, uint size, 
 	-1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0,
 	1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0,
 	1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, 1.0, -1.0, -1.0};
-	double matrix[16], objpos[3], point_a[3], point_b[3];
-	double fov_v, fov_h;
-	PObjImpostor *imp;
-	ENode *n;
-	PObject *o;
-	uint i;
+	double objpos[3];
 
 	p_create_cube_blur_shader();
 	e_nso_get_pos_time(node, objpos, 0, 0);
@@ -289,7 +284,7 @@ void create_matrix_normalized_c(double *matrix, double *origo, double *point_a, 
 void draw_fov(ENode *node, double *matrix, PObject *o)
 {
 	egreal high_x, low_x, high_y, low_y, high_z, low_z, high_x2, low_x2, high_y2, low_y2, high_z2, low_z2;
-	double x, y, z, f, fov = 0, scale[3];
+	double scale[3];
 	float vertex[8 * 3];
 	ENode *g_node;
 	uint i;
@@ -446,12 +441,9 @@ void p_draw_reflection_flares(double *view);
 
 uint update_object_environment(ENode *node, uint texture, uint size, uint side)
 {
-	double matrix[16], objpos[3], point_a[3], point_b[3];
-	double fov_v, fov_h;
-	PObjImpostor *imp;
+	double objpos[3];
 	ENode *n;
 	PObject *o;
-	uint i;
 	e_nso_get_pos_time(node, objpos, 0, 0);
 
 	if(texture == -1)
@@ -503,7 +495,6 @@ uint update_object_environment(ENode *node, uint texture, uint size, uint side)
 	{
 		if(node != n)
 		{
-			float light[3] = {10, 10, 10};
 			glEnable(GL_DEPTH_TEST);
 			glPushMatrix();
 			o = e_ns_get_custom_data(n, P_ENOUGH_SLOT);
@@ -526,9 +517,7 @@ void update_object_impostor(ENode *node, double *pos, uint texture)
 	double matrix[16], objpos[3], point_a[3], point_b[3];
 	double fov_v = 0.0, fov_h = 0.0;
 	static float time = 0;
-	PObjImpostor *imp;
 	PObject *o;
-	uint i;
 
 	o = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
 	point_b[0] = pos[0];
@@ -624,7 +613,6 @@ void p_update_object_impostors(void)
 	uint counter = 0;
 	ENode *node;
 	PObject *o;
-	double matrix[16];
 
 	if(!p_render_to_texture_supported() || !fbo_enabled)
 		return;
@@ -682,7 +670,6 @@ void p_update_object_impostors(void)
 			*/
 				else
 				{
-					uint i;
 				/*	intermidiet2 = o->impostor.environment;
 					o->impostor.environment = intermidiet;
 					intermidiet = intermidiet2;
@@ -713,7 +700,6 @@ boolean p_draw_object_as_impostor(ENode *node)
 void p_draw_object_impostor(ENode *node)
 {
 	float color_array[8] = {1, 1, 1, 0, 0, 0, 0, 1};
-	float vertex_array[12] = {-1, -1, 0, 1, -1, 0, 1, 1, 0, -1, 1, 0};
 	double *matrix, pos[3];
 	PObject *o;
 
