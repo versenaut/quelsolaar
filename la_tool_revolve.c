@@ -21,7 +21,8 @@ void create_polygon_revolve(uint *a, uint *b, uint revolve)
 void fill_vertex_revolve(double *matrix, uint *array, uint vertex_id, uint revolve)
 {
 	uint i;
-	double start[3], vertex[3], space[3], r, angle;
+	double vertex[3], space[3], r, angle;
+
 	udg_get_vertex_pos(vertex, vertex_id);
 	vertex[0] -= matrix[12];
 	vertex[1] -= matrix[13];
@@ -92,7 +93,8 @@ void create_revolve_matrix(double *matrix, uint a, uint b)
 uint get_next_edge(uint a, uint b, boolean del)
 {
 	boolean found = FALSE;
-	uint *edge, count, id, i, output = -1;
+	uint *edge, count, id = 0, i, output = -1;
+
 	edge = udg_get_edge_data(&count);
 	count *= 2;
 	for(i = 0; i < count; i++)
@@ -114,7 +116,8 @@ uint get_next_edge(uint a, uint b, boolean del)
 uint find_end(uint *edge, uint count, uint id, uint skip)
 {
 	boolean found;
-	uint next, next_skip, i;
+	uint next = 0, next_skip = 0, i;
+
 	count *= 2;
 	while(TRUE)
 	{
@@ -217,12 +220,14 @@ void fill_to_end(double *matrix, uint *a, uint *b, uint start, uint skip, uint e
 
 void la_t_revolve(uint *start_edge, uint revolve)
 {
-	uint *edge, count, i, ends[2], current, last, id, *a, *b, *c, crease, crease2;
+	uint *edge, count, i, ends[2], id, *a, *b, *c, crease, crease2;
 	double matrix[16];
+
 	edge = udg_get_edge_data(&count);
-	for(i = 0; i < count && (edge[i * 2] != start_edge[0] || edge[i * 2 + 1] != start_edge[1]); i++);
+	for(i = 0; i < count && (edge[i * 2] != start_edge[0] || edge[i * 2 + 1] != start_edge[1]); i++)
+		;
 	if(i == count)
-        return;
+	        return;
 	ends[0] = find_end(edge, count, start_edge[0], i);
 	ends[1] = find_end(edge, count, start_edge[1], i);
 	if(start_edge[0] == ends[0] && start_edge[0] == ends[1])
