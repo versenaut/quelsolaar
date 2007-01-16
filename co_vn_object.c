@@ -10,13 +10,12 @@
 #include "co_widgets.h"
 
 extern boolean co_handle_head(BInputState *input, ENode *node, float *length);
+extern void co_node_draw(ENode *node, VNodeType type, boolean hidden);
 
-uint32 rename_o_node_id = 0;
+static uint32 rename_o_node_id = 0;
 
 extern float co_background_color[3];
 extern float co_line_color[3];
-double new_transform[10];
-double new_light[3];
 
 void rename_method_group_func(void *user, char *text)
 {
@@ -84,9 +83,8 @@ void rename_param_func(void *user, char *text)
 
 void rename_link_func(void *user, char *text)
 {
-
 	ENode *node;
-	EObjLink *link;
+
 	if((node = e_ns_get_node(0, rename_o_node_id)) != NULL)
 	{
 		EObjLink *link;
@@ -103,7 +101,7 @@ boolean co_handle_object(BInputState *input, ENode *node)
 	float y, color, color_light, y_meth, y_group, pre_expander;
 	static float rot_meth = 0, rot_light = 0, rot_trans = 0, rot_link = 0, rot_hide = 0;
 	static boolean show_meth = TRUE, show_light = TRUE, show_trans = TRUE, show_link = TRUE, show_hide = TRUE;
-	static double light[3], transform[6], data = 0;
+	static double light[3], transform[6];
 	VNQuat64	rot;
 	uint16 m_group, method;
 	char nr[64];
