@@ -135,7 +135,7 @@ void betray_set_mouse_warp(boolean warp)
 
 static int button_map(int button)
 {
-	static const x2betray[] = { 0, 2, 1 };
+	static const int x2betray[] = { 0, 2, 1 };
 
 	return x2betray[button];
 }
