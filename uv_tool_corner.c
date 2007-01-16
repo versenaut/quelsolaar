@@ -111,8 +111,9 @@ void uv_streight_matrix(egreal *matrix, egreal vec1_x, egreal vec1_y, egreal vec
 
 void uv_tool_edge_straight_uv(uint poly_id, uint corner)
 {
-	uint vertex, *ref, length, i, sides;
-	egreal uv[8], matrix[4], matrix2[4], center[2], r, new_uv[8], tmp[2];
+	uint sides;
+	egreal uv[8], matrix[4], matrix2[4], center[2], r, new_uv[8];
+
 	uvg_get_uve(uv, poly_id);
 	sides = uvg_get_sides(poly_id);
 
