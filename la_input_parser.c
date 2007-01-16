@@ -161,7 +161,9 @@ void la_parse_input(BInputState *input)
 			{
 				if(la_t_tm_test_center(input) == FALSE)
 				{
-					if((ParseInputData.mode == PIM_IDLE && selected_distance < VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE)) || (ParseInputData.mode == PIM_DRAW || ParseInputData.mode == PIM_DRAG_MANIPULATOR || ParseInputData.mode == PIM_DRAG_ONE_VERTEX) && input->mouse_button[1] == TRUE)
+					if((ParseInputData.mode == PIM_IDLE && selected_distance < VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE)) ||
+					   (ParseInputData.mode == PIM_DRAW || ParseInputData.mode == PIM_DRAG_MANIPULATOR ||
+					    ParseInputData.mode == PIM_DRAG_ONE_VERTEX) && input->mouse_button[1] == TRUE)
 					{
 						double closest[3];
 						udg_get_vertex_pos(closest, select_closest);
@@ -286,7 +288,6 @@ void la_parse_input(BInputState *input)
 		case PIM_DRAG_ONE_VERTEX :
 			{
 				double vertex[3];
-				static uint collapse = 0;
 				udg_get_vertex_pos(snap, select_closest);
 
 				if(input->mode == BAM_EVENT)
@@ -338,7 +339,6 @@ void la_parse_input(BInputState *input)
 		case PIM_DRAG_ONE_TAG :
 			{
 				double vec[3];
-				static uint collapse = 0;
 				udg_get_vertex_pos(snap, select_closest);
 				if(input->mode == BAM_EVENT)
 				{
