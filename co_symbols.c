@@ -30,6 +30,7 @@ typedef struct{
 }COSymbSetting;
 
 extern float co_line_color[3];
+extern void se_pack_binary_uint32(FILE *f, const uint32 data);
 
 static COSymbSetting *co_symbols = NULL;
 static uint  co_symbol_count;
