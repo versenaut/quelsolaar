@@ -16,6 +16,7 @@ typedef struct{
 	char		group_name[16];
 }ETagGroup;
 
+extern void	e_ns_update_node_version_data(void *node);	/* This is kind of an ugly hack. */
 
 void e_destroy_node_head(ENodeHead *node)
 {
@@ -131,6 +132,8 @@ void callback_send_tag_create(void *user, VNodeID node_id, uint16 group_id, uint
 			t->tag.vblob.size = tag->vblob.size;
 			for(i = 0; i < t->tag.vblob.size; i++)
 				((char *)t->tag.vblob.blob)[i] = ((char *)tag->vblob.blob)[i];
+		break;
+		default:
 		break;
 	}
 	e_ns_update_node_version_data(node);
@@ -288,7 +291,6 @@ uint16 e_ns_get_group_by_name(const ENodeHead *node, char *group_name)
 
 void e_ns_get_tag_by_name_and_group(const ENodeHead *node, char *group_name, char *tag_name, uint16 *group_id, uint16 *tag_id)
 {
-	uint i;
 	uint16 g, t;
 
 	for(g = 0; g < node->group_count; g++)
