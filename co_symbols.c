@@ -155,9 +155,9 @@ static boolean co_load_symb_settings(char *file_name)
 
 void icon_editor_func(BInputState *input, void *user, double x_pos, double y_pos, double width, double length)
 {
-	float color_drawing[3] = {1.0, 1.0, 1.0},  color_interface[3] = {0.2, 0.6, 1.0}; 
+/*	float color_drawing[3] = {1.0, 1.0, 1.0},  color_interface[3] = {0.2, 0.6, 1.0}; 
 	static boolean init = FALSE;
-/*	if(!init)
+	if(!init)
 	{
 		init = TRUE;
 		co_symbol_icons[0].lines = malloc((sizeof *co_symbol_icon[0].lines) * co_symbol_icon[0].line_allocate);
@@ -206,7 +206,6 @@ void co_set_values(COSymbSetting *s, boolean active, float color_r, float color_
 void co_init_symbols(void)
 {
 	static boolean init_symbols = FALSE;
-	uint i;
 
 	if(init_symbols)
 		return;
@@ -272,7 +271,6 @@ void co_init_symbols(void)
 
 void co_draw_symbols(ENode *node, float *color, float pos_x, float pos_y, float pos_z)
 {
-	uint seconds, fractions;
 	VNTag *tag;
 	uint16 group_id, tag_id;
 	uint i, j;
@@ -331,7 +329,7 @@ void co_draw_symbols(ENode *node, float *color, float pos_x, float pos_y, float 
 									}
 									if(VN_TAG_UINT32 == e_ns_get_tag_type(node, group_id, tag_id))
 									{
-										sprintf(text, "%s : %f", tag->vstring, tag->vuint32);
+										sprintf(text, "%s : %f", tag->vstring, tag->vreal64);
 										sui_draw_text(0, line, SUI_T_SIZE, SUI_T_SPACE, text, co_symbols[i].color[0], co_symbols[i].color[1], co_symbols[i].color[2], 1.0);
 										line -= 0.025;
 									}
