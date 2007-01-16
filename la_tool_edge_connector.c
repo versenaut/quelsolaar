@@ -437,7 +437,7 @@ void create_surface(uint *create, uint *crease)
 boolean crease_edge(uint *crease, uint *vertex, uint *ref, uint ref_length)
 {
 	boolean output = FALSE; 
-	uint32 replace; 
+	uint32 replace = 0;
 	uint next, i, j, new_crease[4];
 	if(crease == NULL)
 		return FALSE;
