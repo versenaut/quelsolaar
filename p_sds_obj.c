@@ -174,7 +174,6 @@ boolean p_rm_validate(PMesh *mesh)
 void p_sds_compute_eye_pos(ENode *node, PMesh *mesh, double *eay)
 {
 	double matrix[16], tmp[3];
-	static double t = 0;
 	mesh->tess.eay[0] = eay[0];
 	mesh->tess.eay[1] = eay[1];
 	mesh->tess.eay[2] = eay[2];
@@ -256,19 +255,13 @@ boolean p_lod_material_test(PMesh *mesh, ENode *o_node);
 double *p_lod_get_view_pos(void);
 
 
-				
-
 void p_rm_test(PMesh *mesh, PPolyStore *smesh)
 {
 	PDepend *dep;
-	ENode *g_node;
-	PMesh *store = NULL;
 	PTessTableElement *table;
-	PTimer timer;
 	uint i, j, k, poly, temp, temp2, length;
-	double *eye;
-	uint32 seconds, fractions;
-return;
+
+	return;
 	i = 0;
 	j = 0;
 	k = 0;
@@ -309,7 +302,6 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 	PTimer timer;
 	PPolyStore *smesh;
 	uint i, j, k, poly_size = 4;
-	double *eye;
 	uint32 seconds, fractions;
 	g_node = e_ns_get_node(0, mesh->geometry_id);
 	smesh = p_sds_get_mesh(g_node);
@@ -506,7 +498,6 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 				{
 					if(p_lod_displacement_update_test(mesh))
 					{
-						uint ii;
 						mesh->displacement.displacement = malloc((sizeof *mesh->displacement.displacement) * mesh->render.vertex_count);
 						p_lod_create_displacement_array(g_node, o_node, mesh, smesh->level);
 					//	for(ii = 0; ii < mesh->render.vertex_count; ii++)
@@ -568,7 +559,6 @@ PMesh *p_rm_service(PMesh *mesh, ENode *o_node, /*const*/ egreal *vertex)
 						update = TRUE;
 					if(p_lod_displacement_update_test(mesh))
 					{
-						uint ii;
 						p_lod_update_displacement_array(g_node, o_node, mesh, smesh->level);
 						update = TRUE;
 					}

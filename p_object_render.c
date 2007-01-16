@@ -41,7 +41,7 @@ void p_render_z(void)
 	ENode *node;
 	PMesh *mesh;
 	PObject *o;
-	uint32 i, j = 0, count, range, *ref;
+	uint32 i;
 
 	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 	{
@@ -75,10 +75,9 @@ void p_render_z(void)
 
 void p_render_object_shadow(ENode *node)
 {
-	double matrix[16], scale[3];
 	PMesh *mesh;
 	PObject *o;
-	uint32 i, j = 0, count, range, *ref;
+	uint32 i, count, *ref;
 	o = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
 
 	if(!o->task)
@@ -113,7 +112,6 @@ void p_render_object_shadow(ENode *node)
 
 void p_render_object(ENode *node, boolean transparency, boolean test)
 {
-	double matrix[16], scale[3];
 	PMesh *mesh;
 	PObject *o;
 	uint32 i, j = 0, count, range, *ref, mat;
@@ -158,10 +156,8 @@ void p_render_object(ENode *node, boolean transparency, boolean test)
 
 void p_render_lit_and_transformed_object(ENode *node, boolean transparency)
 {
-	double matrix[16], scale[3];
-	PMesh *mesh;
 	PObject *o;
-	uint32 i, j = 0, count, range, *ref;
+
 	o = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
 	p_set_light(&o->light, 3, 0, 0);
 

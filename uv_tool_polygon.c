@@ -11,8 +11,7 @@
 
 void uv_tool_poly_square(uint poly_id)
 {
-	uint vertex;
-	egreal uv[8], vec[4], pos[2], new_uv[8];
+	egreal uv[8], vec[4], pos[2];
 	if(uvg_get_sides(poly_id) != 4)
 		return;
 	uvg_get_uve(uv, poly_id);
@@ -40,7 +39,6 @@ void uv_tool_poly_square(uint poly_id)
 }
 void uv_tool_poly_rectangle(uint poly_id)
 {
-	uint vertex;
 	egreal uv[8], axis[4], vec[2], pos[2], length[2], r;
 	if(uvg_get_sides(poly_id) != 4)
 		return;
@@ -89,7 +87,6 @@ void uv_tool_poly_rectangle(uint poly_id)
 
 void uv_tool_poly_rectangle_newer_but_not_newest(uint poly_id)
 {
-	uint vertex;
 	egreal uv[8], vec[4], pos[2], length[2], r;
 	if(uvg_get_sides(poly_id) != 4)
 		return;
@@ -132,8 +129,7 @@ void uv_tool_poly_rectangle_newer_but_not_newest(uint poly_id)
 
 void uv_tool_poly_rectangle_old(uint poly_id)
 {
-	uint vertex;
-	egreal uv[8], vec[4], pos[2], new_uv[8];
+	egreal uv[8], vec[4], pos[2];
 	if(uvg_get_sides(poly_id) != 4)
 		return;
 	uvg_get_uve(uv, poly_id);
@@ -165,8 +161,8 @@ void uv_tool_poly_rectangle_old(uint poly_id)
 
 void uv_tool_poly_normal_select(uint poly)
 {
-	uint *ref, id, i;
-	egreal uv[8], *vertex, a[3], b[3], c[3], normal[3], r;
+	uint *ref, id;
+	egreal *vertex, a[3], b[3], c[3], normal[3], r;
 	ref = uvg_get_ref();
 	vertex = uvg_get_vertex();
 
@@ -218,7 +214,7 @@ void uv_tool_poly_normal_select(uint poly)
 void uv_tool_poly_plane_select(uint poly)
 {
 	uint *ref, id, i;
-	egreal uv[8], *vertex, a[3], b[3], normal[3], dist, r, size;
+	egreal *vertex, a[3], b[3], normal[3], dist, r, size;
 	ref = uvg_get_ref();
 	vertex = uvg_get_vertex();
 
@@ -264,7 +260,7 @@ void uv_tool_poly_plane_select(uint poly)
 void uv_tool_poly_project(uint poly)
 {
 	uint *ref, id, i;
-	egreal uv[8], uv_center[2] = {0, 0}, *vertex, a[3], b[3], c[3], *s, dist, r, length[2] = {0, 0}, center[3] = {0, 0, 0};
+	egreal uv[8], uv_center[2] = {0, 0}, *vertex, a[3], b[3], c[3], *s, r, length[2] = {0, 0}, center[3] = {0, 0, 0};
 	ref = uvg_get_ref();
 	vertex = uvg_get_vertex();
 
@@ -365,7 +361,7 @@ void uv_tool_poly_project(uint poly)
 void uv_tool_project(uint u, uint v, boolean unselected)
 {
 	uint *ref, id, i;
-	egreal uv[8], *vertex, *select, center[4], scale, scale2;
+	egreal uv[8], *vertex, *select, center[4], scale;
 	ref = uvg_get_ref();
 	vertex = uvg_get_vertex();
 	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
@@ -545,7 +541,7 @@ void uv_tool_poly_stack(uint poly)
 							found = i + 4;
 						}
 					}
-					printf("found == %f\n", found);
+					printf("found == %u\n", found);
 					if(found > 3)
 						uvg_set_all_corner_uv(id, uv[(found % 4) * 2 + 0],
 												uv[(found % 4) * 2 + 1],

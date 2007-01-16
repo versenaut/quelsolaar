@@ -33,7 +33,7 @@ struct{
 void la_do_init(void)
 {
 	uint i;
-	float temp, square[8] = {0.006, 0.01, 0.003, 0.038, -0.003, 0.038, -0.006, 0.01};
+	float square[8] = {0.006, 0.01, 0.003, 0.038, -0.003, 0.038, -0.006, 0.01};
 	GlobalOverlay.active_vertex = malloc((sizeof * GlobalOverlay.active_vertex) * 4 * 4 * 2);
 	GlobalOverlay.active_vertex_shadow = malloc((sizeof * GlobalOverlay.active_vertex_shadow) * 16 * 4 * 2);
 	GlobalOverlay.active_vertex_color = malloc((sizeof * GlobalOverlay.active_vertex_color) * 16 * 4 * 4);
@@ -324,7 +324,6 @@ void la_do_xyz_lines(double *start, boolean snap)
 
 void la_do_draw(double *start, double *end, boolean snap, double *closest)
 {
-	double camera[3], r, r2, x, y, z;
 	glDisable(GL_DEPTH_TEST);
 	sui_draw_3d_line_gl(start[0], start[1], start[2], end[0], end[1], end[2], 0.7, 0.7, 0.7, 0.0);
 	glEnable(GL_DEPTH_TEST);
@@ -370,7 +369,7 @@ void la_do_draw_closest_edge(uint *edge, double x, double y, boolean snap)
 void la_do_active_polygon(double *snap)
 {
 	static double t = 0;
-	double pos[3], matrix[16], vec[3], rand[3] = {2.342, -1.23, 2.6489};
+	double matrix[16], vec[3], rand[3] = {2.342, -1.23, 2.6489};
 	glPushMatrix();
 	glDisable(GL_DEPTH_TEST);
 	sui_set_blend_gl(GL_ADD, GL_ADD);
@@ -438,7 +437,7 @@ void draw_persuade_surface(ENode *node)
 {
 #ifdef PERSUADE_H
 	static ENode *old_node = NULL;
-	static PMesh *mesh = NULL, *next = NULL;
+	static PMesh *mesh = NULL;
 	static uint version;
 	double cam[3];
 	p_get_view_camera(cam);
@@ -558,7 +557,7 @@ extern void test_draw(void);
 
 void draw_owerlay_surface(void)
 {
-	static uint version, draw;
+	static uint draw;
 	double *vertex;
 	uint *ref, *crease, ref_length, length, i, j, temp[4];
 
@@ -955,7 +954,7 @@ void draw_owerlay_edge(void)
 {
 	static float *edge_array = NULL, *edge_color = NULL;
 	static uint *edge_ref = NULL, el = 0, ev = 0;
-	double *vertex, *vertex0, *vertex1, *vertex2;
+	double *vertex, *vertex0, *vertex1;
 	uint length, edge_length, i, j,  *edge;
 
 	udg_get_geometry(&length, NULL, &vertex, NULL, NULL);
@@ -1015,11 +1014,11 @@ void draw_owerlay_edge(void)
 }
 
 
-extern draw_view_cage(void);
+extern boolean draw_view_cage(void);
 
 void la_do_owerlay(void)
 {
-	static uint version, draw = FALSE;
+	static uint draw = FALSE;
 //	if(sui_test_setting_version(&version))
 //		draw = sui_get_setting_int("RENDER_AS_SDS", TRUE);
 	if(draw_view_cage() || draw != TRUE)

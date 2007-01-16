@@ -136,7 +136,6 @@ typedef struct{
 uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *element, uint element_count, uint button, float back_color)
 {
 	uint i, j, top = 0, bottom = 0;
-	float x, y;
 
 	if(input->mode == BAM_DRAW)
 	{
@@ -220,6 +219,8 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 				case PU_T_ICON :
 					element[i].data.icon.draw_func(element[i].data.icon.pos[0], element[i].data.icon.pos[1], 1 - back_color);
 				break;
+				default:
+				break;
 			}
 		}
 	}else if(input->mouse_button[button] == FALSE && input->last_mouse_button[button] == TRUE)
@@ -250,7 +251,9 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 				case PU_T_ICON :
 					if(element[i].data.icon.size * element[i].data.icon.size > (element[i].data.icon.pos[0] + pos_x - input->pointer_x) * (element[i].data.icon.pos[0] + pos_x - input->pointer_x) + (element[i].data.icon.pos[1] + pos_y - input->pointer_y) * (element[i].data.icon.pos[1] + pos_y - input->pointer_y))
 						return i;
-				break;
+					break;
+				default:
+					break;
 			}
 		}
 	}

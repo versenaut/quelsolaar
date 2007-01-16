@@ -85,7 +85,6 @@ void  copy_vertex_func(double *output, uint vertex_id, void *data)
 
 void set_extrude_selection(ExtrudeParams *param)
 {
-	double select;
 	uint i;
 	for(i = 0; i < param->vertex_length; i++)
 	{
@@ -238,7 +237,8 @@ void la_t_extrude(uint vertex_count, void (*func)(double *output, uint vertex_id
 
 void detach_tri(ExtrudeParams *extrude, uint *ref, uint ref_id, uint *crease)
 {
-	uint new_tri[4], create;
+	uint new_tri[4];
+
 	if(extrude->select[ref[0]] > 0.01 && extrude->select[ref[1]] > 0.01 && extrude->select[ref[2]] > 0.01)
 		return;
 	if(extrude->select[ref[0]] < 0.01 && extrude->select[ref[1]] < 0.01 && extrude->select[ref[2]] < 0.01)
@@ -257,7 +257,7 @@ void detach_tri(ExtrudeParams *extrude, uint *ref, uint ref_id, uint *crease)
 
 void detach_quad(ExtrudeParams *extrude, uint *ref, uint ref_id, uint *crease)
 {
-	uint new_quad[4], create;
+	uint new_quad[4];
 
 	if(extrude->select[ref[0]] > 0.01 && extrude->select[ref[1]] > 0.01 && extrude->select[ref[2]] > 0.01 && extrude->select[ref[3]] > 0.01)
 		return;
@@ -282,7 +282,6 @@ void detach_quad(ExtrudeParams *extrude, uint *ref, uint ref_id, uint *crease)
 void la_t_detach_selected_polygons(void)
 {
 	ExtrudeParams param;
-	double matrix[16];
 	uint i, crease[4] = {0, 0, 0, 0};
 	param.func = copy_vertex_func;
 	udg_get_geometry(&param.vertex_length, &param.ref_length, NULL, &param.ref, &param.crease);
@@ -364,7 +363,6 @@ void duplicate_polygon(ExtrudeParams *extrude, uint *ref, uint ref_id, uint *cre
 void la_t_duplicate_selected_polygons(void)
 {
 	ExtrudeParams param;
-	double matrix[16], select;
 	uint i, crease[4] = {0, 0, 0, 0};
 	param.func = copy_vertex_func;
 	udg_get_geometry(&param.vertex_length, &param.ref_length, NULL, &param.ref, &param.crease);
@@ -468,8 +466,9 @@ void test_for_better_normal(uint base_id, uint selected_id, double *normal, doub
 
 void la_t_flatten(double *origo, double *vector)
 {
-	double a[3], b[3], r, *normal;
+	double a[3], r, *normal;
 	uint i, vertex_length, ref_length, *ref;
+
 	udg_get_geometry(&vertex_length, &ref_length, NULL, &ref, NULL);
 	normal = malloc((sizeof *normal) * vertex_length * 3);
 	for(i = 0; i < vertex_length; i++)
@@ -515,7 +514,8 @@ void la_t_flatten(double *origo, double *vector)
 
 void la_t_face_vector(double *origo, double *vector, uint v0, uint v1, uint v2)
 {
-	double a[3], b[3], r, *normal;
+	double a[3], b[3], r;
+
 	udg_get_vertex_pos(a, v0);
 	udg_get_vertex_pos(origo, v1);
 	udg_get_vertex_pos(b, v2);
