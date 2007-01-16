@@ -289,6 +289,8 @@ void uv_trans_continiue(BInputState *input)
 			matrix[3] = matrix[0]; 
 			uv_trans_form(UVTGlobal.manip_start[0], UVTGlobal.manip_start[1], matrix);
 		break;
+		default:
+		break;
 	}
 }
 
