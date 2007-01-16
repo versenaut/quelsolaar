@@ -29,7 +29,6 @@ boolean qs_draw_settings(BInputState *input)
 {
 	SUIViewElement element[15];
 	boolean output;
-	char text[32] = {0};
 
 	sp_settings_pre(element);
 	element[14].type = S_VET_COLOR;
