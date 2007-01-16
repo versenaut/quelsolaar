@@ -16,7 +16,6 @@ extern float co_line_color[3];
 
 static float co_draw_node_summary(ENode *node, float x, float y, uint recursion)
 {
-	char *type_name[] = {"object", "geometry", "material", "bitmap", "text", "curve", "audio"};
 	ENode *link_node;
 	uint i, j;
 	VNTag *tag;
@@ -46,28 +45,30 @@ static float co_draw_node_summary(ENode *node, float x, float y, uint recursion)
 			switch(e_ns_get_tag_type(node, i, j))
 			{
 				case VN_TAG_BOOLEAN :
-						sprintf(text, "%s = %s", e_ns_get_tag_name(node, i, j), tag->vboolean ? "TRUE" : "FALSE");
+					sprintf(text, "%s = %s", e_ns_get_tag_name(node, i, j), tag->vboolean ? "TRUE" : "FALSE");
 				break;
 				case VN_TAG_UINT32 :
-						sprintf(text, "%s = %u", e_ns_get_tag_name(node, i, j), tag->vuint32);
+					sprintf(text, "%s = %u", e_ns_get_tag_name(node, i, j), tag->vuint32);
 				break;
 				case VN_TAG_REAL64 :
-						sprintf(text, "%s = %f", e_ns_get_tag_name(node, i, j), tag->vreal64);
+					sprintf(text, "%s = %f", e_ns_get_tag_name(node, i, j), tag->vreal64);
 				break;
 				case VN_TAG_STRING :
-						sprintf(text, "%s = %s", e_ns_get_tag_name(node, i, j), tag->vstring);
+					sprintf(text, "%s = %s", e_ns_get_tag_name(node, i, j), tag->vstring);
 				break;
 				case VN_TAG_REAL64_VEC3 :
-						sprintf(text, "%s = %f %f %f", e_ns_get_tag_name(node, i, j), tag->vreal64_vec3[0], tag->vreal64_vec3[1], tag->vreal64_vec3[2]);
+					sprintf(text, "%s = %f %f %f", e_ns_get_tag_name(node, i, j), tag->vreal64_vec3[0], tag->vreal64_vec3[1], tag->vreal64_vec3[2]);
 				break;
 				case VN_TAG_LINK :
-						sprintf(text, "%s = %u", e_ns_get_tag_name(node, i, j), tag->vlink);
+					sprintf(text, "%s = %u", e_ns_get_tag_name(node, i, j), tag->vlink);
 				break;
 				case VN_TAG_ANIMATION :
-						sprintf(text, "%s = %u (%u-%u)", e_ns_get_tag_name(node, i, j), tag->vanimation.curve, tag->vanimation.start, tag->vanimation.end);
+					sprintf(text, "%s = %u (%u-%u)", e_ns_get_tag_name(node, i, j), tag->vanimation.curve, tag->vanimation.start, tag->vanimation.end);
 				break;
 				case VN_TAG_BLOB :
-						sprintf(text, "%s = [%u]", e_ns_get_tag_name(node, i, j), tag->vblob.size);
+					sprintf(text, "%s = [%u]", e_ns_get_tag_name(node, i, j), tag->vblob.size);
+				break;
+				default:
 				break;
 			}
 			sui_draw_text(x + 0.04, line, SUI_T_SIZE * 0.7, SUI_T_SPACE * 0.7, text, co_line_color[0], co_line_color[1], co_line_color[2], 0.5);
