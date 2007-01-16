@@ -64,6 +64,8 @@ void se_draw(SDrawing *e, boolean points, boolean mid, float center_x, float cen
 				sui_draw_gl(GL_LINES, curve, 64, 2, color_drawing[0], color_drawing[1], color_drawing[2], 1.0f);
 				glPopMatrix();
 			break;
+			default:
+			break;
 		}
 	}
 }
@@ -317,9 +319,8 @@ SDrawing *se_load_drawing_binary(FILE *file, uint *draw_count)
 
 void se_save_drawing_code(FILE *file, SDrawing *d, uint draw_count)
 {
-	uint i, j, k, line_count;
-	float *buf;
-	SEFuncType type;
+	uint i, j = 0;
+
 	for(i = 0; i < draw_count; i++)
 	{
 		if(d[i].line_count != 0)
@@ -342,8 +343,6 @@ void se_save_drawing_code(FILE *file, SDrawing *d, uint draw_count)
 
 void se_editor(BInputState *input, SDrawing *d, float pos_x, float pos_y, float size_x, float size_y, float *color_drawing, float *color_interface, SELineMode mode)
 {
-	static boolean init = FALSE, active = FALSE;
-	char *text[] = {"LINE", "ARC"};
 	float center_x, center_y, f;
 	center_x = -(pos_x + size_x / 2);
 	center_y = -(pos_y + size_y / 2); 
