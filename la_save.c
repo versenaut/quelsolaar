@@ -11,8 +11,9 @@ void geometry_load_obj(void *user, char *file)
 {
 	FILE	*obj;
 	char	line[512];
-	uint	i, ref_length = 0, vertex_length = 1, count, ref[4], *vertex_ids;
+	uint	i, vertex_length = 1, count, ref[4], *vertex_ids;
 	float	x, y, z;
+
 	obj = fopen(file, "r");
 	if(obj != NULL)
 	{

@@ -20,8 +20,7 @@ struct{
 void qs_intro_init(void)
 {
 	float a, b, c, d;
-	int i, j;
-
+	int i;
 
 	a = sqrt(2.0);
 	b = 1.0 / a;

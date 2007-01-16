@@ -43,7 +43,6 @@ void qs_draw_handler(BInputState *input, void *user)
 	}
 	if(input->mode == BAM_DRAW)
 	{
-		double pos[3] = {0, 0, 0};
 		float color[3];
 		qs_settings_get_background_color(color);
 		glEnable(GL_DEPTH_TEST);

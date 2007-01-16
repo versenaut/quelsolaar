@@ -84,8 +84,9 @@ void uv_find_square(egreal *pos, egreal *scale)
 
 void uv_fit_selection(boolean preserve_aspect)
 {
-	uint id, i;
+	uint id;
 	egreal uv[8], pos[2], scale[2], *s;
+
 	uv_find_square(pos, scale);
 	if(preserve_aspect)
 	{

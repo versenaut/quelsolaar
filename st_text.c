@@ -58,7 +58,8 @@ uint st_word_copy(uint length, char *dest, char *source)
 
 uint st_text_copy_until(uint length, char *dest, char *source, char *until)
 {
-	uint i = 0, j, k, l;
+	uint i = 0, j, k;
+
 	for(j = 0; j < length && source[j] < 32; j++);
 	while( i < length && source[j] != 0)
 	{
