@@ -180,6 +180,7 @@ void p_th_create_new_texture(ENode *node, PTextureHandle *handle)
 {
 	uint i;
 	uint8 *buf;
+
 	e_nsb_get_size(node, &handle->size[0], &handle->size[1], &handle->size[2]);
 	handle->size_version = p_th_compute_size_check_sum(handle->size);
 	if(handle->size[0] * handle->size[1] * handle->size[2] != 0)
@@ -193,7 +194,7 @@ void p_th_create_new_texture(ENode *node, PTextureHandle *handle)
 				handle->size[1] = i;
 				handle->size[2] = i;
 			}
-	/*		glBindTexture(GL_TEXTURE_3D, handle->texture_id);
+/*			glBindTexture(GL_TEXTURE_3D, handle->texture_id);
 			glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -203,17 +204,18 @@ void p_th_create_new_texture(ENode *node, PTextureHandle *handle)
 			for(i = 0; i < handle->size[0] * handle->size[1] * handle->size[2] * 3; i++)
 				buf = 0;
 			glTexImage3D(GL_TEXTURE_3D, 0, GL_RGB, handle->size[0], handle->size[1], handle->size[2], 0, GL_RGB, GL_UNSIGNED_BYTE, buf);
-			free(buf);*/
-		}else
+			free(buf);
+*/		}
+		else
 		{
 			handle->size[2] = 1;
 			if(TRUE)/* we dont handle any sized textures*/
 			{
-				for(i = 1; i * 2 - 1 < handle->size[0] || i * 2 - 1 < handle->size[1]; i *= 2);
+				for(i = 1; i * 2 - 1 < handle->size[0] || i * 2 - 1 < handle->size[1]; i *= 2)
+					;
 				handle->size[0] = i;
 				handle->size[1] = i;
 			}
-			printf("new texture!\n");
 			glGenTextures(1, &handle->texture_id);
 			glBindTexture(GL_TEXTURE_2D, handle->texture_id);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -377,8 +379,7 @@ boolean p_th_service_handle(PTextureHandle **pointer)
 		return FALSE;
 	if(handle->users == 0)
 	{
-		if(handle->dead--)
-		if(handle->dead == 0)
+		if(--handle->dead == 0)
 		{
 			if(handle->texture_id != PTextureStorage.std_texture_id)
 				glDeleteTextures(1, &handle->texture_id);
@@ -401,7 +402,7 @@ boolean p_th_service_handle(PTextureHandle **pointer)
 		return TRUE;
 	}
 	/* If the node is created create a texture */
-//printf("serv 3\n");
+//	printf("serv 3\n");
 
 	if(handle->texture_id == PTextureStorage.std_texture_id)
 	{
