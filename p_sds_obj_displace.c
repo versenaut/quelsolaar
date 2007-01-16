@@ -400,6 +400,8 @@ boolean p_lod_displacement_version(ENode *m_node, ENode *g_node, uint16 id, uint
 		case VN_M_FT_OUTPUT :
 			output = p_lod_displacement_version(m_node, g_node, frag->output.front, version);
 		break;
+		default:
+		break;
 	}
 	e_nsm_leave_fragment(m_node, id);
 	return output;
@@ -409,7 +411,6 @@ boolean p_lod_displacement_version(ENode *m_node, ENode *g_node, uint16 id, uint
 boolean p_lod_displacement_update_test(PMesh *mesh)
 {
 	uint32 i, tmp, version = 0;
-	boolean output = FALSE;
 	ENode *m_node, *g_node;
 
 	if((g_node = e_ns_get_node(0, mesh->geometry_id)) == NULL)
@@ -469,7 +470,7 @@ typedef struct{
 void p_lod_create_displacement_array(ENode *g_node, ENode *o_node, PMesh *mesh, uint base_level)
 {
 	PDispalacemetParam param;
-	egreal *output, tmp[3];
+	egreal *output;
 	uint i, level[4], *ref;
 	level[0] = base_level;
 	level[1] = base_level;
