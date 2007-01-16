@@ -146,7 +146,6 @@ void p_view_change(BInputState *input)
 
 void p_projection_update(void)
 {
-	double	proj[16];
 	glGetDoublev(GL_PROJECTION_MATRIX, ProjectionData.matrix);
 	glGetDoublev(GL_MODELVIEW_MATRIX, ProjectionData.model);
 }

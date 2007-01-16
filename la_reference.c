@@ -86,7 +86,7 @@ uint *edge_reference(uint *ref, uint poly_count, uint vertex_count)
 void test_ref_creator(void)
 {
 	uint *data;
-	uint *ref, i, poly_count, vertex_count;
+	uint *ref, poly_count, vertex_count;
 	udg_get_geometry(&vertex_count, &poly_count, NULL, &ref, NULL);
 	data = edge_reference(ref, poly_count, vertex_count);
 	free(data);
