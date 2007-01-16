@@ -89,6 +89,8 @@ void vertex_append_array(ESGeometryNode	*node, uint32 id)
 						((egreal *)layer->data)[i] = layer->def_real;
 				}
 				break;
+			default:
+				;
 			}
 		}
 	}
@@ -144,6 +146,8 @@ void polygon_append_array(ESGeometryNode	*node, uint32 id)
 						((egreal *)layer->data)[i] = layer->def_real;
 				}
 				break;
+				default:
+					;
 			}
 		}
 	}
@@ -425,8 +429,9 @@ void callback_send_g_vertex_set_real_xyz(void *user_data, VNodeID node_id, VLaye
 	ESGeometryNode	*node;
 	egreal			*write, input[3];
 	EGeoLayer		*layer;
-	uint			i, j;
+	uint			i;
 	boolean			update = FALSE;
+
 	node = (ESGeometryNode *)e_ns_get_node_networking(node_id);
 	if(layer_id >= node->layer_allocated || node->layers[layer_id].name[0] == 0 || node->layers[layer_id].type != VN_G_LAYER_VERTEX_XYZ)
 		return;
