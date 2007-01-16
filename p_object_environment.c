@@ -267,6 +267,7 @@ typedef struct{
 PObjEnv *p_env_compute(PObjEnv *env)
 {
 	uint i;
+
 	if(env != NULL && env->size != p_std_env_size)
 	{
 		if(env->a_buffer != NULL)
@@ -274,9 +275,9 @@ PObjEnv *p_env_compute(PObjEnv *env)
 		if(env->b_buffer != NULL)
 			free(env->b_buffer);
 		if(env->environment_id != p_std_environment_id)
-			glDeleteTextures(i, &env->environment_id);
+			glDeleteTextures(1, &env->environment_id);
 		if(env->diffuse_environment_id != p_std_diffuse_environment_id)
-			glDeleteTextures(i, &env->diffuse_environment_id);
+			glDeleteTextures(1, &env->diffuse_environment_id);
 		free(env);
 		env = NULL;
 	}
