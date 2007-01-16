@@ -29,7 +29,7 @@ uint p_lod_get_base_corner_translate(uint base_quad, uint corner)
 
 void p_lod_compute_vertex_normals(PPolyStore *smesh, PMesh *mesh)
 {
-	uint i, j, corner, other_corner, tmp, length, material = 0;
+	uint i, j, corner, other_corner, tmp, length;
 	uint *corner_normals;
 	length = (smesh->base_tri_count * 3 + smesh->base_quad_count * 4);
 
@@ -222,7 +222,7 @@ boolean p_lod_handle_edge(PPolyStore *smesh, PMesh *mesh, uint current_poly, uin
 uint p_lod_handle_edge_count(PPolyStore *smesh, PMesh *mesh, uint current_poly, uint current_edge)
 {
 	PTessTableElement *current_table, *table;
-	uint poly, edge, i, j, wrap, current_wrap;
+	uint poly, edge, j, wrap, current_wrap;
 	boolean crease;
 
 	if(mesh->tess.order_temp_mesh[current_poly] > smesh->base_quad_count)
@@ -267,7 +267,7 @@ mesh->tess.order_temp_mesh_ref[mesh->sub_stages[0]]
 void p_rm_create_vertex_normals(uint *output, PMesh *mesh, uint poly, uint corner)
 {
 	PTessTableElement *corner_table;
-	uint *vertex_normals, corner_poly, corner_corner, corner_start, a;
+	uint *vertex_normals, corner_poly, corner_corner, corner_start;
 
 	if(mesh->tess.order_temp_mesh[poly] < mesh->tess.quad_count)
 		vertex_normals = &((uint32 *)mesh->temp)[mesh->tess.order_temp_mesh[poly] * 8];

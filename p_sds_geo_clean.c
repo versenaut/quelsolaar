@@ -153,7 +153,7 @@ typedef struct{
 
 float p_sds_compute_neighbor(PPolyStore *poly)
 {
-	uint i, j, temp, count, cor, other_count, clear = 0, *n, *v, a, b, *ref;
+	uint i, cor, clear = 0, *n, *v, a, b, *ref;
 	uint counter = 0, laps = 0;
 	ref = poly->ref;
 	n = malloc((sizeof *n) * (poly->quad_length + poly->tri_length));
@@ -616,7 +616,8 @@ void p_sds_final_clean_new(PPolyStore *mesh)
 {
 	PDependElement *e, *old_e;
 	PDepend *dep, *new_dep;
-	uint i, j, k, length = 0, gap;
+	uint i, j, length = 0, gap;
+
 	for(i = 0; i < mesh->vertex_count; i++)
 	{
 		dep = &mesh->vertex_dependency[i];
@@ -656,7 +657,7 @@ void p_sds_final_clean_new(PPolyStore *mesh)
 PPolyStore *p_sds_allocate_next(PPolyStore *pre)
 {
 	PPolyStore *mesh;
-	uint i, count;
+
 	mesh = malloc(sizeof *mesh);
 	mesh->tri_length = pre->tri_length * 4;
 	mesh->quad_length = pre->quad_length * 4;
