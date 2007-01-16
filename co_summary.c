@@ -172,9 +172,7 @@ static float co_draw_node_summary(ENode *node, float x, float y, uint recursion)
 				}
 			}
 		break;
-		case V_NT_TEXT :
-		break;
-		case V_NT_CURVE :
+		default:
 		break;
 	}
 	return line;
