@@ -35,7 +35,7 @@ uint la_t_poly_test(BInputState *input, double *mid, double *normal)
 {
 	uint i, j, j2, poly, found, ref_count, *ref, vertex_count;
 	double *vertex, temp[4][3], mouse[2], value;
-	boolean output = FALSE;
+
 	udg_get_geometry(&vertex_count, &ref_count, &vertex, &ref, NULL);
 	for(i = 0; i < ref_count; i++)
 	{

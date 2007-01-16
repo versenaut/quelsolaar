@@ -69,7 +69,8 @@ uint create_new_split_vertex(uint32 **edge, uint32 *edge_length, uint32 *edge_al
 
 void digonal_quad_split(SplitVertexPos *desition, uint32 *ref, uint32 *crease, uint id, boolean del)
 {
-	uint i, poly;
+	uint i;
+
 	if(desition[0] != SVP_MIDDLE || desition[1] != SVP_MIDDLE || desition[2] != SVP_MIDDLE || desition[3] != SVP_MIDDLE)
 	{
 		for(i = 0; i < 2; i++)

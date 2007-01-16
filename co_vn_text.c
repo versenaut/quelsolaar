@@ -50,7 +50,7 @@ boolean co_handle_text(BInputState *input, ENode *node)
 	static boolean show_buffer = TRUE, show_language = TRUE;
 	static uint16 buffer_edit_id = 0;
 	ETextBuffer *buffer;
-	float pos = 1, y, pre_expander, color, color_light;
+	float y, pre_expander, color, color_light;
 	uint i;
 
 	y = co_handle_node_head(input, node, change_t_node_id != e_ns_get_node_id(node));
