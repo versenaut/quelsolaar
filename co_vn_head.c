@@ -130,10 +130,11 @@ void tag_vector_func(void *user, char *text)
 
 void tag_animation_func(void *user, char *text)
 {
-	uint i, j, k;
+	uint i, j;
 	float f;
 	VNTag tag, *t;
 	ENode *node;
+
 	if((node = e_ns_get_node(0, change_node_id)) != NULL)
 	{
 		for(i = e_ns_get_next_tag_group(node, 0); i != -1 ; i = e_ns_get_next_tag_group(node, i + 1))
@@ -230,6 +231,8 @@ void clear_tag(VNTag *tag, VNTagType type)
 			tag->vblob.size = 5;
 			tag->vblob.blob = "ABCDE";
 		break;
+		default:
+		break;
 	}
 }
 
@@ -246,11 +249,10 @@ boolean co_handle_head(BInputState *input, ENode *node, float *length)
 
 float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 {
-	static float pos = 0, tag_rot = 0, temp = 0;
+	static float pos = 0, tag_rot = 0;
 	static boolean show_tags = TRUE, grab = FALSE;
 	static uint16 a_tag = -1, a_group = -1;
 	float size, color, color_light;
-	double value;
 	char *type_names[] = {"Object", "Geometry", "Material", "Bitmap", "Text", "Curve", "Audio"};
 	uint16 i, j, k, l;
 	uint32 m;
