@@ -393,7 +393,7 @@ uint render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		}	
 		case VN_M_FT_TRANSPARENCY :
 		{
-			uint j, k = 0, l;
+			uint k = 0, l;
 			float f, vec[3], normal[3], light[3];
 			if(frag->transparency.normal_falloff > 0.001)
 				samples = LIGHT_SAMPLES;
@@ -440,7 +440,7 @@ uint render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		}
 		case VN_M_FT_VOLUME :
 		{
-			uint k = 0, l;
+			uint k = 0;
 			float normal[3],  f, f2, light[3];
 			for(i = 0; i < size; i++)
 			{
@@ -494,8 +494,8 @@ uint render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		}
 		case VN_M_FT_VIEW :
 		{
-			uint j, k = 0;
-			float vec[3], light;
+			uint k = 0;
+			float vec[3];
 			for(i = 0; i < size; i++)
 			{
 				co_compute_vec(vec, size, line, i);
@@ -509,8 +509,8 @@ uint render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		break;
 		case VN_M_FT_GEOMETRY :
 		{
-			uint j, k = 0;
-			float vec[3], light;
+			uint k = 0;
+			float vec[3];
 			for(i = 0; i < size; i++)
 			{
 				co_compute_vec(vec, size, line, i);
@@ -595,7 +595,7 @@ uint render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		}
 		case VN_M_FT_BLENDER :
 		{
-			float *buf, *control, f;
+			float *buf, *control;
 			buf = malloc((sizeof *buf) * size * 3);
 			samples = 1;
 			samples += render_material(node, frag->blender.data_a, size, line, buffer);
@@ -723,7 +723,7 @@ uint render_material(ENode *node, VNMFragmentID id, uint size, uint line, float 
 		break;
 		case VN_M_FT_ALTERNATIVE :
 		{
-			uint j, k;
+			uint k;
 			float *buf;
 			buf = malloc((sizeof *buf) * size * 3);
 			samples = render_material(node, frag->alternative.alt_a, size, line, buffer);
@@ -771,7 +771,7 @@ extern void co_material_set_version(ENode *node, VNMFragmentID id, uint version)
 
 uint co_get_fragment_version(ENode *node, uint16 fragment)
 {
-	uint i, output, *version;
+	uint output;
 	VMatFrag *frag;
 	frag = e_nsm_get_fragment(node, fragment);
 	if(frag == NULL)
@@ -810,6 +810,8 @@ uint co_get_fragment_version(ENode *node, uint16 fragment)
 			break;
 		case VN_M_FT_OUTPUT :
 			output += co_get_fragment_version(node, frag->output.front);
+			break;
+		default:
 			break;
 	}
 	e_nsm_leave_fragment(node, fragment);

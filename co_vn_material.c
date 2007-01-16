@@ -95,6 +95,8 @@ void rename_m_fragment(void *user, char *text)
 						verse_send_m_fragment_create(change_m_node_id, i, VN_M_FT_OUTPUT, &f);
 					}
 				break;
+				default:
+				break;
 			}
 		}
 	}
@@ -102,7 +104,7 @@ void rename_m_fragment(void *user, char *text)
 
 void clear_new_frag(VMatFrag *frag, uint type, VNMFragmentID input_a, VNMFragmentID input_b, uint mode)
 {
-	char *color = "color", *name = "name", *group = "group", *color_r = "color_r", *color_g = "color_g", *color_b = "color_b", *vertex = "vertex";
+	char *color = "color", *color_r = "color_r", *color_g = "color_g", *color_b = "color_b", *vertex = "vertex";
 	double matrix[16] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
 	double desaturate[16] = {0.3333, 0.3333, 0.3333, 0, 0.3333, 0.3333, 0.3333, 0, 0.3333, 0.3333, 0.3333, 0, 0, 0, 0, 1};
 	ENode *node;
@@ -298,7 +300,9 @@ void co_m_place_frag(ENode *node, uint16 id, float pos_x, float vec, uint gen)
 				break;
 			case VN_M_FT_OUTPUT :
 				co_m_place_frag(node, frag->output.front, pos_x, vec, gen + 1);
-			break;
+				break;
+			default:
+				break;
 		}
 	}
 }
@@ -408,6 +412,8 @@ void set_out_link(ENode *node, uint16 id, uint16 link)
 		case VN_M_FT_OUTPUT :
 			f.output.front = link;
 			verse_send_m_fragment_create(e_ns_get_node_id(node), id, VN_M_FT_OUTPUT, &f);
+		default:
+		break;
 	}
 
 }
@@ -574,7 +580,6 @@ boolean handle_link(BInputState *input, ENode *node, uint16 *link, char *text, u
 	static void *drag = NULL, *popup = NULL;
 	COVNMaterial *pos, *target;
 	VMatFrag *frag;
-	uint i, *active;
 	VNMFragmentID id;
 	float f, pos_x, pos_y;
 	float a, b, dist, vertex[8];
@@ -932,9 +937,8 @@ boolean co_handle_material(BInputState *input, ENode *node)
 	static float rot_tree = 1;
 	COVNMaterial *mat_pos;
 	float expand, place[3] = {0, 0, 0};
-	uint type = 0, j, z_sort;
-	VNMFragmentID i, link;
-	boolean output;
+	uint type = 0, j;
+	VNMFragmentID i;
 	VMatFrag *frag, f;
 	float y, pre_expander, color, color_light;
 
@@ -1084,8 +1088,8 @@ boolean co_handle_material(BInputState *input, ENode *node)
 					break;
 					case VN_M_FT_REFLECTION :
 					{
-						static uint active = FALSE;
 						char *text[1] = {"Normal Falloff"};
+
 						expand = 0.2 + 0.05 * mat_pos->size;
 						place[0] = mat_pos->pos[0];
 						place[1] = mat_pos->pos[1] + y;
@@ -1442,7 +1446,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 					case VN_M_FT_MATRIX :
 						{	
 							static uint mode = 2, active = -1;
-							float size = 0.3, reset[] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+							float reset[] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
 							char *matrix_types[] = {"Matrix", "Balance", "Color Balance"};
 							place[0] = mat_pos->pos[0];
 							place[1] = mat_pos->pos[1] + y;
@@ -1610,14 +1614,13 @@ boolean co_handle_material(BInputState *input, ENode *node)
 					case VN_M_FT_RAMP :
 						{
 							static uint active_type = -1, active_channel = -1;
-							static double *active = NULL, new_color[3];
+							static double new_color[3];
 							static uint segment = 0, drag = -1, drag_frag = -1;
 							static char *ramp_types[] = {"SQUARE", "LINEAR", "SMOOTH"};
 							static char *ramp_channels[] = {"RED", "GREEN", "BLUE"};
 							char *text[] = {"Channel", "Type", "Delete", "Ramp", "Pos", "Red", "Green", "Blue"};
 							double col[3], start, end, last;
 							float col_range[12], vertex[8];
-							uint mode;
 							expand = 0.2 + 0.4 * mat_pos->size;
 							place[0] = mat_pos->pos[0];
 							place[1] = mat_pos->pos[1] + y;
@@ -1899,7 +1902,6 @@ boolean co_handle_material(BInputState *input, ENode *node)
 						break;
 					case VN_M_FT_OUTPUT :
 						{	
-							static uint active = FALSE;
 							char *text[1] = {"Output"};
 							expand = 0.2 + 0.05 * mat_pos->size;
 							place[0] = mat_pos->pos[0];

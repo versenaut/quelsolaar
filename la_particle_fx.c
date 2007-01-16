@@ -193,7 +193,7 @@ void add_point2(int jump, int size, float *data, float *color)
 
 void add_point(int size, float *data, float *color)
 {
-	int i, j, k, temp;
+	int i, j;
 	float x, y, r, r2, half;
 	half = (float)size * 0.5;
 	for(i = 0; i < size; i++)
@@ -213,8 +213,8 @@ void add_point(int size, float *data, float *color)
 
 void add_flare(int size, float *data)
 {
-	int i, j, k, temp;
-	float x, y, r, half, best;
+	int i, j;
+	float x, y, r, half;
 	half = (float)size * 0.5;
 	for(i = 0; i < size; i++)
 	{
@@ -234,8 +234,8 @@ void add_flare(int size, float *data)
 
 void add_intro_flare(int size, float *data)
 {
-	int i, j, k, temp;
-	float x, y, r, half, best;
+	int i, j;
+	float x, y, r, half;
 	half = (float)size * 0.5;
 	for(i = 0; i < size; i++)
 	{
@@ -262,7 +262,7 @@ float get_random(uint temp)
 
 void add_shade(int size, float *data, float *pos, float *color, float color_rand, float brightness)
 {
-	int i, j, k, temp;
+	int i, j, k;
 	float x, y, z, r, half, nex_color[3], nex_pos[3];
 	half = (float)size * 0.5;
 	for(i = 0; i < size; i++)
@@ -302,7 +302,7 @@ void add_shade(int size, float *data, float *pos, float *color, float color_rand
 
 uint create_def_material(void)
 {
-	uint texture_id, size = 256, i;
+	uint texture_id, size = 256;
 	float *data, color[3] = {1, 1, 1};
 	glEnable(GL_TEXTURE_2D);
 	data = malloc((sizeof *data) * size * size * 3);
@@ -330,7 +330,8 @@ extern void get_randomized_color(float *color, uint32 index);
 void la_pfx_image_init(uint texture_size)
 {
 	float *data, color[3];
-	uint i, j, temp;
+	uint i, temp;
+
 	data = malloc((sizeof *data) * texture_size * texture_size * 3);
 	if(!la_load_targa("la_tmp_star.tga", &GlobalParticleData.star_material))
 	{
@@ -347,9 +348,6 @@ void la_pfx_image_init(uint texture_size)
 		add_flare(texture_size / 2, data);
 		GlobalParticleData.flare_material = la_save_targa("la_tmp_flare.tga", data, texture_size / 2);
 	}
-
-
-
 
 	if(!la_load_targa("la_tmp_points.tga", &GlobalParticleData.point_material))
 	{
@@ -380,9 +378,8 @@ void la_pfx_image_init(uint texture_size)
 
 	if(!la_load_targa("la_tmp_surface.tga", &GlobalParticleData.surface_material))	
 	{
-		uint texture_id;
 		float light_color[3] = {0.2, 0.6, 1};
-		float light_pos[3] = {0.2, -0.2, 0} , r;
+		float light_pos[3] = {0.2, -0.2, 0};
 		for(i = 0; i < texture_size * texture_size * 3; i++)
 			data[i] = 0;
 		add_shade(texture_size / 2, data, light_pos, light_color, -0.0, 0.06);
@@ -429,8 +426,8 @@ void la_pfx_image_init(uint texture_size)
 
 void la_pfx_init(uint particle_count)
 {
-	float *data, color[3];
-	uint i, j, temp;
+	uint i;
+
 	GlobalParticleData.dust = NULL;
 	GlobalParticleData.dust_length = particle_count * 4;
 	GlobalParticleData.dust_count = 0;
