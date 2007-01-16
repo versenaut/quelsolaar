@@ -39,8 +39,8 @@ void co_geometry_destroy(PeGeometry *g)
 PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g, boolean fill, boolean scale, float red, float green, float blue, float alpha)
 {
 	egreal *vertex;
-	float f, range[6];
 	uint i, *ref, ref_length, length;
+
 	if(g == NULL)
 	{
 		g = malloc(sizeof *g);
@@ -52,6 +52,8 @@ PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g, boolean fill, boolean s
 	}
 	if(g->version != e_ns_get_node_version_data(node))
 	{
+		float f, range[6] = { 0.0 };
+
 		g->version = e_ns_get_node_version_data(node);
 		vertex = e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node, 0));
 		ref = e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node, 1));
@@ -68,12 +70,9 @@ PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g, boolean fill, boolean s
 			if(ref[i * 4] < length && ref[i * 4 + 1] < length && ref[i * 4 + 2] < length && vertex[ref[i * 4] * 3] != V_REAL64_MAX && vertex[ref[i * 4 + 1] * 3] != V_REAL64_MAX && vertex[ref[i * 4 + 2] * 3] != V_REAL64_MAX)
 			{
 				if(ref[i * 4 + 3] < length && vertex[ref[i * 4 + 3] * 3] != V_REAL64_MAX)
-				{
 					g->quad_count++;
-				}else
-				{
+				else
 					g->tri_count++;
-				}
 			}
 		}
 		if(g->tri_count != 0)
@@ -105,7 +104,8 @@ PeGeometry *co_geometry_draw(ENode *node, PeGeometry *g, boolean fill, boolean s
 					g->quad[g->quad_count * 12 + 10] = vertex[ref[i * 4 + 3] * 3 + 1];
 					g->quad[g->quad_count * 12 + 11] = vertex[ref[i * 4 + 3] * 3 + 2];
 					g->quad_count++;
-				}else
+				}
+				else
 				{
 					g->tri[g->tri_count * 9 + 0] = vertex[ref[i * 4 + 0] * 3 + 0];
 					g->tri[g->tri_count * 9 + 1] = vertex[ref[i * 4 + 0] * 3 + 1];
@@ -293,7 +293,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 		for(layer = e_nsg_get_layer_next(node, 0); layer != NULL ; layer = e_nsg_get_layer_next(node, e_nsg_get_layer_id(layer) + 1))
 		{
 			char *names[] = {"VERTEX_XYZ", "VERTEX_UINT32", "VERTEX_REAL", "POLYGON_CORNER_UINT32", "POLYGON_CORNER_REAL", "POLYGON_FACE_UINT8", "POLYGON_FACE_UINT32", "POLYGON_FACE_REAL"};
-			static popup = -1;
+			static int popup = -1;
 			VNGLayerType type;
 
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer name:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
@@ -357,7 +357,6 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 	pre_expander = y;
 	if(rot_crease > 0.001)
 	{
-		uint bone;
 		y -= 0.05;
 		sui_draw_text(-0.27, y, SUI_T_SIZE, SUI_T_SPACE, "vertex crease", co_line_color[0], co_line_color[1], co_line_color[2], color_light); 
 		sui_draw_text(0.0, y - 0.05, SUI_T_SIZE, SUI_T_SPACE, "Vertex", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
@@ -378,7 +377,6 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 		y -= 0.05;
 		if(sw_text_button(input, -0.27, y, 0, SUI_T_SIZE, SUI_T_SPACE, "Create new Bone", co_line_color[0], co_line_color[1], co_line_color[2], color))
 		{
-			VNQuat64	identity = { 0.0, 0.0, 0.0, 1.0 };
 			uint i;
 			char nr[32];
 			i = 3;
