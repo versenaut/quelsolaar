@@ -143,6 +143,8 @@ void p_shader_fallback_parse(ENode *node, PMatFallBack *fallback, uint16 frag_id
 		case VN_M_FT_MATRIX :
 			p_shader_fallback_parse(node, fallback, f->matrix.data);
 		break;
+		default:
+		break;
 	}
 	e_nsm_leave_fragment(node, frag_id);
 }
