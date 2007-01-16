@@ -24,10 +24,9 @@ void draw_table(PTessTableElement *t, uint corners)
 {
 //	static uint time = 0;
 	float *vertex;
+	uint i;
 
-	uint i, j, k;
 	vertex = malloc((sizeof *vertex) * t->element_count * 2);
-
 	for(i = 0; i < t->element_count * 2; i++)
 		vertex[i] = 0; 
 
@@ -53,7 +52,8 @@ void draw_table(PTessTableElement *t, uint corners)
 void draw_table_normals(PTessTableElement *t, uint corners)
 {
 	float vertex[6], a[2], b[2];
-	uint i, j, k;
+	uint i;
+
 	for(i = 0; i < t->vertex_count; i++)
 	{
 		blend_one_vertex(t, vertex, corners, i);

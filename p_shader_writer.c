@@ -53,7 +53,6 @@ uint16 p_shader_choose_alternative(ENode *node, VMatFrag *frag)
 
 void p_shader_get_name(ENode *node, char *frag_name, uint fragment)
 {
-	VMatFrag *frag;
 	switch(e_nsm_get_fragment_type(node, fragment))
 	{
 		case VN_M_FT_COLOR :
@@ -169,12 +168,12 @@ uint p_shader_write_pre_compute(ENode *node, PSExeCode *v_c, PSExeCode *f_c, boo
 
 void p_shader_write_lights(ENode *node, PSExeCode *f_c, uint lights)
 {
-	uint16 fragment, count = 0;
+	uint16 fragment;
 	VMatFrag *frag;
-	VNMFragmentType type;
 	boolean direct = FALSE, ambient = FALSE, back_direct = FALSE, back_ambient = FALSE, volume = FALSE;
 	char buf[256];
 	uint i;
+
 	for(fragment = e_nsm_get_fragment_next(node, 0); fragment != (uint16)-1; fragment = e_nsm_get_fragment_next(node, fragment + 1))
 	{
 		if(e_nsm_get_fragment_type(node, fragment) == VN_M_FT_LIGHT)
@@ -652,10 +651,8 @@ uint p_render_get_light_count(void)
 
 void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, uint *f_length, uint *dest, uint *src, PCodeGenTemp *t, boolean initialized)
 {
-	uint i, count, *data;
 	uint16 fragment;
-	char code[5120], temp[5120], *c;
-	boolean reflection = FALSE;
+	char code[5120], temp[5120];
 
 	if(e_nsm_get_fragment(node, e_nsm_get_fragment_color_front(node)) != NULL)
 	{

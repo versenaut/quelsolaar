@@ -65,10 +65,8 @@ void co_draw_3d_node_lock(ENode *node)
 {
 	uint seconds, fractions;
 	double pos[3], output[3], f;
-	EObjLink *link;
-	VNQuat64 rot;
-	double matrix[16];
-	COVerseNode *co_g_node, *co_node;
+	COVerseNode *co_node;
+
 	verse_session_get_time(&seconds, &fractions);
 	co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
 	e_nso_get_pos_time(node, pos, seconds, fractions);
@@ -86,11 +84,9 @@ ENode *co_draw_3d_test(float x, float y)
 	ENode *node, *g_node, *found_node = NULL;
 	double pos[3], output[3], light[3], f, best = 0.001;
 	EObjLink *link;
-	VNQuat64 rot;
-	double matrix[16];
-	COVerseNode *co_g_node, *co_node;
-	verse_session_get_time(&seconds, &fractions);
+	COVerseNode *co_node;
 
+	verse_session_get_time(&seconds, &fractions);
 	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 	{
 		co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
@@ -209,12 +205,10 @@ void co_draw_3d_icon_pass(void)
 	float shine[2 * 16] = {0, 0.02, 0, 0.04, 0, -0.02, 0, -0.04, 0.02, 0, 0.04, 0, -0.02, 0, -0.04, 0, 0.014, 0.014, 0.028, 0.028, -0.014, 0.014, -0.028, 0.028, -0.014, -0.014, -0.028, -0.028, 0.014, -0.014, 0.028, -0.028};
 	float sun[2 * 16] = {0, 0.01, 0.007, 0.007, 0.01, 0, 0.007, 0.007, 0, -0.01, 0.007, -0.007, 0.01, 0, 0.007, -0.007, 0, -0.01, -0.007, -0.007, -0.01, 0, -0.007, -0.007, 0, 0.01, -0.007, 0.007, -0.01, 0, -0.007, 0.007};
 	uint seconds, fractions;
-	VNTag *tag;
-	uint16 i, j;
 	ENode *node;
 	double light[3], pos[3], f;
 	COVerseNode *co_node;
-	boolean draw;
+
 	if(!draw_3d_view)
 		return;
 	verse_session_get_time(&seconds, &fractions);
