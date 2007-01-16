@@ -54,34 +54,6 @@ void la_t_polygon_select_fill(uint poly)
     free(select);
 }
 
-create_matrix_from_polygon(double *matrix, uint *ref, boolean quad)
-{
-	double origo[3], point_a[3], point_b[3], a[3], b[3], c[3], d[3];
-	udg_get_vertex_pos(a, ref[0]);
-	udg_get_vertex_pos(b, ref[1]);
-	udg_get_vertex_pos(c, ref[2]);
-	if(quad)
-	{
-		udg_get_vertex_pos(d, ref[3]);
-		origo[0] = (a[0] + b[0] + c[0] + d[0]) * 0.25;
-		origo[1] = (a[1] + b[1] + c[1] + d[1]) * 0.25;
-		origo[2] = (a[2] + b[2] + c[2] + d[2]) * 0.25;
-	}else
-	{
-		origo[0] = (a[0] + b[0] + c[0]) / 3.0;
-		origo[1] = (a[1] + b[1] + c[1]) / 3.0;
-		origo[2] = (a[2] + b[2] + c[2]) / 3.0;
-	}
-	point_a[0] = (a[0] + b[0]) * 0.5;
-	point_a[1] = (a[1] + b[1]) * 0.5;
-	point_a[2] = (a[2] + b[2]) * 0.5;
-	point_b[0] = (b[0] + c[0]) * 0.5;
-	point_b[1] = (b[1] + c[1]) * 0.5;
-	point_b[2] = (b[2] + c[2]) * 0.5;
-	create_matrix_normalized(matrix, origo, point_a, point_b);
-}
-
-
 typedef struct{
 	uint	poly;
 	uint32	v_count;
@@ -128,7 +100,8 @@ void create_poly_vectors(double	*origo, double	*vectors, uint *ref, uint poly)
 uint select_poly_rotate(double *matrix, double *v_a, double *pos_a, double *v_b, double *pos_b, uint poly)
 {
 	double r, matrix2[16], matrix3[16], pos[] = {0, 0, 0}, best = -1;
-	uint dir_a, dir_b, i, j;
+	uint dir_a = 0, dir_b = 0, i, j;
+
 	for(i = 0; i < poly; i++)
 	{
 		for(j = 0; j < poly; j++)
@@ -146,21 +119,23 @@ uint select_poly_rotate(double *matrix, double *v_a, double *pos_a, double *v_b,
 	create_matrix_normalized(matrix3, pos, &v_b[dir_b * 3], &v_b[((poly + dir_b + 1) % poly) * 3]);
 	negate_matrix(matrix2);
 	matrix_multiply(matrix3, matrix2, matrix);
+
 	return (poly + dir_a + dir_b + 2) % poly;
 }
 
 void grabb_marked_mesh(LATDeployParam *param, uint poly)
 {
-    uint32 vertex_count, polygon_count, *ref, i, j, k, *crease;
-	boolean *select, found = TRUE;
+	uint32 vertex_count, polygon_count, *ref, i, j, k, *crease;
+	boolean *select;
 	egreal *vertex;
+
 	param->v_count = 0;
 	param->p_count = 0;
-    udg_get_geometry(&vertex_count, &polygon_count, &vertex, &ref, &crease);
+	udg_get_geometry(&vertex_count, &polygon_count, &vertex, &ref, &crease);
 	param->poly = 3;
 	if(ref[poly * 4 + 3] < vertex_count)
 		param->poly = 4;
-    select = selection_fill(poly);
+	select = selection_fill(poly);
 	for(i = 0; i < vertex_count; i++)
 		if(select[i])
 			param->v_count++;
