@@ -74,10 +74,11 @@ void p_param_array_destroy(PGeoParams *p)
 boolean p_array_update(PGeoParams *p, PMesh *mesh, uint32 geometry, uint32 material)
 {
 	ENode *g_node, *m_node;
-	EGeoLayer *layer, *ref_layer;
+	EGeoLayer *layer;
 	char *names[3];
 	uint i, j;
 	VMatFrag *frag;
+
 	if((m_node = e_ns_get_node(0, material)) == NULL)
 		return FALSE;
 	if((g_node = e_ns_get_node(0, geometry)) == NULL)

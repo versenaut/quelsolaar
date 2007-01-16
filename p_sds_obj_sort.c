@@ -50,9 +50,9 @@ void p_lod_gap_count(ENode *node, PPolyStore *geometry, PMesh *mesh, ENode *o_no
 {
 
 	ENode *m_node;
-	EObjLink *link = NULL, *def = NULL;
+	EObjLink *link = NULL;
 	EGeoLayer *layer;
-	PMeshMaterial *mat;
+	PMeshMaterial *mat = NULL;
 	egreal *v;
 	uint32 i, j, k, *ref, stage, ref_count, vertex_count, mat_count = 0, param_count = 0;
 
