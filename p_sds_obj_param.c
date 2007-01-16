@@ -609,8 +609,9 @@ void p_layer_param_create_old(ENode *g_node, PMesh *mesh)
 
 void p_lod_create_layer_param(ENode *g_node, PMesh *mesh)
 {
-	uint i, j, channel, param, material, start;
+	uint i, j, channel, param, material;
 	ENode *m_node;
+
 	if(mesh->sub_stages[0] == 0)
 	{
 		mesh->param.array_count = 0;
@@ -704,13 +705,13 @@ void p_lod_create_layer_param(ENode *g_node, PMesh *mesh)
 void p_lod_update_material_param_count(ENode *g_node, PMesh *mesh)
 {
 	ENode *m_node;
-	uint i, j, found = 0, *v;
+	uint i, found = 0, *v;
+
 	for(i = 0; i < mesh->render.mat_count; i++)
 		if((m_node = e_ns_get_node(0, mesh->render.mat[i].material)) != NULL)
 			if(mesh->render.mat[i].material_version != e_ns_get_node_version_struct(m_node))
 				if(p_shader_get_param_count(m_node) > found)
 					found = p_shader_get_param_count(m_node);
-
 
 	if(mesh->param.array_count < found)
 	{
