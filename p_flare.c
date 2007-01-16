@@ -13,6 +13,8 @@
 
 #include "enough.h"
 
+#include "st_matrix_operations.h"
+
 extern uint p_th_get_hdri_token(boolean alpha);
 
 static uint flare_texture = 0;
@@ -32,10 +34,9 @@ boolean	p_render_get_flare(void)
 
 void p_create_flare(void)
 {
-	int i, j, k, temp;
-	float x, y, r, half, best;
+	int i, j;
+	float x, y, r, half = 0.5f * flare_size;
 	float *data;
-	half = (float)flare_size * 0.5;
 
 	data = malloc((sizeof *data) * flare_size * flare_size * 3);
 	for(i = 0; i < flare_size; i++)
