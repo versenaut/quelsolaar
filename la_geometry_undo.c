@@ -285,7 +285,6 @@ void execute_event(UNDOEvent *event, uint direction)
 {
 	switch(event->type)
 	{
-		
 		case UNDOET_VERTEX :
 			if(event->event[direction].vertex.layer == 65535)
 				verse_send_g_vertex_delete_real64(UNDOGlobal.g_node, event->id);
@@ -355,7 +354,6 @@ void execute_event(UNDOEvent *event, uint direction)
 			VNTag tag;
 			ENode *node;
 			node = e_ns_get_node(0, UNDOGlobal.g_node);
-printf("A\n");
 			if(event->event[direction].tag.group[0] == 0)
 			{
 				printf("B\n");
@@ -370,7 +368,6 @@ printf("A\n");
 					else
 						verse_send_tag_destroy(UNDOGlobal.g_node, group_id, tag_id);
 				}
-printf("D\n");
 			}else
 			{
 
@@ -392,7 +389,6 @@ printf("D\n");
 					UNDOGlobal.pending_tag = event->event[direction].tag;
 				}
 			}
-printf("H\n");
 		}
 		break;
 		case UNDOET_TAG_MOVE :
@@ -527,7 +523,8 @@ printf("H\n");
 				}
 				printf("J\n");
 			}*/
-
+		default:
+		break;
 	}
 }
 
