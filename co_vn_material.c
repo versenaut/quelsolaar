@@ -582,7 +582,7 @@ boolean handle_link(BInputState *input, ENode *node, uint16 *link, char *text, u
 	VMatFrag *frag;
 	VNMFragmentID id;
 	float f, pos_x, pos_y;
-	float a, b, dist, vertex[8];
+	float a, b, dist, vertex[8] = { 0.0f };
 
 	frag = e_nsm_get_fragment(node, *link);
 	target = e_nsm_get_custom_data(node, *link, CO_ENOUGH_NODE_SLOT);
@@ -936,8 +936,8 @@ boolean co_handle_material(BInputState *input, ENode *node)
 	static VNMFragmentID move = -1;
 	static float rot_tree = 1;
 	COVNMaterial *mat_pos;
-	float expand, place[3] = {0, 0, 0};
-	uint type = 0, j;
+	float expand = 0.0f, place[3] = {0, 0, 0};
+	uint type = 0, j = 0;
 	VNMFragmentID i;
 	VMatFrag *frag, f;
 	float y, pre_expander, color, color_light;
