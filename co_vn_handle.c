@@ -24,8 +24,6 @@ extern float co_line_color[3];
 
 void co_handle_view(BInputState *input, float *pos, boolean active)
 {
-	float light[4] = {1, 1, 1, 1};
-
 	if(active && input->mouse_button[1])
 	{
 		if(input->mouse_button[0])
@@ -111,8 +109,6 @@ void co_unhide_recursevly(uint node_id, float x, float y)
 		{
 			for(link = e_nso_get_next_link(node, 0); link != NULL; link = e_nso_get_next_link(node, e_nso_get_link_id(link) + 1))
 			{
-				COVerseNode *co_link = NULL;
-				ENode *link_node;
 				if(node_id == e_nso_get_link_node(link))
 				{
 					co_node->hidden = FALSE;
@@ -147,7 +143,6 @@ void co_search_update(char *search);
 
 void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 {
-	egreal size = 1, center[3] = {0, 0, 0}; 
 	double time;
 	uint32 seconds, fractions;
 	betray_get_current_time(&seconds, &fractions);
@@ -161,7 +156,6 @@ void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 		switch(type)
 		{
 			case V_NT_OBJECT :
-
 				co_vng_sun();
 				co_vng_sunrays();
 //				co_vng_color(245.0 / 255.0, 243.0 / 255.0, 170.0 / 255.0);
@@ -259,7 +253,8 @@ void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 			break;
 			case V_NT_CURVE :
 				co_vng_dust_planet();
-
+			break;
+			default:
 			break;
 		}
 	}
@@ -306,7 +301,7 @@ extern void co_draw_3d_view(float x, float y);
 extern boolean co_draw_3d_click_test_node(float x, float y);
 extern void co_draw_3d_summary(void);
 extern void co_draw_3d_node_lock(ENode *node);
-extern co_draw_3d_icon_pass(void);
+extern void co_draw_3d_icon_pass(void);
 extern void co_pu_empty(BInputState *input);
 extern void update_bitmap_load(char *name);
 extern void co_clone_node(ENode *node);
@@ -548,8 +543,8 @@ void co_input_handler(BInputState *input, void *user_pointer)
 					{
 						VNMFragmentID i;
 						uint j = 0;
-						VMatFrag *frag, f;
-		
+						VMatFrag *frag;
+
 						for(i = e_nsm_get_fragment_next(node, 0); i != (VNMFragmentID)-1; i = e_nsm_get_fragment_next(node, i + 1))
 						{
 							if(VN_M_FT_TEXTURE == e_nsm_get_fragment_type(node, i))
@@ -592,9 +587,9 @@ void co_input_handler(BInputState *input, void *user_pointer)
 							break;
 							case 3:
 							{
-								uint i;
+/*								uint i;
 								ENode *link;
-							/*	for(i = 0; i < V_NT_NUM_TYPES; i++)
+								for(i = 0; i < V_NT_NUM_TYPES; i++)
 								{
 									e_nso_get_link(node, i);
 									link = e_ns_get_node(0, e_nso_get_link(node, i));
@@ -859,6 +854,8 @@ void co_input_handler(BInputState *input, void *user_pointer)
 					if(!co_handle_audio(input, node) && popup_move > 0.5)
 						mode = COIM_NONE;
 					break;
+				default:
+					break;
 			}
 		}
 
@@ -885,8 +882,6 @@ void co_input_handler(BInputState *input, void *user_pointer)
 			if(search[0] != 0)
 			{
 				float length;
-				static boolean state = TRUE;
-				static uint cursor;
 				glPushMatrix();
 				glTranslatef(0, 0, -1);
 				length = sui_compute_text_length(SUI_T_SIZE * 2, SUI_T_SPACE, search);
