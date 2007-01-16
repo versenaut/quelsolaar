@@ -19,7 +19,7 @@ void *(*p_gl_GetProcAddress)(const char* proc) = NULL;
 
 void p_extension_init(void *(*gl_GetProcAddress)(const char* proc))
 {
-	const char *extension;
+	const unsigned char *extension;
 	p_gl_GetProcAddress = gl_GetProcAddress;
 	extension = glGetString(GL_EXTENSIONS);
 	printf("%s\n", extension);
@@ -35,8 +35,9 @@ void *p_extension_get_address(const char* proc)
 
 boolean p_extension_test(const char *string)
 {
-	const char *extension, *a;
+	const unsigned char *extension, *a;
 	uint i;
+
 	extension = glGetString(GL_EXTENSIONS);
 	if(extension != NULL)
 	{
