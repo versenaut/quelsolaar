@@ -246,7 +246,6 @@ void lp_color_paint(BInputState *input, ENode *node)
 	egreal *vertex, f;
 	double pos[3];
 	uint i, *ref, ref_length, length;
-	VNGLayerType type;
 
 	vertex = e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node, 0));
 	ref = e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node, 1));
@@ -317,10 +316,9 @@ void lp_color_paint(BInputState *input, ENode *node)
 void lp_apply_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *blue, double *value, uint integer)
 {
 	EGeoLayer *layers[3];
-	boolean v = FALSE, p = FALSE;
 	VNodeID node_id;
 	VLayerID layer_id;
-	uint i, j, *ref, ref_length, length, r[4];
+	uint i, j = 0, *ref, ref_length, length, r[4];
 
 
 	node_id = e_ns_get_node_id(node);
