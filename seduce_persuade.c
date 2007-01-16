@@ -8,7 +8,6 @@
 
 void sp_settings_pre(SUIViewElement *element)
 {
-	char text[32] = {0};
 	element[0].type = S_VET_SPLIT;
 	element[0].text = "geometry";
 
@@ -64,7 +63,7 @@ void sp_settings_pre(SUIViewElement *element)
 	element[13].param.integer = p_render_get_light_count();
 }
 
-void sp_settings_init()
+void sp_settings_init(void)
 {
 	p_geo_set_sds_level(sui_get_setting_int("P_BASE_TESSELATION", 3));
 	p_geo_set_sds_poly_cap(sui_get_setting_int("P_POLY_CAP", 100000));
