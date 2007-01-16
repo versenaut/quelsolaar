@@ -50,16 +50,16 @@ typedef struct{
 	uint	dead;
 }PTextureHandle;
 
-struct{
-	PTextureHandle	**handels;
-	uint			handel_count;
-	uint			std_texture_id;
-	uint			update_pos;
-	boolean			use32bit;
-	uint			floating_point_rgb_enum;
-	uint			floating_point_rgba_enum;
-	boolean			use_floating_point;
-}PTextureStorage;
+static struct {
+	PTextureHandle	**handles;
+	uint		handle_count;
+	uint		std_texture_id;
+	uint		update_pos;
+	boolean		use32bit;
+	uint		floating_point_rgb_enum;
+	uint		floating_point_rgba_enum;
+	boolean		use_floating_point;
+} PTextureStorage;
 
 uint p_th_create_std_texture(void)
 {
@@ -99,10 +99,10 @@ uint p_th_create_std_texture(void)
 void p_th_init(void)
 {
 	uint i;
-	PTextureStorage.handel_count = 64;
-	PTextureStorage.handels = malloc((sizeof *PTextureStorage.handels) * PTextureStorage.handel_count);
-	for(i = 0; i < PTextureStorage.handel_count; i++)
-		PTextureStorage.handels[i] = NULL;
+	PTextureStorage.handle_count = 64;
+	PTextureStorage.handles = malloc((sizeof *PTextureStorage.handles) * PTextureStorage.handle_count);
+	for(i = 0; i < PTextureStorage.handle_count; i++)
+		PTextureStorage.handles[i] = NULL;
 	PTextureStorage.std_texture_id = p_th_create_std_texture();
 	PTextureStorage.use32bit = TRUE;
 	if(p_extension_test("ARB_texture_float"))
@@ -158,13 +158,13 @@ void p_th_texture_restart(void)
 {
 	uint i, texture;
 	texture = p_th_create_std_texture();
-	for(i = 0; i < PTextureStorage.handel_count; i++)
+	for(i = 0; i < PTextureStorage.handle_count; i++)
 	{
-		if(PTextureStorage.handels[i] != NULL)
+		if(PTextureStorage.handles[i] != NULL)
 		{
-			if(PTextureStorage.handels[i]->texture_id == PTextureStorage.std_texture_id)
-				PTextureStorage.handels[i]->texture_id = texture;
-			PTextureStorage.handels[i]->size_version++;
+			if(PTextureStorage.handles[i]->texture_id == PTextureStorage.std_texture_id)
+				PTextureStorage.handles[i]->texture_id = texture;
+			PTextureStorage.handles[i]->size_version++;
 		}
 	}
 	glDeleteTextures(1, &PTextureStorage.std_texture_id);
@@ -239,9 +239,9 @@ PTextureHandle *p_th_create_texture_handle(uint node_id, char *layer_r, char *la
 	uint i, j, empty = -1;
 	PTextureHandle *h; 
 
-	for(i = 0; i < PTextureStorage.handel_count; i++)
+	for(i = 0; i < PTextureStorage.handle_count; i++)
 	{
-		h = PTextureStorage.handels[i];
+		h = PTextureStorage.handles[i];
 		if(h == NULL)
 		{
 			if(empty == -1)
@@ -272,13 +272,13 @@ PTextureHandle *p_th_create_texture_handle(uint node_id, char *layer_r, char *la
 	p_texture_func(NULL, E_CDC_STRUCT);
 	if(empty == -1)
 	{
-		PTextureStorage.handels = realloc(PTextureStorage.handels, (sizeof *PTextureStorage.handels) * (PTextureStorage.handel_count + 16));
+		PTextureStorage.handles = realloc(PTextureStorage.handles, (sizeof *PTextureStorage.handles) * (PTextureStorage.handle_count + 16));
 		for(i = 0; i < 16; i++)
-			PTextureStorage.handels[PTextureStorage.handel_count + i] = NULL;
-		empty = PTextureStorage.handel_count;
-		PTextureStorage.handel_count += 16;
+			PTextureStorage.handles[PTextureStorage.handle_count + i] = NULL;
+		empty = PTextureStorage.handle_count;
+		PTextureStorage.handle_count += 16;
 	}
-	h = PTextureStorage.handels[empty] = malloc(sizeof **PTextureStorage.handels);
+	h = PTextureStorage.handles[empty] = malloc(sizeof **PTextureStorage.handles);
 	h->dead = TEXTURE_DEATH_COUNT;
 	h->users = 1;
 	h->node_id = node_id;
@@ -451,11 +451,11 @@ boolean th_in_service = FALSE;
 boolean p_texture_compute(uint dummy)
 {
 	uint empty;
-	for(empty = PTextureStorage.handel_count + 1; empty != 0; empty--)
+	for(empty = PTextureStorage.handle_count + 1; empty != 0; empty--)
 	{
 /*		printf("p_texture_compute\n");*/
-		PTextureStorage.update_pos = (PTextureStorage.update_pos + 1) % PTextureStorage.handel_count;
-		if(p_th_service_handle(&PTextureStorage.handels[PTextureStorage.update_pos]))
+		PTextureStorage.update_pos = (PTextureStorage.update_pos + 1) % PTextureStorage.handle_count;
+		if(p_th_service_handle(&PTextureStorage.handles[PTextureStorage.update_pos]))
 			return FALSE;
 	}
 	th_in_service = FALSE;
@@ -476,9 +476,9 @@ void p_th_context_update(void)
 {
 	ENode *node;
 	uint i;
-	for(i = 0; i < PTextureStorage.handel_count; i++)
-		if(PTextureStorage.handels[i] != NULL)
-			if((node = e_ns_get_node(0, PTextureStorage.handels[i]->node_id)) != NULL)
-				p_th_create_new_texture(node, PTextureStorage.handels[i]);
+	for(i = 0; i < PTextureStorage.handle_count; i++)
+		if(PTextureStorage.handles[i] != NULL)
+			if((node = e_ns_get_node(0, PTextureStorage.handles[i]->node_id)) != NULL)
+				p_th_create_new_texture(node, PTextureStorage.handles[i]);
 	PTextureStorage.std_texture_id = p_th_create_std_texture();
 }
