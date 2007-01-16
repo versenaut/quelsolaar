@@ -111,7 +111,6 @@ void co_clone_object(ENode *node, ENode *clone)
 
 void co_clone_geometry(ENode *node, ENode *clone)
 {
-	VNMFragmentID frag;
 	VNodeID node_id;
 	EGeoLayer *layer, *clayer;
 	double pos[3];
@@ -266,6 +265,9 @@ void co_clone_bitmap(ENode *node, ENode *clone)
 					data = e_nsb_get_layer_data(node, layer);
 					switch(e_nsb_get_layer_type(layer))
 					{
+						case VN_B_LAYER_UINT1:
+							fprintf(stderr, "Can't clone 1-bpp bitmap\n");
+						break;
 						case VN_B_LAYER_UINT8 :
 							for(i = 0; i < size[0]; i += VN_B_TILE_SIZE)
 							{
@@ -358,7 +360,6 @@ void co_clone_node(ENode *node)
 
 void co_clone_node_update(void)
 {
-	static version, timer = 0;
 	ENode *node, *clone;
 	if((node = e_ns_get_node(0, co_clone_from_node)) != NULL && (clone = e_ns_get_node(0, co_clone_to_node)) != NULL && e_ns_get_node_type(clone) == e_ns_get_node_type(node))
 	{
@@ -385,6 +386,8 @@ void co_clone_node_update(void)
 			break;
 			case V_NT_BITMAP :
 				co_clone_bitmap(node, clone);
+			break;
+			default:
 			break;
 		}
 	}
