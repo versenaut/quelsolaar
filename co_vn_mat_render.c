@@ -185,8 +185,8 @@ float co_noise_multi_function(float *vec)
 
 float co_noice_point_function(float *vec)
 {
-	int i, j, k, start, pos, found;
-	float fi, fj, fk, f, fbest = 100000, vector[3]; 
+	int i, j, k, start, pos, found = 0;
+	float fi, fj, fk, f, fbest = 100000, vector[3];
 	fi = vec[0];
 	fj = vec[1];
 	fk = vec[2];
