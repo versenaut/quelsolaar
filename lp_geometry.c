@@ -478,8 +478,9 @@ void lp_color_gray(ViewGeometry *g)
 void lp_geometry_draw(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *blue)
 {
 	static ViewGeometry *g = NULL;
-	VNGLayerType type;
-	if(node !=	NULL)
+	VNGLayerType type = -1;
+
+	if(node != NULL)
 	{
 	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		g = lp_geometry_update(node, g);
@@ -489,9 +490,8 @@ void lp_geometry_draw(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *
 			type = e_nsg_get_layer_type(red);
 		}
 		if(red == green && red == blue && type != VN_G_LAYER_VERTEX_XYZ && type != VN_G_LAYER_VERTEX_UINT32 && type != VN_G_LAYER_POLYGON_CORNER_UINT32 && type != VN_G_LAYER_POLYGON_FACE_UINT8 && type != VN_G_LAYER_POLYGON_FACE_UINT32)
-		{
 			lp_color_gray(g);
-		}else
+		else
 		{
 			if(green != NULL)
 				lp_color_update(node, g, green, 1);
