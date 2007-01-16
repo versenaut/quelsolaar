@@ -125,6 +125,8 @@ ENodeHead *e_create_node(VNodeID node_id, VNodeType type, VNodeOwner owner)
 			case V_NT_AUDIO :
 				node = e_create_a_node(node_id, owner);
 			break;
+			default:
+			break;
 		}
 	}
 	return node;

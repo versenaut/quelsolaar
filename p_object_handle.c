@@ -52,6 +52,8 @@ void p_object_func(ENode *node, ECustomDataCommand command)
 			p_free_impostor(&o->impostor);
 			free(o);
 		break;
+		default:
+		break;
 	}
 }
 
