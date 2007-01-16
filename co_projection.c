@@ -147,7 +147,6 @@ void p_view_change(BInputState *input)
 
 void p_projection_update(void)
 {
-	double	proj[16];
 	glGetDoublev(GL_PROJECTION_MATRIX, ProjectionData.matrix);
 	glGetDoublev(GL_MODELVIEW_MATRIX, ProjectionData.model);
 }
@@ -158,10 +157,11 @@ void p_set_grid_size(double grid_size)
 
 void p_set_view_center(double *center)
 {
-	uint32 vertex_count, polygon_count, *ref, i;
+/*	uint32 vertex_count, polygon_count, *ref, i;
 	double *vertex;
 	boolean rotate = FALSE;
 	double normal[3] = {0, 0, 0}, temp, size = 0.001;
+*/
 	ProjectionData.speed = 0.95;
 	ProjectionData.target[0] = center[0];
 	ProjectionData.target[1] = center[1];

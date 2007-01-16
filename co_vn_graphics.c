@@ -356,7 +356,6 @@ void co_vng_geo_planet()
 
 void co_vng_gas_planet()
 {
-	float color = 0, color_light = 0.9;
 	float time;
 	uint i;
 	float hight;
@@ -398,7 +397,6 @@ void co_vng_gas_planet()
 
 void co_vng_black_hole()
 {
-	float color = 0, color_light = 0.9;
 	uint i;
 	float hight;
 	glPushMatrix();
@@ -420,10 +418,7 @@ void co_vng_black_hole()
 
 void co_vng_sun()
 {
-	float color = 0, color_light = 0.4;
 	static uint time = 0;
-	uint i, temp;
-	float outbreak, length, x, y;
 
 	time++;
 	glPushMatrix();
@@ -452,7 +447,6 @@ void co_vng_ring(void)
 
 void co_vng_saturn_ring()
 {
-	float color = 0, color_light = 0.9;
 	glPushMatrix();
 	glRotatef(-90, 1, 0, 0);
 	glRotatef(COVNGraphicsData.time * 0.01, 0, 0.1, 1);
@@ -573,7 +567,7 @@ void co_vng_divider(BInputState *input, float pos_x, float pos_y, float *rotate,
 	if(input->mode == BAM_DRAW)
 	{
 		static float array[] = {0.010000, 0.002500, 0.010000, -0.002500, 0.010000, -0.002500, -0.010000, -0.007500, -0.010000, -0.007500, -0.010000, 0.007500, -0.010000, 0.007500, 0.010000, 0.002500, -0.000000, 0.015000, -0.004635, 0.014266, -0.004635, 0.014266, -0.008817, 0.012135, -0.008817, 0.012135, -0.012135, 0.008817, -0.012135, 0.008817, -0.014266, 0.004635, -0.014266, 0.004635, -0.015000, 0.000000, -0.000000, 0.015000, 0.004635, 0.014266, 0.004635, 0.014266, 0.008817, 0.012135, 0.008817, 0.012135, 0.012135, 0.008817, 0.012135, 0.008817, 0.014266, 0.004635, 0.014266, 0.004635, 0.015000, 0.000000, -0.000000, -0.015000, 0.004635, -0.014266, 0.004635, -0.014266, 0.008817, -0.012135, 0.008817, -0.012135, 0.012135, -0.008817, 0.012135, -0.008817, 0.014266, -0.004635, 0.014266, -0.004635, 0.015000, 0.000000, -0.000000, -0.015000, -0.004635, -0.014266, -0.004635, -0.014266, -0.008817, -0.012135, -0.008817, -0.012135, -0.012135, -0.008817, -0.012135, -0.008817, -0.014266, -0.004635, -0.014266, -0.004635, -0.015000, 0.000000};
-		static float line[] = {-0.03 , 0, -0.1, 0, 0.03, 0, 0.9, 0}, r = 0;
+		static float line[] = {-0.03 , 0, -0.1, 0, 0.03, 0, 0.9, 0};
 		glPushMatrix();
 		glTranslatef(pos_x - 0.4, pos_y, 0);
 		sui_draw_text(0.03, 0 - SUI_T_SIZE, SUI_T_SIZE, SUI_T_SPACE * 2, text, co_line_color[0], co_line_color[1], co_line_color[2], 0.4);

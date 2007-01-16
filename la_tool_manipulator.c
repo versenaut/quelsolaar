@@ -232,7 +232,7 @@ void la_t_tm_get_pos(double *pos)
 void la_t_tm_get_vector(double *vector)
 {
 	double r;
-	uint i;
+
 	p_get_view_camera(vector);
 	dv3_sub(vector, GlobalTransformManipulator.manipulator_pos);
 	r = sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]);
@@ -370,11 +370,10 @@ void compute_tangent(double *vertex, uint edge_a, uint edge_b, uint other)
 
 void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent, boolean smooth)
 {
-	ENode *node;
 	UNDOTag *tag;
-	uint i, j, *ref, ref_count, vertex_count, count;
+	uint i, j, *ref, ref_count, vertex_count;
 	double select, *vertex;
-	boolean computed;
+
 	udg_get_geometry(&vertex_count, &ref_count, &vertex, &ref, NULL);
 
 	GlobalTransformManipulator.data_length = vertex_count;
@@ -412,8 +411,8 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 	GlobalTransformManipulator.normal = NULL;
 	if(normal)
 	{
-		double x, y, z, x2, y2, z2, r;
-		uint *pos, poly, j2;
+		double x, y, z, r;
+		uint *pos, poly;
 		GlobalTransformManipulator.normal = malloc((sizeof *GlobalTransformManipulator.normal) * vertex_count * 3);
 		for(i = 0; i < vertex_count; i++)
 		{
@@ -472,8 +471,7 @@ void lock_transform_vertexes(BInputState *input, boolean normal, boolean tangent
 	}
 	if(tangent)
 	{
-		double x, y, z, x2, y2, z2, r;
-		uint *pos, poly, j2;
+		uint *pos;
 		boolean *edge;
 		GlobalTransformManipulator.normal = malloc((sizeof *GlobalTransformManipulator.normal) * vertex_count * 3);
 		edge = malloc((sizeof *edge) * vertex_count);
@@ -767,11 +765,11 @@ void la_t_tm_manipulate(BInputState *input, double *snap, uint snap_type)
 {
 	ENode *node;
 	double select, delta, vertex[3], state[3], matrix[16], normal_tangent;
-	uint i, j, id, update_length = -1; 
+	uint i, j, update_length = -1;
 	void  (*func)(double *output, uint vertex_id, void *data) = NULL;
 	void *data;
-	node = e_ns_get_node_selected(0, V_NT_GEOMETRY);
 
+	node = e_ns_get_node_selected(0, V_NT_GEOMETRY);
 	if(input->mouse_button[0] == TRUE)
 		update_length = 50;
 	else
