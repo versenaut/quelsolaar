@@ -221,7 +221,7 @@ void betray_end_type_in_mode(boolean cancel)
 
 void betray_insert_character(char character)
 {
-	int i;
+	uint i;
 	char temp;
 /*	sprintf(type_in_string, "%u", character);
 	return;
@@ -238,8 +238,9 @@ void betray_insert_character(char character)
 
 void betray_delete_character(void)
 {
-	int i;
+	uint i;
 	char temp , temp2 = 0;
+
 	if(*cursor_pos_pointer == 0)
 		return;
 	(*cursor_pos_pointer)--;
@@ -254,10 +255,15 @@ void betray_delete_character(void)
 
 void betray_move_cursor(int move)
 {
-	(*cursor_pos_pointer) += move;
-	if(*cursor_pos_pointer < 0)
-		*cursor_pos_pointer = 0;
-
+	if(move < 0)
+	{
+		if(*cursor_pos_pointer < (uint) -move)
+			*cursor_pos_pointer = 0;
+		else
+			*cursor_pos_pointer += move;
+	}
+	else
+		(*cursor_pos_pointer) += move;
 	if((*cursor_pos_pointer) > type_in_length)
 		(*cursor_pos_pointer) = type_in_length;
 }
