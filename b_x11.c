@@ -27,6 +27,12 @@ static struct {
 	int		warp_x, warp_y;		/* Center coordinates of window, in window space. */
 } x11info;
 
+#if defined __GNUC__
+#define	UNUSED(decl)	decl __attribute__((unused))
+#else
+#define	UNUSED(decl)	decl
+#endif
+
 /* ---------------------------------------------------------------------------------------------- */
 
 void betray_set_context_update_func(void (*context_func)(void))
@@ -34,7 +40,7 @@ void betray_set_context_update_func(void (*context_func)(void))
 	x11info.context = context_func;
 }
 
-boolean betray_internal_set_display(uint size_x, uint size_y, boolean full_screen)
+boolean betray_internal_set_display(uint size_x, uint size_y, UNUSED(boolean full_screen))
 {
 	betray_reshape_view(size_x, size_y);	/* Just resize, and be done. */
 	x11info.warp_x = size_x / 2;
@@ -55,7 +61,7 @@ static void cb_exit(void)
 	}
 }
 
-boolean betray_internal_init_display(int argc, char **argv, uint size_x, uint size_y, boolean full_screen, const char *caption)
+boolean betray_internal_init_display(UNUSED(int argc), UNUSED(char **argv), uint size_x, uint size_y, boolean full_screen, const char *caption)
 {
 	int		attrs[] = { GLX_RGBA, GLX_DOUBLEBUFFER,
 					GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8, GLX_BLUE_SIZE, 8,
