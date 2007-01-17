@@ -37,11 +37,11 @@ void draw_a_polygon(uint id, float x, float y); /* debug draw */
 void uv_input_handler(BInputState *input, void *user_pointer)
 {
 	static UVIMode mode = IM_IDLE;
-	static uint	polygon = -1, part = -1;
+	static uint	polygon = ~0u, part = ~0u;
 	float view[3], x, y;
+
 	x = uv_get_pos_x(input->pointer_x);
 	y = uv_get_pos_y(input->pointer_y);
-
 
 	if(input->mode == BAM_MAIN)
 	{
@@ -74,14 +74,13 @@ void uv_input_handler(BInputState *input, void *user_pointer)
 	{
 		if(input->mouse_button[2] == TRUE && input->last_mouse_button[2] == FALSE && mode == IM_IDLE)
 		{
-
 			if(uv_trans_test_manip(input))
 				mode = IM_PU_MANIP;
-			else if(polygon == -1)
+			else if(polygon == ~0u)
 				mode = IM_PU_EMPTY;
-			else if((part = uv_test_corner(polygon, x, y)) != -1)
+			else if((part = uv_test_corner(polygon, x, y)) != ~0u)
 				mode = IM_PU_CORNER;
-			else if((part = uv_test_edge(polygon, x, y)) != -1)
+			else if((part = uv_test_edge(polygon, x, y)) != ~0u)
 				mode = IM_PU_EDGE;
 			else
 				mode = IM_PU_POLY;
@@ -96,14 +95,14 @@ void uv_input_handler(BInputState *input, void *user_pointer)
 				uvo_set_overlay_motion(0.5);
 			}else
 			{
-				if(polygon != -1)
+				if(polygon != ~0u)
 				{	
-					if((part = uv_test_corner(polygon, x, y)) != -1)
+					if((part = uv_test_corner(polygon, x, y)) != ~0u)
 					{
 						uvo_set_overlay_motion(0.5);
 						mode = IM_VERTEX;
 					}
-					else if((part = uv_test_edge(polygon, x, y)) != -1)
+					else if((part = uv_test_edge(polygon, x, y)) != ~0u)
 					{
 						mode = IM_EDGE;
 					}else
@@ -121,9 +120,9 @@ void uv_input_handler(BInputState *input, void *user_pointer)
 		if(input->mouse_button[1] == TRUE && input->last_mouse_button[1] == FALSE && mode == IM_IDLE)
 			mode = IM_VIEW;
 
-		if(mode == IM_VERTEX && polygon != -1 && polygon == uvg_get_next_polygon(polygon))
+		if(mode == IM_VERTEX && polygon != ~0u && polygon == uvg_get_next_polygon(polygon))
 			uv_trans_move_corner(input, polygon, part);
-		if(mode == IM_EDGE && polygon != -1 && polygon == uvg_get_next_polygon(polygon))
+		if(mode == IM_EDGE && polygon != ~0u && polygon == uvg_get_next_polygon(polygon))
 			uv_trans_move_edge(input, polygon, part);
 		if(mode == IM_MANIP)
 			uv_trans_continiue(input);
@@ -140,7 +139,7 @@ void uv_input_handler(BInputState *input, void *user_pointer)
 			{
 				if(uv_test_polygon(polygon, x, y))
 				{
-					if(polygon != -1 && polygon == uvg_get_next_polygon(polygon) && (0.025 * 0.025 > (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y)))
+					if(polygon != ~0u && polygon == uvg_get_next_polygon(polygon) && (0.025 * 0.025 > (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y)))
 					{
 						egreal *s;
 						s = uvg_get_corner_select(polygon);
@@ -168,7 +167,7 @@ void uv_input_handler(BInputState *input, void *user_pointer)
 				uvo_set_overlay_motion(0.02);
 				if(0.001 > (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
 				{
-					if(mode == IM_EDGE && polygon != -1 && polygon == uvg_get_next_polygon(polygon))
+					if(mode == IM_EDGE && polygon != ~0u && polygon == uvg_get_next_polygon(polygon))
 					{
 						if(s[part] > 0.5 && s[(part + uvg_get_sides(polygon) - 1) % uvg_get_sides(polygon)])
 						{
@@ -200,7 +199,7 @@ void uv_input_handler(BInputState *input, void *user_pointer)
 				else
 					uv_draw_line_test_select();
 			}
-			if(mode == IM_VERTEX && polygon != -1 && polygon == uvg_get_next_polygon(polygon))
+			if(mode == IM_VERTEX && polygon != ~0u && polygon == uvg_get_next_polygon(polygon))
 			{
 				uvg_set_one_corner_select(polygon, part, 1);
 				uv_trans_unhide();
@@ -212,13 +211,13 @@ void uv_input_handler(BInputState *input, void *user_pointer)
 	}
 	if(mode == IM_PU_EMPTY)
 		uv_pu_empty(input);
-	if(mode == IM_PU_POLY && polygon != -1 && polygon == uvg_get_next_polygon(polygon))
+	if(mode == IM_PU_POLY && polygon != ~0u && polygon == uvg_get_next_polygon(polygon))
 		uv_pu_polygon(input, polygon);
-	if(mode == IM_PU_CORNER && polygon != -1 && polygon == uvg_get_next_polygon(polygon))
+	if(mode == IM_PU_CORNER && polygon != ~0u && polygon == uvg_get_next_polygon(polygon))
 		uv_pu_corner(input, polygon, part);
-	if(mode == IM_PU_EDGE && polygon != -1 && polygon == uvg_get_next_polygon(polygon))
+	if(mode == IM_PU_EDGE && polygon != ~0u && polygon == uvg_get_next_polygon(polygon))
 		uv_pu_edge(input, polygon, part);
-	if(mode == IM_PU_MANIP && polygon != -1 && polygon == uvg_get_next_polygon(polygon))
+	if(mode == IM_PU_MANIP && polygon != ~0u && polygon == uvg_get_next_polygon(polygon))
 		uv_pu_manip(input);
 
 
