@@ -548,7 +548,6 @@ boolean co_w_close_button(BInputState *input, float pos_x, float pos_y, float al
 
 float co_w_scroll(BInputState *input, float pos, float size)
 {
-	static boolean drag = FALSE;
 	float aspect, p;
 
 	aspect = betray_get_screen_mode(NULL, NULL, NULL);

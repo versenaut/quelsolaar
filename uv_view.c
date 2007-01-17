@@ -15,7 +15,6 @@ float view_cam_speed = 0.1;
 
 void uv_handle_view(BInputState *input, float *pos, boolean active)
 {
-	float light[4] = {1, 1, 1, 1};
 	if(input->mode == BAM_DRAW)
 	{
 		glDisable(GL_DEPTH_TEST);
