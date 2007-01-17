@@ -257,5 +257,5 @@ uint sui_draw_popup(BInputState *input, float pos_x, float pos_y, SUIPUElement *
 			}
 		}
 	}
-	return -1;
+	return ~0u;
 }
