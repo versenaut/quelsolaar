@@ -293,7 +293,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 		for(layer = e_nsg_get_layer_next(node, 0); layer != NULL ; layer = e_nsg_get_layer_next(node, e_nsg_get_layer_id(layer) + 1))
 		{
 			char *names[] = {"VERTEX_XYZ", "VERTEX_UINT32", "VERTEX_REAL", "POLYGON_CORNER_UINT32", "POLYGON_CORNER_REAL", "POLYGON_FACE_UINT8", "POLYGON_FACE_UINT32", "POLYGON_FACE_REAL"};
-			static int popup = -1;
+			static uint popup = ~0;
 			VNGLayerType type;
 
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer name:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
@@ -308,7 +308,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 				type -= VN_G_LAYER_POLYGON_CORNER_UINT32 - 1 - VN_G_LAYER_VERTEX_REAL;
 			if(type > 7)
 				type = 7;
-			if(type < 0)
+			if((int) type < 0)
 				type = 0;
 			
 			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer type:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
@@ -337,7 +337,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 					output = sui_draw_popup(input, 0.15, y, e, 7, 0, 1.0);
 				else
 					output = sui_draw_popup(input, 0.15, y, e, 7, 0, 0.0);
-				if(output != -1 && output != type)
+				if(output != ~0u && output != type)
 				{
 					if(output > VN_G_LAYER_VERTEX_REAL)
 						output += VN_G_LAYER_POLYGON_CORNER_UINT32 - VN_G_LAYER_VERTEX_REAL - 1; 
@@ -434,8 +434,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 								 e_nsg_get_bone_pos_label(node, bone),
 								 e_nsg_get_bone_rot_label(node, bone),
 								 e_nsg_get_bone_scale_label(node, bone));
-				if(co_w_slider(input, 0.3, y, 0.35, edit, 0, 1, color))
-					/*verse_send_g_bone_create(change_g_node_id, bone, e_nsg_get_bone_weight(node, bone), ref, parent, t[0], t[1], t[2], &rot)*/;
+				co_w_slider(input, 0.3, y, 0.35, edit, 0, 1, color);
 				y -= 0.05;
 			}
 			sui_draw_rounded_square(-0.3, y + 0.525, 1, -0.49, co_line_color[0], co_line_color[1], co_line_color[2], color_light);
