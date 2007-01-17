@@ -225,7 +225,7 @@ SDrawing *se_load_drawing_asci(FILE *drawing, uint *count)
 			d[*count].lines[d[*count].line_count++] = l;
 		}else
 		{
-			*count++;
+			(*count)++;
 			for(i = 0; line[i] != 0 && i < 64; i++)
 				d[*count].name[i] = line[i];
 			d[*count].name[i] = 0;
