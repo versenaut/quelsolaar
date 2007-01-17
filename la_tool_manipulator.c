@@ -980,9 +980,9 @@ void la_t_tm_manipulate(BInputState *input, double *snap, uint snap_type)
 
 	if(input->mouse_button[0] != TRUE && input->last_mouse_button[0] != TRUE)
 	{
-		if(GlobalTransformManipulator.data != NULL);
+		if(GlobalTransformManipulator.data != NULL)
 			free(GlobalTransformManipulator.data);
-		if(GlobalTransformManipulator.normal != NULL);
+		if(GlobalTransformManipulator.normal != NULL)
 		{
 			free(GlobalTransformManipulator.manipulator_normal_array);
 			free(GlobalTransformManipulator.normal);
@@ -1000,7 +1000,8 @@ void grab_one_vertex(BInputState *input, uint id, double *pos)
 {
     static int direction, recursion;
 	static double *select;
-    uint i, j;
+    uint i;
+	int j;
     double delta[3], base[3];
     if(input->mouse_button[0] == TRUE && input->last_mouse_button[0] == FALSE)
     {
