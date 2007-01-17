@@ -155,7 +155,7 @@ static int x11_event_handler(BInputState *input)
 		if(ev.xclient.window == x11info.win &&
 		   ev.xclient.message_type == x11info.wmproto &&
 		   ev.xclient.format == 32 &&
-		   ev.xclient.data.l[0] == x11info.wmdel)
+		   (Atom) ev.xclient.data.l[0] == x11info.wmdel)
 			return 0;
 	}
 
