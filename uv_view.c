@@ -172,6 +172,7 @@ uint uv_test_corner(uint id, float x, float y)
 	egreal uv[8];
 	egreal tmp[8];
 	uint i;
+
 	uvg_get_uve(uv, id);
 	if(uvg_is_quad(id))
 	{
@@ -190,7 +191,7 @@ uint uv_test_corner(uint id, float x, float y)
 				return i;
 		}
 	}
-	return -1;
+	return ~0u;
 }
 
 uint uv_test_edge(uint id, float x, float y)
@@ -241,7 +242,8 @@ uint uv_test_all_polygons(float x, float y)
 {
 	uint id;
 	egreal uv[8];
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(id))
 		{
@@ -258,7 +260,7 @@ uint uv_test_all_polygons(float x, float y)
 			}
 		}
 	}
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(id) && uvg_is_quad(id))
 		{
@@ -300,7 +302,7 @@ void uv_find_closest_corner(egreal *output, float x, float y, boolean selected)
 		shortest = f;
 	}
 
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		uvg_get_uve(uv, id);
 		select = uvg_get_corner_select(id);
