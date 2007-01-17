@@ -111,8 +111,9 @@ void sui_end_type_func(void *user, boolean cancel)
 
 boolean sui_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size, void (*done_func)(void *user, char *text), void* user, float red, float green, float blue, float alpha)
 {
-	int i;
+	uint i;
 	float pos;
+
 	if(input->mode == BAM_DRAW)
 	{
 		char *t;
@@ -126,7 +127,7 @@ boolean sui_type_in(BInputState *input, float pos_x, float pos_y, float length, 
 		{
 			pos = pos_x;
 			for(i = 0; i < sui_type_in_cursor && t[i] != 0; i++)
-				pos += (sui_get_letter_size(t[i]) / sui_get_letter_size(97) + SUI_T_SPACE) * size;
+				pos += (sui_get_letter_size(t[i]) / sui_get_letter_size('a') + SUI_T_SPACE) * size;
 			sui_draw_text(pos + SUI_T_SPACE * 0.5 * size, pos_y, size, SUI_T_SPACE, "|", red, green, blue, alpha);
 		}
 	}
@@ -180,11 +181,11 @@ void sui_end_type_number_func(void *user, boolean cancel)
 	sui_type_in_number_text = NULL;
 }
 
-
 boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, float center, float length, float size, double *number, void *id, float red, float green, float blue, float alpha)
 {
-	int i;
+	uint i;
 	float pos;
+
 	if(input->mode == BAM_DRAW)
 	{
 		if(sui_type_in_number_text != NULL && sui_type_in_number_id == id)
@@ -193,7 +194,7 @@ boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, flo
 			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, sui_type_in_number_text, red, green, blue, alpha);
 			pos = pos_x;
 			for(i = 0; i < sui_type_in_cursor && sui_type_in_number_text[i] != 0; i++)
-				pos += (sui_get_letter_size(sui_type_in_number_text[i]) / sui_get_letter_size(97) + SUI_T_SPACE) * size;
+				pos += (sui_get_letter_size(sui_type_in_number_text[i]) / sui_get_letter_size('a') + SUI_T_SPACE) * size;
 			sui_draw_text(pos + SUI_T_SPACE * 0.5 * size, pos_y, size, SUI_T_SPACE, "|", red, green, blue, alpha);
 		}else
 		{
@@ -232,8 +233,9 @@ boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, flo
 
 boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float center, float length, float size, uint32 *number, void *id, float red, float green, float blue)
 {
-	int i;
+	uint i;
 	float pos;
+
 	if(input->mode == BAM_DRAW)
 	{
 		if(sui_type_in_number_text != NULL && sui_type_in_number_id == id)
@@ -242,7 +244,7 @@ boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float
 			sui_draw_text(pos_x, pos_y, size, SUI_T_SPACE, sui_type_in_number_text, red, green, blue, 1.0);
 			pos = pos_x;
 			for(i = 0; i < sui_type_in_cursor && sui_type_in_number_text[i] != 0; i++)
-				pos += (sui_get_letter_size(sui_type_in_number_text[i]) / sui_get_letter_size(97) + SUI_T_SPACE) * size;
+				pos += (sui_get_letter_size(sui_type_in_number_text[i]) / sui_get_letter_size('a') + SUI_T_SPACE) * size;
 			sui_draw_text(pos + SUI_T_SPACE * 0.5 * size, pos_y, size, SUI_T_SPACE, "|", red, green, blue, 1.0);
 		}else
 		{
