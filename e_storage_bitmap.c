@@ -244,10 +244,10 @@ static void callback_send_b_dimensions_set(void *user_data, VNodeID node_id, uin
 							for(; k < width; k++)
 								buf[i * height * width + j * width + k] = 0;
 						}
-						for(j *= width; j < height * width; j++)
+						for(j *= width; j < (uint) (height * width); j++)
 							buf[i * height * width + j] = 0;
 					}
-					for(i *= height * width; i < depth * height * width; i++)
+					for(i *= height * width; i < (uint) (depth * height * width); i++)
 						buf[i] = 0;
 					free(layer->data);
 					layer->data = buf;
@@ -266,10 +266,10 @@ static void callback_send_b_dimensions_set(void *user_data, VNodeID node_id, uin
 							for(; k < width; k++)
 								buf[i * height * width + j * width + k] = 0;
 						}
-						for(j *= width; j < height * width; j++)
+						for(j *= width; j < (uint) (height * width); j++)
 							buf[i * height * width + j] = 0;
 					}
-					for(i *= height * width; i < depth * height * width; i++)
+					for(i *= height * width; i < (uint) (depth * height * width); i++)
 						buf[i] = 0;
 					free(layer->data);
 					layer->data = buf;
@@ -288,10 +288,10 @@ static void callback_send_b_dimensions_set(void *user_data, VNodeID node_id, uin
 							for(; k < width; k++)
 								buf[i * height * width + j * width + k] = 0;
 						}
-						for(j *= width; j < height * width; j++)
+						for(j *= width; j < (uint) (height * width); j++)
 							buf[i * height * width + j] = 0;
 					}
-					for(i *= height * width; i < depth * height * width; i++)
+					for(i *= height * width; i < (uint) (depth * height * width); i++)
 						buf[i] = 0;
 					free(layer->data);
 					layer->data = buf;
@@ -310,10 +310,10 @@ static void callback_send_b_dimensions_set(void *user_data, VNodeID node_id, uin
 							for(; k < width; k++)
 								buf[i * height * width + j * width + k] = 0;
 						}
-						for(j *= width; j < height * width; j++)
+						for(j *= width; j < (uint) (height * width); j++)
 							buf[i * height * width + j] = 0;
 					}
-					for(i *= height * width; i < depth * height * width; i++)
+					for(i *= height * width; i < (uint) (depth * height * width); i++)
 						buf[i] = 0;
 					free(layer->data);
 					layer->data = buf;
