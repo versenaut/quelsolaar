@@ -161,9 +161,9 @@ void la_parse_input(BInputState *input)
 			{
 				if(la_t_tm_test_center(input) == FALSE)
 				{
-					if((ParseInputData.mode == PIM_IDLE && selected_distance < VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE)) ||
+					if(((ParseInputData.mode == PIM_IDLE && selected_distance < VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE)) ||
 					   (ParseInputData.mode == PIM_DRAW || ParseInputData.mode == PIM_DRAG_MANIPULATOR ||
-					    ParseInputData.mode == PIM_DRAG_ONE_VERTEX) && input->mouse_button[1] == TRUE)
+					    ParseInputData.mode == PIM_DRAG_ONE_VERTEX)) && input->mouse_button[1] == TRUE)
 					{
 						double closest[3];
 						udg_get_vertex_pos(closest, select_closest);
