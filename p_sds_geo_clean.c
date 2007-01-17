@@ -17,9 +17,9 @@ void p_sds_add_depend(PDepend *dep, PDepend *add, egreal mult)
 	float f;
 	if(mult < 0.001)
 		return;
-	for(i = 0; add->element[i].vertex != -1 && i < add->length; i++)
+	for(i = 0; add->element[i].vertex != ~0u && i < add->length; i++)
 	{
-		for(j = 0; j < dep->length && dep->element[j].vertex != add->element[i].vertex && dep->element[j].vertex != -1; j++);
+		for(j = 0; j < dep->length && dep->element[j].vertex != add->element[i].vertex && dep->element[j].vertex != ~0u; j++);
 		if(j == dep->length)
 		{
 			if(dep->length <= INIT_DEPEND_LENGTH)
@@ -35,7 +35,7 @@ void p_sds_add_depend(PDepend *dep, PDepend *add, egreal mult)
 				for(; k < dep->length; k++)
 				{
 					e[k].value = 0;
-					e[k].vertex = -1;
+					e[k].vertex = ~0u;
 				}
 				dep->element = e;
 			}else
@@ -45,7 +45,7 @@ void p_sds_add_depend(PDepend *dep, PDepend *add, egreal mult)
 				for(k = j; k < dep->length; k++)
 				{
 					dep->element[k].value = 0;
-					dep->element[k].vertex = -1;
+					dep->element[k].vertex = ~0u;
 				}
 			}
 		}
@@ -100,7 +100,7 @@ PDepend *p_sds_allocate_depend(uint length)
 	for(i = 0; i < length * INIT_DEPEND_LENGTH; i++)
 	{
 		e[i].value = 0;
-		e[i].vertex = -1;
+		e[i].vertex = ~0u;
 	}
 	d = malloc((sizeof *d) * (length + 1));
 	for(i = 0; i < length; i++)
@@ -121,7 +121,7 @@ void p_sds_free_depend(PDepend *dep, uint length)
 	uint i, dist;
 	dist = dep[length].length;
 	e = dep[length].element;
-	if(dist != 1 && dist != -1)
+	if(dist != 1 && dist != ~0u)
 	{
 		for(i = 0; i < length; i++)
 			if(dep[i].element != &e[i * dist])
@@ -158,92 +158,92 @@ float p_sds_compute_neighbor(PPolyStore *poly)
 	ref = poly->ref;
 	n = malloc((sizeof *n) * (poly->quad_length + poly->tri_length));
 	for(i = 0; i < (poly->quad_length + poly->tri_length); i++)
-		n[i] = -1;
+		n[i] = ~0u;
 	v = malloc((sizeof *v) * poly->vertex_count);
 	for(i = 0; i < poly->vertex_count; i++)
-		v[i] = -1;
+		v[i] = ~0u;
 	while(clear < poly->quad_length + poly->tri_length)
 	{
 		for(i = 0; i < poly->quad_length && clear < poly->quad_length + poly->tri_length; i++)
 		{
 			counter++;
 			cor = v[ref[i]];
-			if(cor == -1)
+			if(cor == ~0u)
 			{
-				if(n[i] == -1 || n[(i / 4) * 4 + (i + 3) % 4] == -1)
+				if(n[i] == ~0u || n[(i / 4) * 4 + (i + 3) % 4] == ~0u)
 					v[ref[i]] = i;
 		//		else
 		//			printf("jump!");
 			}
 			else if(cor == i)
-				v[ref[i]] = -1;
+				v[ref[i]] = ~0u;
 			else
 			{
 				if(cor >= poly->quad_length)
 				{	/* other poly is a tri */
 					a = (i / 4) * 4;
 					b = poly->quad_length + ((cor - poly->quad_length) / 3) * 3;
-					if((n[cor] == -1 && n[a + (i + 3) % 4] == -1) && ref[a + (i + 3) % 4] == ref[b + (cor - b + 1) % 3])
+					if((n[cor] == ~0u && n[a + (i + 3) % 4] == ~0u) && ref[a + (i + 3) % 4] == ref[b + (cor - b + 1) % 3])
 					{
 						n[a + (i + 3) % 4] = cor;
 						n[cor] = a + (i + 3) % 4;
 //						printf("i = %u clear = %u\n", i, clear); 
 						clear = 0;
-						if(n[b + (cor - b + 2) % 3] != -1)
+						if(n[b + (cor - b + 2) % 3] != ~0u)
 						{
-							if(n[i] == -1)
+							if(n[i] == ~0u)
 								v[ref[i]] = i;
 							else
-								v[ref[i]] = -1;
+								v[ref[i]] = ~0u;
 						}
 					}
-					if((n[i] == -1 && n[b + (cor - b + 2) % 3] == -1) && ref[a + (i + 1) % 4] == ref[b + (cor - b + 2) % 3])
+					if((n[i] == ~0u && n[b + (cor - b + 2) % 3] == ~0u) && ref[a + (i + 1) % 4] == ref[b + (cor - b + 2) % 3])
 					{
 						n[i] = b + (cor - b + 2) % 3;						
 						n[b + (cor - b + 2) % 3] = i;
 //						printf("i = %u clear = %u\n", i, clear); 
 						clear = 0;
-						if(n[cor] != -1)
+						if(n[cor] != ~0u)
 						{
-							if(n[a + (i + 3) % 4] == -1)
+							if(n[a + (i + 3) % 4] == ~0u)
 								v[ref[i]] = i;
 							else
-								v[ref[i]] = -1;
+								v[ref[i]] = ~0u;
 						}
-//						v[ref[i]] = -1;
+//						v[ref[i]] = ~0u;
 					}
 				}else
 				{	
 					/* other poly is a quad */
 					a = (i / 4) * 4;
 					b = (cor / 4) * 4;
-					if((n[cor] == -1 && n[a + (i + 3) % 4] == -1) && ref[a + (i + 3) % 4] == ref[b + (cor + 1) % 4])
+					if((n[cor] == ~0u && n[a + (i + 3) % 4] == ~0u) && ref[a + (i + 3) % 4] == ref[b + (cor + 1) % 4])
 					{
 						n[a + (i + 3) % 4] = cor;
 						n[cor] = a + (i + 3) % 4;
 //						printf("i = %u clear = %u\n", i, clear); 
 						clear = 0;	
-//						v[ref[i]] = -1;
-						if(n[b + (cor + 3) % 4] != -1)
+//						v[ref[i]] = ~0u;
+						if(n[b + (cor + 3) % 4] != ~0u)
 						{
-							if(n[i] == -1)
+							if(n[i] == ~0u)
 								v[ref[i]] = i;
 							else
-								v[ref[i]] = -1;
+								v[ref[i]] = ~0u;
 						}
 					}
-					if((n[i] == -1 && n[b + (cor + 3) % 4] == -1) && ref[a + (i + 1) % 4] == ref[b + (cor + 3) % 4])
+					if((n[i] == ~0u && n[b + (cor + 3) % 4] == ~0u) && ref[a + (i + 1) % 4] == ref[b + (cor + 3) % 4])
 					{
 						n[i] = b + (cor + 3) % 4;
 						n[b + (cor + 3) % 4] = i;
 //						printf("i = %u clear = %u\n", i, clear); 
 						clear = 0;	
-						if(n[cor] != -1)
+						if(n[cor] != ~0u)
 						{
-							if(n[a + (i + 3) % 4] == -1)
+							if(n[a + (i + 3) % 4] == ~0u)
 								v[ref[i]] = i;
 							else
-								v[ref[i]] = -1;
+								v[ref[i]] = ~0u;
 						}
 					}
 				}						
@@ -253,83 +253,83 @@ float p_sds_compute_neighbor(PPolyStore *poly)
 		for(; i < poly->quad_length + poly->tri_length && clear < poly->quad_length + poly->tri_length; i++)
 		{
 			cor = v[ref[i]];
-			if(cor == -1)
+			if(cor == ~0u)
 			{
-			//	if(ncor == -1)
+			//	if(ncor == ~0u)
 				v[ref[i]] = i;
 			}
 			else if(cor == i)
-				v[ref[i]] = -1;
+				v[ref[i]] = ~0u;
 			else 
 			{
 				if(cor >= poly->quad_length)
 				{	/* other poly is a tri */
 					a = poly->quad_length + ((i - poly->quad_length) / 3) * 3;
 					b = poly->quad_length + ((cor - poly->quad_length) / 3) * 3;
-					if((n[cor] == -1 && n[a + (i - a + 2) % 3] == -1) && ref[a + (i - a + 2) % 3] == ref[b + (cor - b + 1) % 3])
+					if((n[cor] == ~0u && n[a + (i - a + 2) % 3] == ~0u) && ref[a + (i - a + 2) % 3] == ref[b + (cor - b + 1) % 3])
 					{
 						n[a + (i - a + 2) % 3] = cor;
 						n[cor] = a + (i - a + 2) % 3;
 		//				printf("i = %u clear = %u\n", i, clear); 
 						clear = 0;
-						if(n[b + (cor - b + 2) % 3] != -1)
+						if(n[b + (cor - b + 2) % 3] != ~0u)
 						{
-							if(n[i] == -1)
+							if(n[i] == ~0u)
 								v[ref[i]] = i;
 							else
-								v[ref[i]] = -1;
+								v[ref[i]] = ~0u;
 						}
-//						v[ref[i]] = -1;
+//						v[ref[i]] = ~0u;
 					}
-					if((n[i] == -1 && n[b + (cor - b + 2) % 3] == -1) && ref[a + (i - a + 1) % 3] == ref[b + (cor - b + 2) % 3])
+					if((n[i] == ~0u && n[b + (cor - b + 2) % 3] == ~0u) && ref[a + (i - a + 1) % 3] == ref[b + (cor - b + 2) % 3])
 					{
 						n[i] = b + (cor - b + 2) % 3;						
 						n[b + (cor - b + 2) % 3] = i;
 //						printf("i = %u clear = %u\n", i, clear); 
 						clear = 0;
-						if(n[cor] != -1)
+						if(n[cor] != ~0u)
 						{
-							if(n[a + (i - a + 2) % 3] == -1)
+							if(n[a + (i - a + 2) % 3] == ~0u)
 								v[ref[i]] = i;
 							else
-								v[ref[i]] = -1;
+								v[ref[i]] = ~0u;
 						}
-//						v[ref[i]] = -1;
+//						v[ref[i]] = ~0u;
 					}
 				}else
 				{
 					/* other poly is a quad */
 					a = poly->quad_length + ((i - poly->quad_length) / 3) * 3;
 					b = (cor / 4) * 4;
-					if((n[cor] == -1 && n[a + (i - a + 2) % 3] == -1) && ref[a + (i - a + 2) % 3] == ref[b + (cor + 1) % 4])
+					if((n[cor] == ~0u && n[a + (i - a + 2) % 3] == ~0u) && ref[a + (i - a + 2) % 3] == ref[b + (cor + 1) % 4])
 					{
 						n[a + (i - a + 2) % 3] = cor;
 						n[cor] = a + (i - a + 2) % 3;
 //						printf("i = %u clear = %u\n", i, clear); 
 						clear = 0;
-						if(n[b + (cor + 3) % 4] != -1)
+						if(n[b + (cor + 3) % 4] != ~0u)
 						{
-							if(n[i] == -1)
+							if(n[i] == ~0u)
 								v[ref[i]] = i;
 							else
-								v[ref[i]] = -1;
+								v[ref[i]] = ~0u;
 						}
-//						v[ref[i]] = -1;
+//						v[ref[i]] = ~0u;
 					}
-					if((n[i] == -1 && n[(cor - b + 3) % 4] == -1) && ref[a + (i - a + 1) % 3] == ref[b + (cor + 3) % 4])
+					if((n[i] == ~0u && n[(cor - b + 3) % 4] == ~0u) && ref[a + (i - a + 1) % 3] == ref[b + (cor + 3) % 4])
 					{
 						n[i] = b + (cor + 3) % 4;
 						n[b + (cor + 3) % 4] = i;				
 //						printf("i = %u clear = %u\n", i, clear); 						
 						clear = 0;
-						if(n[cor] != -1)
+						if(n[cor] != ~0u)
 						{
-							if(n[a + (i - a + 2) % 3] == -1)
+							if(n[a + (i - a + 2) % 3] == ~0u)
 								v[ref[i]] = i;
 							else
-								v[ref[i]] = -1;
+								v[ref[i]] = ~0u;
 						}
-//						v[ref[i]] = -1;
+//						v[ref[i]] = ~0u;
 					}
 				}						
 			}
@@ -347,7 +347,7 @@ float p_sds_compute_neighbor(PPolyStore *poly)
 */
 
 	for(i = 0; i < (poly->quad_length + poly->tri_length); i++)
-		if(n[i] == -1)
+		if(n[i] == ~0u)
 			counter++;
 	poly->open_edges = counter;
 	free(v);
@@ -573,7 +573,7 @@ egreal p_sds_get_crease(PPolyStore *mesh, uint edge)
 {
 	uint id;
 	id = mesh->neighbor[edge];
-	if(id == -1)
+	if(id == ~0u)
 		return 0;	
 	if(mesh->crease == NULL)
 		return 1;
@@ -603,7 +603,7 @@ void p_sds_final_clean(PPolyStore *mesh)
 	for(i = 0; i < mesh->vertex_count; i++)
 	{
 		dep = &mesh->vertex_dependency[i];
-		for(j = 0; j < dep->length && dep->element[j].vertex != -1; j++)
+		for(j = 0; j < dep->length && dep->element[j].vertex != ~0u; j++)
 			dep->element[j].value /= dep->sum;
 		dep->sum = 1.0;
 		dep->length = j;
@@ -621,14 +621,14 @@ void p_sds_final_clean_new(PPolyStore *mesh)
 	for(i = 0; i < mesh->vertex_count; i++)
 	{
 		dep = &mesh->vertex_dependency[i];
-		for(j = 0; j < dep->length && dep->element[j].vertex != -1; j++);
+		for(j = 0; j < dep->length && dep->element[j].vertex != ~0u; j++);
 		length += j;
 	}
 	gap = mesh->vertex_dependency[mesh->vertex_dependency_length].length;
 	old_e = mesh->vertex_dependency[mesh->vertex_dependency_length].element;
 	e = malloc((sizeof *e) * length);
 	new_dep = malloc((sizeof *new_dep) * (mesh->vertex_count + 1));
-	new_dep[mesh->vertex_count].length = -1;
+	new_dep[mesh->vertex_count].length = ~0u;
 	new_dep[mesh->vertex_count].element = e;
 	dep = mesh->vertex_dependency;
 	mesh->vertex_dependency = new_dep;
@@ -636,7 +636,7 @@ void p_sds_final_clean_new(PPolyStore *mesh)
 	for(i = 0; i < mesh->vertex_count; i++)
 	{
 		new_dep->element = e;
-		for(j = 0; j < dep->length && dep->element[j].vertex != -1; j++)
+		for(j = 0; j < dep->length && dep->element[j].vertex != ~0u; j++)
 		{
 			e->value = dep->element[j].value / dep->sum;
 			e->vertex = dep->element[j].vertex;
