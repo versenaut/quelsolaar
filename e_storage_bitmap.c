@@ -476,17 +476,17 @@ void e_nsb_evaluate_image_handle_clamp(EBMHandle *handle, ebreal *pixel, ebreal 
 	uint i;
 	if(handle->global_version != global_version)
 		update_bitmap_image_handle(handle);
-	if(x > 1);
+	if(x > 1)
 		x = 1;
-	if(x < 0);
+	if(x < 0)
 		x = 0;
-	if(y > 1);
+	if(y > 1)
 		y = 1;
-	if(y < 0);
+	if(y < 0)
 		y = 0;
-	if(z > 1);
+	if(z > 1)
 		z = 1;
-	if(z < 0);
+	if(z < 0)
 		z = 0;
 	i = (uint)(x * (ebreal)handle->size_x) + (uint)(y * handle->size_y) * handle->size_x + (uint)(z * handle->size_z) * handle->size_x * handle->size_y;
 	pixel[0] = handle->func[0](handle->data[0], i);
