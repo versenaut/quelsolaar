@@ -24,8 +24,8 @@ void rename_group_func(void *user, char *text)
 	ENode *node;
 	if((node = e_ns_get_node(0, change_node_id)) != NULL)
 	{
-		for(i = e_ns_get_next_tag_group(node, 0); i != -1 && user != e_ns_get_tag_group(node, i); i = e_ns_get_next_tag_group(node, i + 1));
-		if(i != -1)
+		for(i = e_ns_get_next_tag_group(node, 0); i != ~0u && user != e_ns_get_tag_group(node, i); i = e_ns_get_next_tag_group(node, i + 1));
+		if(i != ~0u)
 			verse_send_tag_group_create(change_node_id, i, text);
 	}
 }
@@ -36,10 +36,10 @@ void rename_tag_func(void *user, char *text)
 	ENode *node;
 	if((node = e_ns_get_node(0, change_node_id)) != NULL)
 	{
-		for(i = e_ns_get_next_tag_group(node, 0); i != -1 ; i = e_ns_get_next_tag_group(node, i + 1))
+		for(i = e_ns_get_next_tag_group(node, 0); i != ~0u ; i = e_ns_get_next_tag_group(node, i + 1))
 		{
-			for(j = e_ns_get_next_tag(node, i, 0); j != -1 && user != e_ns_get_tag_name(node, i, j); j = e_ns_get_next_tag(node, i, j + 1));
-			if(j != -1)
+			for(j = e_ns_get_next_tag(node, i, 0); j != ~0u && user != e_ns_get_tag_name(node, i, j); j = e_ns_get_next_tag(node, i, j + 1));
+			if(j != ~0u)
 			{
 				verse_send_tag_create(change_node_id, i, j, text, e_ns_get_tag_type(node, i, j), e_ns_get_tag(node, i, j));
 				return;
@@ -55,10 +55,10 @@ void tag_string_func(void *user, char *text)
 	ENode *node;
 	if((node = e_ns_get_node(0, change_node_id)) != NULL)
 	{
-		for(i = e_ns_get_next_tag_group(node, 0); i != -1 ; i = e_ns_get_next_tag_group(node, i + 1))
+		for(i = e_ns_get_next_tag_group(node, 0); i != ~0u ; i = e_ns_get_next_tag_group(node, i + 1))
 		{
-			for(j = e_ns_get_next_tag(node, i, 0); j != -1 && user != e_ns_get_tag_name(node, i, j); j = e_ns_get_next_tag(node, i, j + 1));
-			if(j != -1)
+			for(j = e_ns_get_next_tag(node, i, 0); j != ~0u && user != e_ns_get_tag_name(node, i, j); j = e_ns_get_next_tag(node, i, j + 1));
+			if(j != ~0u)
 			{
 				tag.vstring = text;
 				verse_send_tag_create(change_node_id, i, j, e_ns_get_tag_name(node, i, j), e_ns_get_tag_type(node, i, j), &tag);
@@ -76,10 +76,10 @@ void tag_number_func(void *user, char *text)
 	ENode *node;
 	if((node = e_ns_get_node(0, change_node_id)) != NULL)
 	{
-		for(i = e_ns_get_next_tag_group(node, 0); i != -1 ; i = e_ns_get_next_tag_group(node, i + 1))
+		for(i = e_ns_get_next_tag_group(node, 0); i != ~0u ; i = e_ns_get_next_tag_group(node, i + 1))
 		{
-			for(j = e_ns_get_next_tag(node, i, 0); j != -1 && user != e_ns_get_tag_name(node, i, j); j = e_ns_get_next_tag(node, i, j + 1));
-			if(j != -1)
+			for(j = e_ns_get_next_tag(node, i, 0); j != ~0u && user != e_ns_get_tag_name(node, i, j); j = e_ns_get_next_tag(node, i, j + 1));
+			if(j != ~0u)
 			{
 				if(VN_TAG_REAL64 == e_ns_get_tag_type(node, i, j) && sscanf(text, "%f", &f) == 1)
 				{
@@ -106,9 +106,9 @@ void tag_vector_func(void *user, char *text)
 	ENode *node;
 	if((node = e_ns_get_node(0, change_node_id)) != NULL)
 	{
-		for(i = e_ns_get_next_tag_group(node, 0); i != -1 ; i = e_ns_get_next_tag_group(node, i + 1))
+		for(i = e_ns_get_next_tag_group(node, 0); i != ~0u ; i = e_ns_get_next_tag_group(node, i + 1))
 		{
-			for(j = e_ns_get_next_tag(node, i, 0); j != -1 ; j = e_ns_get_next_tag(node, i, j + 1))
+			for(j = e_ns_get_next_tag(node, i, 0); j != ~0u ; j = e_ns_get_next_tag(node, i, j + 1))
 			if(VN_TAG_REAL64_VEC3 == e_ns_get_tag_type(node, i, j))
 			{
 				t = e_ns_get_tag(node, i, j);
@@ -137,9 +137,9 @@ void tag_animation_func(void *user, char *text)
 
 	if((node = e_ns_get_node(0, change_node_id)) != NULL)
 	{
-		for(i = e_ns_get_next_tag_group(node, 0); i != -1 ; i = e_ns_get_next_tag_group(node, i + 1))
+		for(i = e_ns_get_next_tag_group(node, 0); i != ~0u ; i = e_ns_get_next_tag_group(node, i + 1))
 		{
-			for(j = e_ns_get_next_tag(node, i, 0); j != -1 ; j = e_ns_get_next_tag(node, i, j + 1))
+			for(j = e_ns_get_next_tag(node, i, 0); j != ~0u ; j = e_ns_get_next_tag(node, i, j + 1))
 			if(VN_TAG_ANIMATION == e_ns_get_tag_type(node, i, j))
 			{
 				t = e_ns_get_tag(node, i, j);
@@ -176,10 +176,10 @@ void tag_blob_count_func(void *user, char *text)
 	ENode *node;
 	if((node = e_ns_get_node(0, change_node_id)) != NULL)
 	{
-		for(i = e_ns_get_next_tag_group(node, 0); i != -1 ; i = e_ns_get_next_tag_group(node, i + 1))
+		for(i = e_ns_get_next_tag_group(node, 0); i != ~0u ; i = e_ns_get_next_tag_group(node, i + 1))
 		{
-			for(j = e_ns_get_next_tag(node, i, 0); j != -1 && user != e_ns_get_tag_name(node, i, j); j = e_ns_get_next_tag(node, i, j + 1));
-			if(j != -1)
+			for(j = e_ns_get_next_tag(node, i, 0); j != ~0u && user != e_ns_get_tag_name(node, i, j); j = e_ns_get_next_tag(node, i, j + 1));
+			if(j != ~0u)
 			{
 				if(VN_TAG_BLOB == e_ns_get_tag_type(node, i, j) && sscanf(text, "%u", &count) == 1 && count < VN_TAG_MAX_BLOB_SIZE)
 				{
@@ -251,7 +251,7 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 {
 	static float pos = 0, tag_rot = 0;
 	static boolean show_tags = TRUE, grab = FALSE;
-	static uint16 a_tag = -1, a_group = -1;
+	static uint16 a_tag = (uint16) ~0u, a_group = (uint16) ~0u;
 	float size, color, color_light;
 	char *type_names[] = {"Object", "Geometry", "Material", "Bitmap", "Text", "Curve", "Audio"};
 	uint16 i, j, k, l;
@@ -304,12 +304,12 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 			verse_send_tag_group_create(e_ns_get_node_id(node), (uint16) ~0u, nr);
 		}
 		y -= 0.05;
-		if((uint16) -1 == e_ns_get_next_tag_group(node, 0))
+		if((uint16) ~0u == e_ns_get_next_tag_group(node, 0))
 		{
 			sui_draw_text(-0.3, y, SUI_T_SIZE, SUI_T_SPACE, "No Tag Groups", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 			y -= 0.05;
 		}
-		for(i = e_ns_get_next_tag_group(node, 0); i != (uint16) -1 ; i = e_ns_get_next_tag_group(node, i + 1))
+		for(i = e_ns_get_next_tag_group(node, 0); i != (uint16) ~0u ; i = e_ns_get_next_tag_group(node, i + 1))
 		{
 			size = 0.0;
 			sui_draw_text(0.0, y + size, SUI_T_SIZE, SUI_T_SPACE, "Group name:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
@@ -371,7 +371,7 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 					else
 						output = sui_draw_popup(input, 0.15, y + size, e, 8, 0, 0.0);
 					clear_tag(&t, output);
-					if(output != -1 && output != k)
+					if(output != ~0u && output != k)
 						verse_send_tag_create(e_ns_get_node_id(node), i, j, e_ns_get_tag_name(node, i, j), output, &t);
 				}
 				size -= 0.05;
@@ -495,8 +495,8 @@ float co_handle_node_head(BInputState *input, ENode *node, boolean reset)
 
 		if(input->mouse_button[0] == FALSE)
 		{
-			a_group = -1;
-			a_tag = -1;
+			a_group = (uint16) ~0u;
+			a_tag = (uint16) ~0u;
 		}
 	}
 	if(input->mode == BAM_DRAW)

@@ -70,7 +70,7 @@ uint p_sds_get_vertex(PPolyStore *old_mesh, uint corner)
 	PDepend *dep;
 	dep = &((PPolyStore *)old_mesh->next)->vertex_dependency[old_mesh->ref[corner]];
 
-	if(dep->element[0].vertex == -1)
+	if(dep->element[0].vertex == ~0u)
 	{
 //		PSDSVertexSet list[2000];
 		uint	vertex[2000];
@@ -97,12 +97,10 @@ uint p_sds_get_vertex(PPolyStore *old_mesh, uint corner)
 		polys[0] = corner;
 
 		a = old_mesh->neighbor[corner];
-		if(a != -1)
+		if(a != ~0u)
 			a = p_sds_get_corner_next(old_mesh, a, 1);
 
-
-
-		while(a != -1)
+		while(a != ~0u)
 		{
 			polys[poly_count++] = a;
 			vertex[vertex_count] = old_mesh->ref[p_sds_get_corner_next(old_mesh, a, 1)];
@@ -111,17 +109,16 @@ uint p_sds_get_vertex(PPolyStore *old_mesh, uint corner)
 				break;
 			crease[vertex_count++] = 1 - p_sds_get_crease(old_mesh, a);
 			a = old_mesh->neighbor[a];
-			if(a != -1)
+			if(a != ~0u)
 				a = p_sds_get_corner_next(old_mesh, a, 1);
 		}
-		if(a == -1)
-
+		if(a == ~0u)
 		{
-			a = old_mesh->neighbor[p_sds_get_corner_next(old_mesh, corner, -1)];
-			if(a != -1)
-				a = p_sds_get_corner_next(old_mesh, a, -1);
+			a = old_mesh->neighbor[p_sds_get_corner_next(old_mesh, corner, ~0u)];
+			if(a != ~0u)
+				a = p_sds_get_corner_next(old_mesh, a, ~0u);
 
-			while(a != -1)
+			while(a != ~0u)
 			{
 				vertex[vertex_count] = old_mesh->ref[a];
 				for(i = 0; i < vertex_count && i < 2000 && vertex[i] != vertex[vertex_count]; i++);
@@ -130,8 +127,8 @@ uint p_sds_get_vertex(PPolyStore *old_mesh, uint corner)
 				polys[poly_count++] = a;
 				crease[vertex_count++] = (1 - p_sds_get_crease(old_mesh, a));
 				a = old_mesh->neighbor[a];
-				if(a != -1)
-					a = p_sds_get_corner_next(old_mesh, a, -1);
+				if(a != ~0u)
+					a = p_sds_get_corner_next(old_mesh, a, ~0u);
 			}
 		}
 
@@ -168,7 +165,7 @@ uint p_sds_get_vertex(PPolyStore *old_mesh, uint corner)
 		egreal best, third_best;
 		corner_start = corner;
 
-		while(corner != -1)
+		while(corner != ~0u)
 		{
 			vertex = old_mesh->ref[p_sds_get_corner_next(old_mesh, corner, 1)];
 			for(i = 0; i < list_count && i < 2000 && list[i].edge != vertex; i++);
@@ -179,27 +176,27 @@ uint p_sds_get_vertex(PPolyStore *old_mesh, uint corner)
 			list[list_count].polygon = corner;
 			a = corner;
 			corner = old_mesh->neighbor[corner];
-			if(corner != -1)
+			if(corner != ~0u)
 				corner = p_sds_get_corner_next(old_mesh, corner, 1);
 			list_count++;
 		}
-		if(corner == -1)
+		if(corner == ~0u)
 		{
-			corner = p_sds_get_corner_next(old_mesh, corner_start, -1);
-			while(corner != -1)
+			corner = p_sds_get_corner_next(old_mesh, corner_start, ~0u);
+			while(corner != ~0u)
 			{
-				vertex = old_mesh->ref[p_sds_get_corner_next(old_mesh, corner, -1)];
+				vertex = old_mesh->ref[p_sds_get_corner_next(old_mesh, corner, ~0u)];
 				for(i = 0; i < list_count; i++)
 					if(list[i].edge == vertex || i == 1999)
 						break;
 				if(list[i].edge == vertex)
 					break;
 				list[list_count].edge = vertex;
-				list[list_count].crease = 1 - p_sds_get_crease(old_mesh, p_sds_get_corner_next(old_mesh, corner, -1));
+				list[list_count].crease = 1 - p_sds_get_crease(old_mesh, p_sds_get_corner_next(old_mesh, corner, ~0u));
 				list[list_count].polygon = corner;
 				corner = old_mesh->neighbor[corner];
-				if(corner != -1)
-					corner = p_sds_get_corner_next(old_mesh, corner, -1);
+				if(corner != ~0u)
+					corner = p_sds_get_corner_next(old_mesh, corner, ~0u);
 				else
 				{
 					p_sds_add_depend(dep, &old_mesh->vertex_dependency[old_mesh->ref[corner_start]], 20);
@@ -229,8 +226,8 @@ uint p_sds_get_vertex(PPolyStore *old_mesh, uint corner)
 		}
 		printf("list end\n");
 *//*		best = 0;
-		a = -1;
-		b = -1;
+		a = ~0u;
+		b = ~0u;
 		for(i = 1; i < list_count; i++)
 		{
 			if(list[i].crease > 0.01)
@@ -327,7 +324,7 @@ uint p_sds_get_edge(PPolyStore *old_mesh, uint edge)
 
 	p_sds_add_depend(&mesh->vertex_dependency[mesh->vertex_count], &old_mesh->vertex_dependency[old_mesh->ref[edge]], 1);
 	p_sds_add_depend(&mesh->vertex_dependency[mesh->vertex_count], &old_mesh->vertex_dependency[old_mesh->ref[p_sds_get_corner_next(old_mesh, edge, 1)]], 1);
-	if(crease > 0.01 && old_mesh->neighbor[edge] != -1)
+	if(crease > 0.01 && old_mesh->neighbor[edge] != ~0u)
 	{
 		p_sds_add_edge_polygon(old_mesh, &mesh->vertex_dependency[mesh->vertex_count], old_mesh->neighbor[edge], crease);
 		p_sds_add_edge_polygon(old_mesh, &mesh->vertex_dependency[mesh->vertex_count], edge, crease);
@@ -369,10 +366,10 @@ float p_sds_divide(PPolyStore *mesh)
 
 		for(j = 0; j < 4; j++)
 		{
-			if(mesh->neighbor[stage + j] == -1)
+			if(mesh->neighbor[stage + j] == ~0u)
 			{
-				n[quad_edge[j * 2 + 0]] = -1;
-				n[quad_edge[j * 2 + 1]] = -1;		
+				n[quad_edge[j * 2 + 0]] = ~0u;
+				n[quad_edge[j * 2 + 1]] = ~0u;		
 			}else if(mesh->neighbor[stage + j] < mesh->quad_length)
 			{
 				n[quad_edge[j * 2 + 0]] = (mesh->neighbor[stage + j] / 4) * 16 + quad_first[mesh->neighbor[stage + j] % 4];
@@ -413,10 +410,10 @@ float p_sds_divide(PPolyStore *mesh)
 		n = &new_mesh->neighbor[stage * 4];
 		for(j = 0; j < 3; j++)
 		{
-			if(mesh->neighbor[stage + j] == -1)
+			if(mesh->neighbor[stage + j] == ~0u)
 			{
-				n[tri_edge[j * 2 + 0]] = -1;
-				n[tri_edge[j * 2 + 1]] = -1;		
+				n[tri_edge[j * 2 + 0]] = ~0u;
+				n[tri_edge[j * 2 + 1]] = ~0u;		
 			}else if(mesh->neighbor[stage + j] < mesh->quad_length)
 			{
 				n[tri_edge[j * 2 + 0]] = (mesh->neighbor[stage + j] / 4) * 16 + quad_first[mesh->neighbor[stage + j] % 4];
