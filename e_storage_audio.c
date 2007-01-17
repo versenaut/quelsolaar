@@ -118,7 +118,7 @@ char * e_nsa_get_stream_name(ESAudioStream *stream)
 	return stream->name;
 }
 
-static uint e_nsa_get_stream_version(ESAudioStream *stream)
+uint e_nsa_get_stream_version(ESAudioStream *stream)
 {
 	return stream->version;
 }
