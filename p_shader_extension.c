@@ -84,9 +84,9 @@ typedef struct{
 	PShader		*s;
 	void		*writer_temp;
 	char		*v_shader;
-	uint		v_length; 
+	GLint		v_length; 
 	char		*f_shader;
-	uint		f_length; 
+	GLint		f_length; 
 	uint		stage;
 }PShaderGenTemp;
 
@@ -162,7 +162,7 @@ static uint shadow_prog_obj = -1;
 uint p_shader_create(char *vertex, char *fragment)
 {
 	uint vertex_obj, fragment_obj, prog_obj;
-	uint i;
+	GLint i;
 	char buf[2000];
 
 	prog_obj = p_glCreateProgramObjectARB();
@@ -199,7 +199,7 @@ void p_shader_use(uint program)
 void p_shader_init_shadow(void)
 {
 	uint vertex_obj, fragment_obj;
-	uint i;
+	GLint i;
 	char buf[2000];
 	char *v_shader = "vec3 vector;\n"
 	"vec3 normal;\n"
@@ -245,8 +245,9 @@ void p_shader_init_shadow(void)
 
 void p_shader_init(void)
 {
-	uint length;
+	GLint length;
 	char *code;
+
 	if(p_extension_test("GL_ARB_shading_language_100"))
 	{
 		p_glCreateShaderObjectARB = p_extension_get_address("glCreateShaderObjectARB");
@@ -585,7 +586,7 @@ void p_shader_unbind(uint32 node_id)
 
 
 
-extern void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, uint *f_length, uint *dest, uint *src, void *t, boolean initialized);
+extern void *p_shader_write(ENode *node, char **v_code, GLint *v_length, char **f_code, GLint *f_length, uint *dest, uint *src, void *t, boolean initialized);
 extern void p_shader_write_destroy_temp(void *t);
 
 boolean p_shader_compute(uint node_id)
@@ -780,7 +781,7 @@ void main()
 void p_shader_init_blur_cube(void)
 {
 	uint vertex_obj, fragment_obj;
-	uint i;
+	GLint i;
 	char buf[2000];
 	char *v_shader =
 	"varying vec4 pixel_pos;"

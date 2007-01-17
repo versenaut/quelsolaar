@@ -649,7 +649,7 @@ uint p_render_get_light_count(void)
 	return p_light_count;
 }
 
-void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, uint *f_length, uint *dest, uint *src, PCodeGenTemp *t, boolean initialized)
+void *p_shader_write(ENode *node, char **v_code, GLint *v_length, char **f_code, GLint *f_length, uint *dest, uint *src, PCodeGenTemp *t, boolean initialized)
 {
 	uint16 fragment;
 	char code[5120], temp[5120];
@@ -729,10 +729,12 @@ void *p_shader_write(ENode *node, char **v_code, uint *v_length, char **f_code, 
 	return t;
 }
 
-void p_shader_code_write(ENode *node, char **v_code, uint *v_length, char **f_code, uint *f_length, uint *dest, uint *src, boolean initialized)
+void p_shader_code_write(ENode *node, char **v_code, GLint *v_length, char **f_code, GLint *f_length, uint *dest, uint *src, boolean initialized)
 {
 	PCodeGenTemp *t = NULL;
-	while((t = p_shader_write(node, v_code, v_length, f_code, f_length, dest, src, t, initialized)) != NULL);
+
+	while((t = p_shader_write(node, v_code, v_length, f_code, f_length, dest, src, t, initialized)) != NULL)
+		;
 }
 
 void p_shader_write_destroy_temp(PCodeGenTemp *t)
