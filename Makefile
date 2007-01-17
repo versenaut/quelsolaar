@@ -6,8 +6,8 @@ VERSE=../verse
 
 .PHONY:		clean dist dist-enough dist-connector dist-loqairou
 
-CFLAGS=-I$(VERSE) -g -Wstrict-prototypes
-LDFLAGS=-L$(VERSE) -L/usr/X11R6/lib
+CFLAGS=-I$(VERSE) -g -Wstrict-prototypes -Wall #-pg
+LDFLAGS=-L$(VERSE) -L/usr/X11R6/lib #-pg
 LDLIBS=-lverse -lGL -lm # -lglut -lGLU -lSDL
 
 DATE=`date --iso-8601 | tr -d -`
