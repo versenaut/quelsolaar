@@ -286,13 +286,13 @@ void execute_event(UNDOEvent *event, uint direction)
 	switch(event->type)
 	{
 		case UNDOET_VERTEX :
-			if(event->event[direction].vertex.layer == 65535)
+			if(event->event[direction].vertex.layer == (unsigned short) ~0)
 				verse_send_g_vertex_delete_real64(UNDOGlobal.g_node, event->id);
 			else
 				verse_send_g_vertex_set_xyz_real64(UNDOGlobal.g_node, event->event[direction].vertex.layer, event->id, event->event[direction].vertex.x, event->event[direction].vertex.y, event->event[direction].vertex.z);
 		break;
 		case UNDOET_POLYGON :
-			if(event->event[direction].polygon.a == -1)
+			if(event->event[direction].polygon.a == ~0u)
 				verse_send_g_polygon_delete(UNDOGlobal.g_node, event->id);
 			else
 				verse_send_g_polygon_set_corner_uint32(UNDOGlobal.g_node, 1, event->id, event->event[direction].polygon.a, event->event[direction].polygon.b, event->event[direction].polygon.c, event->event[direction].polygon.d);
@@ -310,7 +310,7 @@ void execute_event(UNDOEvent *event, uint direction)
 				verse_send_g_vertex_set_real64(UNDOGlobal.g_node, UNDOGlobal.select_layer, event->id, event->event[direction].select);
 		break;
 		case UNDOET_EDGE :
-			if(event->event[direction].edge.a != -1)
+			if(event->event[direction].edge.a != ~0u)
 			{
 				if(UNDOGlobal.edge_count == UNDOGlobal.edge_alocated)
 				{
@@ -536,7 +536,7 @@ void udg_undo_geometry(void)
 		i = UNDOGlobal.pos;
 		while(UNDOGlobal.event[--UNDOGlobal.pos % UNDOGlobal.length].type != UNDOET_STOPP)
 		{
-			if(UNDOGlobal.pos == -1)
+			if(UNDOGlobal.pos == ~0u)
 				UNDOGlobal.pos = UNDOGlobal.length;
 			execute_event(&UNDOGlobal.event[UNDOGlobal.pos], 0);
 			
@@ -555,7 +555,7 @@ void udg_redo_geometry(void)
 
 		while(UNDOGlobal.event[++UNDOGlobal.pos].type != UNDOET_STOPP)
 		{
-			if(UNDOGlobal.pos == -1)
+			if(UNDOGlobal.pos == ~0u)
 				UNDOGlobal.pos = UNDOGlobal.length;
 			execute_event(&UNDOGlobal.event[UNDOGlobal.pos], 1);
 		}
@@ -1104,7 +1104,7 @@ void udg_end_event(void)
 {
 	if(UNDOGlobal.event[UNDOGlobal.pos].type == UNDOET_STOPP)
 		return;
-	if(++UNDOGlobal.pos == UNDOGlobal.length);
+	if(++UNDOGlobal.pos == UNDOGlobal.length)
 		UNDOGlobal.pos = 0;
 	UNDOGlobal.event[UNDOGlobal.pos].type = UNDOET_STOPP;
 }
@@ -1250,9 +1250,9 @@ void undo_event_done(void)
 		i = UNDOGlobal.pos;
 		while(UNDOGlobal.event[--i].type != UNDOET_STOPP)
 		{
-			if(i == -1)
+			if(i == ~0u)
 				i = UNDOGlobal.length;
-			if(UNDOGlobal.event[i].type == UNDOET_POLYGON && UNDOGlobal.event[i].event[1].polygon.a == -1 && UNDOGlobal.ref[UNDOGlobal.event[i].id * 4] < UNDOGlobal.vertex_length)
+			if(UNDOGlobal.event[i].type == UNDOET_POLYGON && UNDOGlobal.event[i].event[1].polygon.a == ~0u && UNDOGlobal.ref[UNDOGlobal.event[i].id * 4] < UNDOGlobal.vertex_length)
 			{
 				if(UNDOGlobal.event[i].event[0].polygon.a < UNDOGlobal.vertex_length)
 					array[UNDOGlobal.event[i].event[0].polygon.a]--;
