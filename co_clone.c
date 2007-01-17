@@ -102,7 +102,8 @@ void co_clone_object(ENode *node, ENode *clone)
 						break;
 				if(j != (uint16)-1)
 				for(k = e_nso_get_next_method(node, i, 0); k != (uint16)-1; k = e_nso_get_next_method(node, i, k + 1))
-					verse_send_o_method_create(id, j, -1, e_nso_get_method(node, i, k), e_nso_get_method_param_count(node, i, k), e_nso_get_method_param_types(node, i, k), e_nso_get_method_param_names(node, i, k));
+					verse_send_o_method_create(id, j, -1, e_nso_get_method(node, i, k), e_nso_get_method_param_count(node, i, k),
+								   e_nso_get_method_param_types(node, i, k), (const char **) e_nso_get_method_param_names(node, i, k));
 			}
 			co_clone_method_sub = TRUE;
 		}
