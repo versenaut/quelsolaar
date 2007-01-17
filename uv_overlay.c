@@ -42,7 +42,7 @@ void uvo_draw_square()
 	float uv[] = {0, 1, 1, 1, 1, 0, 0, 0};
 	ENode *node;
 #ifdef PERSUADE_H
-	if((node = e_ns_get_node_next(0, texture_node_id, V_NT_BITMAP)) != NULL);
+	if((node = e_ns_get_node_next(0, texture_node_id, V_NT_BITMAP)) != NULL)
 	{
 		PTextureHandle *h;
 		h = p_th_create_texture_handle(e_ns_get_node_id(node), "col_r", "col_g", "col_b");
@@ -187,7 +187,7 @@ void uvo_draw_overlay(BInputState *input)
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	size = 0;
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		size += 24;
 		if(uvg_is_quad(id))
@@ -203,7 +203,7 @@ void uvo_draw_overlay(BInputState *input)
 		array_length = size;
 	}
 	pos = 0;
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		uvg_get_uve(uv, id);
 		if(uvg_is_quad(id))
@@ -310,7 +310,8 @@ void draw_a_polygon(uint id, float x, float y)
 {
 	egreal uv[8];
 	uint part;
-	if(id == -1 || id != uvg_get_next_polygon(id))
+
+	if(id == ~0u || id != uvg_get_next_polygon(id))
 		return;
 	uvg_get_uve(uv, id);
 
