@@ -34,7 +34,7 @@ boolean	p_render_get_flare(void)
 
 void p_create_flare(void)
 {
-	int i, j;
+	uint i, j;
 	float x, y, r, half = 0.5f * flare_size;
 	float *data;
 
