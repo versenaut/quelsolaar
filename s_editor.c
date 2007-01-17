@@ -326,9 +326,12 @@ void se_save_drawing_code(FILE *file, SDrawing *d, uint draw_count)
 		if(d[i].line_count != 0)
 		{
 			fprintf(file, "void	sui_draw_symb_%s(float pos_x, float pos_y, float red, float green, float blue)\n{\n", d[i].name);
-			fprintf(file, "\tstatic float array[] = {%f, %f", d[i].lines[j].pos_one[0] * SE_OUTPUT_SCALE, d[i].lines[j].pos_one[1] * SE_OUTPUT_SCALE, d[i].lines[j].pos_two[0] * SE_OUTPUT_SCALE, d[i].lines[j].pos_two[1] * SE_OUTPUT_SCALE);
+			fprintf(file, "\tstatic float array[] = {%f, %f, %f, %f",
+				d[i].lines[j].pos_one[0] * SE_OUTPUT_SCALE, d[i].lines[j].pos_one[1] * SE_OUTPUT_SCALE,
+				d[i].lines[j].pos_two[0] * SE_OUTPUT_SCALE, d[i].lines[j].pos_two[1] * SE_OUTPUT_SCALE);
 			for(j = 1; j < d[i].line_count; j++)
-				fprintf(file, ", %f, %f", d[i].lines[j].pos_one[0] * SE_OUTPUT_SCALE, d[i].lines[j].pos_one[1] * SE_OUTPUT_SCALE, d[i].lines[j].pos_two[0] * SE_OUTPUT_SCALE, d[i].lines[j].pos_two[1] * SE_OUTPUT_SCALE);
+				fprintf(file, ", %f, %f, %f, %f", d[i].lines[j].pos_one[0] * SE_OUTPUT_SCALE, d[i].lines[j].pos_one[1] * SE_OUTPUT_SCALE,
+					d[i].lines[j].pos_two[0] * SE_OUTPUT_SCALE, d[i].lines[j].pos_two[1] * SE_OUTPUT_SCALE);
 			fprintf(file, "};\n");
 			fprintf(file, "\tglPushMatrix();\n");
 			fprintf(file, "\tglTranslatef(pos_x, pos_y, 0);\n");
