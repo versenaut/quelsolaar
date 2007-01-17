@@ -17,7 +17,7 @@ void p_sds_add_depend(PDepend *dep, PDepend *add, egreal mult)
 	float f;
 	if(mult < 0.001)
 		return;
-	for(i = 0; i < add->element[i].vertex != -1 && i < add->length; i++)
+	for(i = 0; add->element[i].vertex != -1 && i < add->length; i++)
 	{
 		for(j = 0; j < dep->length && dep->element[j].vertex != add->element[i].vertex && dep->element[j].vertex != -1; j++);
 		if(j == dep->length)
