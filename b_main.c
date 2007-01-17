@@ -178,8 +178,8 @@ extern void b_glut_main_loop(void);
 
 static char *type_in_string = NULL;
 static uint type_in_alocated = 0;
-static int cursor_pos = 0;
-static int *cursor_pos_pointer = NULL;
+static uint cursor_pos = 0;
+static uint *cursor_pos_pointer = NULL;
 static uint type_in_length = 0;
 static void (*type_in_done_func)(void *user, boolean cansle) = NULL;
 static void *func_param;
