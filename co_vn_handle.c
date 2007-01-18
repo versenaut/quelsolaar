@@ -758,7 +758,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 			uint i;
 			EObjLink *link;
 			ENode *linker;
-			uint32 found = -1;
+			uint32 found = ~0u;
 			for(i = 0; found == (uint32) -1 && i < V_NT_NUM_TYPES; i++)
 			{
 				for(node = e_ns_get_node_next(0, 0, i); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, i))
@@ -777,7 +777,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 			{
 				if(V_NT_OBJECT == e_ns_get_node_type(linker))
 				{
-					if(found == -1)
+					if(found == ~0u)
 						verse_send_o_link_destroy(active, link_id);
 					else if((link = e_nso_get_link(linker, link_id)) != NULL)
 						verse_send_o_link_set(active, link_id, found, e_nso_get_link_name(link), e_nso_get_link_target_id(link));

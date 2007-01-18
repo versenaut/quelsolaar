@@ -117,7 +117,7 @@ boolean co_handle_audio(BInputState *input, ENode *node)
 					output = sui_draw_popup(input, 0.15, y, e, 8, 0, 1.0);
 				else
 					output = sui_draw_popup(input, 0.15, y, e, 8, 0, 0.0);
-				if(output != -1 && output != e_nsa_get_buffer_type(buffer))
+				if(output != ~0u && output != e_nsa_get_buffer_type(buffer))
 					verse_send_a_buffer_create(change_a_node_id, e_nsa_get_buffer_id(buffer), e_nsa_get_buffer_name(buffer), output, e_nsa_get_buffer_frequency(buffer));
 			}
 			if(input->mouse_button[0] == FALSE && input->last_mouse_button[0] == FALSE)

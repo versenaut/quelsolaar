@@ -36,12 +36,13 @@ void rename_method_func(void *user, char *text)
 {
 	uint i, j;
 	ENode *node;
+
 	if((node = e_ns_get_node(0, rename_o_node_id)) != NULL)
 	{
 		for(i = e_nso_get_next_method_group(node, 0); i != (uint16)-1 ; i = e_nso_get_next_method_group(node, i + 1))
 		{
 			for(j = e_nso_get_next_method(node, i, 0); j != (uint16)-1 && user != e_nso_get_method(node, i, j); j = e_nso_get_next_method(node, i, j + 1))
-			if(j != -1)
+			if(j != ~0u)
 			{
 				verse_send_o_method_create(rename_o_node_id, i, j, text, e_nso_get_method_param_count(node, i, j), e_nso_get_method_param_types(node, i, j),
 							   (const char **) e_nso_get_method_param_names(node, i, j));

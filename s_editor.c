@@ -209,13 +209,14 @@ SDrawing *se_load_drawing_asci(FILE *drawing, uint *count)
 	SEditorLine l;
 	uint	i;
 	SDrawing *d;
+
 	d = malloc((sizeof *d) * 32);
 	*count = -1;
 	for(i = 0; i < 512; i++)
 		line[i] = 0;
 	while((fgets(line, sizeof line, drawing)) != NULL)
 	{
-		if(sscanf(line, "%u %f %f %f %f", &l.type, &l.pos_one[0], &l.pos_one[1], &l.pos_two[0], &l.pos_two[1]) == 5 && *count != -1)
+		if(sscanf(line, "%u %f %f %f %f", &l.type, &l.pos_one[0], &l.pos_one[1], &l.pos_two[0], &l.pos_two[1]) == 5 && *count != ~0u)
 		{
 			if(d[*count].line_count == d[*count].line_allocate)
 			{

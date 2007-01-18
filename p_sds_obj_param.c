@@ -785,7 +785,7 @@ boolean p_lod_update_layer_param(ENode *g_node, PMesh *mesh)
 				layer = e_nsg_get_layer_by_name(g_node, frag->geometry.layer_g);
 			else if(channel == 2)
 				layer = e_nsg_get_layer_by_name(g_node, frag->geometry.layer_b);
-			if((layer != NULL && mesh->param.version[i] != e_nsg_get_layer_version(layer)) || (layer == NULL && mesh->param.version[i] != -1))
+			if((layer != NULL && mesh->param.version[i] != e_nsg_get_layer_version(layer)) || (layer == NULL && mesh->param.version[i] != ~0u))
 			{
 				if(material > 0)
 					start = mesh->render.mat[material - 1].tri_end;

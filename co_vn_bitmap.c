@@ -168,10 +168,8 @@ boolean co_handle_bitmap(BInputState *input, ENode *node)
 					output = sui_draw_popup(input, 0.15, y, e, 5, 0, 1.0);
 				else
 					output = sui_draw_popup(input, 0.15, y, e, 5, 0, 0.0);
-				if(output != -1 && output != type)
-				{
+				if(output != ~0u && output != type)
 					verse_send_b_layer_create(e_ns_get_node_id(node), popup, e_nsb_get_layer_name(layer), output);
-				}
 			}
 			if(input->mouse_button[0] == FALSE && input->last_mouse_button[0] == FALSE)
 				popup = -1;

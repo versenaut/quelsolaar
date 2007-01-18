@@ -244,7 +244,7 @@ boolean la_pu_empty(BInputState *input)
 	for(i = 1; node != NULL && i < start; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_GEOMETRY))
 		i++;
 	count = 4;
-	if(ring > 3 && ring != -1)		
+	if(ring > 3 && ring != ~0u)		
 		for(; node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_GEOMETRY))
 			if(ring == count++)
 				udg_set_modeling_node(e_ns_get_node_id(node));
