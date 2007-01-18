@@ -4,20 +4,20 @@
 
 
 typedef struct{
-	ebreal						value;
-	uint32						vertex;
+	ebreal		value;
+	uint32		vertex;
 }PDependElement;
 
 typedef struct{
-	uint16			length;
-	ebreal			sum;
+	uint16		length;
+	ebreal		sum;
 	PDependElement	*element;
 }PDepend;
 
-extern void		p_sds_add_depend(PDepend *dep, PDepend *add, egreal mult);
- extern PDepend	*p_sds_allocate_depend_first(uint length);
-extern PDepend	*p_sds_allocate_depend(uint length);
-extern void		p_sds_free_depend(PDepend *dep, uint length);
+extern void	p_sds_add_depend(PDepend *dep, PDepend *add, egreal mult);
+extern PDepend*	p_sds_allocate_depend_first(uint length);
+extern PDepend*	p_sds_allocate_depend(uint length);
+extern void	p_sds_free_depend(PDepend *dep, uint length);
 
 typedef struct{
 	uint *ref;
