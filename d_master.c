@@ -330,7 +330,7 @@ void d_draw_login(BInputState *input)
 			d_view[i] = 0.0;
 	}
 	y_size = d_view[D_CM_URL] * 0.050 + d_view[D_CM_HISTORY] * 0.2 + d_view[D_CM_FAVORITES] * 0.3 + d_view[D_CM_LIST] * 0.4 + d_view[D_CM_ADD_FAVORITES] * 0.1125 + d_view[D_CM_CONNECTING] * 0.050;
-	x_size = d_view[D_CM_URL] * 0.600 + d_view[D_CM_HISTORY] * 0.7 + d_view[D_CM_FAVORITES] * 0.7 + d_view[D_CM_LIST] * 1.9 + d_view[D_CM_ADD_FAVORITES] * 0.600 + d_view[D_CM_CONNECTING] * 0.600; 
+	x_size = d_view[D_CM_URL] * 0.600 + d_view[D_CM_HISTORY] * 0.7 + d_view[D_CM_FAVORITES] * 0.7 + d_view[D_CM_LIST] * 1.9 + d_view[D_CM_ADD_FAVORITES] * 0.600 + d_view[D_CM_CONNECTING] * 0.600;
 
 	if(input->mouse_button[1])
 	{
@@ -387,8 +387,8 @@ void d_draw_login(BInputState *input)
 			d_current_mode = 0;
 			e_vc_disconnect_all();
 		}
-	//	if(e_vc_check_rejected_slot(0))
-	//		d_current_mode = D_CM_NAME_PASS;
+//		if(e_vc_check_rejected_slot(0))
+//			d_current_mode = D_CM_NAME_PASS;
 	}
 
 	if(d_view[D_CM_URL] < 0.9 && d_view[D_CM_ADD_FAVORITES] < 0.9 && d_view[D_CM_CONNECTING] < 0.9)
@@ -420,7 +420,13 @@ void d_draw_login(BInputState *input)
 */		sui_draw_text(-x_size / 2 + 0.25, -y_size + 0, SUI_T_SIZE, SUI_T_SPACE, "MASTER SERVER :", 0.0, 0.0, 0.0, d_view[D_CM_LIST]);
 		sui_type_in(input, -x_size / 2 + 0.47, -y_size + 0, 1.0, SUI_T_SIZE, d_master_address, 64, NULL, NULL, 0.0, 0.0, 0.0, d_view[D_CM_LIST]);
 		if(input->mode == BAM_DRAW)
+		{
 			sui_draw_2d_line_gl(-x_size / 2 + 0.47, -y_size - 0.01, x_size / 2, -y_size - 0.01, 1.0 - d_view[D_CM_LIST] * 0.25, 1.0 - d_view[D_CM_LIST] * 0.25, 1.0 - d_view[D_CM_LIST] * 0.25, 0);
+
+			/* Betray mouse debugging aid (render cross hair at mouse position).
+			sui_draw_2d_line_gl(input->pointer_x, input->pointer_y - 0.1f, input->pointer_x, input->pointer_y + 0.1f, 1.0f, 0.0f, 0.0f, 1.0f);
+			sui_draw_2d_line_gl(input->pointer_x - 0.1f, input->pointer_y, input->pointer_x + 0.1f, input->pointer_y, 1.0f, 0.0f, 0.0f, 1.0f);
+*/		}
 	}
 
 	for(i = 1; i < 4; i++)
