@@ -68,7 +68,7 @@ boolean poly_texture_hit_test(uint id, egreal x, egreal y)
 
 uint get_surface_poly_id(egreal x, egreal y)
 {
-	static uint last = -1;
+	static uint last = ~0u;
 	if(poly_texture_hit_test(last, x, y))
 		return last;
 	for(last = uvg_get_next_polygon(0); last != ~0u && !poly_texture_hit_test(last, x, y); last = uvg_get_next_polygon(last + 1));
