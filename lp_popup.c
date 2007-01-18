@@ -85,9 +85,7 @@ uint lp_pu_empty(BInputState *input, uint node_id)
 		y = input->pointer_y;
 	}
 	ring = sui_draw_popup(input, x, y, element, count, 2, 0);
-
-				/*udg_set_modeling_node(e_ns_get_node_id(node))*/;
-
+	/*udg_set_modeling_node(e_ns_get_node_id(node))*/;
 //	sw_drawbackground();
 	if(input->mode == BAM_DRAW)
 	{
@@ -100,16 +98,15 @@ uint lp_pu_empty(BInputState *input, uint node_id)
 	for(i = 1; node != NULL && i < start; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_GEOMETRY))
 		i++;
 
-	if(ring > 0 && ring < groups)
+	if(ring < groups)
 		lp_layer_current_set(ring);
 
 	count = groups;
 //	if(start != 0)
 //		count++;
-	if(ring != -1)		
+	if(ring != ~0u)		
 		for(; node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_GEOMETRY))
 			if(ring == count++)
 				return e_ns_get_node_id(node);
-
 	return node_id;
 }
