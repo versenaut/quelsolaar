@@ -227,8 +227,9 @@ unsigned int p_env_find_pixel(float x, float y, float z,unsigned int size)
 
 void p_env_create_sky(float *vector, float *data, float light, unsigned int size)
 {
-	int i;
+	uint i;
 	float temp;
+
 	for(i = 0; i < size * size * 6; i++)
 	{
 		temp = vector[i * 3 + 1];
