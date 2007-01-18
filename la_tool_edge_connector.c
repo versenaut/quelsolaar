@@ -103,7 +103,7 @@ void add_neighbor(uint list, uint vertex, uint turn, uint32 crease, uint32 primi
 
 void find_neighbor_polygon(uint *ref, uint length, uint vertex_length, uint *vertex)
 {
-	int i, j, poly;
+	uint i, j, poly;
 
 	length *= 4; 
 	for(i = 0; i < length; i++)
@@ -129,8 +129,9 @@ void find_neighbor_polygon(uint *ref, uint length, uint vertex_length, uint *ver
 
 void find_neighbor_edges(uint *edge, uint length, uint *vertex)
 {
-	int i;
-	length *= 2; 
+	uint i;
+
+	length *= 2;
 	for(i = 0; i < length; i++)
 	{
 		if(edge[i] == vertex[0])
@@ -182,7 +183,8 @@ void create_polygon(uint *vertex, uint list_a, uint list_b, uint destroy_a, uint
 
 void find_triangles(uint *vertex)
 {
-	int i, j;
+	uint i, j;
+
 	for(i = 0; i < GlobalSurfaceCreate.list_length[0]; i++)
 		for(j = 0; j < GlobalSurfaceCreate.list_length[1]; j++)
 			if(GlobalSurfaceCreate.list[0][i].vertex == GlobalSurfaceCreate.list[1][j].vertex)
@@ -200,7 +202,7 @@ boolean polygon_culling(double *vertex, uint vertex_0, uint vertex_1, uint verte
 
 void find_quads(uint *vertex, uint *ref, uint ref_length, uint *edge, uint edge_length)
 {
-	int i, j, k, prev, next;
+	uint i, j, k, prev, next;
 
 	ref_length *= 4;
 	for(i = 0; i < ref_length; i++)
@@ -209,7 +211,7 @@ void find_quads(uint *vertex, uint *ref, uint ref_length, uint *edge, uint edge_
 		{
 			if(ref[i] == GlobalSurfaceCreate.list[0][j].vertex && GlobalSurfaceCreate.list[0][j].vertex != vertex[0] && (GlobalSurfaceCreate.list[0][j].primitive != i / 4 || GlobalSurfaceCreate.list[0][j].polygon != TRUE))
 			{
-				if(ref[(i / 4) * 4 + 3] != -1)
+				if(ref[(i / 4) * 4 + 3] != ~0u)
 				{
 					prev = (i / 4) * 4 + ((i + 3) % 4);
 					next = (i / 4) * 4 + ((i + 1) % 4);
@@ -420,13 +422,14 @@ void destroy_edges(uint *edge, uint edge_length, uint *create_ref)
 void create_surface(uint *create, uint *crease)
 {
 	uint poly;
-	if(create[0] != -1)
+
+	if(create[0] != ~0u)
 	{
 		poly = udg_find_empty_slot_polygon();
 		udg_polygon_set(poly, create[0], create[1], create[2], create[3]);
 		udg_crease_set(poly, crease[0], crease[1], crease[2], crease[3]);
 	}
-	if(create[4] != -1)
+	if(create[4] != ~0u)
 	{
 		poly = udg_find_empty_slot_polygon();
 		udg_polygon_set(poly, create[4], create[5], create[6], create[7]);
@@ -439,18 +442,19 @@ boolean crease_edge(uint *crease, uint *vertex, uint *ref, uint ref_length)
 	boolean output = FALSE; 
 	uint32 replace = 0;
 	uint next, i, j, new_crease[4];
+
 	if(crease == NULL)
 		return FALSE;
 	ref_length *= 4;
 	for(i = 0; i < ref_length; i += 4)
 	{
-		if(ref[i] != -1)
+		if(ref[i] != ~0u)
 		{
 			for(j = 0; j < 4; j++)
 			{
 				if(vertex[0] == ref[i + j] || vertex[1] == ref[i + j])
 				{
-					if(ref[i + 3] == -1)
+					if(ref[i + 3] == ~0u)
 						next = i + ((j + 1) % 3);
 					else
 					{
