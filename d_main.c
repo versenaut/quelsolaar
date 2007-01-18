@@ -44,7 +44,7 @@ char deceive_select_node[64] = {0};
 void deceive_set_arg(int argc, char **argv)
 {
 	char address[64] = "", name[64] = "", pass[64] = "", *input;
-	uint i, j, k;
+	int i, j, k;
 
 	if(argc > 1)
 	{
