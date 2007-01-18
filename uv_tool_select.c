@@ -14,8 +14,9 @@ void uv_tool_flip_x(void)
 {
 	uint id, i;
 	egreal uv[8], center[2], *s;
+
 	uv_trans_get_pos(center);
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(id))
 		{
@@ -34,7 +35,7 @@ void uv_tool_flip_y(void)
 	uint id, i;
 	egreal uv[8], center[2], *s;
 	uv_trans_get_pos(center);
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(id))
 		{
@@ -56,7 +57,7 @@ void uv_find_square(egreal *pos, egreal *scale)
 	pos[1] = 100000000;
 	scale[0] = -100000000;
 	scale[1] = -100000000;
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(id))
 		{
@@ -95,7 +96,7 @@ void uv_fit_selection(boolean preserve_aspect)
 		else
 			scale[1] = scale[0];
 	}
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(id))
 		{

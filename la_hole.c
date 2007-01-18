@@ -221,20 +221,20 @@ uint *tri_edge_ref(uint *ref, uint ref_length, uint vertex_length)
 	{
 		for(i = 0; i < ref_length * 3; i++)
 		{
-			if(vertex[ref[i]] == -1)
+			if(vertex[ref[i]] == ~0u)
 				vertex[ref[i]] = i;
 			else if(vertex[ref[i]] == i)
-				vertex[ref[i]] = -1;
+				vertex[ref[i]] = ~0u;
 			else
 			{
 				c = vertex[ref[i]];
-				if(edge[i] == -1 && ref[i - i % 3 + (i + 1) % 3] == ref[c - c % 3 + (c + 2) % 3])
+				if(edge[i] == ~0u && ref[i - i % 3 + (i + 1) % 3] == ref[c - c % 3 + (c + 2) % 3])
 				{
 					edge[i] = c - c % 3 + (c + 2) % 3;
 					edge[c - c % 3 + (c + 2) % 3] = i;
 					j = 0;
 				}
-				if(edge[c] == -1 && ref[i - i % 3 + (i + 2) % 3] == ref[c - c % 3 + (c + 1) % 3])
+				if(edge[c] == ~0u && ref[i - i % 3 + (i + 2) % 3] == ref[c - c % 3 + (c + 1) % 3])
 				{
 					edge[i - i % 3 + (i + 2) % 3] = c;
 					edge[c] = i - i % 3 + (i + 2) % 3;
@@ -720,7 +720,7 @@ void create_hull(uint *ref, uint *n, uint ref_length, egreal *vertex, uint key, 
 		found = FALSE;
 		for(i = 0; i < ref_length * 3; i++)
 		{
-			if(n[i] != -1 && status[i / 3] == PS_OUTSIDE /*&& accepted[i / 3] != PS_FULL*/ && status[n[i] / 3] == PS_FULL)
+			if(n[i] != ~0u && status[i / 3] == PS_OUTSIDE /*&& accepted[i / 3] != PS_FULL*/ && status[n[i] / 3] == PS_FULL)
 			{
 			//	status[i / 3] = hull_poly_test(ref, status, ref_length, vertex, &ref[(i / 3) * 3]);
 				status[i / 3] = convex_test(vertex, &ref[(i / 3) * 3], &vertex[ref[(n[i] / 3) * 3 + ((n[i] + 2) % 3)] * 3]);
@@ -880,7 +880,7 @@ void create_hulls2(uint *ref, uint *n, uint ref_length, egreal *vertex)
 		accepted[i] = PS_OUTSIDE;
 	for(i = 0; i < ref_length; i++)
 		status[i] = PS_OUTSIDE;
-	key = -1;
+	key = ~0u;
 	best = 0;
 	for(i = 0; i < ref_length; i++)
 	{
@@ -898,7 +898,7 @@ void create_hulls2(uint *ref, uint *n, uint ref_length, egreal *vertex)
 		}
 	}
 //	key = 41;
-	while(key != -1)
+	while(key != ~0u)
 	{
 		create_hull(ref, n, ref_length, vertex, key, status);
 		global_hulls[global_hulls_used].count = 0;
@@ -933,7 +933,7 @@ void create_hulls2(uint *ref, uint *n, uint ref_length, egreal *vertex)
 		accepted[key] = PS_FULL;
 
 	//	group[key] = global_hulls_used + 7;
-		key = -1;
+		key = ~0u;
 		best = 0;
 		for(i = 0; i < ref_length; i++)
 		{
@@ -952,7 +952,7 @@ void create_hulls2(uint *ref, uint *n, uint ref_length, egreal *vertex)
 			}
 		}
 		printf("key = %u\n", key); 
-//		key = -1;
+//		key = ~0u;
 	}
 
 
@@ -974,20 +974,20 @@ uint close_a_hole(uint *triangles, uint *n, /*uint *group,*/ uint *length, uint 
 		i = (i / 3 * 3) + (i + 1) % 3;
 	/*	if(i > *length * 3)
 			exit(0);*/
-		if(n[i] == -1)
+		if(n[i] == ~0u)
 		{
 			if(triangles[start] == triangles[(i / 3 * 3) + (i + 1) % 3])
 			{
 				n[start] = i;
 				n[i] = start;
-				return -1;
+				return ~0u;
 			}else
 			{
 			/*	group[*length] = triangles[start / 3];*/
 				triangles[*length * 3 + 0] = triangles[start];
 				triangles[*length * 3 + 1] = triangles[(i / 3 * 3) + (i + 1) % 3];
 				triangles[*length * 3 + 2] = triangles[(start / 3 * 3) + (start + 1) % 3];
-				n[*length * 3 + 0] = -1;
+				n[*length * 3 + 0] = ~0u;
 				n[*length * 3 + 1] = i;
 				n[*length * 3 + 2] = start;
 				n[-1] = *length * 3 + 0;
@@ -1009,11 +1009,11 @@ void close_all_holes(uint *triangles, uint *n, /*uint *group,*/ uint *length)
 	uint i, start;
 	for(i = 0; i < *length; i++)
 	{
-		if(n[i] == -1)
+		if(n[i] == ~0u)
 		{
 			start = i;
 			printf("start %i\n", start);
-			while((start = close_a_hole(triangles, n, /*group,*/ length, start)) != -1); 
+			while((start = close_a_hole(triangles, n, /*group,*/ length, start)) != ~0u); 
 		}
 	}
 }

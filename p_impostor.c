@@ -55,7 +55,7 @@ extern void p_shader_unbind_texture(uint unit);
 
 static uint p_impostor_resolution = 128; 
 static float p_render_impostor_size = 0.03;
-static uint p_blur_program = -1; 
+static uint p_blur_program = ~0u;
 
 uint create_environment(uint size, float *buf)
 {
@@ -136,7 +136,7 @@ void p_create_cube_blur_shader(void)
 //	"	gl_FragColor = vec4(normal, 1.0);\n"
 	"}\n";
 
-	if(p_blur_program == -1)
+	if(p_blur_program == ~0u)
 		p_blur_program = p_shader_create(vertex, fragment);
 //	print_blur_matrix();
 }
@@ -171,7 +171,7 @@ uint p_blur_object_environment(ENode *node, uint blur, uint texture, uint size, 
 	p_create_cube_blur_shader();
 	e_nso_get_pos_time(node, objpos, 0, 0);
 
-	if(blur == -1)
+	if(blur == ~0u)
 	{
 		blur = create_environment(size, NULL);
 //		printf("blur node = %s\n", e_ns_get_node_name(node));
@@ -446,7 +446,7 @@ uint update_object_environment(ENode *node, uint texture, uint size, uint side)
 	PObject *o;
 	e_nso_get_pos_time(node, objpos, 0, 0);
 
-	if(texture == -1)
+	if(texture == ~0u)
 	{
 		texture = create_environment(size, NULL);
 	//	printf("texture node = %s\n", e_ns_get_node_name(node));
@@ -625,7 +625,7 @@ void p_update_object_impostors(void)
 			if(o->impostor.timer > 1)
 			{
 				o->impostor.timer = 0;
-				if(o->impostor.texture == -1)
+				if(o->impostor.texture == ~0u)
 					o->impostor.texture = p_create_renderable_texture(p_impostor_resolution, p_th_get_hdri_token(TRUE));
 				if(stage == 0)
 					update_object_impostor(node, p_lod_get_view_pos(), o->impostor.texture);
@@ -694,7 +694,7 @@ boolean p_draw_object_as_impostor(ENode *node)
 {
 	PObject *o;
 	o = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
-	return (o != NULL && o->impostor.texture != -1 && o->impostor.impostor == TRUE);
+	return (o != NULL && o->impostor.texture != ~0u && o->impostor.impostor == TRUE);
 }
 
 void p_draw_object_impostor(ENode *node)
@@ -705,7 +705,7 @@ void p_draw_object_impostor(ENode *node)
 
 	matrix = p_lod_get_view_matrix();
 	o = e_ns_get_custom_data(node, P_ENOUGH_SLOT);
-	if(o == NULL || o->impostor.texture == -1 || o->impostor.impostor != TRUE)
+	if(o == NULL || o->impostor.texture == ~0u || o->impostor.impostor != TRUE)
 		return;
 	e_nso_get_pos_time(node, pos, 0, 0);
 	glPushMatrix();
