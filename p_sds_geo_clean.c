@@ -628,7 +628,7 @@ void p_sds_final_clean_new(PPolyStore *mesh)
 	old_e = mesh->vertex_dependency[mesh->vertex_dependency_length].element;
 	e = malloc((sizeof *e) * length);
 	new_dep = malloc((sizeof *new_dep) * (mesh->vertex_count + 1));
-	new_dep[mesh->vertex_count].length = ~0u;
+	new_dep[mesh->vertex_count].length = (uint16) ~0u;
 	new_dep[mesh->vertex_count].element = e;
 	dep = mesh->vertex_dependency;
 	mesh->vertex_dependency = new_dep;
