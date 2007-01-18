@@ -123,7 +123,7 @@ void p_init_render_to_texture(void)
 	fbo_supported = FALSE;
 	if(1 && p_extension_test("GL_EXT_framebuffer_object"))
 	{
-		int	i;
+		uint	i;
 
 		p_glBindFramebufferEXT = p_extension_get_address("glBindFramebufferEXT");
 		p_glDeleteFramebuffersEXT = p_extension_get_address("glDeleteFramebuffersEXT");
@@ -218,7 +218,7 @@ void p_texture_render_bind(uint texture, uint size, uint target)
 	{
 		int	index = size_to_index(size);
 
-		if(size == -1)
+		if(index == -1)
 			return;
 		fbo = &g_global_fbos[index];
 	}
