@@ -160,9 +160,9 @@ boolean uvg_update()
 	if(UVGGlobal.u != NULL && UVGGlobal.v != NULL && UVGGlobal.create)
 	{
 		UVGGlobal.collapse_id = uvg_get_next_polygon(UVGGlobal.collapse_id + 1);
-		if(UVGGlobal.collapse_id == -1)
+		if(UVGGlobal.collapse_id == ~0u)
 			UVGGlobal.collapse_id = uvg_get_next_polygon(0);
-		if(UVGGlobal.collapse_id != -1)
+		if(UVGGlobal.collapse_id != ~0u)
 			uvg_get_un_collapse(UVGGlobal.collapse_id);
 	}
 	return TRUE;
@@ -443,7 +443,8 @@ void uvg_set_corner_select_all(egreal select)
 {
 	egreal *s;
 	uint id;
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		s = uvg_get_corner_select(id);
 		if(s[0] + 0.001 < select || s[0] - 0.001 > select ||

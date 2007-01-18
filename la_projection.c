@@ -533,7 +533,7 @@ boolean p_find_closest_tag(double *pos, double distance, double x, double y)
 
 uint p_find_click_tag(double x, double y)
 {
-	uint32 count, i, output = -1;
+	uint32 count, i, output = ~0u;
 	double r, pos[3];
 	UNDOTag	*tag;
 	tag = udg_get_tags(&count);
@@ -617,8 +617,8 @@ boolean p_find_closest_edge(uint *edge, double *snap, double x, double y)
 	udg_get_geometry(&vertex_count, &ref_count, &vertex, &ref, NULL);
 	ref_count *= 4;
 
-	edge[0] = -1;
-	edge[1] = -1;
+	edge[0] = ~0u;
+	edge[1] = ~0u;
 
 	for(i = 0; i < ref_count; i += 4)
 	{
@@ -665,7 +665,7 @@ boolean p_find_closest_edge(uint *edge, double *snap, double x, double y)
 			}
 		}
 	}
-	if(edge[0] == -1)
+	if(edge[0] == ~0u)
 	{
 		ref = udg_get_edge_data(&ref_count);
 		for(i = 0; i < ref_count; i++)
@@ -680,7 +680,7 @@ boolean p_find_closest_edge(uint *edge, double *snap, double x, double y)
 			}
 		}
 	}
-	if(edge[0] != -1)
+	if(edge[0] != ~0u)
 	{
 		snap[0] = (vertex[edge[0] * 3 + 0] + vertex[edge[1] * 3 + 0]) * 0.5;
 		snap[1] = (vertex[edge[0] * 3 + 1] + vertex[edge[1] * 3 + 1]) * 0.5;

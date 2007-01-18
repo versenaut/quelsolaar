@@ -333,7 +333,7 @@ void la_do_draw(double *start, double *end, boolean snap, double *closest)
 void la_do_draw_closest_edge(uint *edge, double x, double y, boolean snap)
 {
 	double *vertex, a[3], b[3];
-	if(edge[0] != -1 && edge[1] != -1)
+	if(edge[0] != ~0u && edge[1] != ~0u)
 	{
 		udg_get_geometry(NULL, NULL, &vertex, NULL, NULL);
 		glPopMatrix();
@@ -394,7 +394,7 @@ void la_do_draw_snap_edge(uint *edge)
 {
 	double a[3], b[3], vertex_a[3], vertex_b[3];
 	float draw[16];
-	if(edge[0] != -1 && edge[1] != -1)
+	if(edge[0] != ~0u && edge[1] != ~0u)
 	{
 		udg_get_vertex_pos(a, edge[0]);
 		udg_get_vertex_pos(b, edge[1]);

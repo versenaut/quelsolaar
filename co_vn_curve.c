@@ -131,8 +131,9 @@ void	sui_draw_symb_empty(float point_x, float point_y, float pos_x, float pos_y,
 void co_c_draw_point(BInputState *input, ENode *node, ECurve *curve, float *scroll, float *stretch, float y_pos, float scale, float pan, float color, float color_light)
 {
 	uint i, dimensions, point;
-	static uint grab_dim, grab_control, grab_point = -1;
+	static uint grab_dim, grab_control, grab_point = ~0u;
 	double pre_x[4], pre_y[4], pos_x, pos_y[4], post_x[4], post_y[4], x, y, aspect;
+
 	aspect = betray_get_screen_mode(NULL, NULL, NULL);
 	if(aspect < 0.1)
 		aspect = 0.1;
@@ -146,7 +147,7 @@ void co_c_draw_point(BInputState *input, ENode *node, ECurve *curve, float *scro
 	sui_draw_2d_line_gl(-0.9, y_pos + 0.02, 0.9, y_pos + 0.02, color_light, color_light, color_light, 1);
 	sui_draw_2d_line_gl(-0.9, -aspect + 0.08, 0.9, -aspect + 0.08, color_light, color_light, color_light, 1);
 
-	if(input->mode == BAM_EVENT && input->mouse_button[0] != TRUE && input->last_mouse_button[0] == TRUE && grab_point == -1 && y_pos > y)
+	if(input->mode == BAM_EVENT && input->mouse_button[0] != TRUE && input->last_mouse_button[0] == TRUE && grab_point == ~0u && y_pos > y)
 	{
 		if(0.0001 > (x - input->click_pointer_x) * (x - input->click_pointer_x) + (y - input->click_pointer_y) * (y - input->click_pointer_y))
 		{
@@ -162,12 +163,12 @@ void co_c_draw_point(BInputState *input, ENode *node, ECurve *curve, float *scro
 			verse_send_c_key_set(e_ns_get_node_id(node), e_nsc_get_curve_id(curve), -1, dimensions, pre_value, pre_pos, value, pos, post_value, post_pos);
 		}
 	}
-	if(input->mode == BAM_EVENT && input->mouse_button[0] == TRUE && input->last_mouse_button[0] == TRUE && grab_point == -1 && y_pos > input->click_pointer_y)
+	if(input->mode == BAM_EVENT && input->mouse_button[0] == TRUE && input->last_mouse_button[0] == TRUE && grab_point == ~0u && y_pos > input->click_pointer_y)
 	{
 		*scroll -= input->delta_pointer_x;
 		*stretch *= 1 + input->delta_pointer_y * 4;
 	}
-	for(point = e_nsc_get_point_next(curve, 0); point != -1; point = e_nsc_get_point_next(curve, point + 1))
+	for(point = e_nsc_get_point_next(curve, 0); point != ~0u; point = e_nsc_get_point_next(curve, point + 1))
 	{
 		e_nsc_get_point_double(curve, point, pre_y, pre_x, pos_y, &pos_x, post_y, post_x);
 		for(i = 0; i < dimensions; i++)
@@ -219,7 +220,7 @@ void co_c_draw_point(BInputState *input, ENode *node, ECurve *curve, float *scro
 						if(0.0001 > (pos_x - x - 0.014) * (pos_x - x - 0.014) + (pos_y[i] - y + 0.014) * (pos_y[i] - y + 0.014))
 						{
 							grab_point = i;
-							grab_control = -1;
+							grab_control = ~0u;
 							verse_send_c_key_destroy(e_ns_get_node_id(node), e_nsc_get_curve_id(curve), point);
 						}
 					}else
@@ -255,7 +256,7 @@ void co_c_draw_point(BInputState *input, ENode *node, ECurve *curve, float *scro
 						}
 					}
 				}else
-					grab_point = -1;
+					grab_point = ~0u;
 			}
 		}
 	}
@@ -314,7 +315,7 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 				j = 0;
 				for(curve = e_nsc_get_curve_by_id(node, 0); curve != NULL; curve = e_nsc_get_curve_by_id(node, ++j));
 				sprintf(nr, "curve_%u", j);
-				verse_send_c_curve_create(change_c_node_id, -1, nr, i + 1);
+				verse_send_c_curve_create(change_c_node_id, (uint16) ~0u, nr, i + 1);
 			}
 		}
 		y -= 0.05;
@@ -381,7 +382,7 @@ boolean co_handle_curve(BInputState *input, ENode *node)
 			uint i;
 			char nr[32];
 			i = 3;
-			for(bone = e_nsg_get_bone_next(node, 0); bone != (uint16)-1; bone = e_nsg_get_bone_next(node, bone + 1))
+			for(bone = e_nsg_get_bone_next(node, 0); bone != (uint16)~0u; bone = e_nsg_get_bone_next(node, bone + 1))
 				i++;
 			sprintf(nr, "weight_%u", i);
 			verse_send_g_bone_create(change_g_node_id, -1, nr, "reference", 0, 0, 0, 0, 0, 0, 0, 1);

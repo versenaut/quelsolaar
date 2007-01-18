@@ -236,7 +236,7 @@ extern void p_texture_func(ENode *node, ECustomDataCommand command);
 
 PTextureHandle *p_th_create_texture_handle(uint node_id, char *layer_r, char *layer_g, char *layer_b)
 {
-	uint i, j, empty = -1;
+	uint i, j, empty = ~0u;
 	PTextureHandle *h; 
 
 	for(i = 0; i < PTextureStorage.handle_count; i++)
@@ -244,9 +244,10 @@ PTextureHandle *p_th_create_texture_handle(uint node_id, char *layer_r, char *la
 		h = PTextureStorage.handles[i];
 		if(h == NULL)
 		{
-			if(empty == -1)
+			if(empty == ~0u)
 				empty = i;
-		}else
+		}
+		else
 		{
 			if(h->node_id == node_id)
 			{
@@ -270,7 +271,7 @@ PTextureHandle *p_th_create_texture_handle(uint node_id, char *layer_r, char *la
 		}
 	}
 	p_texture_func(NULL, E_CDC_STRUCT);
-	if(empty == -1)
+	if(empty == ~0u)
 	{
 		PTextureStorage.handles = realloc(PTextureStorage.handles, (sizeof *PTextureStorage.handles) * (PTextureStorage.handle_count + 16));
 		for(i = 0; i < 16; i++)

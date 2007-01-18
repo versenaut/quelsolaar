@@ -482,12 +482,13 @@ void callback_send_o_method_group_create(void *user_data, VNodeID node_id, uint1
 {
 	ESObjectNode	*node;
 	uint i;
+
 	node = e_create_o_node(node_id, 0);
 	verse_send_o_method_group_subscribe(node_id, group_id);
 	if(node->group_count <= group_id)
 	{
 		node->groups = realloc(node->groups, sizeof(*node->groups) * (group_id + 8));
-		for(i = node->group_count; i < group_id + 8; i++)
+		for(i = node->group_count; i < (uint) group_id + 8; i++)
 		{
 			node->groups[i].name[0] = 0;
 			node->groups[i].count = 0;
@@ -539,7 +540,7 @@ void callback_send_o_method_create(void *user_data, VNodeID node_id, uint16 grou
 		if(node->groups[group_id].count <= method_id)
 		{
 			node->groups[group_id].methods = realloc(node->groups[group_id].methods, (sizeof *node->groups[group_id].methods) * (method_id + 8));
-			for(i = node->groups[group_id].count; i < method_id + 8; i++)
+			for(i = node->groups[group_id].count; i < (uint) method_id + 8; i++)
 			{
 				node->groups[group_id].methods[i].name[0] = 0;
 				node->groups[group_id].methods[i].param_count = 0;

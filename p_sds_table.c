@@ -12,7 +12,7 @@ uint p_get_max_tess_level(void)
 
 void p_sds_t_make_table_element(PTessTableElement *table, weight_polygon *read, uint polycount, PTessTableElement *base, TessPolygonType type)
 {
-	uint i, j, k, corner,	found, corner_compare;
+	uint i, j, k, corner, found, corner_compare;
 	table->index = malloc(sizeof(uint) * polycount * type);
 	table->vertex_influence = malloc(sizeof(float) * polycount * type * type);
 	table->reference = malloc(sizeof(uint) * polycount * type);
@@ -31,7 +31,7 @@ void p_sds_t_make_table_element(PTessTableElement *table, weight_polygon *read, 
 			found = -1;
 			if(type == 3)
 			{
-				for(i = 0 ; i < table->vertex_count && found == -1 ; i++) /* finding vertexes allready used by the polygon*/
+				for(i = 0 ; i < table->vertex_count && found == ~0u; i++) /* finding vertexes allready used by the polygon*/
 					if(table->vertex_influence[i * 3] == read[j].corner[corner][0] &&
 					table->vertex_influence[(i * 3) + 1] == read[j].corner[corner][1] &&
 					table->vertex_influence[(i * 3) + 2] == read[j].corner[corner][2])
@@ -39,17 +39,15 @@ void p_sds_t_make_table_element(PTessTableElement *table, weight_polygon *read, 
 			}
 			else
 			{
-				for(i = 0 ; i < table->vertex_count && found == -1 ; i++) /* finding vertexes allready used by the polygon*/
+				for(i = 0 ; i < table->vertex_count && found == ~0u; i++) /* finding vertexes allready used by the polygon*/
 					if(table->vertex_influence[i * 4] == read[j].corner[corner][0] &&
 					table->vertex_influence[(i * 4) + 1] == read[j].corner[corner][1] &&
 					table->vertex_influence[(i * 4) + 2] == read[j].corner[corner][2] &&
 					table->vertex_influence[(i * 4) + 3] == read[j].corner[corner][3])
 					found = i;
 			}
-			if(found != -1) 
-			{
+			if(found != ~0u) 
 				table->index[table->element_count] = found;
-			}
 			else
 			{
 				if(base == NULL)

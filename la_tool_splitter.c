@@ -9,16 +9,16 @@
 #define MAX_SPLITS_PLUS_TWO 34
 
 struct{
-    uint 	division;
-    uint 	division_old;
+	uint 	division;
+	uint 	division_old;
 	uint	split_count;
 	uint	ref[2][4];
 	uint	crease[2][4];
 	uint	new_vertex;
 	uint	poly_id[2][MAX_SPLITS_PLUS_TWO];
 	uint	vertex_id[MAX_SPLITS];
-    uint	vertex_old[MAX_SPLITS];
-    uint	edge[2];
+	uint	vertex_old[MAX_SPLITS];
+	uint	edge[2];
 	uint	vertex_create;
 	uint	poly_create;
 	double	pos[3];
@@ -79,7 +79,8 @@ void polygon_split_end(uint *ref, uint *crease, uint *poly_id, /*uint vertex_cou
 {
 	double vertex[3], r;
 	uint i;
-	if(ref[3] != -1)
+
+	if(ref[3] != ~0u)
 	{
 		if(GlobalSplitData.division < 2)
 		{
@@ -225,7 +226,7 @@ void la_t_edge_splitter_start(BInputState *input, uint *edge)
 }
 void final_edge_split(uint poly, uint edge)
 {
-	if(GlobalSplitData.ref[poly][3] != -1)
+	if(GlobalSplitData.ref[poly][3] != ~0u)
 	{
 		if(edge == 0)
 		{
@@ -356,7 +357,7 @@ void la_t_edge_splitter(BInputState *input)
 		p_get_projection_screen(&vertex[1][0], vertex[1][0], vertex[1][1], vertex[1][2]);
 		udg_get_vertex_pos(&vertex[2][0], GlobalSplitData.ref[i][2]);
 		p_get_projection_screen(&vertex[2][0], vertex[2][0], vertex[2][1], vertex[2][2]);
-		if(GlobalSplitData.ref[i][3] != -1)
+		if(GlobalSplitData.ref[i][3] != ~0u)
 		{
 			udg_get_vertex_pos(&vertex[3][0], GlobalSplitData.ref[i][3]);
 			p_get_projection_screen(&vertex[3][0], vertex[3][0], vertex[3][1], vertex[3][2]);

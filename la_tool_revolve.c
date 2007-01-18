@@ -318,15 +318,12 @@ void fill_vertex_tube(double *matrix, uint *array, uint vertex, uint revolve, do
 void create_tube_matrix(double *matrix, double *vector, uint a, uint b, uint c)
 {
 	double origo[3], point[3];
+
 	udg_get_vertex_pos(origo, a);
-	if(c == -1)
-	{
+	if(c == ~0u)
 		udg_get_vertex_pos(point, b);
-	}
 	else
-	{
 		udg_get_vertex_pos(point, c);
-	}
 	point[0] -= origo[0];
 	point[1] -= origo[1];
 	point[2] -= origo[2];
@@ -363,7 +360,7 @@ void la_t_tube(uint *start_edge, uint revolve)
 	fill_vertex_tube(matrix, a, cur[0], revolve, scale * 0.5, 1);
 	for(i = 0; i < revolve; i++)
 		c[i] = a[i];
-	while(cur[1] != -1 && cur[1] != start_edge[0])
+	while(cur[1] != ~0u && cur[1] != start_edge[0])
 	{
 		next = get_next_edge(cur[1], cur[0], TRUE);
 		create_tube_matrix(matrix, vector, cur[0], cur[1], next);
@@ -394,7 +391,7 @@ void la_t_tube(uint *start_edge, uint revolve)
 	cur[1] = next;
 	a = c;
     
-	while(cur[1] != -1)
+	while(cur[1] != ~0u)
 	{
 		next = get_next_edge(cur[1], cur[0], TRUE);
 		create_tube_matrix(matrix, vector, cur[0], cur[1], next);

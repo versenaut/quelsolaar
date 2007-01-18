@@ -211,7 +211,7 @@ void callback_send_c_key_set(void *user_data, VNodeID node_id, VLayerID curve_id
 	{
 		curve->points = realloc(curve->points, (sizeof *curve->points) * (key_id + 16));
 		for(i = curve->allocated; i < (key_id + 16); i++)
-			curve->points[i].sorted_pos = -1;
+			curve->points[i].sorted_pos = ~0u;
 		curve->allocated = key_id + 16;
 	}
 
@@ -225,7 +225,7 @@ void callback_send_c_key_set(void *user_data, VNodeID node_id, VLayerID curve_id
 		point->post_pos[i] = post_pos[i];
 	}
 
-	if(point->sorted_pos == -1)
+	if(point->sorted_pos == ~0u)
 	{
 		for(i = curve->length; i != 0 && pos < curve->points[curve->points[i - 1].sorted].pos; i--)
 		{
@@ -283,12 +283,12 @@ void callback_send_c_key_destroy(void *user_data, VNodeID node_id, VLayerID curv
 
 	point = &curve->points[key_id];
 	for(i = 0; i <  curve->allocated; i++)
-		if(curve->points[i].sorted_pos != -1 && curve->points[i].sorted_pos > point->sorted_pos)
+		if(curve->points[i].sorted_pos != ~0u && curve->points[i].sorted_pos > point->sorted_pos)
 			curve->points[i].sorted_pos--;
 	curve->length--;
 	for(i = point->sorted_pos; i < curve->length; i++)
 		curve->points[i].sorted = curve->points[i + 1].sorted;
-	point->sorted_pos = -1;
+	point->sorted_pos = ~0u;
 
 	curve->version++;
 	e_ns_update_node_version_data(node);
@@ -298,17 +298,17 @@ void callback_send_c_key_destroy(void *user_data, VNodeID node_id, VLayerID curv
 
 void es_curve_init(void)
 {
-	verse_callback_set(verse_send_c_curve_create,		callback_send_c_curve_create,		NULL);
-	verse_callback_set(verse_send_c_curve_destroy,		callback_send_c_curve_destroy,		NULL);
-	verse_callback_set(verse_send_c_key_set,			callback_send_c_key_set,		NULL);
-	verse_callback_set(verse_send_c_key_destroy,		callback_send_c_key_destroy,	NULL);
+	verse_callback_set(verse_send_c_curve_create,	callback_send_c_curve_create,	NULL);
+	verse_callback_set(verse_send_c_curve_destroy,	callback_send_c_curve_destroy,	NULL);
+	verse_callback_set(verse_send_c_key_set,	callback_send_c_key_set,	NULL);
+	verse_callback_set(verse_send_c_key_destroy,	callback_send_c_key_destroy,	NULL);
 }
 
 uint e_nsc_get_point_next(ESCurve *curve, uint point_id)
 {
-	for(;point_id < curve->allocated && curve->points[point_id].sorted_pos == -1; point_id++);
+	for(; point_id < curve->allocated && curve->points[point_id].sorted_pos == ~0u; point_id++);
 	if(point_id == curve->allocated)
-		return -1;
+		return ~0u;
 	return point_id;
 }
 
@@ -339,7 +339,7 @@ void e_nsc_get_point(ESCurve *curve, uint point_id, real64 *pre_value, uint32 *p
 void e_nsc_get_point_double(ESCurve *curve, uint point_id, real64 *pre_value, real64 *pre_pos, real64 *value, real64 *pos, real64 *post_value, real64 *post_pos)
 {
 	ESCurvePoint *point; 
-	double dist[2] = {-1, 1};
+	double dist[2] = { -1, 1 };
 	uint i;
 	point = &curve->points[point_id];
 
@@ -372,7 +372,7 @@ void e_nsc_get_point_double(ESCurve *curve, uint point_id, real64 *pre_value, re
 void e_nsc_send_c_key_set(ESCurveNode *node, ESCurve *curve, uint32 key_id, real64 *pre_value, real64 *pre_pos, real64 *value, real64 *pos, real64 *post_value, real64 *post_pos)
 {
 	ESCurvePoint	*point;
-	double dist[2] = {-1, 1}, f, prev[4], postv[4];
+	double dist[2] = { -1, 1 }, f, prev[4], postv[4];
 	uint32 prep[4], postp[4];
 	uint8 dimensions;
 	uint i;

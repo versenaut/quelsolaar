@@ -57,9 +57,10 @@ void uve_update_edge(uint polygon, uint edge)
 {
 	uint *ref, id, i, j, sides[2];
 	egreal dist[2];
+
 	ref = uvg_get_ref();
 	sides[0] = uvg_get_sides(polygon);
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		sides[1] = uvg_get_sides(id);
 		for(i = 0; i < sides[1]; i++)
@@ -108,7 +109,7 @@ void uve_update()
 		UVEdgeGlobal.edge_count = 0;
 	}
 	UVEdgeGlobal.polygon = uvg_get_next_polygon(UVEdgeGlobal.polygon + 1);
-	if(UVEdgeGlobal.polygon == -1)
+	if(UVEdgeGlobal.polygon == ~0u)
 		UVEdgeGlobal.polygon = uvg_get_next_polygon(0);
 
 	for(i = 0; i < UVEdgeGlobal.edge_count; i++)
@@ -121,11 +122,10 @@ void uve_update()
 	}
 
 	if(UVEdgeGlobal.edge_count < UVEdgeGlobal.edge_allocated)
-	if(UVEdgeGlobal.polygon != -1)
+	if(UVEdgeGlobal.polygon != ~0u)
 		for(i = 0; i < uvg_get_sides(UVEdgeGlobal.polygon); i++)
 			uve_update_edge(UVEdgeGlobal.polygon, i);
 }
-
 
 void uve_find_intersection(egreal *output, egreal *e1start, egreal *e1end, egreal *e2start, egreal *e2end)
 {

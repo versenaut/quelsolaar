@@ -53,7 +53,7 @@ void uv_trans_move_edge(BInputState *input, uint poly_id, uint corner)
 	x = uv_get_pos_x(input->pointer_x);
 	y = uv_get_pos_y(input->pointer_y);
 
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(id != poly_id)
 		{
@@ -148,7 +148,7 @@ void uv_trans_lock(void)
 {
 	uint id;
 	UVTGlobal.locked_uv = malloc((sizeof *UVTGlobal.locked_uv) * uvg_get_polygon_length() * 8);
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 		uvg_get_uve(&UVTGlobal.locked_uv[id * 8], id);
 	UVTGlobal.locked_length = uvg_get_polygon_length();
 }
@@ -164,7 +164,7 @@ void uv_trans_form(egreal pos_x, egreal pos_y, egreal *matrix)
 	uint id, i;
 	egreal *select;
 //	printf("UVTGlobal.locked_length %u\n", UVTGlobal.locked_length);
-	for(id = uvg_get_next_polygon(0); id != -1 && id < UVTGlobal.locked_length; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u && id < UVTGlobal.locked_length; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(id))
 		{
@@ -312,7 +312,7 @@ void uv_trans_unhide(void)
 	{
 		egreal uv[8],  *s, pos[2] = {0, 0}, sum = 0;
 		uint id, i, poly;
-		for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+		for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 		{
 			if(uvg_get_polygon_select(id))
 			{
