@@ -86,7 +86,7 @@ uint count_entry_dlut(DynLookUpTable *table)
 
 void clean_dlut(DynLookUpTable *table)
 {
-	int i;
+	uint i;
 
 	for(i = table->allocated - 1; i > 1 && table->data[i] == NULL; i--);
 	if(i + ARRAY_CHUNK_SIZE < table->allocated)
