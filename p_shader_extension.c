@@ -157,7 +157,7 @@ PShader *p_shader_allocate(void)
 
 extern void p_shader_func(ENode *node, ECustomDataCommand command);
 
-static uint shadow_prog_obj = -1;
+static uint shadow_prog_obj = ~0u;
 
 uint p_shader_create(char *vertex, char *fragment)
 {
@@ -738,7 +738,7 @@ void p_shader_func(ENode *node, ECustomDataCommand command)
 
 boolean p_shader_shadow_bind(void)
 {
-	if(shadow_prog_obj == -1)
+	if(shadow_prog_obj == ~0u)
 		p_shader_init_shadow();
 	if(p_programmable_shaders_supported)
 		p_glUseProgramObjectARB(shadow_prog_obj);
