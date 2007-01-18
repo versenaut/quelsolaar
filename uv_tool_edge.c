@@ -80,7 +80,7 @@ void uv_tool_edge_select_streight(uint poly_id, uint edge)
 
 	uv_find_staight_edge(matrix, pos, poly_id, edge);
 
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(id))
 		{

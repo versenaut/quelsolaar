@@ -136,7 +136,7 @@ void uv_draw_line_test_select(void)
 
 	GlobalDrawLine.array[GlobalDrawLine.array_length * 2] = GlobalDrawLine.array[0];
 	GlobalDrawLine.array[GlobalDrawLine.array_length * 2 + 1] = GlobalDrawLine.array[1];
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(id))
 		{

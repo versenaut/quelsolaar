@@ -71,7 +71,7 @@ uint get_surface_poly_id(egreal x, egreal y)
 	static uint last = -1;
 	if(poly_texture_hit_test(last, x, y))
 		return last;
-	for(last = uvg_get_next_polygon(0); last != -1 && !poly_texture_hit_test(last, x, y); last = uvg_get_next_polygon(last + 1));
+	for(last = uvg_get_next_polygon(0); last != ~0u && !poly_texture_hit_test(last, x, y); last = uvg_get_next_polygon(last + 1));
 	return last;
 }
 
