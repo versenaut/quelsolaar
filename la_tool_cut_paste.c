@@ -3,14 +3,14 @@
 #include "st_matrix_operations.h"
 #include "la_geometry_undo.h"
 
-uint *la_polygon_buffer = NULL;
-uint la_polygon_buffer_length = 0;
-uint *la_crease_buffer = NULL;
-egreal *la_vertex_buffer = NULL;
-uint la_vertex_buffer_length = 0;
-uint *la_edge_buffer = NULL;
-uint la_edge_buffer_length = 0;
-uint la_new_node_paste = -1;
+static uint *la_polygon_buffer = NULL;
+static uint la_polygon_buffer_length = 0;
+static uint *la_crease_buffer = NULL;
+static egreal *la_vertex_buffer = NULL;
+static uint la_vertex_buffer_length = 0;
+static uint *la_edge_buffer = NULL;
+static uint la_edge_buffer_length = 0;
+static uint la_new_node_paste = ~0u;
 
 void la_t_copy(egreal *pos)
 {
@@ -168,7 +168,7 @@ void la_t_copy_to_new_geometry(void)
 void la_t_paste_to_new_geometry(void)
 {
 	egreal pos[3] = {0.0, 0.0, 0.0};
-	if(la_new_node_paste == -1)
+	if(la_new_node_paste == ~0u)
 		return;
 	if(la_new_node_paste != udg_get_modeling_node())
 	la_t_paste(pos);
