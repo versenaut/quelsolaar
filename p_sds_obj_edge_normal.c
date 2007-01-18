@@ -40,18 +40,18 @@ void p_lod_compute_vertex_normals(PPolyStore *smesh, PMesh *mesh)
 
 	for(i = 0; i < length; i++)
 	{
-		if(corner_normals[i * 2] == -1)
+		if(corner_normals[i * 2] == ~0u)
 		{
 			corner = other_corner = i;
 
 			for(j = 0; j < 100; j++)
 			{
 				tmp = smesh->base_neighbor[corner];
-				if(tmp != -1 && smesh->crease[tmp] > 0.5)
+				if(tmp != ~0u && smesh->crease[tmp] > 0.5)
 					corner = p_lod_get_base_corner_next(smesh, tmp, 1);
 				else
 				{
-					tmp = -1;
+					tmp = ~0u;
 					break;
 				}
 				if(j % 2 == 1)
@@ -65,14 +65,14 @@ void p_lod_compute_vertex_normals(PPolyStore *smesh, PMesh *mesh)
 			if(corner != i)
 			{
 				other_corner = i;
-				tmp = p_lod_get_base_corner_next(smesh, i, -1);
-				for(j = 0; other_corner != -1 && j < 100; j++)
+				tmp = p_lod_get_base_corner_next(smesh, i, ~0u);
+				for(j = 0; other_corner != ~0u && j < 100; j++)
 				{
 					tmp = smesh->base_neighbor[tmp];
-					if(tmp != -1 && smesh->crease[tmp] > 0.5)
+					if(tmp != ~0u && smesh->crease[tmp] > 0.5)
 					{
 						other_corner = tmp;
-						tmp = p_lod_get_base_corner_next(smesh, tmp, -1);
+						tmp = p_lod_get_base_corner_next(smesh, tmp, ~0u);
 					}else
 						break;
 					if(tmp == i)
@@ -87,7 +87,7 @@ void p_lod_compute_vertex_normals(PPolyStore *smesh, PMesh *mesh)
 			for(j = 0; j < 100; j++)
 			{
 				tmp = smesh->base_neighbor[tmp];
-				if(tmp != -1 && smesh->crease[tmp] > 0.5)
+				if(tmp != ~0u && smesh->crease[tmp] > 0.5)
 					tmp = p_lod_get_base_corner_next(smesh, tmp, 1);
 				else
 					break;
@@ -97,22 +97,22 @@ void p_lod_compute_vertex_normals(PPolyStore *smesh, PMesh *mesh)
 					break;
 			}
 
-			tmp = p_lod_get_base_corner_next(smesh, i, -1);
+			tmp = p_lod_get_base_corner_next(smesh, i, ~0u);
 			for(j = 0; j < 100; j++)
 			{
 				tmp = smesh->base_neighbor[tmp];
-				if(tmp == -1 || smesh->crease[tmp] < 0.5)
+				if(tmp == ~0u || smesh->crease[tmp] < 0.5)
 					break;
 				corner_normals[tmp * 2] = corner;
 				corner_normals[tmp * 2 + 1] = other_corner;
-				tmp = p_lod_get_base_corner_next(smesh, tmp, -1);
+				tmp = p_lod_get_base_corner_next(smesh, tmp, ~0u);
 				if(tmp == i)
 					break;
 			}
 		}
 	}
 	for(i = 0; i < length * 2; i++)
-		if(corner_normals[i] == -1)
+		if(corner_normals[i] == ~0u)
 			corner_normals[i] = 0;
 /*	for(i = 0; i < length * 2; i++)
 	{
@@ -144,7 +144,7 @@ uint p_lod_get_rev_corner(PPolyStore *mesh, uint corner)
 uint p_lod_edge_shadow_length_quad(PPolyStore *smesh, PMesh *mesh, uint poly, uint edge, uint *crease, egreal def)
 {
 	poly = mesh->tess.order_temp_mesh[poly];
-	if(smesh->base_neighbor[poly * 4 + edge] == -1)
+	if(smesh->base_neighbor[poly * 4 + edge] == ~0u)
 		return FALSE;
 	if(crease != NULL)
 		def = crease[poly * 4 + edge];
@@ -166,7 +166,7 @@ boolean p_lod_handle_edge(PPolyStore *smesh, PMesh *mesh, uint current_poly, uin
 		poly = smesh->base_neighbor[smesh->base_quad_count * 4 + (mesh->tess.order_temp_mesh[current_poly] - smesh->base_quad_count) * 3 + current_edge];
 	else
 		poly = smesh->base_neighbor[mesh->tess.order_temp_mesh[current_poly] * 4 + current_edge];
-	if(poly == -1)
+	if(poly == ~0u)
 		return FALSE;
 	if(poly / 4 < smesh->base_quad_count)
 	{
@@ -229,7 +229,7 @@ uint p_lod_handle_edge_count(PPolyStore *smesh, PMesh *mesh, uint current_poly, 
 		poly = smesh->base_neighbor[smesh->base_quad_count * 4 + (mesh->tess.order_temp_mesh[current_poly] - smesh->base_quad_count) * 3 + current_edge];
 	else
 		poly = smesh->base_neighbor[mesh->tess.order_temp_mesh[current_poly] * 4 + current_edge];
-	if(poly == -1)
+	if(poly == ~0u)
 		return FALSE;
 	if(poly / 4 < smesh->base_quad_count)
 	{

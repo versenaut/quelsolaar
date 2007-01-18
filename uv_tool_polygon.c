@@ -184,7 +184,7 @@ void uv_tool_poly_normal_select(uint poly)
 	normal[1] /= r;
 	normal[2] /= r;
 
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(id))
 		{
@@ -239,7 +239,7 @@ void uv_tool_poly_plane_select(uint poly)
 
 	dist = vertex[ref[poly * 4] * 3 + 0] * normal[0] + vertex[ref[poly * 4] * 3 + 1] * normal[1] + vertex[ref[poly * 4] * 3 + 2] * normal[2];
 
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(id))
 		{
@@ -336,7 +336,7 @@ void uv_tool_poly_project(uint poly)
 	}
 	r = sqrt(length[1]) / sqrt(length[0]);
 
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(id))
 		{
@@ -365,7 +365,7 @@ void uv_tool_project(uint u, uint v, boolean unselected)
 
 	ref = uvg_get_ref();
 	vertex = uvg_get_vertex();
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(id))
 		{
@@ -379,7 +379,7 @@ void uv_tool_project(uint u, uint v, boolean unselected)
 			}
 		}
 	}
-	for(; id != -1; id = uvg_get_next_polygon(id + 1))
+	for(; id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(id))
 		{
@@ -406,7 +406,7 @@ void uv_tool_project(uint u, uint v, boolean unselected)
 		scale = center[3] - center[2];
 	center[0] = (center[0] - (center[1] - center[0]) * 0.5) / (center[1] - center[0]);
 	center[2] = (center[2] - (center[3] - center[2]) * 0.5) / (center[3] - center[2]);
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(i / 4))
 		{
@@ -498,7 +498,7 @@ void uv_tool_poly_stack(uint poly)
 	if(uvg_is_quad(poly))
 	{
 		uv_get_quad_vectors(v1, poly);
-		for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+		for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 		{
 			if(uvg_get_polygon_select(id) && id != poly)
 			{

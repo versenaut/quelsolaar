@@ -10,10 +10,10 @@ uint *la_compute_neighbor(uint *ref, uint ref_count, uint vertex_count, egreal *
 	uint tq1, tq2;
 	n = malloc((sizeof *n) * ref_count * 4);
 	for(i = 0; i < ref_count * 4; i++)
-		n[i] = -1;
+		n[i] = ~0u;
 	v = malloc((sizeof *v) * vertex_count);
 	for(i = 0; i < vertex_count; i++)
-		v[i] = -1;
+		v[i] = ~0u;
 
 	while(clear < ref_count * 4)
 	{
@@ -29,14 +29,14 @@ uint *la_compute_neighbor(uint *ref, uint ref_count, uint vertex_count, egreal *
 				for(j = 0; j < tq1; j++)
 				{
 					cor = v[ref[i]];
-					if(cor == -1)
+					if(cor == ~0u)
 					{
-						if(n[i] == -1 || n[(i / 4) * 4 + (i + tq1 - 1) % tq1] == -1)
+						if(n[i] == ~0u || n[(i / 4) * 4 + (i + tq1 - 1) % tq1] == ~0u)
 							v[ref[i]] = i;
 					}
 					else if(cor == i)
 					{
-						v[ref[i]] = -1;
+						v[ref[i]] = ~0u;
 					}
 					else
 					{
@@ -46,30 +46,30 @@ uint *la_compute_neighbor(uint *ref, uint ref_count, uint vertex_count, egreal *
 							tq2 = 3;
 						a = (i / 4) * 4;
 						b = (cor / 4) * 4;
-						if((n[cor] == -1 || n[a + (i + tq1 - a - 1) % tq1] == -1) && ref[a + (i + tq1 - a - 1) % tq1] == ref[b + (cor + 1 - b) % tq2])
+						if((n[cor] == ~0u || n[a + (i + tq1 - a - 1) % tq1] == ~0u) && ref[a + (i + tq1 - a - 1) % tq1] == ref[b + (cor + 1 - b) % tq2])
 						{
 							n[a + (i + tq1 - a - 1) % tq1] = cor;
 							n[cor] = a + (i + tq1 - a - 1) % tq1;
 							clear = 0;
-							if(n[b + (cor + tq2 - 1) % tq2] != -1)
+							if(n[b + (cor + tq2 - 1) % tq2] != ~0u)
 							{
-								if(n[i] == -1)
+								if(n[i] == ~0u)
 									v[ref[i]] = i;
 								else
-									v[ref[i]] = -1;
+									v[ref[i]] = ~0u;
 							}
 						}
-						if((n[i] == -1 || n[b + (cor + tq2 - b - 1) % tq2] == -1) && ref[a + (i - a + 1) % tq1] == ref[b + (cor + tq2 - b - 1) % tq2])
+						if((n[i] == ~0u || n[b + (cor + tq2 - b - 1) % tq2] == ~0u) && ref[a + (i - a + 1) % tq1] == ref[b + (cor + tq2 - b - 1) % tq2])
 						{
 							n[i] = b + (cor + tq2 - b - 1) % tq2;
 							n[b + (cor + tq2 - b - 1) % tq2] = i;
 							clear = 0;	
-							if(n[cor] != -1)
+							if(n[cor] != ~0u)
 							{
-								if(n[a + (i + tq1 - a - 1) % tq1] == -1)
+								if(n[a + (i + tq1 - a - 1) % tq1] == ~0u)
 									v[ref[i]] = i;
 								else
-									v[ref[i]] = -1;
+									v[ref[i]] = ~0u;
 							}
 						}
 					}
@@ -126,15 +126,15 @@ void la_t_poly_triangulate(void)
 						side = 1;
 					if(side == 0)
 					{
-						udg_polygon_set(i / 4, ref[i], ref[i + 1], ref[i + 2], -1);
+						udg_polygon_set(i / 4, ref[i], ref[i + 1], ref[i + 2], ~0u);
 						udg_crease_set(i / 4, crease[i], crease[i + 1], 0, 0);
-						udg_polygon_set(id, ref[i + 2], ref[i + 3], ref[i], -1);
+						udg_polygon_set(id, ref[i + 2], ref[i + 3], ref[i], ~0u);
 						udg_crease_set(id, crease[i + 2], crease[i + 3], 0, 0);
 					}else
 					{
-						udg_polygon_set(i / 4, ref[i], ref[i + 1], ref[i + 3], -1);
+						udg_polygon_set(i / 4, ref[i], ref[i + 1], ref[i + 3], ~0u);
 						udg_crease_set(i / 4, crease[i], 0, crease[i + 3], 0);
-						udg_polygon_set(id, ref[i + 1], ref[i + 2], ref[i + 3], -1);
+						udg_polygon_set(id, ref[i + 1], ref[i + 2], ref[i + 3], ~0u);
 						udg_crease_set(id, crease[i + 1], crease[i + 2], 0, 0);
 					}
 				}
@@ -203,7 +203,7 @@ void la_t_poly_find_quads(void)
 				if(udg_get_select(ref[i]) > 0.1 && udg_get_select(ref[i + 1]) > 0.1 && udg_get_select(ref[i + 2]) > 0.1)
 				{
 					j = (la_t_poly_quad_corner_test(&vertex[ref[i] * 3], &vertex[ref[i + 1] * 3], &vertex[ref[i + 2] * 3]) + 1) % 3;
-					if(n[i + j] != -1 && n[i + j] < i + j && crease[i + j] == 0)
+					if(n[i + j] != ~0u && n[i + j] < i + j && crease[i + j] == 0)
 					{
 						other = (n[i + j] / 4) * 4;
 						otherj = n[i + j] - other;
@@ -275,7 +275,7 @@ void la_t_poly_auto_crease(void)
 
 			for(j = 0; j < poly; j++)
 			{
-				if(udg_get_select(ref[i + j]) > 0.1 && udg_get_select(ref[i + (j + 1) % poly]) && n[i + j] != -1)
+				if(udg_get_select(ref[i + j]) > 0.1 && udg_get_select(ref[i + (j + 1) % poly]) && n[i + j] != ~0u)
 				{
 				/*	printf("normals %i %f\n", j , normals[(n[i + j] / 4) * 3 + 0]
 						* normals[(i / 4) * 3 + 0]
@@ -291,7 +291,7 @@ void la_t_poly_auto_crease(void)
 						* normals[(i / 4) * 3 + 2] > 0.5)
 						out_crease[j] = 0;
 					else
-						out_crease[j] = -1;
+						out_crease[j] = ~0u;
 				}else
 					out_crease[j] = crease[i + j];
 			}

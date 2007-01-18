@@ -11,8 +11,9 @@
 uint uv_find_next_strip(uint edge_1, uint edge_2)
 {
 	uint *ref, i, id, size;
+
 	ref = uvg_get_ref();
-	for(id = uvg_get_next_polygon(0); id != -1; id = uvg_get_next_polygon(id + 1))
+	for(id = uvg_get_next_polygon(0); id != ~0u; id = uvg_get_next_polygon(id + 1))
 	{
 		if(uvg_get_polygon_select(id))
 		{
@@ -22,7 +23,7 @@ uint uv_find_next_strip(uint edge_1, uint edge_2)
 					return id * 4 + ((i + 2) % size);
 		}
 	}
-	return -1;
+	return ~0u;
 }
 
 egreal uv_get_stripth_length(uint polygon, uint edge)
@@ -113,7 +114,7 @@ void uv_strip_old(uint polygon, uint edge)
 	while(TRUE)
 	{
 		id = uv_find_next_strip(ref[id], ref[(id / 4) * 4 + (id + 1) % uvg_get_sides(id / 4)]);
-		if(id == -1 || !uvg_is_quad(id / 4))
+		if(id == ~0u || !uvg_is_quad(id / 4))
 			break;
 		uv_next_strip(uv1, uv2, vec, id, uv_get_stripth_length(id / 4, id % 4));
 		if(i++ == 6)
@@ -160,7 +161,7 @@ void uv_strip(uint polygon, uint edge)
 			if(active[i])
 			{
 				id[i] = uv_find_next_strip(ref[id[i]], ref[(id[i] / 4) * 4 + (id[i] + 1) % uvg_get_sides(id[i] / 4)]);
-				if(id[i] == -1 || !uvg_is_quad(id[i] / 4) || used[id[i] / 4])
+				if(id[i] == ~0u || !uvg_is_quad(id[i] / 4) || used[id[i] / 4])
 					active[i] = FALSE;
 				else
 				{
@@ -233,7 +234,7 @@ void uv_strip_plane(uint polygon)
 			if(active[i])
 			{
 				id[i] = uv_find_next_strip(ref[id[i]], ref[(id[i] / 4) * 4 + (id[i] + 1) % uvg_get_sides(id[i] / 4)]);
-				if(id[i] == -1 || !uvg_is_quad(id[i] / 4) || used[id[i] / 4])
+				if(id[i] == ~0u || !uvg_is_quad(id[i] / 4) || used[id[i] / 4])
 					active[i] = FALSE;
 				else
 				{

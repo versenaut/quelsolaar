@@ -8,7 +8,7 @@ uint *edge_reference(uint *ref, uint poly_count, uint vertex_count)
 	back = malloc((sizeof *back) * poly_count);
 	cur = back;
 	for(end = cur + poly_count; cur != end; cur++)
-		*cur = -1;
+		*cur = ~0u;
 	vertex = malloc((sizeof *back) * vertex_count);
 	cur = vertex;
 	for(i = 0; i < poly_count; i++)
@@ -25,15 +25,15 @@ uint *edge_reference(uint *ref, uint poly_count, uint vertex_count)
 			for(j = 0; j < poly; j++)
 			{
 				cur = &vertex[ref[i + j]];
-				if(*cur == -1)
+				if(*cur == ~0u)
 					*cur = i + j;
 				else
 				{
 					if(*cur == i + j)
-						*cur = -1;
+						*cur = ~0u;
 					else
 					{
-						if(back[i + j] == -1)
+						if(back[i + j] == ~0u)
 						{
 							uint temp;
 							temp = (*cur / 4 * 4);
@@ -47,13 +47,13 @@ uint *edge_reference(uint *ref, uint poly_count, uint vertex_count)
 							{
 								back[i + j] = temp;
 								back[temp] = i + j;
-								if(back[temp2] != -1)
-									*cur = -1;
+								if(back[temp2] != ~0u)
+									*cur = ~0u;
 								update = poly_count;
 							}
 						}
 						temp2 = i + ((j + poly - 1) % poly);
-						if(back[temp2] == -1)
+						if(back[temp2] == ~0u)
 						{	
 							temp = (*cur / 4 * 4);
 							if(ref[temp + 3] < vertex_count)
@@ -65,8 +65,8 @@ uint *edge_reference(uint *ref, uint poly_count, uint vertex_count)
 							{
 								back[temp2] = *cur;
 								back[*cur] = temp2;
-								if(back[i + j] == -1)
-									*cur = -1;
+								if(back[i + j] == ~0u)
+									*cur = ~0u;
 								update = poly_count;
 							}
 						}

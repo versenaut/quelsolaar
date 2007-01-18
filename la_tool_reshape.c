@@ -10,7 +10,7 @@ struct{
 
 uint reshape_find_next(uint id, double *pos, double *vector)
 {
-	uint i, vertex_count, *ref, ref_count, next, poly, temp, found = -1;
+	uint i, vertex_count, *ref, ref_count, next, poly, temp, found = ~0u;
 	double test[3], r, best = -0.0;
 	udg_get_geometry(&vertex_count, &ref_count, NULL, &ref, NULL);
 	r = sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]);
@@ -114,7 +114,7 @@ void la_t_reshape_hull_start(BInputState *input, uint *edge)
 	temp[1] = third[1] - second[1];
 	temp[2] = third[2] - second[2];
 	GlobalReshapeData.edge[1] = reshape_find_next(GlobalReshapeData.edge[2], second, temp);
-	if(GlobalReshapeData.edge[1] != -1)
+	if(GlobalReshapeData.edge[1] != ~0u)
 	{
 //		p_get_projection_screen(first, vertex[GlobalReshapeData.edge[1]].x, vertex[GlobalReshapeData.edge[1]].y, vertex[GlobalReshapeData.edge[1]].z);
 		udg_get_vertex_pos(first, GlobalReshapeData.edge[1]);
@@ -123,9 +123,9 @@ void la_t_reshape_hull_start(BInputState *input, uint *edge)
 		temp[2] = second[2] - first[2];
 		GlobalReshapeData.edge[0] = reshape_find_next(GlobalReshapeData.edge[1], first, temp);
 	}else
-		GlobalReshapeData.edge[0] = -1;
+		GlobalReshapeData.edge[0] = ~0u;
 
-	if(GlobalReshapeData.edge[4] != -1)
+	if(GlobalReshapeData.edge[4] != ~0u)
 	{
 //		p_get_projection_screen(fourth, vertex[GlobalReshapeData.edge[4]].x, vertex[GlobalReshapeData.edge[4]].y, vertex[GlobalReshapeData.edge[4]].z);
 		udg_get_vertex_pos(fourth, GlobalReshapeData.edge[4]);
@@ -134,7 +134,7 @@ void la_t_reshape_hull_start(BInputState *input, uint *edge)
 		temp[2] = third[2] - fourth[2];
 		GlobalReshapeData.edge[5] = reshape_find_next(GlobalReshapeData.edge[4], fourth, temp);
 	}else
-		GlobalReshapeData.edge[5] = -1;
+		GlobalReshapeData.edge[5] = ~0u;
 }
 
 
@@ -148,7 +148,7 @@ void la_t_reshape_hull(BInputState *input)
 	p_get_projection_screen(first, first[0], first[1], first[2]);
 	udg_get_vertex_pos(second, GlobalReshapeData.edge[3]);
 	p_get_projection_screen(second, second[0], second[1], second[2]);
-	if(GlobalReshapeData.edge[1] != -1)
+	if(GlobalReshapeData.edge[1] != ~0u)
 	{
 		udg_get_vertex_pos(a, GlobalReshapeData.edge[1]);
 		p_get_projection_screen(a, a[0], a[1], a[2]);
@@ -169,7 +169,7 @@ void la_t_reshape_hull(BInputState *input)
 		GlobalReshapeData.edge[2] = GlobalReshapeData.edge[1];
 		GlobalReshapeData.edge[1] = GlobalReshapeData.edge[0];
 		reshape_hull_place_vertex(GlobalReshapeData.edge[3], first, vector, input->pointer_x, input->pointer_y);
-		if(GlobalReshapeData.edge[0] != -1)
+		if(GlobalReshapeData.edge[0] != ~0u)
 		{
 			udg_get_vertex_pos(a, GlobalReshapeData.edge[2]);
 			udg_get_vertex_pos(b, GlobalReshapeData.edge[1]);
@@ -182,7 +182,7 @@ void la_t_reshape_hull(BInputState *input)
 		}
 	}else
 	{
-		if(GlobalReshapeData.edge[4] != -1)
+		if(GlobalReshapeData.edge[4] != ~0u)
 		{
 			udg_get_vertex_pos(a, GlobalReshapeData.edge[4]);
 			p_get_projection_screen(a, a[0], a[1], a[2]);
@@ -203,7 +203,7 @@ void la_t_reshape_hull(BInputState *input)
 			GlobalReshapeData.edge[3] = GlobalReshapeData.edge[4];
 			GlobalReshapeData.edge[4] = GlobalReshapeData.edge[5];
 			reshape_hull_place_vertex(GlobalReshapeData.edge[2], second, vector, input->pointer_x, input->pointer_y);
-			if(GlobalReshapeData.edge[5] != -1)
+			if(GlobalReshapeData.edge[5] != ~0u)
 			{
 				udg_get_vertex_pos(a, GlobalReshapeData.edge[3]);
 				udg_get_vertex_pos(b, GlobalReshapeData.edge[4]);
@@ -226,28 +226,28 @@ void la_t_reshape_hull_draw(void)
 	glPushMatrix();
 	glTranslated(0, 0, -1);
 	glDisable(GL_DEPTH_TEST);
-	if(GlobalReshapeData.edge[0] != -1)
+	if(GlobalReshapeData.edge[0] != ~0u)
 		p_get_projection_screen(a, vertex[GlobalReshapeData.edge[0] * 3], vertex[GlobalReshapeData.edge[0] * 3 + 1], vertex[GlobalReshapeData.edge[0] * 3 + 2]);
-	if(GlobalReshapeData.edge[1] != -1)
+	if(GlobalReshapeData.edge[1] != ~0u)
 		p_get_projection_screen(b, vertex[GlobalReshapeData.edge[1] * 3], vertex[GlobalReshapeData.edge[1] * 3 + 1], vertex[GlobalReshapeData.edge[1] * 3 + 2]);
-	if(GlobalReshapeData.edge[2] != -1)
+	if(GlobalReshapeData.edge[2] != ~0u)
 		p_get_projection_screen(c, vertex[GlobalReshapeData.edge[2] * 3], vertex[GlobalReshapeData.edge[2] * 3 + 1], vertex[GlobalReshapeData.edge[2] * 3 + 2]);
-	if(GlobalReshapeData.edge[3] != -1)
+	if(GlobalReshapeData.edge[3] != ~0u)
 		p_get_projection_screen(d, vertex[GlobalReshapeData.edge[3] * 3], vertex[GlobalReshapeData.edge[3] * 3 + 1], vertex[GlobalReshapeData.edge[3] * 3 + 2]);
-	if(GlobalReshapeData.edge[4] != -1)
+	if(GlobalReshapeData.edge[4] != ~0u)
 		p_get_projection_screen(e, vertex[GlobalReshapeData.edge[4] * 3], vertex[GlobalReshapeData.edge[4] * 3 + 1], vertex[GlobalReshapeData.edge[4] * 3 + 2]);
-	if(GlobalReshapeData.edge[5] != -1)
+	if(GlobalReshapeData.edge[5] != ~0u)
 		p_get_projection_screen(f, vertex[GlobalReshapeData.edge[5] * 3], vertex[GlobalReshapeData.edge[5] * 3 + 1], vertex[GlobalReshapeData.edge[5] * 3 + 2]);
 
-	if(GlobalReshapeData.edge[0] != -1 && GlobalReshapeData.edge[1] != -1)
+	if(GlobalReshapeData.edge[0] != ~0u && GlobalReshapeData.edge[1] != ~0u)
 		la_do_edge_select(a, b);	
-	if(GlobalReshapeData.edge[1] != -1 && GlobalReshapeData.edge[2] != -1)
+	if(GlobalReshapeData.edge[1] != ~0u && GlobalReshapeData.edge[2] != ~0u)
 		la_do_edge_select(b, c);	
-	if(GlobalReshapeData.edge[2] != -1 && GlobalReshapeData.edge[3] != -1)
+	if(GlobalReshapeData.edge[2] != ~0u && GlobalReshapeData.edge[3] != ~0u)
 		la_do_edge_select(c, d);	
-	if(GlobalReshapeData.edge[3] != -1 && GlobalReshapeData.edge[4] != -1)
+	if(GlobalReshapeData.edge[3] != ~0u && GlobalReshapeData.edge[4] != ~0u)
 		la_do_edge_select(d, e);	
-	if(GlobalReshapeData.edge[4] != -1 && GlobalReshapeData.edge[5] != -1)
+	if(GlobalReshapeData.edge[4] != ~0u && GlobalReshapeData.edge[5] != ~0u)
 		la_do_edge_select(e, f);	
 	glEnable(GL_DEPTH_TEST);
 	glPopMatrix();
@@ -285,7 +285,7 @@ void la_t_select_hull(uint *edge)
 			if(a < count)
 			{
 				if(select[a] == TRUE)
-					a = -1;
+					a = ~0u;
 				else
 				{
 					a_last[0] = a_cur[0];
@@ -305,7 +305,7 @@ void la_t_select_hull(uint *edge)
 			if(b < count)
 			{
 				if(select[b] == TRUE)
-					b = -1;
+					b = ~0u;
 				else
 				{
 					b_last[0] = b_cur[0];
