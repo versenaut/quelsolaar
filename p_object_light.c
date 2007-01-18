@@ -116,10 +116,10 @@ void p_light_update(PObjLight *light, uint32 node_id, uint light_count, uint32 t
 
 extern void sui_draw_3d_line_gl(float start_x, float start_y,  float start_z, float end_x, float end_y, float end_z, float red, float green, float blue);
 
-uint current_shadow_light = -1;
-uint current_shadow_goal_light = -1;
-float current_light_fade = 0;
-boolean light_fade_up = TRUE;
+static uint current_shadow_light = -1;
+static uint current_shadow_goal_light = -1;
+static float current_light_fade = 0;
+static boolean light_fade_up = TRUE;
 
 void p_set_enable_shadow(uint id)
 {
@@ -127,7 +127,7 @@ void p_set_enable_shadow(uint id)
 	uint32 found = ~0u;
 	ENode *node;
 
-	if(id != -1)
+	if(id != ~0u)
 	{
 		if(current_light_fade < 0.01 || current_light_fade > 0.99)
 		{
