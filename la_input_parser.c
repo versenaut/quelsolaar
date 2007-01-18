@@ -47,6 +47,7 @@ void la_parse_input(BInputState *input)
 	static double snap[6], distance, selected_distance;
 	static uint closest, select_closest, edge[2] = {-1, -1}, polygon, tag;
 	static LASnapType snap_type = LA_ST_VERTEX;
+
 	if(input->mode == BAM_EVENT)
 	{
 		distance = 1E100;
@@ -63,7 +64,7 @@ void la_parse_input(BInputState *input)
 			if(ParseInputData.mode != PIM_SHOW_POLY_MENU)
 			{
 				polygon = la_t_poly_test(input, snap, &snap[3]);
-				if(polygon != -1)
+				if(polygon != ~0u)
 					snap_type = LA_ST_SURFACE;
 			}
 			if(ParseInputData.mode != PIM_SHOW_EDGE_MENU)
@@ -93,7 +94,7 @@ void la_parse_input(BInputState *input)
 						return;
 
 					tag = p_find_click_tag(input->pointer_x, input->pointer_y);
-					if(tag != -1)
+					if(tag != ~0u)
 					{
 						udg_get_tag_pos(tag, ParseInputData.depth);
 						ParseInputData.mode = PIM_DRAG_ONE_TAG;
@@ -106,7 +107,7 @@ void la_parse_input(BInputState *input)
 					}
 					else
 					{
-						if(edge[0] != -1 && edge[1] != -1)
+						if(edge[0] != ~0u && edge[1] != ~0u)
 						{
 							if(udg_get_select(edge[0]) > 0.01 && udg_get_select(edge[1]) > 0.01)
 							{
@@ -120,9 +121,9 @@ void la_parse_input(BInputState *input)
 							return;
 						}
 						p_get_projection_vertex(ParseInputData.depth, ParseInputData.depth, input->pointer_x, input->pointer_y);
-						ParseInputData.start_vertex = -1;
+						ParseInputData.start_vertex = ~0u;
 					}
-					if(ParseInputData.start_vertex != -1 && udg_get_select(ParseInputData.start_vertex) > 0.5)
+					if(ParseInputData.start_vertex != ~0u && udg_get_select(ParseInputData.start_vertex) > 0.5)
 					{
                     	ParseInputData.mode = PIM_DRAG_ONE_VERTEX;
                         grab_one_vertex(input, ParseInputData.start_vertex, ParseInputData.depth);
@@ -140,9 +141,9 @@ void la_parse_input(BInputState *input)
 						ParseInputData.mode = PIM_SHOW_VERTEX_MENU;
 						la_pu_vertex(input, ParseInputData.start_vertex);
 					}
-					else if(edge[0] != -1 && edge[1] != -1)
+					else if(edge[0] != ~0u && edge[1] != ~0u)
 						ParseInputData.mode = PIM_SHOW_EDGE_MENU;
-					else if((polygon = la_t_poly_test(input, NULL, NULL)) != -1)
+					else if((polygon = la_t_poly_test(input, NULL, NULL)) != ~0u)
 						ParseInputData.mode = PIM_SHOW_POLY_MENU;
 					else
 						ParseInputData.mode = PIM_SHOW_EMPTY_MENU;
@@ -180,12 +181,12 @@ void la_parse_input(BInputState *input)
 			if(input->mode == BAM_DRAW)
 			{
 				glDisable(GL_DEPTH_TEST);
-				if(selected_distance > VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE) && ParseInputData.start_vertex == -1 && input->mode == BAM_DRAW)
+				if(selected_distance > VERTEX_SNAP_DISTANCE - (0.1 * VERTEX_SNAP_DISTANCE) && ParseInputData.start_vertex == ~0u && input->mode == BAM_DRAW)
 					la_t_draw_line_draw_delete_overlay();
 				glEnable(GL_DEPTH_TEST);
 			}
 			p_get_projection_vertex_with_axis(output, ParseInputData.depth, input->pointer_x, input->pointer_y, input->mouse_button[1], snap, snap_type);
-			if(ParseInputData.start_vertex == -1)
+			if(ParseInputData.start_vertex == ~0u)
 				if(la_t_draw_select_menu_test())
 					ParseInputData.mode = PIM_DRAW_SELECT;
 			if(input->mode == BAM_EVENT)
@@ -201,7 +202,7 @@ void la_parse_input(BInputState *input)
 						{
 							udg_set_select(select_closest, 1);
 							break;
-						}else if(ParseInputData.start_vertex != -1)
+						}else if(ParseInputData.start_vertex != ~0u)
 						{
 							vertex[0] = ParseInputData.start_vertex;
 							if(la_t_edge_connector(vertex) == TRUE)
@@ -212,14 +213,14 @@ void la_parse_input(BInputState *input)
 						}
 					}else
 					{
-						if(ParseInputData.start_vertex == -1 && input->mouse_button[1] != TRUE && input->last_mouse_button[2] != TRUE)
+						if(ParseInputData.start_vertex == ~0u && input->mouse_button[1] != TRUE && input->last_mouse_button[2] != TRUE)
 						{
 							if(la_t_draw_line_test_delete() || la_t_draw_line_test_select(SM_SELECT))
 								break;
 							if(0.01 > (input->pointer_x - input->click_pointer_x) * (input->pointer_x - input->click_pointer_x) + (input->pointer_y - input->click_pointer_y) * (input->pointer_y - input->click_pointer_y))
 							{
 								polygon = la_t_poly_test(input, NULL, NULL);
-								if(polygon == -1)
+								if(polygon == ~0u)
 								{
 									la_pfx_create_dust_selected_vertexes(ParseInputData.depth);
 									udg_clear_select(0);
@@ -236,7 +237,7 @@ void la_parse_input(BInputState *input)
 						ParseInputData.depth[1] = pos[1];
 						ParseInputData.depth[2] = pos[2];
 					}
-					if(ParseInputData.start_vertex == -1)
+					if(ParseInputData.start_vertex == ~0u)
 					{
 						p_get_projection_vertex_with_axis(pos, ParseInputData.depth, input->click_pointer_x, input->click_pointer_y, FALSE, snap, snap_type);
 						ParseInputData.start_vertex = udg_find_empty_slot_vertex();
@@ -250,7 +251,7 @@ void la_parse_input(BInputState *input)
 			}else
 			{
 				la_do_draw(ParseInputData.depth, output, input->mouse_button[1], snap);
-				if(ParseInputData.start_vertex == -1)
+				if(ParseInputData.start_vertex == ~0u)
 					la_t_draw_line_add(input->pointer_x, input->pointer_y, TRUE);
 
 				if(input->mouse_button[1] && snap_type != LA_ST_VERTEX)
@@ -367,7 +368,7 @@ void la_parse_input(BInputState *input)
 				i = la_pu_select(input);
 				if(input->mode == BAM_EVENT)
 				{
-					if(i != -1)
+					if(i != ~0u)
 					la_t_draw_line_test_select(i);
 				}else
 					la_t_draw_line_add(input->pointer_x, input->pointer_y, FALSE);
@@ -447,7 +448,7 @@ void la_edit_func(BInputState *input, void *user)
 		{
 			glPopMatrix();
 			glPushMatrix();
-			glTranslatef(0, 0, -1);
+			glTranslatef(0, 0, ~0u);
 			sui_draw_text(-0.5 * sui_compute_text_length(SUI_T_SIZE * 2, 3, "NO GEOMETRY"), 0, SUI_T_SIZE * 2, 3, "NO GEOMETRY", 1, 1, 1, 1);
 			sui_draw_text(-0.5 * sui_compute_text_length(SUI_T_SIZE, SUI_T_SPACE, "Click to create a geometry node"), -0.1, SUI_T_SIZE, SUI_T_SPACE, "Click to create a geometry node", 1, 1, 1, 1);
 		}else
