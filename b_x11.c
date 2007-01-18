@@ -131,7 +131,11 @@ boolean betray_internal_init_display(UNUSED(int argc), UNUSED(char **argv), uint
 
 void * betray_get_gl_proc_address(void)
 {
+#if defined GLX_ARB_get_proc_address
+	return glXGetProcAddressARB;
+#else
 	return glXGetProcAddress;
+#endif
 }
 
 void betray_set_mouse_warp(boolean warp)
