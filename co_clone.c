@@ -176,27 +176,27 @@ void co_clone_geometry(ENode *node, ENode *clone)
 						break;
 						case VN_G_LAYER_POLYGON_CORNER_UINT32 :
 							for(i = 0; i < p_length; i++)
-								if(ref[i * 4] != -1)
+								if(ref[i * 4] != ~0u)
 									verse_send_g_polygon_set_corner_uint32(node_id, e_nsg_get_layer_id(clayer), i, ((uint32 *)data)[i * 4 + 0], ((uint32 *)data)[i * 4 + 1], ((uint32 *)data)[i * 4 + 2], ((uint32 *)data)[i * 4 + 3]);
 						break;
 						case VN_G_LAYER_POLYGON_CORNER_REAL :
 							for(i = 0; i < p_length; i++)
-								if(ref[i * 4] != -1)
+								if(ref[i * 4] != ~0u)
 									verse_send_g_polygon_set_corner_real64(node_id, e_nsg_get_layer_id(clayer), i, ((egreal *)data)[i * 4 + 0], ((egreal *)data)[i * 4 + 1], ((egreal *)data)[i * 4 + 2], ((egreal *)data)[i * 4 + 3]);
 						break;
 						case VN_G_LAYER_POLYGON_FACE_UINT32 :
 							for(i = 0; i < p_length; i++)
-								if(ref[i * 4] != -1)
+								if(ref[i * 4] != ~0u)
 									verse_send_g_polygon_set_face_uint8(node_id, e_nsg_get_layer_id(clayer), i, ((uint32 *)data)[i]);
 						break;
 						case VN_G_LAYER_POLYGON_FACE_UINT8 :
 							for(i = 0; i < p_length; i++)
-								if(ref[i * 4] != -1)
+								if(ref[i * 4] != ~0u)
 									verse_send_g_polygon_set_face_uint32(node_id, e_nsg_get_layer_id(clayer), i, ((uint8 *)data)[i]);
 						break;
 						case VN_G_LAYER_POLYGON_FACE_REAL :
 							for(i = 0; i < p_length; i++)
-								if(ref[i * 4] != -1)
+								if(ref[i * 4] != ~0u)
 									verse_send_g_polygon_set_face_real64(node_id, e_nsg_get_layer_id(clayer), i, ((egreal *)data)[i]);
 						break;
 					}
