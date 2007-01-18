@@ -811,7 +811,8 @@ void co_draw_material_texture(COVNMaterial *mat, float x, float y)
 {
 	static float vertex[65 * 2], uv[65 * 2];
 	static uint	ref[64 * 3] = {-1};
-	if(ref[0] == -1)
+
+	if(ref[0] == ~0u)
 	{
 		float a, b;
 		uint i;
@@ -1615,7 +1616,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 						{
 							static uint active_type = -1, active_channel = -1;
 							static double new_color[3];
-							static uint segment = 0, drag = -1, drag_frag = -1;
+							static uint segment = 0, drag = ~0u, drag_frag = -1;
 							static char *ramp_types[] = {"SQUARE", "LINEAR", "SMOOTH"};
 							static char *ramp_channels[] = {"RED", "GREEN", "BLUE"};
 							char *text[] = {"Channel", "Type", "Delete", "Ramp", "Pos", "Red", "Green", "Blue"};
@@ -1703,7 +1704,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 										sui_draw_2d_line_gl(place[0] - 0.125, place[1]- 0.145, place[0] - 0.125, place[1] - 0.15, co_line_color[0], co_line_color[1], co_line_color[2], color);
 									}
 								}
-								if(drag != -1)
+								if(drag != ~0u)
 								{
 									sui_draw_2d_line_gl(input->pointer_x, place[1]- 0.2, input->pointer_x, place[1] - 0.22, co_line_color[0], co_line_color[1], co_line_color[2], color);
 									sui_draw_2d_line_gl(input->pointer_x, place[1]- 0.135, input->pointer_x, place[1] - 0.15, co_line_color[0], co_line_color[1], co_line_color[2], color);

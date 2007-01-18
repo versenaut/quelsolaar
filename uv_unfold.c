@@ -17,7 +17,7 @@ void uv_start_polygon_unfold(uint id, float x, float y)
 {
 	uvg_get_uve(unfold_uv, id);
 	unfold_side = 0 > (x - unfold_uv[0 * 2 + 0]) * (unfold_uv[1 * 2 + 1] - unfold_uv[0 * 2 + 1]) + (y - unfold_uv[0 * 2 + 1]) * (unfold_uv[0 * 2 + 0] - unfold_uv[1 * 2 + 0]);
-	unfold_last = -1;
+	unfold_last = ~0u;
 }
 
 void find_unfold_vertex(egreal *edge_vertex, egreal *edge_vertex2, egreal *vertex, egreal *u, egreal *v)
@@ -96,13 +96,13 @@ uint uv_polygon_unfold(uint id, float x, float y)
 	boolean in[4];
 	uint i, *ref, id2, edge[2], pass_edge;
 
-	if(id == -1 || id != uvg_get_next_polygon(id))
-		return -1;
+	if(id == ~0u || id != uvg_get_next_polygon(id))
+		return ~0u;
 	uvg_get_uve(uv, id);
 	if(uvg_is_quad(id) && uv_test_quad(uv, x, y))
-		unfold_last = -1;
+		unfold_last = ~0u;
 	if(!uvg_is_quad(id) && uv_test_tri(uv, x, y))
-		unfold_last = -1;
+		unfold_last = ~0u;
 
 	in[0] = 0 > (x - unfold_uv[0 * 2 + 0]) * (unfold_uv[1 * 2 + 1] - unfold_uv[0 * 2 + 1]) + (y - unfold_uv[0 * 2 + 1]) * (unfold_uv[0 * 2 + 0] - unfold_uv[1 * 2 + 0]);
 	in[1] = 0 > (x - unfold_uv[1 * 2 + 0]) * (unfold_uv[2 * 2 + 1] - unfold_uv[1 * 2 + 1]) + (y - unfold_uv[1 * 2 + 1]) * (unfold_uv[1 * 2 + 0] - unfold_uv[2 * 2 + 0]);
@@ -120,7 +120,7 @@ uint uv_polygon_unfold(uint id, float x, float y)
 		{
 			edge[0] = ref[id * 4 + pass_edge];
 			edge[1] = ref[id * 4 + (pass_edge + 1) % uvg_get_sides(id)];
-			for(id2 = uvg_get_next_polygon(0); id2 != -1; id2 = uvg_get_next_polygon(id2 + 1))
+			for(id2 = uvg_get_next_polygon(0); id2 != ~0u; id2 = uvg_get_next_polygon(id2 + 1))
 			{
 				if(unfold_last != id2 && uvg_get_polygon_select(id2))
 				{
@@ -135,7 +135,7 @@ uint uv_polygon_unfold(uint id, float x, float y)
 					}
 				}
 			}
-			return -1;
+			return ~0u;
 		}
 	}
 	return id;
