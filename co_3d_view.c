@@ -133,15 +133,14 @@ extern float co_line_color[3];
 
 void co_draw_3d_view_pass(boolean fill, float color)
 {
-
 	uint seconds, fractions;
 	ENode *node, *g_node;
 	double pos[3], scale[3];
 	EObjLink *link;
-	VNQuat64 rot;
 	double matrix[16];
 	COVerseNode *co_g_node, *co_node;
 	boolean draw;
+
 	verse_session_get_time(&seconds, &fractions);
 	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 	{
@@ -157,22 +156,21 @@ void co_draw_3d_view_pass(boolean fill, float color)
 					e_nso_get_pos_time(node, pos, seconds, fractions);
 					e_nso_get_scale(node, scale);
 					glPushMatrix();
-					glTranslatef(pos[0], pos[1], pos[2]);
-					glScalef(scale[0], scale[1], scale[2]);
-					e_nso_get_rot(node, &rot, NULL, NULL, NULL, NULL, NULL);
-					rot.w = sqrt(1 - (rot.x * rot.x + rot.y * rot.y + rot.z * rot.z));
-					e_quaternions_to_matrixd(matrix, &rot);
+					e_nso_get_matrix(node, matrix, 0u, 0u);
+					e_nso_get_pos_time(node, &matrix[12], 0, 0);
 					glMultMatrixd(matrix);
-
 					co_g_node = e_ns_get_custom_data(g_node, CONNECTOR_ENOUGH_SLOT);
 					if((!co_node->hidden || select_node == e_ns_get_node_id(node)) && !fill)
 						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, FALSE, co_node->color[0], co_node->color[1], co_node->color[2], 1.0);
 					else if(/*!co_g_node->hidden &&*/ !fill)
-						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, FALSE, co_node->color[0] * 0.5 + co_background_color[0] * 0.5, 
-																												co_node->color[1] * 0.5 + co_background_color[1] * 0.5, 
-																												co_node->color[2] * 0.5 + co_background_color[2] * 0.5, 1.0);
+						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, FALSE, co_node->color[0] * 0.5 + co_background_color[0] * 0.5,
+											  co_node->color[1] * 0.5 + co_background_color[1] * 0.5,
+											  co_node->color[2] * 0.5 + co_background_color[2] * 0.5, 1.0);
 					else
-						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, FALSE, co_node->color[0] * (1.0 - color) + co_background_color[0] * color, co_node->color[1] * (1.0 - color) + co_background_color[1] * color, co_node->color[2] * (1.0 - color) + co_background_color[2] * color, 1.0);
+						co_g_node->render_cash = co_geometry_draw(g_node, co_g_node->render_cash, fill, FALSE,
+											  co_node->color[0] * (1.0 - color) + co_background_color[0] * color,
+											  co_node->color[1] * (1.0 - color) + co_background_color[1] * color,
+											  co_node->color[2] * (1.0 - color) + co_background_color[2] * color, 1.0);
 					glPopMatrix();
 					draw = TRUE;
 				}
@@ -247,43 +245,6 @@ void co_draw_3d_icon_pass(void)
 		}
 	}
 }
-
-/*
-void co_draw_3d_view_persuade()
-{
-	uint seconds, fractions;
-	ENode *node, *g_node;
-	double pos[3], scale[3];
-	EObjLink *link;
-	VNQuat64 rot;
-	double matrix[16];
-	COVerseNode *co_g_node, *co_node;
-	verse_session_get_time(&seconds, &fractions);
-	for(node = e_ns_get_node_next(0, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
-	{
-		co_node = e_ns_get_custom_data(node, CONNECTOR_ENOUGH_SLOT);
-
-		for(link = e_nso_get_next_link(node, 0); link != NULL; link = e_nso_get_next_link(node, e_nso_get_link_id(link) + 1))
-		{
-			if((g_node = e_ns_get_node(0, e_nso_get_link_node(link))) != NULL && V_NT_GEOMETRY == e_ns_get_node_type(g_node))
-			{
-				e_nso_get_pos_time(node, pos, seconds, fractions);
-				e_nso_get_scale(node, scale);
-				glPushMatrix();
-				glTranslatef(pos[0], pos[1], pos[2]);
-				glScalef(scale[0], scale[1], scale[2]);
-				e_nso_get_rot(node, &rot, NULL, NULL, NULL, NULL, NULL);
-				rot.w = sqrt(1 - (rot.x * rot.x + rot.y * rot.y + rot.z * rot.z));
-				e_quaternions_to_matrixd(matrix, &rot);
-				glMultMatrixd(matrix);
-				p_render_object(node);
-				glPopMatrix();
-			}
-		}
-	}
-}
-*/
-
 
 boolean co_draw_3d_view_get(void)
 {
