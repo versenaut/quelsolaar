@@ -84,8 +84,8 @@ void callback_send_tag_create(void *user, VNodeID node_id, uint16 group_id, uint
 	if(((ETagGroup *)node->tag_groups)[group_id].tag_count <= tag_id)
 	{
 		((ETagGroup *)node->tag_groups)[group_id].tags = realloc(((ETagGroup *)node->tag_groups)[group_id].tags, (sizeof *((ETagGroup *)node->tag_groups)[group_id].tags) * (tag_id + 8));
-		i = 0;
-		for(((ETagGroup *)node->tag_groups)[group_id].tag_count = 0; i < (uint) tag_id + 8; i++)
+		i = 0;	
+	for(((ETagGroup *)node->tag_groups)[group_id].tag_count = 0; i < (uint) tag_id + 8; i++)
 			((ETagGroup *)node->tag_groups)[group_id].tags[i].tag_name[0] = 0;
 		((ETagGroup *)node->tag_groups)[group_id].tag_count = tag_id + 8;
 	}	
