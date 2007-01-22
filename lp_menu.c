@@ -169,7 +169,8 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 				lp_compute_int_color(color, *integer);
 				sui_type_number_uint(input, 0.55, position - 0.05, 0.4, 0.5f, SUI_T_SIZE, (uint32 *) integer, integer, color[0], color[1], color[2]);
 				position -= 0.1;
-			}else
+			}
+			else
 			{
 				sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "color:", 0, 0, 0, 1.0);
 				slider[0] = lp_menu_slider(input, 0.5, position - 0.05, 0.4, slider[0], 0, 0, 0, 1, 1, 1);
@@ -186,7 +187,7 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 			position -= 0.1;
 		}
 
-		sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Brush size:", 0, 0, 0, 1.0);
+		sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Brush Size:", 0, 0, 0, 1.0);
 		brush_size = lp_menu_slider(input, 0.55, position - 0.05, 0.4, brush_size / 0.2, 0, 0, 0, 1, 1, 1) * 0.2;
 		lp_brush_size_set(brush_size);	
 		position -= 0.1;
