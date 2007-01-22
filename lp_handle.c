@@ -158,7 +158,7 @@ void lp_input_handler(BInputState *input, void *user)
 						       lp_layer_get_green(lp_layer_current_get()),
 						       lp_layer_get_blue(lp_layer_current_get()),
 						       slider,
-						       last_integer);
+						       current_integer);
 			}else
 			{
 				input_mode = PLIM_NONE;
