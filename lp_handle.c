@@ -23,14 +23,34 @@ typedef enum{
 	PLIM_POPUP
 }PLInputMode;
 
-PLInputMode input_mode = PLIM_NONE;
-void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer);
+static PLInputMode input_mode = PLIM_NONE;
+extern void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer);
+
+static uint32	current_integer = 0, last_integer = 0;
+
+static void set_integer(uint x, boolean swap)
+{
+	if(swap)
+	{
+		uint	old = current_integer;
+
+		current_integer = last_integer;
+		last_integer = old;
+		return;		
+	}
+	if(x != current_integer)
+	{
+		last_integer = current_integer;
+		current_integer = x;
+	}
+}
 
 void lp_input_handler(BInputState *input, void *user)
 {
 	static double slider[3] = {0, 0, 0};
-	static uint node_id = -1, integer = 0;
+	static uint node_id = -1, buf;
 	static boolean now_plus = FALSE, now_minus = FALSE, last_plus = FALSE, last_minus = FALSE;
+	static boolean now_space = FALSE, last_space = FALSE;
 	ENode *node;
 	uint i;
 
@@ -65,23 +85,25 @@ void lp_input_handler(BInputState *input, void *user)
 		sui_set_blend_gl(GL_ONE, GL_ZERO);
 		if(node != 0)
 		{
-		glEnable(GL_POLYGON_OFFSET_FILL);
-		glPolygonOffset(1.0, 1.0);
-		lp_geometry_draw(node, lp_layer_get_red(lp_layer_current_get()), lp_layer_get_green(lp_layer_current_get()), lp_layer_get_blue(lp_layer_current_get()));
-		glPolygonOffset(1.0, 1.0);
-		glDepthFunc(GL_LEQUAL);
-		glPolygonOffset(0, 0);
-		sui_set_blend_gl(GL_ONE, GL_ONE);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		lp_geometry_draw(node, lp_layer_get_red(lp_layer_current_get()), lp_layer_get_green(lp_layer_current_get()), lp_layer_get_blue(lp_layer_current_get()));
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glDisable(GL_POLYGON_OFFSET_FILL);
-
-
-		}sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			glPolygonOffset(1.0, 1.0);
+			lp_geometry_draw(node, lp_layer_get_red(lp_layer_current_get()), lp_layer_get_green(lp_layer_current_get()), lp_layer_get_blue(lp_layer_current_get()));
+			glPolygonOffset(1.0, 1.0);
+			glDepthFunc(GL_LEQUAL);
+			glPolygonOffset(0, 0);
+			sui_set_blend_gl(GL_ONE, GL_ONE);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			lp_geometry_draw(node, lp_layer_get_red(lp_layer_current_get()), lp_layer_get_green(lp_layer_current_get()), lp_layer_get_blue(lp_layer_current_get()));
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glDisable(GL_POLYGON_OFFSET_FILL);
+		}
+		sui_set_blend_gl(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glPopMatrix();
 	}
-	lp_menu(input, node, slider, &integer);
+	buf = current_integer;	/* Manually work around the widget system, to implement swap. */
+	lp_menu(input, node, slider, &current_integer);
+	if(current_integer != buf)
+		last_integer = buf;
 	switch(input_mode)
 	{
 		case PLIM_NONE :
@@ -104,17 +126,20 @@ void lp_input_handler(BInputState *input, void *user)
 				{
 					if(betray_get_key(i))
 					{
-						integer = i - '0';
+						set_integer(i - '0', FALSE);
 						break;
 					}
 				}
 				/* Plus and minus keys increase/decrease the integer by one. Handy when creasing. */
 				betray_get_key_up_down(&now_plus, &last_plus, '+');
 				if(now_plus && !last_plus)
-					integer++;
+					set_integer(current_integer + 1, FALSE);
 				betray_get_key_up_down(&now_minus, &last_minus, '-');
 				if(now_minus && !last_minus)
-					integer--;
+					set_integer(current_integer - 1, FALSE);
+				betray_get_key_up_down(&now_space, &last_space, ' ');
+				if(now_space && !last_space)
+					set_integer(0, TRUE);
 			}
 		break;
 		case PLIM_VIEW :
@@ -128,7 +153,12 @@ void lp_input_handler(BInputState *input, void *user)
 				static uint counter = 0;
 				lp_color_paint(input, node);
 				if(counter++ % 5 == 0)
-					lp_apply_paint(node, lp_layer_get_red(lp_layer_current_get()), lp_layer_get_green(lp_layer_current_get()), lp_layer_get_blue(lp_layer_current_get()), slider, integer);
+					lp_apply_paint(node,
+						       lp_layer_get_red(lp_layer_current_get()),
+						       lp_layer_get_green(lp_layer_current_get()),
+						       lp_layer_get_blue(lp_layer_current_get()),
+						       slider,
+						       last_integer);
 			}else
 			{
 				input_mode = PLIM_NONE;
@@ -141,5 +171,4 @@ void lp_input_handler(BInputState *input, void *user)
 				input_mode = PLIM_NONE;
 		break;
 	}
-
 }
