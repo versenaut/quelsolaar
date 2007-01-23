@@ -6,8 +6,7 @@
 
 #include "lp_projection.h"
 
-
-double lp_brush_size;
+static double lp_brush_size;
 
 void lp_brush_size_set(double size)
 {
@@ -17,6 +16,7 @@ void lp_brush_size_set(double size)
 boolean lp_cull(egreal *v1, egreal *v2, egreal *v3)
 {
 	double a[3], b[3], c[3];
+
 	p_get_projection_screen(a, v1[0], v1[1], v1[2]);
 	p_get_projection_screen(b, v2[0], v2[1], v2[2]);
 	p_get_projection_screen(c, v3[0], v3[1], v3[2]);
@@ -25,7 +25,8 @@ boolean lp_cull(egreal *v1, egreal *v2, egreal *v3)
 	b[1] -= a[1];
 	c[0] -= a[0];
 	c[1] -= a[1];
-	return c[0] * b[1] - c[1] * b[0] > 0;
+
+	return c[0] * b[1] - c[1] * b[0] > 0.0;
 }
 
 egreal lp_paint(BInputState *input, egreal *vertex)
@@ -36,7 +37,7 @@ egreal lp_paint(BInputState *input, egreal *vertex)
 	output[0] = (output[0] + input->pointer_x) / lp_brush_size;
 	output[1] = (output[1] + input->pointer_y) / lp_brush_size;
 	f = output[0] * output[0] + output[1] * output[1];
-	if(f < 1)
+	if(f < 1.0)
 	{
 		f = sqrt(f);
 		return 1.0 - f; 
@@ -44,14 +45,13 @@ egreal lp_paint(BInputState *input, egreal *vertex)
 	return 0.0;
 }
 
-double *lp_vertex_influence = NULL;
-double *lp_polygon_influence = NULL;
-double *lp_vertex_influence_back = NULL;
-double *lp_polygon_influence_back = NULL;
+static double *lp_vertex_influence = NULL;
+static double *lp_polygon_influence = NULL;
+static double *lp_vertex_influence_back = NULL;
+static double *lp_polygon_influence_back = NULL;
 
-
-void *lp_channels[3] = {NULL, NULL, NULL};
-egreal *lp_normal = NULL;
+static void *lp_channels[3] = {NULL, NULL, NULL};
+static egreal *lp_normal = NULL;
 
 void lp_unlock_paint(void)
 {
@@ -224,20 +224,14 @@ void lp_lock_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *blu
 		lp_vertex_influence = malloc((sizeof *lp_vertex_influence) * length);
 		lp_vertex_influence_back = malloc((sizeof *lp_vertex_influence) * length);
 		for(i = 0; i < length; i++)
-		{
-			lp_vertex_influence[i] = 0;
-			lp_vertex_influence_back[i] = 0;
-		}
+			lp_vertex_influence[i] = lp_vertex_influence_back[i] = 0;
 	}
 	if(p)
 	{
 		lp_polygon_influence = malloc((sizeof *lp_polygon_influence) * ref_length);
 		lp_polygon_influence_back = malloc((sizeof *lp_polygon_influence) * ref_length);
 		for(i = 0; i < ref_length; i++)
-		{	
-			lp_polygon_influence[i] = 0;
-			lp_polygon_influence_back[i] = 0;
-		}
+			lp_polygon_influence[i] = lp_polygon_influence_back[i] = 0;
 	}
 }
 
@@ -312,14 +306,12 @@ void lp_color_paint(BInputState *input, ENode *node)
 	}
 }
 
-
 void lp_apply_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *blue, double *value, uint integer)
 {
 	EGeoLayer *layers[3];
 	VNodeID node_id;
 	VLayerID layer_id;
 	uint i, j = 0, *ref, ref_length, length, r[4];
-
 
 	node_id = e_ns_get_node_id(node);
 	length = e_nsg_get_vertex_length(node);
@@ -345,10 +337,10 @@ void lp_apply_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *bl
 				{
 					if(lp_vertex_influence_back[j] < lp_vertex_influence[j])
 					{
-						verse_send_g_vertex_set_xyz_real64(node_id, layer_id, j, 
-							((egreal *)lp_channels[i])[j * 3] + lp_vertex_influence[j] * lp_normal[j * 3] * value[i],
-							((egreal *)lp_channels[i])[j * 3 + 1] + lp_vertex_influence[j] * lp_normal[j * 3 + 1] * value[i],
-							((egreal *)lp_channels[i])[j * 3 + 2] + lp_vertex_influence[j] * lp_normal[j * 3 + 2] * value[i]);
+						verse_send_g_vertex_set_xyz_real64(node_id, layer_id, j,
+										   ((egreal *)lp_channels[i])[j * 3] + lp_vertex_influence[j] * lp_normal[j * 3] * value[i],
+										   ((egreal *)lp_channels[i])[j * 3 + 1] + lp_vertex_influence[j] * lp_normal[j * 3 + 1] * value[i],
+										   ((egreal *)lp_channels[i])[j * 3 + 2] + lp_vertex_influence[j] * lp_normal[j * 3 + 2] * value[i]);
 					}
 				}
 				break;
@@ -371,10 +363,10 @@ void lp_apply_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *bl
 					r[3] = ref[j * 4 + 3];
 					if(r[0] < length && r[1] < length && r[2] < length)
 					{				
-						if(0 < lp_vertex_influence[r[0]]
-							|| 0 < lp_vertex_influence[r[1]]
-							|| 0 < lp_vertex_influence[r[2]]
-							|| (r[3] < length && 0 < lp_vertex_influence[r[3]]))
+						if(0 < lp_vertex_influence[r[0]] ||
+						   0 < lp_vertex_influence[r[1]] ||
+						   0 < lp_vertex_influence[r[2]] ||
+						   (r[3] < length && 0 < lp_vertex_influence[r[3]]))
 						{
 							if(((uint32 *)lp_channels[i])[j * 4] != integer
 								|| ((uint32 *)lp_channels[i])[j * 4 + 1] != integer
@@ -421,14 +413,16 @@ void lp_apply_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *bl
 							|| (r[3] < length && lp_vertex_influence[r[3]] > 0.0001))
 						{
 							if(r[3] < length)
-								verse_send_g_polygon_set_corner_real64(node_id, layer_id, j, ((egreal *)lp_channels[i])[r[0]] * (1.0 - lp_polygon_influence[r[0]]) + value[i] * lp_polygon_influence[r[0]],
+								verse_send_g_polygon_set_corner_real64(node_id, layer_id, j,
+												       ((egreal *)lp_channels[i])[r[0]] * (1.0 - lp_polygon_influence[r[0]]) + value[i] * lp_polygon_influence[r[0]],
 																							((egreal *)lp_channels[i])[r[1]] * (1.0 - lp_polygon_influence[r[1]]) + value[i] * lp_polygon_influence[r[1]],
 																							((egreal *)lp_channels[i])[r[2]] * (1.0 - lp_polygon_influence[r[2]]) + value[i] * lp_polygon_influence[r[2]],
 																							((egreal *)lp_channels[i])[r[3]] * (1.0 - lp_polygon_influence[r[3]]) + value[i] * lp_polygon_influence[r[3]]);
 							else
-								verse_send_g_polygon_set_corner_real64(node_id, layer_id, j, ((egreal *)lp_channels[i])[r[0]] * (1.0 - lp_polygon_influence[r[0]]) + value[i] * lp_polygon_influence[r[0]],
-																							((egreal *)lp_channels[i])[r[1]] * (1.0 - lp_polygon_influence[r[1]]) + value[i] * lp_polygon_influence[r[1]],
-																							((egreal *)lp_channels[i])[r[2]] * (1.0 - lp_polygon_influence[r[2]]) + value[i] * lp_polygon_influence[r[2]], 0);
+								verse_send_g_polygon_set_corner_real64(node_id, layer_id, j,
+												       ((egreal *)lp_channels[i])[r[0]] * (1.0 - lp_polygon_influence[r[0]]) + value[i] * lp_polygon_influence[r[0]],
+												       ((egreal *)lp_channels[i])[r[1]] * (1.0 - lp_polygon_influence[r[1]]) + value[i] * lp_polygon_influence[r[1]],
+												       ((egreal *)lp_channels[i])[r[2]] * (1.0 - lp_polygon_influence[r[2]]) + value[i] * lp_polygon_influence[r[2]], 0);
 
 						}
 					}
