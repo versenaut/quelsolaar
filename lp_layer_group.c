@@ -1,9 +1,11 @@
+/*
+ * 
+*/
 
 #include "st_matrix_operations.h"
 #include "enough.h"
 #include "seduce.h"
 #include "deceive.h"
-
 
 #include "lp_layer_groups.h"
 #include "lp_projection.h"
@@ -16,10 +18,10 @@ typedef struct{
 	boolean		gray;
 }LayerGroup;
 
-LayerGroup	*lp_groups = NULL;
-uint		lp_groups_count = 0;
-uint		lp_groups_allocated = 0;
-uint		lp_group_current = 0;
+static LayerGroup	*lp_groups = NULL;
+static uint		lp_groups_count = 0;
+static uint		lp_groups_allocated = 0;
+static uint		lp_group_current = 0;
 
 uint lp_layer_current_get()
 {
@@ -79,20 +81,27 @@ void lp_update_layer_groups(ENode *node)
 	char *name;
 	VNGLayerType type;
 	uint i, j;
+
 	lp_groups_count = 0;
 	for(layer = e_nsg_get_layer_next(node, 0); layer != NULL; layer = e_nsg_get_layer_next(node, e_nsg_get_layer_id(layer) + 1))
 	{
-		if(1 !=  e_nsg_get_layer_id(layer))
+		if(1 != e_nsg_get_layer_id(layer))
 		{
 			name = e_nsg_get_layer_name(layer);
 			type = e_nsg_get_layer_type(layer);
 			i = lp_groups_count;
-			if(type != VN_G_LAYER_VERTEX_XYZ && type != VN_G_LAYER_VERTEX_UINT32 && type != VN_G_LAYER_POLYGON_CORNER_UINT32 && type != VN_G_LAYER_POLYGON_FACE_UINT8 && type != VN_G_LAYER_POLYGON_FACE_UINT32)
+			if(type != VN_G_LAYER_VERTEX_XYZ && type != VN_G_LAYER_VERTEX_UINT32 && type != VN_G_LAYER_POLYGON_CORNER_UINT32 &&
+			   type != VN_G_LAYER_POLYGON_FACE_UINT8 && type != VN_G_LAYER_POLYGON_FACE_UINT32)
 			{
 				for(i = 0; i < lp_groups_count; i++)
 				{
-					for(j = 0; lp_groups[i].name[j] != 0 && lp_groups[i].name[j] == name[j]; j++);
-					if(name[j] == 95 && lp_groups[i].name[j] == 0 && (name[j + 1] == 'r' || name[j + 1] == 'g' || name[j + 1] == 'b' || name[j + 1] == 'u' || name[j + 1] == 'v' || name[j + 1] == 'w') && name[j + 2] == 0)
+					for(j = 0; lp_groups[i].name[j] != 0 && lp_groups[i].name[j] == name[j]; j++)
+						;
+					if(name[j] == '_' && lp_groups[i].name[j] == 0 &&
+					   (name[j + 1] == 'r' || name[j + 1] == 'g' ||
+					    name[j + 1] == 'b' || name[j + 1] == 'u' ||
+					    name[j + 1] == 'v' || name[j + 1] == 'w') &&
+					   name[j + 2] == 0)
 					{
 						j++;
 						if(name[j] == 'r' || name[j] == 'u')
@@ -120,14 +129,15 @@ void lp_update_layer_groups(ENode *node)
 					lp_groups_allocated += 32;
 					lp_groups = realloc(lp_groups, (sizeof *lp_groups) * lp_groups_allocated);
 				}
-				for(j = 0; name[j] != 0 && name[j] != 95; j++)
+				for(j = 0; name[j] != 0 && name[j] != '_'; j++)
 					lp_groups[lp_groups_count].name[j] = name[j];
 				lp_groups[lp_groups_count].name[j] = 0;
 
-		//		if(lp_groups[lp_groups_count].name[j] == 95)
-		//			lp_groups[lp_groups_count].gray = TRUE;
-			
-				if(name[j] == 95 && (name[j + 1] == 'r' || name[j + 1] == 'g' || name[j + 1] == 'b' || name[j + 1] == 'u' || name[j + 1] == 'v' || name[j + 1] == 'w') && name[j + 2] == 0)
+				if(name[j] == '_' &&
+				   (name[j + 1] == 'r' || name[j + 1] == 'g' ||
+				    name[j + 1] == 'b' || name[j + 1] == 'u' ||
+				    name[j + 1] == 'v' || name[j + 1] == 'w') &&
+				   name[j + 2] == 0)
 				{
 					lp_groups[lp_groups_count].red = NULL;
 					lp_groups[lp_groups_count].green = NULL;
@@ -135,11 +145,12 @@ void lp_update_layer_groups(ENode *node)
 					j++;
 					if(name[j] == 'r' || name[j] == 'u')
 						lp_groups[lp_groups_count].red = layer;
-					if(name[j] == 'g' || name[j] == 'v')
+					else if(name[j] == 'g' || name[j] == 'v')
 						lp_groups[lp_groups_count].green = layer;
-					if(name[j] == 'b' || name[j] == 'w')
+					else if(name[j] == 'b' || name[j] == 'w')
 						lp_groups[lp_groups_count].blue = layer;
-				}else
+				}
+				else
 				{
 					lp_groups[lp_groups_count].red = layer;
 					lp_groups[lp_groups_count].green = NULL;
