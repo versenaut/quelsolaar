@@ -16,6 +16,7 @@ ViewGeometry *lp_geometry_update(ENode *node, ViewGeometry *g)
 {
 	egreal *vertex;
 	uint i, *ref, ref_length, length;
+
 	if(g == NULL)
 	{
 		g = malloc(sizeof *g);
@@ -24,9 +25,9 @@ ViewGeometry *lp_geometry_update(ENode *node, ViewGeometry *g)
 		g->version = 0;
 		g->tri_count = 0;
 	}
-	if(g->version != e_ns_get_node_version_struct(node))
+	if(g->version != e_ns_get_node_version_data(node))
 	{
-		g->version = e_ns_get_node_version_struct(node);
+		g->version = e_ns_get_node_version_data(node);
 		vertex = e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node, 0));
 		ref = e_nsg_get_layer_data(node, e_nsg_get_layer_by_id(node, 1));
 		length = e_nsg_get_vertex_length(node);
@@ -88,11 +89,6 @@ ViewGeometry *lp_geometry_update(ENode *node, ViewGeometry *g)
 extern VNGLayerType e_nsg_get_layer_type(EGeoLayer *layer);
 extern uint			e_nsg_get_layer_id(EGeoLayer *layer);
 
-
-void la_compute_set_range(double start, double end)
-{
-}
-
 void lp_compute_int_color(float *color, uint i)
 {
 	color[0] = get_rand(i++);
@@ -130,9 +126,8 @@ float lp_tri_alpha(egreal *select, uint *ref)
 		return 0.2;
 }
 
-
 extern EGeoLayer *	e_nsg_get_layer_by_name(ENode *g_node, const char *name);
-extern void		*	e_nsg_get_layer_data(ENode *g_node, EGeoLayer *layer);
+extern void *		e_nsg_get_layer_data(ENode *g_node, EGeoLayer *layer);
 
 void lp_color_update(ENode *node, ViewGeometry *g, EGeoLayer *layer, uint slot)
 {
@@ -162,9 +157,10 @@ void lp_color_update(ENode *node, ViewGeometry *g, EGeoLayer *layer, uint slot)
 			case VN_G_LAYER_VERTEX_XYZ :
 			for(i = 0; i < ref_length; i++)
 			{
-				if(ref[i * 4] < length && ref[i * 4 + 1] < length && ref[i * 4 + 2] < length && vertex[ref[i * 4] * 3] != V_REAL64_MAX && vertex[ref[i * 4 + 1] * 3] != V_REAL64_MAX && vertex[ref[i * 4 + 2] * 3] != V_REAL64_MAX)
+				if(ref[i * 4] < length && ref[i * 4 + 1] < length &&
+				   ref[i * 4 + 2] < length && vertex[ref[i * 4] * 3] != V_REAL64_MAX &&
+				   vertex[ref[i * 4 + 1] * 3] != V_REAL64_MAX && vertex[ref[i * 4 + 2] * 3] != V_REAL64_MAX)
 				{
-
 					g->color[g->tri_count * 12 + 0] = vertex[ref[i * 4 + 0] * 3 + 0];
 					g->color[g->tri_count * 12 + 1] = vertex[ref[i * 4 + 0] * 3 + 1];
 					g->color[g->tri_count * 12 + 2] = vertex[ref[i * 4 + 0] * 3 + 2];
@@ -472,8 +468,6 @@ void lp_color_gray(ViewGeometry *g)
 	g->layer_version[1] = g->layer_version[0];
 	g->layer_version[2] = g->layer_version[0];
 }
-
-
 
 void lp_geometry_draw(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *blue)
 {
