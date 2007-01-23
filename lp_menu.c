@@ -175,7 +175,7 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 			}
 			else
 			{
-				sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "color:", 0, 0, 0, 1.0);
+				sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Displacement:", 0, 0, 0, 1.0);
 				slider[0] = lp_menu_slider(input, 0.5, position - 0.05, 0.4, slider[0], 0, 0, 0, 1, 1, 1);
 				sui_type_number_double(input, 0.55, position - 0.1, 0.4, 0.5f, SUI_T_SIZE, &slider[0], &slider[0], color[0], color[1], color[2], 1.0);
 				glPopMatrix();
