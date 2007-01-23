@@ -84,7 +84,7 @@ uint lp_pu_empty(BInputState *input, uint node_id)
 		x = input->pointer_x;
 		y = input->pointer_y;
 	}
-	ring = sui_draw_popup(input, x, y, element, count, 2, 0);
+	ring = sui_draw_popup(input, x, y, element, count, 2, 0.2);
 	/*udg_set_modeling_node(e_ns_get_node_id(node))*/;
 //	sw_drawbackground();
 	if(input->mode == BAM_DRAW)
