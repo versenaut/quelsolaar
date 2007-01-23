@@ -94,7 +94,6 @@ void lp_draw_pointer(BInputState *input, double brush_size)
 	if(!init)
 	{
 		uint i;
-		init = TRUE;
 		for(i = 0; i < 32; i++)
 		{
 			pointer[i * 4] = sin((float)i * 2 * PI / 32.0);
@@ -102,10 +101,11 @@ void lp_draw_pointer(BInputState *input, double brush_size)
 			pointer[i * 4 + 2] = sin((float)(i + 1) * 2 * PI / 32.0);
 			pointer[i * 4 + 3] = cos((float)(i + 1) * 2 * PI / 32.0);
 		}
+		init = TRUE;
 	}
 	glPushMatrix();
-	glTranslatef(input->pointer_x, input->pointer_y, 0);
-	glScalef(brush_size, brush_size, brush_size);
+	glTranslatef(input->pointer_x, input->pointer_y, 0.0f);
+	glScaled(brush_size, brush_size, brush_size);
 	sui_draw_gl(GL_LINES, pointer, 64, 2, 0, 0, 0, 1.0f);
 	glPopMatrix();
 }
@@ -123,9 +123,10 @@ void la_compute_set_range(double start, double end);
 	VN_G_LAYER_POLYGON_FACE_REAL
 } VNGLayerType;
 */
+
 void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 {
-	static double brush_size = 0.1;
+	static double brush_size = 0.03;
 	static double start_range = 0, end_range = 1;
 	float position = 0, color[3] = { 0, 0, 0 };
 	VNGLayerType type;
@@ -145,7 +146,8 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 			type = e_nsg_get_layer_type(lp_layer_get_green(lp_layer_current_get()));
 		else
 			type = e_nsg_get_layer_type(lp_layer_get_blue(lp_layer_current_get()));
-		if(NULL != lp_layer_get_green(lp_layer_current_get()) || NULL != lp_layer_get_blue(lp_layer_current_get()))
+		if(lp_layer_get_green(lp_layer_current_get()) != NULL ||
+		   lp_layer_get_blue(lp_layer_current_get()) != NULL)
 		{
 			sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Color:", 0, 0, 0, 1.0);
 			if(NULL != lp_layer_get_red(lp_layer_current_get()))
@@ -161,7 +163,8 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 			else
 				lp_menu_slider(input, 0.55, position - 0.15, 0.4, 0.5, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3);
 			position -= 0.2;
-		}else
+		}
+		else
 		{
 			if(type == VN_G_LAYER_VERTEX_UINT32 || type == VN_G_LAYER_POLYGON_CORNER_UINT32 || type == VN_G_LAYER_POLYGON_FACE_UINT8 || type == VN_G_LAYER_POLYGON_FACE_UINT32)
 			{
