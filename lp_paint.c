@@ -339,11 +339,10 @@ void lp_apply_paint(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *bl
 			{
 				if(lp_vertex_influence_back[j] < lp_vertex_influence[j])
 				{
-/*					printf("painting XYZ, current is (%g,%g,%g), i=%u\n", value[0], value[1], value[2], i);*/
 					verse_send_g_vertex_set_xyz_real64(node_id, layer_id, j,
-									   ((egreal *)lp_channels[i])[j * 3 + 0] + lp_vertex_influence[j] * lp_normal[j * 3 + 0] * (value[i] - 0.5f),
-									   ((egreal *)lp_channels[i])[j * 3 + 1] + lp_vertex_influence[j] * lp_normal[j * 3 + 1] * (value[i] - 0.5f),
-									   ((egreal *)lp_channels[i])[j * 3 + 2] + lp_vertex_influence[j] * lp_normal[j * 3 + 2] * (value[i] - 0.5f));
+									   ((egreal *)lp_channels[i])[j * 3 + 0] + lp_vertex_influence[j] * lp_normal[j * 3 + 0] * value[i],
+									   ((egreal *)lp_channels[i])[j * 3 + 1] + lp_vertex_influence[j] * lp_normal[j * 3 + 1] * value[i],
+									   ((egreal *)lp_channels[i])[j * 3 + 2] + lp_vertex_influence[j] * lp_normal[j * 3 + 2] * value[i]);
 				}
 			}
 			break;
