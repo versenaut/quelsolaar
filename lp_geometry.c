@@ -474,28 +474,28 @@ void lp_geometry_draw(ENode *node, EGeoLayer *red, EGeoLayer *green, EGeoLayer *
 	static ViewGeometry *g = NULL;
 	VNGLayerType type = -1;
 
-	if(node != NULL)
-	{
-		g = lp_geometry_update(node, g);
-		if(red != NULL)
-		{
-			lp_color_update(node, g, red, 0);
-			type = e_nsg_get_layer_type(red);
-		}
-		if(red == green && red == blue && type != VN_G_LAYER_VERTEX_XYZ && type != VN_G_LAYER_VERTEX_UINT32 && type != VN_G_LAYER_POLYGON_CORNER_UINT32 && type != VN_G_LAYER_POLYGON_FACE_UINT8 && type != VN_G_LAYER_POLYGON_FACE_UINT32)
-			lp_color_gray(g);
-		else
-		{
-			if(green != NULL)
-				lp_color_update(node, g, green, 1);
-			if(blue != NULL)
-				lp_color_update(node, g, blue, 2);
-		}
+	if(node == NULL)
+		return;
 
-		if(g->tri_count != 0)
-		{
-			sui_set_color_array_gl(g->color, g->tri_count * 3, 4);
-			sui_draw_gl(GL_TRIANGLES, g->tri, g->tri_count * 3, 3, 1, 0, 1, 1.0f);
-		}
+	g = lp_geometry_update(node, g);
+	if(red != NULL)
+	{
+		lp_color_update(node, g, red, 0);
+		type = e_nsg_get_layer_type(red);
+	}
+	if(red == green && red == blue && type != VN_G_LAYER_VERTEX_XYZ && type != VN_G_LAYER_VERTEX_UINT32 && type != VN_G_LAYER_POLYGON_CORNER_UINT32 && type != VN_G_LAYER_POLYGON_FACE_UINT8 && type != VN_G_LAYER_POLYGON_FACE_UINT32)
+		lp_color_gray(g);
+	else
+	{
+		if(green != NULL)
+			lp_color_update(node, g, green, 1);
+		if(blue != NULL)
+			lp_color_update(node, g, blue, 2);
+	}
+
+	if(g->tri_count != 0)
+	{
+		sui_set_color_array_gl(g->color, g->tri_count * 3, 4);
+		sui_draw_gl(GL_TRIANGLES, g->tri, g->tri_count * 3, 3, 1, 0, 1, 1.0f);
 	}
 }
