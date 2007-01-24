@@ -10,12 +10,9 @@
 
 extern void lp_compute_int_color(float *color, uint i);
 
-float slider_vertex[20];
-
-
-void lp_init_slider(void)
+void lp_init_slider(float *slider_vertex)
 {
-	slider_vertex[0] = 0;
+	slider_vertex[0] = 0;		/* The knob. */
 	slider_vertex[1] = -0.01;
 	slider_vertex[2] = -0.01;
 	slider_vertex[3] = 0.01;
@@ -30,8 +27,7 @@ void lp_init_slider(void)
 	slider_vertex[10] = 0.01;
 	slider_vertex[11] = 0.01;
 
-
-	slider_vertex[12] = -0.01;
+	slider_vertex[12] = -0.01;	/* The indicator line. */
 	slider_vertex[13] = 0;
 	slider_vertex[14] = -0.01;
 	slider_vertex[15] = 0;
@@ -42,46 +38,45 @@ void lp_init_slider(void)
 	slider_vertex[19] = 0;
 }
 
-
 float lp_menu_slider(BInputState *input, float x, float y, float length, float pos, float start_r, float start_g, float start_b, float end_r, float end_g, float end_b)
 {
-	float slider_color[30];
+	float slider_vertex[10 * 2];
+	float slider_color[10 * 3];
 	float color[3];
-	uint i;
-	lp_init_slider();
+	int i;
+
+	lp_init_slider(slider_vertex);
 	if(input->mode == BAM_DRAW)
 	{
-		color[0] = start_r * (1 - pos) + end_r * pos;
-		color[1] = start_g * (1 - pos) + end_g * pos;
-		color[2] = start_b * (1 - pos) + end_b * pos;
+		color[0] = start_r * (1.0f - pos) + end_r * pos;
+		color[1] = start_g * (1.0f - pos) + end_g * pos;
+		color[2] = start_b * (1.0f - pos) + end_b * pos;
 		for(i = 0; i < 30; i++)
 			slider_color[i] = color[i % 3];
-
-		glPushMatrix();
-		glTranslatef(x + pos * length, y, 0);
 		slider_color[6 * 3 + 0] = start_r;
 		slider_color[6 * 3 + 1] = start_g;
 		slider_color[6 * 3 + 2] = start_b;
 		slider_color[8 * 3 + 0] = end_r;
 		slider_color[8 * 3 + 1] = end_g;
 		slider_color[8 * 3 + 2] = end_b;
-		slider_vertex[12] = -length * pos - 0.01;
-		slider_vertex[16] = length * (1 - pos) + 0.01;
+		slider_vertex[12] = -length * pos - 0.01f;
+		slider_vertex[16] = length * (1.0f - pos) + 0.01f;
+
+		glPushMatrix();
+		glTranslatef(x + pos * length, y, 0);
 		sui_set_color_array_gl(slider_color, 10, 3);
 		sui_draw_gl(GL_LINES, slider_vertex, 10, 2, 0, 0, 0, 1.0f);
 		glPopMatrix();
-	}else
+	}
+	else if(input->mouse_button[0])
 	{
-		if(input->mouse_button[0])
+		if(input->click_pointer_x > x - 0.01 && input->click_pointer_x < x + 0.01 + length && input->click_pointer_y > y - 0.01 && input->click_pointer_y < y + 0.01)
 		{
-			if(input->click_pointer_x > x - 0.01 && input->click_pointer_x < x + 0.01 + length && input->click_pointer_y > y - 0.01 && input->click_pointer_y < y + 0.01)
-			{
-				pos = (input->pointer_x - x) / length; 
-				if(pos > 1)
-					pos = 1.0;
-				if(pos < 0)
-					pos = 0.0;
-			}
+			pos = (input->pointer_x - x) / length; 
+			if(pos > 1.0f)
+				pos = 1.0f;
+			if(pos < 0.0f)
+				pos = 0.0f;
 		}
 	}
 	return pos;
@@ -123,6 +118,11 @@ void la_compute_set_range(double start, double end);
 	VN_G_LAYER_POLYGON_FACE_REAL
 } VNGLayerType;
 */
+
+static boolean type_is_integer(VNGLayerType type)
+{
+	return type == VN_G_LAYER_VERTEX_UINT32 || type == VN_G_LAYER_POLYGON_CORNER_UINT32 || type == VN_G_LAYER_POLYGON_FACE_UINT8 || type == VN_G_LAYER_POLYGON_FACE_UINT32;
+}
 
 void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 {
@@ -166,7 +166,7 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 		}
 		else
 		{
-			if(type == VN_G_LAYER_VERTEX_UINT32 || type == VN_G_LAYER_POLYGON_CORNER_UINT32 || type == VN_G_LAYER_POLYGON_FACE_UINT8 || type == VN_G_LAYER_POLYGON_FACE_UINT32)
+			if(type_is_integer(type))
 			{
 				sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Integer:", 0, 0, 0, 1.0);
 				lp_compute_int_color(color, *integer);
@@ -182,7 +182,7 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 				position -= 0.15;
 			}		
 		}
-		if(type != VN_G_LAYER_VERTEX_UINT32 && type != VN_G_LAYER_POLYGON_CORNER_UINT32 && type != VN_G_LAYER_POLYGON_FACE_UINT8 && type != VN_G_LAYER_POLYGON_FACE_UINT32)
+		if(!type_is_integer(type))
 		{				
 			sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Tone Range:", 0, 0, 0, 1.0);
 			sui_type_number_double(input, 0.55, position - 0.05, 0.4, 0.5f, SUI_T_SIZE, &start_range, &start_range, 0, 0, 0, 1.0);
