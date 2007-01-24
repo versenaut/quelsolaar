@@ -8,7 +8,9 @@
 #include "lp_projection.h"
 #include "lp_layer_groups.h"
 
+extern void lp_brush_size_set(double size);
 extern void lp_compute_int_color(float *color, uint i);
+extern void la_compute_set_range(double start, double end);
 
 void lp_init_slider(float *slider_vertex)
 {
@@ -104,20 +106,6 @@ void lp_draw_pointer(BInputState *input, double brush_size)
 	sui_draw_gl(GL_LINES, pointer, 64, 2, 0, 0, 0, 1.0f);
 	glPopMatrix();
 }
-
-void lp_brush_size_set(double size);
-void la_compute_set_range(double start, double end);
-/*
-	VN_G_LAYER_VERTEX_XYZ = 0,
-	VN_G_LAYER_VERTEX_UINT32,
-	VN_G_LAYER_VERTEX_REAL,
-	VN_G_LAYER_POLYGON_CORNER_UINT32 = 128,
-	VN_G_LAYER_POLYGON_CORNER_REAL,
-	VN_G_LAYER_POLYGON_FACE_UINT8,
-	VN_G_LAYER_POLYGON_FACE_UINT32,
-	VN_G_LAYER_POLYGON_FACE_REAL
-} VNGLayerType;
-*/
 
 static boolean type_is_integer(VNGLayerType type)
 {
