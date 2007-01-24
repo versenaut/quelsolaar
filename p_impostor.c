@@ -23,6 +23,7 @@
 #include "p_sds_geo.h"
 #include "p_sds_table.h"
 #include "p_sds_obj.h"
+#include "p_shader.h"
 #include "p_extension.h"
 #include "p_object.h"
 #include "st_matrix_operations.h"
@@ -614,7 +615,7 @@ void p_update_object_impostors(void)
 	ENode *node;
 	PObject *o;
 
-	if(!p_render_to_texture_supported() || !fbo_enabled)
+	if(!p_render_to_texture_supported() || !fbo_enabled || !p_shaders_supported())
 		return;
 	for(node = e_ns_get_node_next(node_id, 0, V_NT_OBJECT); node != NULL; node = e_ns_get_node_next(e_ns_get_node_id(node) + 1, 0, V_NT_OBJECT))
 	{		
