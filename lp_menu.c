@@ -40,11 +40,12 @@ void lp_init_slider(float *slider_vertex)
 	slider_vertex[19] = 0;
 }
 
-float lp_menu_slider(BInputState *input, float x, float y, float length, float pos, float start_r, float start_g, float start_b, float end_r, float end_g, float end_b)
+float lp_menu_slider(BInputState *input, float x, float y, float length, float pos, float pos_min, float pos_max,
+		      float start_r, float start_g, float start_b, float end_r, float end_g, float end_b)
 {
 	float slider_vertex[10 * 2];
 	float slider_color[10 * 3];
-	float color[3];
+	float color[3], range = pos_max - pos_min;
 	int i;
 
 	lp_init_slider(slider_vertex);
@@ -61,11 +62,11 @@ float lp_menu_slider(BInputState *input, float x, float y, float length, float p
 		slider_color[8 * 3 + 0] = end_r;
 		slider_color[8 * 3 + 1] = end_g;
 		slider_color[8 * 3 + 2] = end_b;
-		slider_vertex[12] = -length * pos - 0.01f;
-		slider_vertex[16] = length * (1.0f - pos) + 0.01f;
+		slider_vertex[12] = -length * (pos - pos_min) / range - 0.01f;
+		slider_vertex[16] = length * (pos_max - pos) / range + 0.01f;
 
 		glPushMatrix();
-		glTranslatef(x + pos * length, y, 0);
+		glTranslatef(x + (pos - pos_min) * length / range, y, 0.0f);
 		sui_set_color_array_gl(slider_color, 10, 3);
 		sui_draw_gl(GL_LINES, slider_vertex, 10, 2, 0, 0, 0, 1.0f);
 		glPopMatrix();
@@ -74,11 +75,11 @@ float lp_menu_slider(BInputState *input, float x, float y, float length, float p
 	{
 		if(input->click_pointer_x > x - 0.01 && input->click_pointer_x < x + 0.01 + length && input->click_pointer_y > y - 0.01 && input->click_pointer_y < y + 0.01)
 		{
-			pos = (input->pointer_x - x) / length; 
-			if(pos > 1.0f)
-				pos = 1.0f;
-			if(pos < 0.0f)
-				pos = 0.0f;
+			pos = pos_min + (input->pointer_x - x) / length * range;
+			if(pos > pos_max)
+				pos = pos_max;
+			if(pos < pos_min)
+				pos = pos_min;
 		}
 	}
 	return pos;
@@ -139,17 +140,17 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 		{
 			sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Color:", 0, 0, 0, 1.0);
 			if(NULL != lp_layer_get_red(lp_layer_current_get()))
-				slider[0] = lp_menu_slider(input, 0.55, position - 0.05, 0.4, slider[0], 0, slider[1], slider[2], 1, slider[1], slider[2]);
+				slider[0] = lp_menu_slider(input, 0.55, position - 0.05, 0.4, slider[0], 0.0f, 1.0f,  0, slider[1], slider[2], 1, slider[1], slider[2]);
 			else
-				lp_menu_slider(input, 0.55, position - 0.05, 0.4, 0.5, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3);
+				lp_menu_slider(input, 0.55, position - 0.05, 0.4, 0.5, 0.0f, 1.0f,  0.3, 0.3, 0.3, 0.3, 0.3, 0.3);
 			if(NULL != lp_layer_get_green(lp_layer_current_get()))
-				slider[1] = lp_menu_slider(input, 0.55, position - 0.1, 0.4, slider[1], slider[0], 0, slider[2], slider[0], 1, slider[2]);
+				slider[1] = lp_menu_slider(input, 0.55, position - 0.1, 0.4, slider[1], 0.0f, 1.0f,  slider[0], 0, slider[2], slider[0], 1, slider[2]);
 			else
-				lp_menu_slider(input, 0.55, position - 0.1, 0.4, 0.5, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3);
+				lp_menu_slider(input, 0.55, position - 0.1, 0.4, 0.5, 0.0f, 1.0f,  0.3, 0.3, 0.3, 0.3, 0.3, 0.3);
 			if(NULL != lp_layer_get_blue(lp_layer_current_get()))
-				slider[2] = lp_menu_slider(input, 0.55, position - 0.15, 0.4, slider[2], slider[0], slider[1], 0, slider[0], slider[1], 1);
+				slider[2] = lp_menu_slider(input, 0.55, position - 0.15, 0.4, slider[2], 0.0f, 1.0f,  slider[0], slider[1], 0, slider[0], slider[1], 1);
 			else
-				lp_menu_slider(input, 0.55, position - 0.15, 0.4, 0.5, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3);
+				lp_menu_slider(input, 0.55, position - 0.15, 0.4, 0.5, 0.0f, 1.0f, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3);
 			position -= 0.2;
 		}
 		else
@@ -164,7 +165,7 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 			else
 			{
 				sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Displacement:", 0, 0, 0, 1.0);
-				slider[0] = lp_menu_slider(input, 0.5, position - 0.05, 0.4, slider[0], 0, 0, 0, 1, 1, 1);
+				slider[0] = lp_menu_slider(input, 0.5, position - 0.05, 0.4, slider[0], -1.0f, 1.0f,  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
 				sui_type_number_double(input, 0.55, position - 0.1, 0.4, 0.5f, SUI_T_SIZE, &slider[0], &slider[0], color[0], color[1], color[2], 1.0);
 				glPopMatrix();
 				position -= 0.15;
@@ -179,7 +180,7 @@ void lp_menu(BInputState *input, ENode *node, double *slider, uint *integer)
 		}
 
 		sui_draw_text(0.55, position - 0.02, SUI_T_SIZE, SUI_T_SPACE, "Brush Size:", 0, 0, 0, 1.0);
-		brush_size = lp_menu_slider(input, 0.55, position - 0.05, 0.4, brush_size / 0.2, 0, 0, 0, 1, 1, 1) * 0.2;
+		brush_size = lp_menu_slider(input, 0.55, position - 0.05, 0.4, brush_size / 0.2, 0.0f, 1.0f,  0, 0, 0, 1, 1, 1) * 0.2;
 		lp_brush_size_set(brush_size);	
 		position -= 0.1;
 
