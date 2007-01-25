@@ -684,7 +684,6 @@ void *p_shader_write(ENode *node, char **v_code, GLint *v_length, char **f_code,
 					break;
 				case 1 :
 					p_shader_write_types(node, t->start, 1, &t->f_c, t->data, &t->count);
-					printf("p_light_count == %u\n", p_light_count);
 					p_shader_write_lights(node, &t->f_c, p_light_count);
 					p_shader_extend_code(&t->v_c, "\n\tnormal = normalize(gl_NormalMatrix * gl_Normal);\n");
 					break;
