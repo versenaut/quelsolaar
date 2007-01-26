@@ -312,6 +312,7 @@ void co_place_all_fragments(ENode *node)
 	VNMFragmentID id;
 	COVNMaterial *pos;
 	float pos_x = 0;
+
 	for(id = e_nsm_get_fragment_next(node, 0); id != (VNMFragmentID)-1; id = e_nsm_get_fragment_next(node, id + 1))
 		if(e_nsm_get_fragment_type(node, id) == VN_M_FT_OUTPUT && (pos = e_nsm_get_custom_data(node, id, CO_ENOUGH_NODE_SLOT)) != NULL && pos->placed != TRUE)
 			co_m_place_frag(node, id, pos_x++ * 0.05, 0, 0);
@@ -326,13 +327,25 @@ void co_place_all_fragments(ENode *node)
 			co_m_place_frag(node, id, pos_x++ * 0.05, 0, 0);
 }
 
+static void co_place_all_fragments_redo(ENode *node)
+{
+	VNMFragmentID	id;
 
-float compute_spline(float f, float v0, float v1, float v2, float v3)
+	/* Forget all fragment's current locations. */
+	for(id = e_nsm_get_fragment_next(node, 0); id != (VNMFragmentID) ~0u; id = e_nsm_get_fragment_next(node, id + 1))
+	{
+		COVNMaterial *pos;
+		if((pos = e_nsm_get_custom_data(node, id, CO_ENOUGH_NODE_SLOT)) != NULL)
+			pos->placed = FALSE;
+	}
+}
+
+static float compute_spline(float f, float v0, float v1, float v2, float v3)
 {
 	return ((v0 * f + v1 * (1 - f)) * f + (v1 * f + v2 * (1 - f)) * (1 - f)) * f +	((v1 * f + v2 * (1 - f)) * f + (v2 * f + v3 * (1 - f)) * (1 - f)) * (1 - f);
 }
 
-void draw_spline(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3, float color)
+static void draw_spline(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3, float color)
 {
 	float vertex[LINK_SECTIONS * 2];
 	uint i;
@@ -951,7 +964,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 
 	if(rot_tree > 0.001)
 	{
-		static boolean create = FALSE;
+		static boolean create = FALSE, c_now = FALSE, c_last;
 		co_place_all_fragments(node);
 
 		for(i = e_nsm_get_fragment_next(node, 0); i != (VNMFragmentID)-1; i = e_nsm_get_fragment_next(node, i + 1))
@@ -1966,6 +1979,9 @@ boolean co_handle_material(BInputState *input, ENode *node)
 		}
 		if(input->last_mouse_button[0] == TRUE && input->mouse_button[0] == FALSE)
 			create = FALSE;
+		betray_get_key_up_down(&c_now, &c_last, 'c');
+		if(c_now && !c_last)
+			co_place_all_fragments_redo(node);
 	}
 
 	if(input->mode == BAM_DRAW)
