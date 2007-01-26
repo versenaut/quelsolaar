@@ -238,7 +238,6 @@ void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 					co_draw_material(node);
 			break;
 			case V_NT_BITMAP :
-
 				if(node != NULL)
 				{
 					glPushMatrix();
@@ -260,8 +259,6 @@ void co_node_draw(ENode *node, VNodeType type, boolean hidden)
 	}
 }
 
-
-
 void co_center(float x, float y)
 {
 	view_cam_pos[0] = x;
@@ -271,7 +268,6 @@ void co_center(float x, float y)
 }
 
 extern boolean co_serch_node(ENode *node, char *search);
-
 
 typedef enum{
 	COIM_NONE,
@@ -407,7 +403,6 @@ void co_input_handler(BInputState *input, void *user_pointer)
 	}
 
 	co_search_update(search);
-
 
 	if(input->mode != BAM_DRAW && mode == COIM_NONE && input->last_mouse_button[1] == FALSE && input->mouse_button[1] == TRUE)
 	{
