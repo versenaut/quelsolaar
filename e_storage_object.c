@@ -794,21 +794,21 @@ typedef struct{
 }ESAnimLink;
 
 typedef struct{
-	char		lable[16];
+	char		label[16];
 	VNodeID		node_id;
 	uint		version;
 	ESAnimLink *links;
 	uint		link_count;
 }ESAnimhandle;
 
-ESAnimhandle *e_nso_get_anim_handle(VNodeID node_id, char *lable)
+ESAnimhandle *e_nso_get_anim_handle(VNodeID node_id, char *label)
 {
 	uint i;
 	ESAnimhandle *h;
 	h = malloc(sizeof *h);
-	for(i = 0; i < 15 && lable[i] != 0; i++)
-		h->lable[i] = lable[i];
-	h->lable[i] = 0;
+	for(i = 0; i < 15 && label[i] != 0; i++)
+		h->label[i] = label[i];
+	h->label[i] = 0;
 	h->node_id = node_id;
 	h->version = -1;
 	h->links = NULL;
