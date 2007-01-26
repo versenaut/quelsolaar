@@ -554,7 +554,7 @@ uint p_find_click_tag(double x, double y)
 	return output;
 }
 
-boolean p_find_click_tag_lable(double x, double y)
+boolean p_find_click_tag_label(double x, double y)
 {
 	uint32 count, i;
 	double f, f2, pos[3];

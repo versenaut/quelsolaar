@@ -90,7 +90,7 @@ void la_parse_input(BInputState *input)
 						ParseInputData.mode = PIM_DRAG_MANIPULATOR;
 						return;
 					}
-					if(p_find_click_tag_lable(input->pointer_x, input->pointer_y))
+					if(p_find_click_tag_label(input->pointer_x, input->pointer_y))
 						return;
 
 					tag = p_find_click_tag(input->pointer_x, input->pointer_y);

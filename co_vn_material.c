@@ -929,13 +929,13 @@ boolean co_material_click_test(BInputState *input, COVNMaterial *mat, VNMFragmen
 	return mat->expand;
 }
 	
-void co_draw_lable(COVNMaterial *mat, float y, float color, char *lable)
+void co_draw_label(COVNMaterial *mat, float y, float color, char *label)
 {
 	glPushMatrix();
 	glTranslatef(mat->pos[0], mat->pos[1] + y, 0);
 	glScalef(1 / mat->size, 1 / mat->size, 1);
 	sui_draw_2d_line_gl(mat->size * 0.2, -0.015, mat->size * 0.2 + 0.04, 0, color, color, color, 1);
-	sui_draw_text(mat->size * 0.2 + 0.04, 0, SUI_T_SIZE, SUI_T_SPACE, lable, co_line_color[0], co_line_color[1], co_line_color[2], color);  		
+	sui_draw_text(mat->size * 0.2 + 0.04, 0, SUI_T_SIZE, SUI_T_SPACE, label, co_line_color[0], co_line_color[1], co_line_color[2], color);  		
 	glPopMatrix();
 }
 
@@ -1026,7 +1026,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								frag->color.blue = f.color.blue;
 							}
 						}else if(input->mode == BAM_DRAW)
-							co_draw_lable(mat_pos, y, color_light, "Color");
+							co_draw_label(mat_pos, y, color_light, "Color");
 						if(input->mode == BAM_DRAW)
 							glPopMatrix();
 					}
@@ -1093,7 +1093,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.3, 0.24, SUI_T_SIZE, f.light.brdf_g, 16, rename_m_fragment, frag->light.brdf_g, color, color_light);
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.35, 0.24, SUI_T_SIZE, f.light.brdf_b, 16, rename_m_fragment, frag->light.brdf_b, color, color_light);
 						}else if(input->mode == BAM_DRAW)
-							co_draw_lable(mat_pos, y, color_light, light_labels[frag->light.type]);
+							co_draw_label(mat_pos, y, color_light, light_labels[frag->light.type]);
 						if(input->mode == BAM_DRAW)
 							glPopMatrix();
 					}
@@ -1118,7 +1118,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								frag->reflection.normal_falloff = f.reflection.normal_falloff;
 							}
 						}if(input->mode == BAM_DRAW)
-							co_draw_lable(mat_pos, y, color_light, "Reflection");
+							co_draw_label(mat_pos, y, color_light, "Reflection");
 						if(input->mode == BAM_DRAW)
 							glPopMatrix();
 					}
@@ -1149,7 +1149,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								frag->transparency.refraction_index = f.transparency.refraction_index;
 							}
 						}else if(input->mode == BAM_DRAW)
-							co_draw_lable(mat_pos, y, color_light, "Transparancy");
+							co_draw_label(mat_pos, y, color_light, "Transparancy");
 						if(input->mode == BAM_DRAW)
 							glPopMatrix();
 					}
@@ -1200,7 +1200,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								frag->volume.col_b = f.volume.col_b;
 							}
 						}else if(input->mode == BAM_DRAW)
-							co_draw_lable(mat_pos, y, color_light, "Volume");
+							co_draw_label(mat_pos, y, color_light, "Volume");
 						if(input->mode == BAM_DRAW)
 							glPopMatrix();
 					}
@@ -1212,7 +1212,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 						co_vng_fragment(place[0], place[1], 0.2, color);
 						co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.2);
 						if(!co_material_click_test(input, mat_pos, i, place[0], place[1], 0.2, &move) && input->mode == BAM_DRAW)
-							co_draw_lable(mat_pos, y, color_light, "View");
+							co_draw_label(mat_pos, y, color_light, "View");
 						if(input->mode == BAM_DRAW)
 							glPopMatrix();
 					}
@@ -1232,7 +1232,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.15, 0.24, SUI_T_SIZE, f.geometry.layer_g, 16, rename_m_fragment, frag->geometry.layer_g, color, color_light);
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.2, 0.24, SUI_T_SIZE, f.geometry.layer_b, 16, rename_m_fragment, frag->geometry.layer_b, color, color_light);
 						}else if(input->mode == BAM_DRAW)
-							co_draw_lable(mat_pos, y, color_light, "Geometry");
+							co_draw_label(mat_pos, y, color_light, "Geometry");
 						if(input->mode == BAM_DRAW)
 							glPopMatrix();
 					}
@@ -1258,7 +1258,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.2, 0.24, SUI_T_SIZE, f.texture.layer_g, 16, rename_m_fragment, frag->texture.layer_g, color, color_light);
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.25, 0.24, SUI_T_SIZE, f.texture.layer_b, 16, rename_m_fragment, frag->texture.layer_b, color, color_light);
 						}else if(input->mode == BAM_DRAW)
-							co_draw_lable(mat_pos, y, color_light, "Texture");
+							co_draw_label(mat_pos, y, color_light, "Texture");
 						if(input->mode == BAM_DRAW)
 							glPopMatrix();
 						if(handle_link(input, node, &frag->texture.mapping, "Mapping", i, 0, y, expand, color, move))
@@ -1309,7 +1309,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								if(input->last_mouse_button[0] == FALSE && input->mouse_button[0] == FALSE)
 									active = -1;
 							}else if(input->mode == BAM_DRAW)
-								co_draw_lable(mat_pos, y, color_light, noise_labels[frag->noise.type]);
+								co_draw_label(mat_pos, y, color_light, noise_labels[frag->noise.type]);
 							if(input->mode == BAM_DRAW)
 								glPopMatrix();
 							if(handle_link(input, node, &frag->noise.mapping, "B", i, 0, y, expand, color, move))
@@ -1362,7 +1362,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								if(input->last_mouse_button[0] == FALSE && input->mouse_button[0] == FALSE)
 									active = -1;
 							}else if(input->mode == BAM_DRAW)
-								co_draw_lable(mat_pos, y, color_light, blender_labels[frag->blender.type]);
+								co_draw_label(mat_pos, y, color_light, blender_labels[frag->blender.type]);
 							if(input->mode == BAM_DRAW)
 								glPopMatrix();
 							if(handle_link(input, node, &frag->blender.data_a, "A", i, -30, y, expand, color, move))
@@ -1446,7 +1446,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								if(input->last_mouse_button[0] == FALSE && input->mouse_button[0] == FALSE)
 									active = -1;
 							}else if(input->mode == BAM_DRAW)
-								co_draw_lable(mat_pos, y, color_light, "Clamp");
+								co_draw_label(mat_pos, y, color_light, "Clamp");
 							if(input->mode == BAM_DRAW)
 								glPopMatrix();
 							if(handle_link(input, node, &frag->clamp.data, "Input", i, 0, y, expand, color, move))
@@ -1612,7 +1612,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 									break;
 								}
 							}else if(input->mode == BAM_DRAW)
-								co_draw_lable(mat_pos, y, color_light, "Matrix");
+								co_draw_label(mat_pos, y, color_light, "Matrix");
 				//			co_vng_fragment(place[0] - 0.015, place[1] - 0.015, expand, color);
 							co_vng_fragment(place[0], place[1], expand + 0.015, color);
 							co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.015 - expand);
@@ -1868,7 +1868,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 									}
 								}
 							}else if(input->mode == BAM_DRAW)
-								co_draw_lable(mat_pos, y, color_light, "Ramp");
+								co_draw_label(mat_pos, y, color_light, "Ramp");
 							if(input->mode == BAM_DRAW)
 								glPopMatrix();
 							if(handle_link(input, node, &frag->ramp.mapping, "MAPPING", i, 0, y, expand, color, move))
@@ -1891,7 +1891,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							co_draw_param_text(place[0], place[1], 3, text, color_light);
 							co_w_type_in(input, place[0] - 0.12, place[1] - 0.1, 0.24, SUI_T_SIZE, f.animation.label, 16, rename_m_fragment, frag->animation.label, color, color_light);
 						}else if(input->mode == BAM_DRAW)
-							co_draw_lable(mat_pos, y, color_light, "Animation");
+							co_draw_label(mat_pos, y, color_light, "Animation");
 						if(input->mode == BAM_DRAW)
 							glPopMatrix();
 					}
@@ -1902,7 +1902,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 							co_vng_fragment(place[0], place[1], 0.20, color);
 							co_draw_material_texture(mat_pos, place[0] + (-1 + rot_tree * rot_tree) * 3 / mat_pos->size, place[1] - 0.20);
 							if(!co_material_click_test(input, mat_pos, i, place[0], place[1], 0.2, &move))
-								co_draw_lable(mat_pos, y, color_light, "Alternative");
+								co_draw_label(mat_pos, y, color_light, "Alternative");
 							if(input->mode == BAM_DRAW)
 								glPopMatrix();
 							if(handle_link(input, node, &frag->alternative.alt_a, "A", i, -30, y, expand, color, move))
@@ -1925,7 +1925,7 @@ boolean co_handle_material(BInputState *input, ENode *node)
 								co_draw_param_text(place[0], place[1], 1, text, color_light);
 								co_w_type_in(input, place[0] - 0.12, place[1] - 0.1, 0.24, SUI_T_SIZE, f.output.label, 16, rename_m_fragment, frag->output.label, color, color_light);
 							}else if(input->mode == BAM_DRAW)
-								co_draw_lable(mat_pos, y, color_light, "Output");
+								co_draw_label(mat_pos, y, color_light, "Output");
 							if(input->mode == BAM_DRAW)
 								glPopMatrix();
 							if(handle_link(input, node, &frag->output.front, "Front", i, -20, y, expand, color, move))
