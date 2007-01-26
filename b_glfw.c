@@ -50,10 +50,6 @@ void *betray_get_gl_proc_address()
   return glfwGetProcAddress;
 }
 
-void betray_set_context_update_func(void (*update)(void))
-{
-}
-
 void b_glfw_keyboard_func(int key, int state)
 {
   BInputState *input;
