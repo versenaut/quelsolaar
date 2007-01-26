@@ -11,11 +11,11 @@
 
 extern boolean co_handle_head(BInputState *input, ENode *node, float *length);
 
-uint change_m_node_id = 0;
+static uint change_m_node_id = 0;
 extern float co_background_color[3];
 extern float co_line_color[3];
 
-void rename_m_fragment(void *user, char *text)
+static void rename_m_fragment(void *user, char *text)
 {
 	VNMFragmentID i;
 	uint j;
@@ -102,7 +102,7 @@ void rename_m_fragment(void *user, char *text)
 	}
 }
 
-void clear_new_frag(VMatFrag *frag, uint type, VNMFragmentID input_a, VNMFragmentID input_b, uint mode)
+static void clear_new_frag(VMatFrag *frag, uint type, VNMFragmentID input_a, VNMFragmentID input_b, uint mode)
 {
 	char *color = "color", *color_r = "color_r", *color_g = "color_g", *color_b = "color_b", *vertex = "vertex";
 	double matrix[16] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
@@ -256,7 +256,7 @@ float frag_placement_x[1];
 float frag_placement_y[1];
 uint16 frag_placement_id[1] = {-1};
 
-void co_m_place_frag(ENode *node, uint16 id, float pos_x, float vec, uint gen)
+static void co_m_place_frag(ENode *node, uint16 id, float pos_x, float vec, uint gen)
 {
 	VMatFrag *frag;
 	COVNMaterial *pos;
@@ -307,7 +307,7 @@ void co_m_place_frag(ENode *node, uint16 id, float pos_x, float vec, uint gen)
 	}
 }
 
-void co_place_all_fragments(ENode *node)
+static void co_place_all_fragments(ENode *node)
 {
 	VNMFragmentID id;
 	COVNMaterial *pos;
@@ -354,7 +354,7 @@ static void draw_spline(float x0, float y0, float x1, float y1, float x2, float 
 	sui_draw_gl(GL_LINES, vertex, LINK_SECTIONS, 2, co_line_color[0], co_line_color[1], co_line_color[2], color);
 }
 
-void draw_frag_link(float x, float y, float rot, float color)
+static void draw_frag_link(float x, float y, float rot, float color)
 {
 	static float vertex[128] = {100001};
 	if(vertex[0] > 100000)
@@ -373,8 +373,7 @@ void draw_frag_link(float x, float y, float rot, float color)
 	glPopMatrix();
 }
 
-
-void set_out_link(ENode *node, uint16 id, uint16 link)
+static void set_out_link(ENode *node, uint16 id, uint16 link)
 {
 	VMatFrag *frag, f;
 	if((frag = e_nsm_get_fragment(node, id)) == NULL)
@@ -431,8 +430,7 @@ void set_out_link(ENode *node, uint16 id, uint16 link)
 
 }
 
-
-void insert_fragment(ENode *node, uint16 *link, uint prev_id, uint id, VNMFragmentType type, uint branch_id, uint mode, float x, float y)
+static void insert_fragment(ENode *node, uint16 *link, uint prev_id, uint id, VNMFragmentType type, uint branch_id, uint mode, float x, float y)
 {
 	VNMFragmentID id2;
 	VMatFrag f;
@@ -448,7 +446,7 @@ void insert_fragment(ENode *node, uint16 *link, uint prev_id, uint id, VNMFragme
 	frag_placement_y[0] = y;
 }
 
-void handle_link_popup(BInputState *input, ENode *node, uint16 *link, uint frag_id, float x, float y, float scroll)
+static void handle_link_popup(BInputState *input, ENode *node, uint16 *link, uint frag_id, float x, float y, float scroll)
 {
 	SUIPUElement element[14];
 	VNMFragmentID id, id2;
@@ -588,7 +586,7 @@ void handle_link_popup(BInputState *input, ENode *node, uint16 *link, uint frag_
 	}
 }
 
-boolean handle_link(BInputState *input, ENode *node, uint16 *link, char *text, uint frag_id, float angle, float scroll, float length, float color, uint16 move)
+static boolean handle_link(BInputState *input, ENode *node, uint16 *link, char *text, uint frag_id, float angle, float scroll, float length, float color, uint16 move)
 {
 	static void *drag = NULL, *popup = NULL;
 	COVNMaterial *pos, *target;
@@ -710,7 +708,7 @@ boolean handle_link(BInputState *input, ENode *node, uint16 *link, char *text, u
 	return FALSE;
 }
 
-void co_draw_param_text(float x, float y, uint count, char **text, float color)
+static void co_draw_param_text(float x, float y, uint count, char **text, float color)
 {
 	uint i;
 	for(i = 0; i < count; i++)
