@@ -6,7 +6,7 @@ VERSE=../verse
 
 .PHONY:		clean dist dist-enough dist-connector dist-loqairou
 
-CFLAGS=-I$(VERSE) -g -Wstrict-prototypes -Wall #-pg
+CFLAGS=-I$(VERSE) -g -Wstrict-prototypes -Wall -Wextra #-pg
 LDFLAGS=-L$(VERSE) -L/usr/X11R6/lib #-pg
 LDLIBS=-lverse -lGL -lm # -lglut -lGLU -lSDL
 
@@ -27,6 +27,7 @@ APPS=connector loqairou lpaint quelsolaar uvedit
 # Turning off Persuade support and trying to build an application
 # that requires Persuade will cause breakage.
 #
+SHELL=/bin/bash
 PROG="\#include \"verse.h\"\n\#include \"persuade.h\"\nint main(void)\n{\n\#if defined PERSUADE_ENABLED\n puts(\"enabled\");\n\#else\n puts(\"disabled\");\n\#endif\n return 0;\n}"
 PERSUADE:=$(shell echo -e $(PROG) | gcc -I$(VERSE) -x c - && ./a.out && rm -f ./a.out)
 ifeq ($(PERSUADE), enabled)
