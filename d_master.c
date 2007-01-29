@@ -36,7 +36,7 @@ static DConnectMode d_current_mode = D_CM_URL;
 
 static char d_master_address[MAX_ADDRESS_SIZE] = "";
 
-static void d_add_address(DConnectMode mode, char *address, char *description, char *name, char *pass)
+static void d_add_address(DConnectMode mode, const char *address, const char *description, const char *name, const char *pass)
 {
 	DMasterAddress *a;
 	uint i, j, k;
@@ -87,7 +87,7 @@ static void d_add_address(DConnectMode mode, char *address, char *description, c
 	d_address_count[mode]++;
 }
 
-static void d_remove_favorite(char *address, boolean specific, uint id)
+static void d_remove_favorite(const char *address, boolean specific, uint id)
 {
 	DMasterAddress *a;
 	uint i, j, k;
@@ -132,7 +132,7 @@ static void d_remove_favorite(char *address, boolean specific, uint id)
 	}
 }
 
-static void d_add_address_to_history(char *address, char *description, char *name, char *pass)
+static void d_add_address_to_history(const char *address, const char *description, const char *name, const char *pass)
 {
 	DMasterAddress *a;
 	uint i, j;
