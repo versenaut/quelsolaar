@@ -167,7 +167,7 @@ void d_add_address_to_history(char *address, char *description, char *name, char
 	a->pass[i] = 0;
 }
 
-void d_typein_done_func(void *user, char *text)
+static void d_typein_done_func(void *user, char *text)
 {
 	d_add_address_to_history(text, text, "somename", "somepass");
 	e_vc_connect(text, "somename", "somepass", NULL);
