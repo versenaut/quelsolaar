@@ -13,6 +13,8 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 
+#define GLX_GLXEXT_PROTOTYPES
+
 #include <GL/gl.h>
 #include <GL/glx.h>
 
@@ -65,7 +67,7 @@ boolean betray_internal_init_display(UNUSED(int argc), UNUSED(char **argv), uint
 {
 	int		attrs[] = { GLX_RGBA, GLX_DOUBLEBUFFER,
 					GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8, GLX_BLUE_SIZE, 8,
-					GLX_STENCIL_SIZE, 8, GLX_DEPTH_SIZE, 8,
+					/*GLX_STENCIL_SIZE, 8*/ GLX_DEPTH_SIZE, 8,
 					None };
 	XTextProperty	prop;
 
