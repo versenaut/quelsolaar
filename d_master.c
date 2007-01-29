@@ -460,16 +460,18 @@ void d_draw_login(BInputState *input)
 					if(d_address_list[d_current_mode][j].favorites)
 						d_remove_favorite(d_address_list[d_current_mode][j].address, d_current_mode == D_CM_ADD_FAVORITES, j);
 					else
-						d_add_address(D_CM_FAVORITES, d_address_list[d_current_mode][j].address, d_address_list[d_current_mode][j].message, d_address_list[d_current_mode][j].name, d_address_list[d_current_mode][j].pass);
+						d_add_address(D_CM_FAVORITES, d_address_list[d_current_mode][j].address, d_address_list[d_current_mode][j].message,
+							      d_address_list[d_current_mode][j].name, d_address_list[d_current_mode][j].pass);
 				}
 			}
 			if(sw_text_button(input, x_size * -0.5, y_size - 0.05 * (float)j - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, d_address_list[d_current_mode][j].message, 0.0, 0.0, 0.0, d_view[d_current_mode]) ||
-				sw_text_button(input, x_size * 0.1, y_size - 0.05 * (float)j - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, d_address_list[d_current_mode][j].address, 0.0, 0.0, 0.0, d_view[d_current_mode]))
+			   sw_text_button(input, x_size * 0.1, y_size - 0.05 * (float)j - 0.1, 0, SUI_T_SIZE, SUI_T_SPACE, d_address_list[d_current_mode][j].address, 0.0, 0.0, 0.0, d_view[d_current_mode]))
 			{
 				e_vc_connect(d_address_list[d_current_mode][j].address, d_address_list[d_current_mode][j].name, d_address_list[d_current_mode][j].pass, NULL);
 				d_add_address_to_history(d_address_list[d_current_mode][j].address, d_address_list[d_current_mode][j].message, d_address_list[d_current_mode][j].name, d_address_list[d_current_mode][j].pass);
 				d_save_address_settings();
 				d_current_mode = D_CM_CONNECTING;
+				break;	/* Don't stay in the loop, since prereq just broke. */
 			}
 		}
 	}
