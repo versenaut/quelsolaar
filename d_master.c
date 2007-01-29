@@ -36,7 +36,7 @@ static DConnectMode d_current_mode = D_CM_URL;
 
 static char d_master_address[MAX_ADDRESS_SIZE] = "";
 
-void d_add_address(DConnectMode mode, char *address, char *description, char *name, char *pass)
+static void d_add_address(DConnectMode mode, char *address, char *description, char *name, char *pass)
 {
 	DMasterAddress *a;
 	uint i, j, k;
@@ -87,7 +87,7 @@ void d_add_address(DConnectMode mode, char *address, char *description, char *na
 	d_address_count[mode]++;
 }
 
-void d_remove_favorite(char *address, boolean specific, uint id)
+static void d_remove_favorite(char *address, boolean specific, uint id)
 {
 	DMasterAddress *a;
 	uint i, j, k;
@@ -132,7 +132,7 @@ void d_remove_favorite(char *address, boolean specific, uint id)
 	}
 }
 
-void d_add_address_to_history(char *address, char *description, char *name, char *pass)
+static void d_add_address_to_history(char *address, char *description, char *name, char *pass)
 {
 	DMasterAddress *a;
 	uint i, j;
@@ -173,7 +173,7 @@ static void d_typein_done_func(void *user, char *text)
 	e_vc_connect(text, "somename", "somepass", NULL);
 }
 
-void callback_send_ping(void *user, const char *address, const char *message)
+static void callback_send_ping(void *user, const char *address, const char *message)
 {
 	char *ms_list = "MS:LIST";
 	char *ip = "IP=";
@@ -214,7 +214,7 @@ void callback_send_ping(void *user, const char *address, const char *message)
 	}
 }
 
-void d_save_address_settings(void)
+static void d_save_address_settings(void)
 {
 	uint i, j, k;
 	FILE *f;
@@ -253,7 +253,7 @@ void d_save_address_settings(void)
 	}
 }
 
-void d_load_address_settings(void)
+static void d_load_address_settings(void)
 {
 	char *default_master = "master.uni-verse.org:4950", a[256], b[256], c[256], d[256];
 	uint i, j, k, count;
@@ -292,16 +292,17 @@ void d_load_address_settings(void)
 	d_view[d_current_mode] = 1.0;
 }
 
-
 void d_init_master(void)
 {
 	d_load_address_settings();
 }
 
-float star_data[40] = {0.000000, 0.015000, 0.005290, 0.007281, 0.005290, 0.007281, 0.014266, 0.004635, 0.014266, 0.004635, 0.008560, -0.002781, 0.008560, -0.002781, 0.008817, -0.012135, 0.008817, -0.012135, 0.000000, -0.009000, 0.000000, -0.009000, -0.008817, -0.012135, -0.008817, -0.012135, -0.008560, -0.002781, -0.008560, -0.002781, -0.014266, 0.004635, -0.014266, 0.004635, -0.005290, 0.007281, -0.005290, 0.007281, -0.000000, 0.015000};
-
-void d_draw_star(float x, float y, float color)
+static void d_draw_star(float x, float y, float color)
 {
+	static const float star_data[40] = {0.000000, 0.015000, 0.005290, 0.007281, 0.005290, 0.007281, 0.014266, 0.004635, 0.014266, 0.004635,
+		0.008560, -0.002781, 0.008560, -0.002781, 0.008817, -0.012135, 0.008817, -0.012135, 0.000000, -0.009000, 0.000000, -0.009000,
+		-0.008817, -0.012135, -0.008817, -0.012135, -0.008560, -0.002781, -0.008560, -0.002781, -0.014266, 0.004635, -0.014266, 0.004635,
+		-0.005290, 0.007281, -0.005290, 0.007281, -0.000000, 0.015000};
 	glPushMatrix();
 	glTranslatef(x, y, 0);
 	sui_draw_gl(GL_LINES, star_data, 20, 2, 0.0, 0.0, 0.0, color);
