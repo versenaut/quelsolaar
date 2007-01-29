@@ -188,10 +188,10 @@ static int x11_event_handler(BInputState *input)
 			break;
 		case KeyPress:
 			{
-				KeySym	sym = XLookupKeysym(&ev.xkey, 0);
+				char	buf[32];
+				KeySym	sym;
 
-				if(ev.xkey.state & (LockMask | ShiftMask))
-					XConvertCase(sym, &sym, &sym);
+				XLookupString(&ev.xkey, buf, sizeof buf, &sym, NULL);
 				if(betray_is_type_in())
 				{
 					if(sym == XK_Return || sym == XK_KP_Enter)
@@ -213,8 +213,8 @@ static int x11_event_handler(BInputState *input)
 						betray_move_cursor(32000);
 					else if(sym == XK_Home)
 						betray_move_cursor(-32000);
-					else if(sym < 256)
-						betray_insert_character(sym);
+					else if(buf[0] >= ' ' && buf[1] == '\0')
+						betray_insert_character(buf[0]);
 				}
 				else
 					betray_internal_key_add(input, sym, TRUE);
