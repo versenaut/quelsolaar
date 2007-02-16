@@ -87,7 +87,7 @@ boolean sw_text_button(BInputState *input, float pos_x, float pos_y, float cente
 	return FALSE;
 }
 
-static uint sui_type_in_cursor = 0;
+static int sui_type_in_cursor = 0;
 static char *sui_type_in_text = 0;
 static char *sui_type_in_copy = 0;
 static char *sui_return_text = 0;
@@ -126,7 +126,7 @@ boolean sui_type_in(BInputState *input, float pos_x, float pos_y, float length, 
 		if(sui_type_in_text == text)
 		{
 			pos = pos_x;
-			for(i = 0; i < sui_type_in_cursor && t[i] != 0; i++)
+			for(i = 0; i < (uint) sui_type_in_cursor && t[i] != 0; i++)
 				pos += (sui_get_letter_size(t[i]) / sui_get_letter_size('a') + SUI_T_SPACE) * size;
 			sui_draw_text(pos + SUI_T_SPACE * 0.5 * size, pos_y, size, SUI_T_SPACE, "|", red, green, blue, alpha);
 		}
@@ -183,7 +183,7 @@ void sui_end_type_number_func(void *user, boolean cancel)
 
 boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, float center, float length, float size, double *number, void *id, float red, float green, float blue, float alpha)
 {
-	uint i;
+	int i;
 	float pos;
 
 	if(input->mode == BAM_DRAW)
@@ -233,7 +233,7 @@ boolean sui_type_number_double(BInputState *input, float pos_x, float pos_y, flo
 
 boolean sui_type_number_uint(BInputState *input, float pos_x, float pos_y, float center, float length, float size, uint32 *number, void *id, float red, float green, float blue)
 {
-	uint i;
+	int i;
 	float pos;
 
 	if(input->mode == BAM_DRAW)

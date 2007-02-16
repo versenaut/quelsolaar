@@ -189,7 +189,7 @@ void deceive_draw_symb_close(float pos_x, float pos_y)
 
 void hidden_type_in(BInputState *input, float pos_x, float pos_y, float length, float size, char *text, uint buffer_size, float red, float green, float blue)
 {
-	static uint cursor;
+	static int cursor;
 	char zeros[256];
 	int i;
 	

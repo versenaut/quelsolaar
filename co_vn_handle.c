@@ -326,7 +326,7 @@ void co_input_handler(BInputState *input, void *user_pointer)
 	static VNodeType link_id = -1;
 	static float clear_color = 1, create_move = 0, popup_move = 0, type_count, create_scroll = 0;
 	static char search[64];
-	static uint search_cursor = 0;
+	static int search_cursor = 0;
 
 //	char *names[7] = {"OBJECT", "GEOMETRY", "MATERIAL", "BITMAP", "TEXT", "PARTICLE", "CURVE"};
 	float create_length;

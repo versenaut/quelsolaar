@@ -103,7 +103,7 @@ struct{
 	uint		tag_type_in_tag;
 	uint		tag_type_in_group;
 	char		tag_type_in_text[16];
-	uint		tag_type_in_cursor;
+	int		tag_type_in_cursor;
 }UNDOGlobal;
 
 /*
