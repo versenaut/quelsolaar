@@ -389,6 +389,9 @@ static char ** unquote(const char *command)
 	}
 	len = get - command;
 
+	/* Allocate space for vector of argument (word) pointers, and for the text itself.
+	 * We use the length of the input string as an upper bound on the text's size.
+	*/
 	buf = malloc(maxword * sizeof *argv + len + maxword);
 	if(buf == NULL)
 		return NULL;
@@ -407,7 +410,7 @@ static char ** unquote(const char *command)
 			else if(!quote)			/* Start a new quoting. */
 				quote = here;
 		}
-		else if(here == '\\')			/* Backslashes espace the next character. */
+		else if(here == '\\')			/* Backslashes escape the next character. */
 		{
 			if(get[1] != '\0')		/* .. if there is one. */
 				*put++ = *++get;
