@@ -190,14 +190,14 @@ void betray_get_key_up_down(boolean *press, boolean *last_press, uint key)
 extern void b_glut_main_loop(void);
 
 static char *type_in_string = NULL;
-static uint type_in_alocated = 0;
+static int type_in_alocated = 0;
 static int cursor_pos = 0;
 static int *cursor_pos_pointer = NULL;
-static uint type_in_length = 0;
+static int type_in_length = 0;
 static void (*type_in_done_func)(void *user, boolean cansle) = NULL;
 static void *func_param;
 
-void betray_start_type_in(char *string, uint length, void (*done_func)(void *user, boolean cancel), uint *cursor, void *user_pointer)
+void betray_start_type_in(char *string, uint length, void (*done_func)(void *user, boolean cancel), int *cursor, void *user_pointer)
 {
 	type_in_string = string;
 	type_in_alocated = length;
