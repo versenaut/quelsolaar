@@ -296,7 +296,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 			static uint popup = ~0;
 			VNGLayerType type;
 
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer name:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Name:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 			co_w_type_in(input, 0.15, y, 0.5, SUI_T_SIZE, e_nsg_get_layer_name(layer), 16, rename_g_layer_func, e_nsg_get_layer_name(layer), color, color_light);
 
 			if(e_nsg_get_layer_id(layer) > 1 && co_w_close_button(input, 0.635, y, color))
@@ -311,7 +311,7 @@ boolean co_handle_geometry(BInputState *input, ENode *node)
 			if((int) type < 0)
 				type = 0;
 			
-			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Layer type:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
+			sui_draw_text(0.0, y, SUI_T_SIZE, SUI_T_SPACE, "Type:", co_line_color[0], co_line_color[1], co_line_color[2], color_light);  
 			if(sw_text_button(input, 0.15, y, 0, SUI_T_SIZE, SUI_T_SPACE, names[type], co_line_color[0], co_line_color[1], co_line_color[2], color))
 				popup = e_nsg_get_layer_id(layer);
 
