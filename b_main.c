@@ -377,7 +377,7 @@ static char ** unquote(const char *command)
 {
 	int		quote = 0, word = 0, maxword = 2;
 	const char	*get = command;
-	char		**argv, *buf, *put, here, last;
+	char		**argv, *buf, *put, here, last = '\0';
 	size_t		len;
 
 	/* Naively count the spaces, to get an upper bound on the number of words. */
@@ -414,7 +414,7 @@ static char ** unquote(const char *command)
 		}
 		else if(isspace(here) && !quote)	/* Space separate words. */
 		{
-			if(!isspace(last))		/* ... but multiple spaces are ignored, 'a b' == 'a   b'. */
+			if(put > argv[word] && !isspace(last))	/* But only if there is a word, and only once. */
 			{
 				*put++ = '\0';
 				argv[++word] = put;
@@ -423,9 +423,10 @@ static char ** unquote(const char *command)
 		else
 			*put++ = here;
 	}
-	if(get > command && *get == '\0')	/* Don't drop the final word. */
+	if(*get == '\0' && put > argv[word])	/* Don't drop the final word. */
 		word++;
 	argv[word] = NULL;
+
 	return argv;
 }
 
@@ -437,6 +438,14 @@ boolean betray_run(const char *command)
 
 	argv = unquote(command);
 
+/*	{
+		int	i;
+
+		for(i = 0; argv[i] != NULL; i++)
+			printf("%2d: '%s'\n", i, argv[i]);
+		return FALSE;
+	}
+*/
 	/* The code here is adapted from fork2(), by Andrew Gierth
 	 * (see <http://www.erlenstar.demon.co.uk/usenet/daemons.txt>).
 	*/
