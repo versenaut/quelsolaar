@@ -151,4 +151,6 @@ extern void		betray_get_current_time(uint32 *seconds, uint32 *fractions);
 extern double		betray_get_delta_time(void);
 extern void		betray_time_update(void);
 
+extern boolean		betray_run(const char *command);
+
 #endif

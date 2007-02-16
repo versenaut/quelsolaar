@@ -1,5 +1,18 @@
+
+#if defined _WIN32
+#else
+#include <fcntl.h>
+#include <errno.h>
+#include <signal.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#endif
+
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "betray.h"
 #include <time.h>
@@ -178,8 +191,8 @@ extern void b_glut_main_loop(void);
 
 static char *type_in_string = NULL;
 static uint type_in_alocated = 0;
-static uint cursor_pos = 0;
-static uint *cursor_pos_pointer = NULL;
+static int cursor_pos = 0;
+static int *cursor_pos_pointer = NULL;
 static uint type_in_length = 0;
 static void (*type_in_done_func)(void *user, boolean cansle) = NULL;
 static void *func_param;
@@ -221,7 +234,7 @@ void betray_end_type_in_mode(boolean cancel)
 
 void betray_insert_character(char character)
 {
-	uint i;
+	int i;
 	char temp;
 /*	sprintf(type_in_string, "%u", character);
 	return;
@@ -238,9 +251,8 @@ void betray_insert_character(char character)
 
 void betray_delete_character(void)
 {
-	uint i;
+	int i;
 	char temp , temp2 = 0;
-
 	if(*cursor_pos_pointer == 0)
 		return;
 	(*cursor_pos_pointer)--;
@@ -255,15 +267,10 @@ void betray_delete_character(void)
 
 void betray_move_cursor(int move)
 {
-	if(move < 0)
-	{
-		if(*cursor_pos_pointer < (uint) -move)
-			*cursor_pos_pointer = 0;
-		else
-			*cursor_pos_pointer += move;
-	}
-	else
-		(*cursor_pos_pointer) += move;
+	(*cursor_pos_pointer) += move;
+	if(*cursor_pos_pointer < 0)
+		*cursor_pos_pointer = 0;
+
 	if((*cursor_pos_pointer) > type_in_length)
 		(*cursor_pos_pointer) = type_in_length;
 }
@@ -335,3 +342,126 @@ void betray_time_update(void)
 	BGlobal.time[0] = seconds;
 	BGlobal.time[1] = fractions;
 }
+
+#if defined _WIN32
+boolean betray_run(const char *command)
+{
+	STARTUPINFO		sui;
+	PROCESSINFORMATION	pi;
+
+	sui.cb = sizeof sui;
+	sui.lpReserved = NULL;
+	sui.lpDesktop = "";
+	sui.lpTitle = NULL;
+	sui.dwFlags = 0;
+	sui.cbReserved2 = 0;
+	sui.lpReserved2 = NULL;
+	
+	return CreateProcess(NULL,		/* Application name. */
+			     command,		/* Command line. */
+			     NULL,		/* Process attributes. */
+			     NULL,		/* Thread attributes. */
+			     FALSE,		/* Don't inherit any handles. */
+			     DETACHED_PROCESS,	/* Creation flags. */
+			     NULL,		/* Environment block. */
+			     NULL,		/* Current directory. */
+			     &sui,		/* Startupinfo. */
+			     &pi);		/* Processinfo. */
+}
+#else
+
+/* Unquotes and splits stuff like '"this is" a\ quoted string' into { "this is", "a quoted", "string", NULL },
+ * returning a pointer to that array. The data can be freed with a single call to free() on the array base.
+*/
+static char ** unquote(const char *command)
+{
+	int		quote = 0, word = 0, maxword = 2;
+	const char	*get = command;
+	char		**argv, *buf, *put, here, last;
+	size_t		len;
+
+	/* Naively count the spaces, to get an upper bound on the number of words. */
+	for(get = command; *get != '\0'; last = here, get++)
+	{
+		here = *get;
+		if(isspace(here) && !isspace(last))
+			maxword++;
+	}
+	len = get - command;
+
+	buf = malloc(maxword * sizeof *argv + len + maxword);
+	if(buf == NULL)
+		return NULL;
+	argv = (char **) buf;
+	put = (char *) (argv + maxword);
+	argv[0] = put;
+	for(get = command; word < maxword && *get; last = here, get++)
+	{
+		here = *get;
+		if(here == '"' || here == '\'')
+		{
+			if(quote && quote == here)	/* End of quote? */
+				quote = 0;		/* Does not imply new word, consider 'this"is quoted"inside'. */
+			else if(quote && quote != here)	/* Embedded quotes of the other kind are fine. */
+				*put++ = here;
+			else if(!quote)			/* Start a new quoting. */
+				quote = here;
+		}
+		else if(here == '\\')			/* Backslashes espace the next character. */
+		{
+			if(get[1] != '\0')		/* .. if there is one. */
+				*put++ = *++get;
+		}
+		else if(isspace(here) && !quote)	/* Space separate words. */
+		{
+			if(!isspace(last))		/* ... but multiple spaces are ignored, 'a b' == 'a   b'. */
+			{
+				*put++ = '\0';
+				argv[++word] = put;
+			}
+		}
+		else
+			*put++ = here;
+	}
+	if(get > command && *get == '\0')	/* Don't drop the final word. */
+		word++;
+	argv[word] = NULL;
+	return argv;
+}
+
+boolean betray_run(const char *command)
+{
+	pid_t	pid;
+	int	status, rc;
+	char	**argv;
+
+	argv = unquote(command);
+
+	/* The code here is adapted from fork2(), by Andrew Gierth
+	 * (see <http://www.erlenstar.demon.co.uk/usenet/daemons.txt>).
+	*/
+	if((pid = fork()) == 0)	/* In child ... */
+	{
+		switch(fork())	/* ... fork() again. */
+		{
+		case 0:
+			rc = execvp(argv[0], argv);
+			return FALSE;
+		case -1:	_exit(errno);
+		default:	_exit(0);
+		}
+	}
+	free(argv);
+	if(pid < 0 || waitpid(pid, &status, 0) < 0)
+		return FALSE;
+	if(WIFEXITED(status))
+	{
+		if(WEXITSTATUS(status) == 0)
+			return TRUE;
+		errno = WEXITSTATUS(status);
+	}
+	else
+		errno = EINTR;
+	return FALSE;
+}
+#endif		/* _WIN32 */
