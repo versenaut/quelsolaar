@@ -347,7 +347,7 @@ void betray_time_update(void)
 boolean betray_run(const char *command)
 {
 	STARTUPINFO		sui;
-	PROCESSINFORMATION	pi;
+	PROCESS_INFORMATION	pi;
 
 	sui.cb = sizeof sui;
 	sui.lpReserved = NULL;
