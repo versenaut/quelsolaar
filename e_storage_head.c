@@ -53,6 +53,7 @@ void callback_send_tag_group_create(void *user, VNodeID node_id, uint16 group_id
 		((ETagGroup *)node->tag_groups)[group_id].group_name[i] = name[i];
 	((ETagGroup *)node->tag_groups)[group_id].group_name[i] = 0;
 	verse_send_tag_group_subscribe(node_id, group_id);
+	e_ns_update_node_version_data(node);
 }
 
 void callback_send_tag_group_destroy(void *user, VNodeID node_id, uint16 group_id)
@@ -67,6 +68,7 @@ void callback_send_tag_group_destroy(void *user, VNodeID node_id, uint16 group_i
 	((ETagGroup *)node->tag_groups)[group_id].group_name[0] = 0;
 	((ETagGroup *)node->tag_groups)[group_id].tags = NULL;
 	((ETagGroup *)node->tag_groups)[group_id].tag_count = 0;
+	e_ns_update_node_version_data(node);
 }
 
 
